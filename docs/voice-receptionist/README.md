@@ -24,6 +24,10 @@ The source `agent/`, `jobs/`, and `infra/` contained only placeholders. Live aud
 
 ## Local setup
 
+Install prerequisites first: Node.js with pnpm, Python 3.12+, `uv` (`brew install uv` on macOS), and a running Docker daemon (`colima start` when using Colima).
+
+If port 5432 is already occupied, set `POSTGRES_PORT=5433` in root `.env` and change the host port to 5433 in all four `DATABASE_*_URL` values. Keep the container port at 5432. This lets both PostgreSQL instances run independently.
+
 From the monorepo root:
 
 ```sh
