@@ -63,7 +63,7 @@ Existing source users/workspaces/database data are not imported by this code mig
 - Feature backend endpoints remain `/features/voice_receptionist/*` and use the existing feature entitlement gate. The voice frontend layout also calls `requireFeature`.
 - Global auth tables use the restricted `clinic_auth` connection. Verified-user membership lookup and atomic provisioning use narrowly scoped system-session operations. Feature requests then use tenant RLS sessions as before.
 - Authenticated platform writes require CSRF and the configured public origin. Server actions forward cookies, CSRF and origin to FastAPI; browser authentication uses same-origin cookies.
-- The clinic sidebar appears once; voice screens use local section navigation. Source CSS is prefixed with `.voice-scope` to prevent styling other products.
+- Voice routes retain the original Avishkar sidebar, workspace card, header and responsive shell. The parent sidebar is replaced on these routes; “All clinic products” returns to the platform overview. Source CSS is prefixed with `.voice-scope` to prevent styling other products.
 - Sample mutations last across voice navigation until refresh. Reset demo does not reset your real identity or clinic. No real calls, tool requests, recordings or patient records are produced by the sample dashboard.
 
 ## Checks

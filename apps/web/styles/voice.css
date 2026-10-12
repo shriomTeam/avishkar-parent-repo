@@ -1,3 +1,21 @@
+/* Preserve the source browser defaults that Tailwind preflight resets. */
+.voice-scope :where(h1, h2, h3, h4, h5, h6, p, ul, ol, figure, blockquote) {
+  margin-block: revert;
+}
+.voice-scope :where(h1, h2, h3, h4, h5, h6, strong, b) {
+  font-weight: revert;
+}
+.voice-scope :where(ul, ol) {
+  padding-inline-start: revert;
+  list-style: revert;
+}
+.voice-scope .platform-return {
+  display: block;
+  margin: -10px 12px 18px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
 /* Source design scoped to auth and voice screens. */
 .voice-scope {
   --purple: #a1ff62;
@@ -1465,8 +1483,8 @@
 
 /* Match the preferred 90% view without changing the user's browser zoom. */
 @media (min-width: 701px) {
-  .voice-scope body:has(.shell),
-  .voice-scope body:has(.login-page) {
+  .voice-scope:has(.shell),
+  .voice-scope:has(.login-page) {
     zoom: 0.9;
   }
   .voice-scope .shell main {
@@ -1477,31 +1495,8 @@
   }
 }
 
-.voice-scope {
-  min-height: 100%;
-}
-.voice-scope .voice-navigation {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  background: white;
-  border-radius: 12px;
-  padding: 8px;
-}
-.voice-scope .voice-navigation a {
-  margin: 0;
-}
-.voice-scope .voice-sample-notice {
-  padding: 12px 8px;
-  color: var(--muted);
-  font-size: 13px;
-}
-.voice-scope #voice-content {
-  min-width: 0;
-}
-.voice-scope footer {
-  margin-top: 24px;
-  display: flex;
-  justify-content: space-between;
-  padding: 16px;
+@media (max-width: 700px) {
+  .voice-scope .platform-return {
+    margin: 12px 12px 18px;
+  }
 }

@@ -139,7 +139,7 @@ docs/
   voice/                              NEW source design/reference docs and runbook
 ```
 
-The `(platform)` move is needed because the current root layout hides all children without a tenant. Copying a `/login` page under that layout would hide login too. Route groups preserve existing URLs; update relative imports during the move and avoid duplicate `/` pages. Keep one clinic sidebar. Adapt the source voice shell into section navigation instead of nesting its full sidebar inside the parent sidebar.
+The `(platform)` move is needed because the current root layout hides all children without a tenant. Copying a `/login` page under that layout would hide login too. Route groups preserve existing URLs; update relative imports during the move and avoid duplicate `/` pages. Preserve the source voice sidebar and header on voice routes, replacing the parent sidebar there rather than nesting two sidebars. Provide a return link to the clinic platform. Other platform routes retain their existing shell.
 
 ## 4. Source-to-destination copy map
 

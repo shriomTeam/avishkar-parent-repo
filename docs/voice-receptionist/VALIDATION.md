@@ -14,3 +14,7 @@ Tests used an isolated temporary PostgreSQL server on port 55439 with separate a
 Browser tests use a test-only simulated identity provider. Real Google consent/token exchange in this merged checkout, production HTTPS, and live voice remain separate acceptance work. The source implementation has no live voice runtime or voice CRUD backend to migrate. One non-failing Authlib warning notes its legacy httpx import namespace; copied provider behavior is covered by signed-token tests.
 
 No source database, credentials, generated caches or nested Git repository were copied. The source checkout remains intact. See [current setup](README.md) for root environment configuration and the auth role step for existing parent database volumes.
+
+## Voice shell restoration
+
+Restored the original Avishkar sidebar, workspace identity, profile, breadcrumbs, header actions, footer and desktop scale. Voice routes replace the parent shell; a return link preserves access to other clinic products. Scoped browser defaults protect source typography from Tailwind preflight. Nine browser journeys passed against a separate `voice_ui_test` database, including shell geometry and navigation to/from the platform at 1440, 820 and 390 pixels. Desktop and mobile screenshots were visually inspected.

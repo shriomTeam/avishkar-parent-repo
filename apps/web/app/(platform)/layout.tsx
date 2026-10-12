@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PlatformFrame } from "@/components/platform-frame";
 import type { ReactNode } from "react";
 
 import { getMe } from "@/lib/api";
@@ -15,8 +16,8 @@ export default async function RootLayout({
   const me = await getMe();
   return (
     <AuthProvider initial={auth}>
-      <div className="min-h-screen text-stone-900 antialiased">
-        <div className="flex min-h-screen flex-col md:flex-row">
+      <PlatformFrame
+        sidebar={
           <aside className="border-b border-stone-200 bg-white md:w-60 md:shrink-0 md:border-b-0 md:border-r">
             <div className="px-5 py-4">
               <Link href="/" className="text-sm font-semibold">
@@ -48,11 +49,10 @@ export default async function RootLayout({
               <SignOut />
             </div>
           </aside>
-          <main className="min-w-0 flex-1 px-4 py-6 md:px-8">
-            {me ? children : <NoTenant />}
-          </main>
-        </div>
-      </div>
+        }
+      >
+        {me ? children : <NoTenant />}
+      </PlatformFrame>
     </AuthProvider>
   );
 }

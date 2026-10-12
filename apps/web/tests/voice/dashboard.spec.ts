@@ -22,15 +22,13 @@ test("Google sign-in, protected routes and sign-out", async ({ page }) => {
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("textbox")).toHaveCount(0);
   // An obsolete tenant selection from the pre-auth parent must not block onboarding.
-  await page
-    .context()
-    .addCookies([
-      {
-        name: "clinic_tenant",
-        value: "11111111-1111-1111-1111-111111111111",
-        url: "http://127.0.0.1:3100",
-      },
-    ]);
+  await page.context().addCookies([
+    {
+      name: "clinic_tenant",
+      value: "11111111-1111-1111-1111-111111111111",
+      url: "http://127.0.0.1:3100",
+    },
+  ]);
   await signIn(page);
   for (const width of [1440, 820, 390]) {
     await page.setViewportSize({ width, height: 950 });
@@ -295,4 +293,53 @@ test("session service failure hides content and supports retry", async ({
   await expect(
     page.getByRole("button", { name: "Sign out", exact: true }).last(),
   ).toBeVisible();
+});
+
+test("original voice shell and platform return work across screen sizes", async ({
+  page,
+}) => {
+  for (const width of [1440, 820, 390]) {
+    await page.setViewportSize({ width, height: 950 });
+    await page.goto("/voice-receptionist");
+    await expect(page.locator(".sidebar .brand")).toBeVisible();
+    await expect(
+      page.getByRole("navigation", { name: "Workspace navigation" }),
+    ).toBeVisible();
+    await expect(page.locator(".shell header .breadcrumb")).toContainText(
+      "Overview",
+    );
+    await expect(
+      page.getByText("Always-On Clinic", { exact: true }),
+    ).toHaveCount(0);
+    await expect(page.locator(".voice-navigation")).toHaveCount(0);
+    if (width > 700) {
+      await expect(page.getByTestId("clinic-name")).toHaveText(
+        "Browser Practice",
+      );
+      const sidebar = await page.locator(".sidebar").boundingBox();
+      const main = await page.locator(".shell main").boundingBox();
+      expect(main!.x).toBeGreaterThanOrEqual(sidebar!.x + sidebar!.width);
+      expect(
+        await page
+          .locator(".voice-scope")
+          .evaluate((el) => getComputedStyle(el).zoom),
+      ).toBe("0.9");
+    }
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth > innerWidth + 1,
+      ),
+    ).toBeFalsy();
+    await page.screenshot({
+      path: test.info().outputPath(`voice-restored-${width}.png`),
+      fullPage: true,
+    });
+  }
+  await page.getByRole("link", { name: "All clinic products" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(
+    page.getByText("Always-On Clinic", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Calls", exact: true }).click();
+  await expect(page.locator(".sidebar .brand")).toBeVisible();
 });
