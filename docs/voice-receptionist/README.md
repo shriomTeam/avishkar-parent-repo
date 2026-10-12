@@ -50,7 +50,7 @@ pnpm db:migrate
 
 This does not reset or delete existing data. The local script sets the example local `clinic_auth` password; production must provision its own restricted auth role/credentials. New volumes get the role from `infra/postgres/init.sql` automatically.
 
-Open `/login`, sign in with Google, and create your clinic (name, clinic type, timezone, optional callback number). Onboarding creates an owner staff link and a 14-day trial of reactivation, blueprints and voice receptionist. It does not mark a BAA signed. Open **Calls** in the clinic sidebar to reach `/voice-receptionist`.
+Open `/login`, sign in with Google, and create your clinic (name, clinic type, timezone, optional callback number). Onboarding creates an owner staff link and a 14-day trial of reactivation, blueprints and voice receptionist. It does not mark a BAA signed. Open **Voice Receptionist** in the clinic sidebar to reach `/voice-receptionist`.
 
 Existing source users/workspaces/database data are not imported by this code migration. Existing parent demo clinics are not assigned to Google users by email; clinic access needs an explicit staff-to-user link. A new login creates a new authenticated clinic through onboarding. The original source database remains untouched.
 

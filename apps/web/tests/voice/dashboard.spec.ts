@@ -340,6 +340,6 @@ test("original voice shell and platform return work across screen sizes", async 
   await expect(
     page.getByText("Always-On Clinic", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Calls", exact: true }).click();
+  await page.getByRole("link", { name: "Voice Receptionist", exact: true }).click();
   await expect(page.locator(".sidebar .brand")).toBeVisible();
 });

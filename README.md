@@ -101,7 +101,7 @@ Stop with `Ctrl+C`. Stop the database with `pnpm db:down`.
 1. Open http://localhost:3000/login and **Continue with Google**.
 2. Complete clinic onboarding. Your owner account gets a 14-day trial of
    **Dormant Revenue Finder**, **Patient Blueprints**, and **Voice Receptionist**.
-3. Open **Calls** to use the voice dashboard: agents, numbers, call history,
+3. Open **Voice Receptionist** to use the voice dashboard: agents, numbers, call history,
    tools, variables and test studio. Voice actions use sample data and are
    simulated; authentication and clinic identity are real.
 4. Reactivation, blueprints and import pages retain their existing URLs and
