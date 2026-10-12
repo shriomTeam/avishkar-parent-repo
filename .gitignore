@@ -21,3 +21,8 @@ __pycache__/
 
 .DS_Store
 packages/api-client/openapi.json
+
+# Terraform
+.terraform/
+*.tfplan
+*.tfstate*

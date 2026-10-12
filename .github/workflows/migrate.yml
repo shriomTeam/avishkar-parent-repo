@@ -1,0 +1,67 @@
+name: Migrate database
+
+on:
+  pull_request:
+    paths: ["packages/db/**", ".github/workflows/migrate.yml"]
+  push:
+    branches: [main]
+    paths: ["packages/db/**", ".github/workflows/migrate.yml"]
+  workflow_dispatch:
+
+# One migration at a time.
+concurrency:
+  group: migrate
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write # Workload Identity Federation
+
+env:
+  # Names follow infra/terraform: <environment>-avishkar-...
+  PROJECT_ID: ${{ vars.PROJECT_ID }}
+  REGION: ${{ vars.REGION }}
+  JOB: prod-avishkar-migrate
+  SQL_INSTANCE: prod-avishkar-postgres
+  IMAGE: ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/prod-avishkar-docker/migrate
+
+jobs:
+  build:
+    name: Build migration image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build only (pull requests)
+        if: github.event_name == 'pull_request'
+        run: docker build -f packages/db/Dockerfile .
+      - if: github.event_name != 'pull_request'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.CICD_SA }}
+      - name: Build and push
+        if: github.event_name != 'pull_request'
+        run: |
+          gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+          docker build -f packages/db/Dockerfile -t "${IMAGE}:${GITHUB_SHA}" .
+          docker push "${IMAGE}:${GITHUB_SHA}"
+
+  migrate:
+    name: Migrate
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.CICD_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Back up the database first
+        run: gcloud sql backups create --instance="${SQL_INSTANCE}" --description="pre-migration ${GITHUB_SHA}"
+      - name: Point the job at this image
+        run: gcloud run jobs update "${JOB}" --region="${REGION}" --image="${IMAGE}:${GITHUB_SHA}"
+      - name: Run migrations
+        run: gcloud run jobs execute "${JOB}" --region="${REGION}" --wait
+      - name: Record result
+        run: echo "Migrated prod to ${GITHUB_SHA}" >> "$GITHUB_STEP_SUMMARY"

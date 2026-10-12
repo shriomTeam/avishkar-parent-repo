@@ -1,0 +1,14 @@
+.git
+.github
+.turbo
+.venv
+.env
+**/node_modules
+**/.next
+**/__pycache__
+apps/web
+packages/ui
+packages/api-client
+packages/integrations/samples
+docs
+infra
