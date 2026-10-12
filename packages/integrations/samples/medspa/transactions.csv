@@ -1,0 +1,963 @@
+Invoice ID,Client ID,Appointment ID,Date,Item,Category,Provider,Total
+INV1001,C00001,A1001,08/04/2026 02:00 PM,Botox,Injectables,Dr. Rivera,$553.83
+INV1002,C00001,A1002,05/29/2026 01:00 PM,Botox,Injectables,Dr. Rivera,$508.88
+INV1003,C00001,A1003,02/15/2026 02:00 PM,Botox,Injectables,Dr. Rivera,$457.13
+INV1004,C00001,A1004,01/09/2026 10:00 AM,Botox,Injectables,"Jessica Park, RN",$437.53
+INV1005,C00001,A1005,07/12/2025 10:00 AM,Botox,Injectables,"Jessica Park, RN",$533.18
+INV1006,C00001,A1006,04/11/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",$481.97
+INV1007,C00001,A1007,04/11/2025 11:00 AM,Botox,Injectables,"Sarah Kim, NP",$449.72
+INV1008,C00002,A1008,04/05/2026 12:00 PM,Microneedling,Skin,Dr. Rivera,$449.68
+INV1009,C00002,A1009,01/31/2026 08:00 AM,Microneedling,Skin,"Sarah Kim, NP",$362.62
+INV1010,C00002,A1010,10/23/2025 10:00 AM,Microneedling,Skin,Dr. Rivera,$432.60
+INV1011,C00003,A1011,10/05/2026 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$224.79
+INV1012,C00003,A1012,07/12/2026 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$251.95
+INV1013,C00004,A1013,11/28/2025 11:00 AM,HydraFacial,Facials,Dr. Rivera,$215.61
+INV1014,C00004,A1014,08/26/2025 12:00 PM,Botox,Injectables,Dr. Rivera,$529.29
+INV1015,C00004,A1015,05/28/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$566.92
+INV1016,C00004,A1016,01/05/2025 08:00 AM,Botox,Injectables,"Sarah Kim, NP",$476.82
+INV1017,C00005,A1018,01/08/2026 12:00 PM,Botox,Injectables,Dr. Rivera,$515.53
+INV1018,C00005,A1019,10/31/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$490.35
+INV1019,C00006,A1021,12/11/2025 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$764.43
+INV1020,C00006,A1022,09/01/2025 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$785.01
+INV1021,C00006,A1023,07/24/2025 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$489.84
+INV1022,C00006,A1024,01/21/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$896.96
+INV1023,C00006,A1025,02/18/2025 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$971.88
+INV1024,C00006,A1026,06/09/2024 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$961.95
+INV1025,C00007,A1027,12/21/2024 09:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$379.18
+INV1026,C00008,A1029,06/09/2026 10:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$191.51
+INV1027,C00008,A1030,02/08/2026 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$230.81
+INV1028,C00009,A1031,09/04/2026 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",$275.85
+INV1029,C00010,A1032,03/08/2026 02:00 PM,Botox,Injectables,"Jessica Park, RN",$491.85
+INV1030,C00010,A1033,11/19/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",$412.60
+INV1031,C00011,A1036,05/14/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$184.75
+INV1032,C00011,A1037,02/12/2025 01:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$218.44
+INV1033,C00011,A1038,09/18/2024 08:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$188.37
+INV1034,C00012,A1039,09/14/2025 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,$776.39
+INV1035,C00012,A1040,06/17/2025 11:00 AM,Microneedling,Skin,"Jessica Park, RN",$356.36
+INV1036,C00012,A1043,11/10/2024 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$920.69
+INV1037,C00012,A1045,03/17/2024 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$730.00
+INV1038,C00013,A1046,09/04/2026 11:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$333.23
+INV1039,C00013,A1047,06/21/2026 02:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$381.87
+INV1040,C00013,A1048,02/16/2026 12:00 PM,Botox,Injectables,"Sarah Kim, NP",$495.02
+INV1041,C00013,A1049,02/03/2026 12:00 PM,Botox,Injectables,"Sarah Kim, NP",$411.65
+INV1042,C00013,A1051,06/11/2025 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$804.65
+INV1043,C00014,A1052,08/24/2026 09:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$280.14
+INV1044,C00015,A1054,03/22/2026 12:00 PM,HydraFacial,Facials,Dr. Rivera,$245.22
+INV1045,C00015,A1055,12/01/2025 09:00 AM,HydraFacial,Facials,Dr. Rivera,$210.68
+INV1046,C00015,A1056,07/02/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$204.52
+INV1047,C00015,A1057,07/22/2025 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",$279.29
+INV1048,C00015,A1058,06/23/2025 09:00 AM,Microneedling,Skin,"Jessica Park, RN",$452.86
+INV1049,C00016,A1060,08/01/2026 02:00 PM,IPL Photofacial,Laser,Dr. Rivera,$420.26
+INV1050,C00016,A1061,05/05/2026 10:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$468.91
+INV1051,C00016,A1062,01/31/2026 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$509.20
+INV1052,C00016,A1063,08/15/2025 10:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$477.89
+INV1053,C00017,A1064,07/24/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$205.18
+INV1054,C00017,A1065,05/04/2025 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$202.88
+INV1055,C00017,A1066,03/26/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$169.17
+INV1056,C00017,A1067,12/17/2024 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$195.46
+INV1057,C00017,A1068,08/02/2024 08:00 AM,Chemical Peel,Facials,Dr. Rivera,$184.44
+INV1058,C00018,A1070,01/13/2026 12:00 PM,Botox,Injectables,"Jessica Park, RN",$455.32
+INV1059,C00018,A1071,11/07/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$475.93
+INV1060,C00018,A1072,08/26/2025 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$190.30
+INV1061,C00018,A1073,05/12/2025 11:00 AM,Botox,Injectables,Dr. Rivera,$463.42
+INV1062,C00019,A1075,10/28/2025 02:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",$382.27
+INV1063,C00020,A1076,12/04/2024 10:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",$285.28
+INV1064,C00020,A1077,09/05/2024 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$896.62
+INV1065,C00020,A1078,05/16/2024 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$842.20
+INV1066,C00020,A1079,03/24/2024 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,$825.18
+INV1067,C00020,A1080,09/17/2023 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$973.94
+INV1068,C00020,A1081,09/21/2023 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,$727.41
+INV1069,C00020,A1082,05/14/2023 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$735.64
+INV1070,C00021,A1084,01/21/2026 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",$375.46
+INV1071,C00021,A1085,11/03/2025 08:00 AM,Botox,Injectables,"Sarah Kim, NP",$532.71
+INV1072,C00021,A1086,06/01/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,$209.08
+INV1073,C00021,A1087,01/29/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$224.86
+INV1074,C00022,A1089,09/21/2026 09:00 AM,Botox,Injectables,"Jessica Park, RN",$542.49
+INV1075,C00022,A1091,04/06/2026 12:00 PM,Botox,Injectables,Dr. Rivera,$501.75
+INV1076,C00022,A1092,12/28/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$201.38
+INV1077,C00022,A1093,01/20/2026 11:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$329.80
+INV1078,C00023,A1094,12/01/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,$220.97
+INV1079,C00023,A1095,09/20/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$181.08
+INV1080,C00023,A1096,04/13/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$219.36
+INV1081,C00023,A1097,04/23/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$215.67
+INV1082,C00024,A1098,09/23/2026 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$205.37
+INV1083,C00024,A1099,06/13/2026 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$242.32
+INV1084,C00024,A1100,05/14/2026 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$288.50
+INV1085,C00024,A1101,03/06/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$221.18
+INV1086,C00024,A1102,10/10/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$251.24
+INV1087,C00024,A1103,07/10/2025 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$205.23
+INV1088,C00025,A1106,08/23/2024 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,$707.18
+INV1089,C00025,A1107,02/10/2024 11:00 AM,Microneedling,Skin,"Sarah Kim, NP",$429.07
+INV1090,C00025,A1108,03/24/2024 11:00 AM,Microneedling,Skin,"Jessica Park, RN",$357.46
+INV1091,C00025,A1109,07/20/2023 08:00 AM,Microneedling,Skin,"Sarah Kim, NP",$379.51
+INV1092,C00026,A1110,08/26/2025 02:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$281.57
+INV1093,C00026,A1111,05/27/2025 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$243.98
+INV1094,C00026,A1112,01/04/2025 09:00 AM,Botox,Injectables,"Jessica Park, RN",$541.72
+INV1095,C00027,A1113,09/06/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$233.46
+INV1096,C00027,A1114,06/06/2026 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$195.40
+INV1097,C00027,A1115,05/05/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$222.52
+INV1098,C00028,A1116,11/13/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,$686.24
+INV1099,C00029,A1117,03/02/2026 02:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,$242.45
+INV1100,C00029,A1118,11/20/2025 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$173.79
+INV1101,C00030,A1120,01/29/2026 01:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$203.60
+INV1102,C00030,A1121,12/11/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$215.32
+INV1103,C00030,A1122,06/27/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$215.08
+INV1104,C00031,A1123,05/13/2026 10:00 AM,Microneedling,Skin,"Jessica Park, RN",$401.85
+INV1105,C00031,A1124,01/21/2026 01:00 PM,HydraFacial,Facials,"Jessica Park, RN",$238.90
+INV1106,C00031,A1125,09/27/2025 01:00 PM,HydraFacial,Facials,Dr. Rivera,$238.48
+INV1107,C00031,A1126,08/07/2025 01:00 PM,HydraFacial,Facials,Dr. Rivera,$289.86
+INV1108,C00031,A1127,02/19/2025 01:00 PM,HydraFacial,Facials,"Jessica Park, RN",$205.93
+INV1109,C00031,A1128,10/25/2024 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$278.91
+INV1110,C00032,A1129,03/25/2026 01:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$245.69
+INV1111,C00032,A1130,12/04/2025 11:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$213.38
+INV1112,C00032,A1131,11/15/2025 08:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$182.34
+INV1113,C00032,A1132,09/02/2025 02:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$372.79
+INV1114,C00032,A1133,01/17/2025 10:00 AM,HydraFacial,Facials,Dr. Rivera,$292.15
+INV1115,C00032,A1134,10/11/2024 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$182.73
+INV1116,C00032,A1135,05/28/2024 08:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$184.32
+INV1117,C00032,A1136,08/28/2024 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",$227.25
+INV1118,C00033,A1137,08/21/2026 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,$486.74
+INV1119,C00033,A1138,06/06/2026 02:00 PM,Botox,Injectables,"Sarah Kim, NP",$578.91
+INV1120,C00033,A1139,02/26/2026 10:00 AM,HydraFacial,Facials,Dr. Rivera,$225.18
+INV1121,C00033,A1140,11/12/2025 09:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$452.38
+INV1122,C00033,A1141,09/23/2025 12:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$238.29
+INV1123,C00033,A1142,10/10/2025 12:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",$381.42
+INV1124,C00033,A1143,09/18/2024 12:00 PM,Botox,Injectables,"Sarah Kim, NP",$515.89
+INV1125,C00034,A1144,04/11/2026 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$258.65
+INV1126,C00034,A1146,09/13/2025 01:00 PM,HydraFacial,Facials,Dr. Rivera,$280.92
+INV1127,C00034,A1147,05/16/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,$207.55
+INV1128,C00035,A1148,02/23/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$678.71
+INV1129,C00036,A1149,12/28/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$539.13
+INV1130,C00037,A1150,06/05/2025 08:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$280.25
+INV1131,C00037,A1152,01/12/2025 01:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",$412.57
+INV1132,C00037,A1153,10/23/2024 11:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$234.63
+INV1133,C00037,A1154,03/06/2024 02:00 PM,Microneedling,Skin,"Jessica Park, RN",$438.87
+INV1134,C00037,A1155,12/03/2023 01:00 PM,Microneedling,Skin,"Jessica Park, RN",$442.51
+INV1135,C00037,A1156,04/17/2024 02:00 PM,Microneedling,Skin,Dr. Rivera,$363.28
+INV1136,C00038,A1158,12/25/2024 08:00 AM,Microneedling,Skin,Dr. Rivera,$343.44
+INV1137,C00038,A1159,10/24/2024 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$864.68
+INV1138,C00039,A1160,03/02/2026 12:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$238.45
+INV1139,C00039,A1161,11/12/2025 11:00 AM,HydraFacial,Facials,Dr. Rivera,$233.71
+INV1140,C00039,A1162,08/04/2025 02:00 PM,HydraFacial,Facials,Dr. Rivera,$254.21
+INV1141,C00039,A1163,07/11/2025 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$271.10
+INV1142,C00039,A1164,06/23/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$274.21
+INV1143,C00040,A1166,04/12/2026 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$682.55
+INV1144,C00040,A1169,07/04/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$498.91
+INV1145,C00040,A1170,01/07/2025 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$174.21
+INV1146,C00040,A1171,01/27/2025 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$208.27
+INV1147,C00041,A1172,08/02/2026 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$705.49
+INV1148,C00041,A1173,05/10/2026 01:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",$302.86
+INV1149,C00041,A1174,03/23/2026 09:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",$325.67
+INV1150,C00041,A1175,02/03/2026 11:00 AM,Microneedling,Skin,"Jessica Park, RN",$452.32
+INV1151,C00041,A1176,09/24/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$238.92
+INV1152,C00041,A1177,02/13/2025 01:00 PM,Microneedling,Skin,"Jessica Park, RN",$419.87
+INV1153,C00042,A1178,11/02/2025 08:00 AM,HydraFacial,Facials,"Jessica Park, RN",$279.77
+INV1154,C00042,A1179,08/01/2025 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",$232.02
+INV1155,C00042,A1180,07/05/2025 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$740.36
+INV1156,C00043,A1181,09/10/2025 09:00 AM,Botox,Injectables,Dr. Rivera,$536.24
+INV1157,C00043,A1182,06/03/2025 12:00 PM,Botox,Injectables,"Sarah Kim, NP",$476.94
+INV1158,C00043,A1183,05/13/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",$526.48
+INV1159,C00043,A1184,11/23/2024 12:00 PM,Botox,Injectables,"Sarah Kim, NP",$574.19
+INV1160,C00043,A1185,09/03/2024 01:00 PM,Microneedling,Skin,Dr. Rivera,$333.10
+INV1161,C00043,A1186,03/14/2024 02:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$213.89
+INV1162,C00043,A1187,11/08/2023 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$489.26
+INV1163,C00043,A1188,03/13/2024 08:00 AM,Botox,Injectables,"Sarah Kim, NP",$468.85
+INV1164,C00044,A1189,07/04/2025 11:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$216.25
+INV1165,C00044,A1190,04/16/2025 08:00 AM,HydraFacial,Facials,"Jessica Park, RN",$284.02
+INV1166,C00044,A1191,11/26/2024 01:00 PM,HydraFacial,Facials,"Jessica Park, RN",$203.85
+INV1167,C00044,A1192,01/05/2025 01:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$339.42
+INV1168,C00044,A1193,04/04/2024 01:00 PM,HydraFacial,Facials,Dr. Rivera,$221.27
+INV1169,C00044,A1194,05/05/2024 08:00 AM,HydraFacial,Facials,"Jessica Park, RN",$257.25
+INV1170,C00044,A1195,09/13/2023 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$277.99
+INV1171,C00044,A1196,02/16/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$278.04
+INV1172,C00045,A1197,08/07/2026 11:00 AM,Botox,Injectables,"Jessica Park, RN",$406.19
+INV1173,C00045,A1198,04/16/2026 12:00 PM,Botox,Injectables,"Jessica Park, RN",$458.43
+INV1174,C00045,A1200,01/27/2026 01:00 PM,Botox,Injectables,Dr. Rivera,$408.70
+INV1175,C00045,A1201,12/02/2025 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,$441.70
+INV1176,C00045,A1202,05/09/2025 08:00 AM,Botox,Injectables,"Sarah Kim, NP",$517.55
+INV1177,C00045,A1203,04/08/2025 02:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$448.66
+INV1178,C00045,A1204,05/03/2024 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$504.72
+INV1179,C00046,A1206,04/17/2026 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$838.62
+INV1180,C00046,A1207,04/01/2026 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,$921.59
+INV1181,C00046,A1208,11/08/2025 10:00 AM,Botox,Injectables,"Jessica Park, RN",$515.11
+INV1182,C00046,A1209,07/05/2025 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$937.90
+INV1183,C00046,A1210,09/14/2025 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$903.80
+INV1184,C00048,A1213,07/02/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$207.14
+INV1185,C00048,A1214,04/06/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$177.71
+INV1186,C00048,A1215,02/18/2025 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$179.44
+INV1187,C00048,A1216,08/18/2024 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$213.38
+INV1188,C00048,A1217,04/02/2024 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$887.77
+INV1189,C00048,A1219,10/11/2023 02:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$211.44
+INV1190,C00049,A1221,04/20/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$287.54
+INV1191,C00049,A1222,12/21/2024 08:00 AM,HydraFacial,Facials,Dr. Rivera,$258.47
+INV1192,C00050,A1223,09/15/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$181.30
+INV1193,C00050,A1224,07/07/2025 10:00 AM,Botox,Injectables,Dr. Rivera,$551.12
+INV1194,C00050,A1226,11/10/2024 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$448.59
+INV1195,C00051,A1227,05/31/2026 02:00 PM,HydraFacial,Facials,Dr. Rivera,$223.46
+INV1196,C00051,A1228,02/23/2026 10:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$392.30
+INV1197,C00051,A1229,01/05/2026 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$235.15
+INV1198,C00051,A1230,08/16/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,$224.67
+INV1199,C00051,A1231,02/09/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$244.21
+INV1200,C00051,A1232,07/10/2025 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$249.25
+INV1201,C00051,A1234,09/01/2024 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$240.84
+INV1202,C00052,A1237,05/20/2026 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,$255.23
+INV1203,C00052,A1238,11/25/2025 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$208.62
+INV1204,C00052,A1239,12/01/2025 09:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$254.02
+INV1205,C00052,A1240,11/16/2025 10:00 AM,Botox,Injectables,"Jessica Park, RN",$532.73
+INV1206,C00053,A1241,10/06/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$179.17
+INV1207,C00053,A1242,07/29/2025 09:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$242.69
+INV1208,C00053,A1244,10/23/2024 09:00 AM,Chemical Peel,Facials,Dr. Rivera,$228.67
+INV1209,C00053,A1245,11/04/2024 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$185.22
+INV1210,C00054,A1246,03/20/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$775.35
+INV1211,C00054,A1247,01/09/2026 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$709.25
+INV1212,C00054,A1248,09/17/2025 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,$842.98
+INV1213,C00054,A1249,04/15/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$804.62
+INV1214,C00054,A1250,05/20/2025 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$943.86
+INV1215,C00054,A1251,05/09/2025 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",$271.92
+INV1216,C00054,A1252,05/23/2024 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,$911.87
+INV1217,C00055,A1253,09/14/2026 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$894.25
+INV1218,C00055,A1254,05/29/2026 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$887.33
+INV1219,C00055,A1255,02/04/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$882.67
+INV1220,C00056,A1256,09/20/2026 08:00 AM,Botox,Injectables,"Sarah Kim, NP",$508.49
+INV1221,C00056,A1258,05/15/2026 02:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$241.12
+INV1222,C00057,A1259,10/05/2026 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$920.15
+INV1223,C00057,A1260,08/05/2026 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,$753.43
+INV1224,C00057,A1261,02/21/2026 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,$885.79
+INV1225,C00057,A1262,03/21/2026 12:00 PM,HydraFacial,Facials,Dr. Rivera,$244.34
+INV1226,C00058,A1263,06/27/2025 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$427.28
+INV1227,C00058,A1264,03/06/2025 10:00 AM,IPL Photofacial,Laser,Dr. Rivera,$484.31
+INV1228,C00058,A1265,01/16/2025 11:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$494.88
+INV1229,C00058,A1266,09/12/2024 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$368.57
+INV1230,C00058,A1267,06/20/2024 01:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",$466.10
+INV1231,C00058,A1268,08/31/2024 12:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",$429.29
+INV1232,C00058,A1269,12/23/2023 09:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$484.25
+INV1233,C00059,A1270,07/30/2026 10:00 AM,Microneedling,Skin,Dr. Rivera,$355.25
+INV1234,C00059,A1271,05/12/2026 12:00 PM,Microneedling,Skin,"Jessica Park, RN",$449.27
+INV1235,C00059,A1272,12/06/2025 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$954.58
+INV1236,C00059,A1273,11/08/2025 02:00 PM,Microneedling,Skin,"Sarah Kim, NP",$395.83
+INV1237,C00059,A1274,09/25/2025 01:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",$353.38
+INV1238,C00060,A1277,11/11/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$183.28
+INV1239,C00060,A1278,06/27/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$193.68
+INV1240,C00061,A1280,07/24/2025 08:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$235.50
+INV1241,C00061,A1281,03/28/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,$798.13
+INV1242,C00062,A1282,10/16/2025 12:00 PM,Botox,Injectables,"Jessica Park, RN",$512.18
+INV1243,C00062,A1283,07/07/2025 12:00 PM,Botox,Injectables,"Sarah Kim, NP",$473.52
+INV1244,C00062,A1284,05/11/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$508.58
+INV1245,C00062,A1286,07/21/2024 10:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$502.60
+INV1246,C00063,A1287,03/19/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$194.62
+INV1247,C00063,A1288,01/18/2025 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$188.96
+INV1248,C00063,A1289,09/30/2024 09:00 AM,Chemical Peel,Facials,Dr. Rivera,$231.44
+INV1249,C00063,A1290,06/19/2024 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$186.72
+INV1250,C00063,A1291,03/12/2024 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$290.56
+INV1251,C00063,A1292,09/06/2023 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$211.67
+INV1252,C00063,A1293,05/17/2023 10:00 AM,Microneedling,Skin,"Jessica Park, RN",$355.59
+INV1253,C00064,A1294,10/20/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$210.10
+INV1254,C00065,A1295,08/16/2026 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$726.16
+INV1255,C00065,A1296,05/15/2026 11:00 AM,Microneedling,Skin,Dr. Rivera,$406.01
+INV1256,C00065,A1297,01/22/2026 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$781.15
+INV1257,C00066,A1298,09/09/2026 10:00 AM,Botox,Injectables,Dr. Rivera,$572.55
+INV1258,C00066,A1299,05/18/2026 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$459.66
+INV1259,C00066,A1301,01/27/2026 09:00 AM,Botox,Injectables,Dr. Rivera,$479.43
+INV1260,C00066,A1302,10/04/2025 09:00 AM,Botox,Injectables,Dr. Rivera,$420.74
+INV1261,C00066,A1303,09/24/2025 12:00 PM,Botox,Injectables,"Sarah Kim, NP",$476.28
+INV1262,C00066,A1304,04/29/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",$477.58
+INV1263,C00067,A1306,09/18/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$242.40
+INV1264,C00067,A1307,05/28/2026 08:00 AM,HydraFacial,Facials,Dr. Rivera,$267.52
+INV1265,C00068,A1308,09/19/2025 10:00 AM,HydraFacial,Facials,Dr. Rivera,$263.51
+INV1266,C00068,A1309,07/16/2025 10:00 AM,Microneedling,Skin,"Jessica Park, RN",$394.48
+INV1267,C00068,A1310,04/14/2025 02:00 PM,HydraFacial,Facials,Dr. Rivera,$272.35
+INV1268,C00068,A1311,02/09/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,$253.08
+INV1269,C00069,A1312,12/04/2025 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$211.75
+INV1270,C00069,A1313,08/09/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$179.89
+INV1271,C00069,A1314,04/20/2025 11:00 AM,Chemical Peel,Facials,Dr. Rivera,$182.99
+INV1272,C00071,A1316,05/20/2025 09:00 AM,HydraFacial,Facials,Dr. Rivera,$272.44
+INV1273,C00072,A1317,10/21/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$248.57
+INV1274,C00072,A1318,06/24/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,$288.21
+INV1275,C00072,A1319,03/11/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,$289.75
+INV1276,C00072,A1320,12/25/2024 01:00 PM,HydraFacial,Facials,Dr. Rivera,$217.62
+INV1277,C00072,A1321,11/27/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,$214.79
+INV1278,C00072,A1322,05/14/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,$203.03
+INV1279,C00072,A1323,02/05/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$229.44
+INV1280,C00072,A1324,08/01/2023 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$259.15
+INV1281,C00073,A1326,10/06/2026 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",$377.72
+INV1282,C00074,A1328,10/08/2025 09:00 AM,Chemical Peel,Facials,Dr. Rivera,$218.44
+INV1283,C00074,A1329,07/20/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$207.20
+INV1284,C00074,A1330,02/12/2025 09:00 AM,Chemical Peel,Facials,Dr. Rivera,$167.63
+INV1285,C00074,A1331,11/21/2024 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$183.33
+INV1286,C00074,A1332,12/28/2024 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$174.13
+INV1287,C00075,A1333,11/27/2025 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$795.97
+INV1288,C00075,A1334,09/25/2025 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$973.69
+INV1289,C00075,A1335,05/15/2025 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,$724.09
+INV1290,C00076,A1338,05/20/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$549.75
+INV1291,C00076,A1339,02/20/2025 12:00 PM,Botox,Injectables,"Jessica Park, RN",$463.27
+INV1292,C00076,A1341,08/14/2024 02:00 PM,Botox,Injectables,"Sarah Kim, NP",$514.65
+INV1293,C00077,A1343,07/01/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$425.57
+INV1294,C00077,A1344,04/21/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$521.94
+INV1295,C00077,A1345,02/07/2025 10:00 AM,Botox,Injectables,Dr. Rivera,$504.72
+INV1296,C00077,A1346,11/21/2024 10:00 AM,Botox,Injectables,"Jessica Park, RN",$568.67
+INV1297,C00077,A1347,06/12/2024 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,$934.04
+INV1298,C00077,A1348,03/13/2024 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$829.55
+INV1299,C00077,A1349,01/14/2024 08:00 AM,Botox,Injectables,Dr. Rivera,$506.35
+INV1300,C00078,A1350,01/24/2026 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$709.41
+INV1301,C00078,A1351,10/10/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$916.23
+INV1302,C00078,A1352,06/24/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,$786.90
+INV1303,C00079,A1353,06/24/2025 09:00 AM,Botox,Injectables,"Jessica Park, RN",$484.18
+INV1304,C00079,A1354,03/06/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",$438.35
+INV1305,C00079,A1355,12/16/2024 12:00 PM,Microneedling,Skin,"Jessica Park, RN",$437.56
+INV1306,C00079,A1357,10/23/2024 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,$242.82
+INV1307,C00079,A1358,08/18/2024 02:00 PM,Botox,Injectables,"Jessica Park, RN",$512.99
+INV1308,C00080,A1359,05/29/2025 01:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$209.98
+INV1309,C00081,A1360,06/26/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",$508.23
+INV1310,C00081,A1362,11/08/2024 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$912.91
+INV1311,C00081,A1363,11/13/2024 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$289.17
+INV1312,C00081,A1364,08/06/2024 09:00 AM,Botox,Injectables,Dr. Rivera,$468.08
+INV1313,C00081,A1365,03/08/2024 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$525.92
+INV1314,C00081,A1366,07/31/2023 08:00 AM,Botox,Injectables,Dr. Rivera,$550.66
+INV1315,C00082,A1367,09/16/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$286.87
+INV1316,C00082,A1368,06/27/2026 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$849.14
+INV1317,C00082,A1369,03/22/2026 12:00 PM,Microneedling,Skin,Dr. Rivera,$432.40
+INV1318,C00082,A1370,01/19/2026 01:00 PM,HydraFacial,Facials,Dr. Rivera,$270.76
+INV1319,C00082,A1371,08/12/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,$238.46
+INV1320,C00083,A1372,02/05/2025 01:00 PM,Botox,Injectables,"Jessica Park, RN",$562.58
+INV1321,C00083,A1373,10/28/2024 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$163.95
+INV1322,C00083,A1374,08/07/2024 11:00 AM,Botox,Injectables,Dr. Rivera,$415.34
+INV1323,C00083,A1375,05/23/2024 08:00 AM,Botox,Injectables,"Sarah Kim, NP",$544.67
+INV1324,C00083,A1376,01/10/2024 11:00 AM,Botox,Injectables,Dr. Rivera,$409.63
+INV1325,C00083,A1377,01/02/2024 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$515.51
+INV1326,C00084,A1378,10/01/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",$225.70
+INV1327,C00084,A1379,06/18/2025 11:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",$387.29
+INV1328,C00084,A1380,04/06/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$214.37
+INV1329,C00085,A1383,03/06/2025 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$272.53
+INV1330,C00085,A1384,01/22/2025 11:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$250.82
+INV1331,C00085,A1385,10/12/2024 11:00 AM,IPL Photofacial,Laser,Dr. Rivera,$377.25
+INV1332,C00086,A1386,01/27/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$867.81
+INV1333,C00086,A1387,11/09/2025 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,$818.21
+INV1334,C00086,A1388,06/03/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$210.46
+INV1335,C00086,A1389,07/31/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$205.94
+INV1336,C00086,A1390,02/09/2025 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$930.40
+INV1337,C00086,A1391,08/10/2024 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$729.69
+INV1338,C00086,A1392,03/08/2024 01:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$288.23
+INV1339,C00087,A1393,10/04/2025 12:00 PM,Botox,Injectables,Dr. Rivera,$547.58
+INV1340,C00087,A1394,06/22/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$203.39
+INV1341,C00087,A1396,03/26/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$199.83
+INV1342,C00087,A1397,02/06/2025 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$215.15
+INV1343,C00087,A1398,07/01/2024 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$187.16
+INV1344,C00087,A1399,07/23/2024 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$212.66
+INV1345,C00088,A1401,11/02/2025 11:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",$334.80
+INV1346,C00088,A1402,08/10/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$549.68
+INV1347,C00088,A1403,03/13/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$529.86
+INV1348,C00088,A1404,12/19/2024 11:00 AM,Chemical Peel,Facials,Dr. Rivera,$222.70
+INV1349,C00088,A1405,08/19/2024 02:00 PM,Botox,Injectables,"Jessica Park, RN",$463.39
+INV1350,C00088,A1406,06/15/2024 11:00 AM,Botox,Injectables,"Jessica Park, RN",$405.17
+INV1351,C00089,A1407,11/12/2024 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",$274.26
+INV1352,C00089,A1408,08/02/2024 01:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",$372.92
+INV1353,C00089,A1409,06/01/2024 10:00 AM,HydraFacial,Facials,Dr. Rivera,$208.43
+INV1354,C00089,A1410,12/24/2023 10:00 AM,HydraFacial,Facials,Dr. Rivera,$275.70
+INV1355,C00089,A1411,01/17/2024 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$218.49
+INV1356,C00090,A1412,09/25/2025 09:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$234.42
+INV1357,C00090,A1413,06/29/2025 09:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$191.03
+INV1358,C00090,A1414,03/03/2025 01:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,$228.67
+INV1359,C00090,A1415,12/20/2024 12:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$270.10
+INV1360,C00090,A1416,11/25/2024 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$200.96
+INV1361,C00091,A1417,01/07/2026 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$965.94
+INV1362,C00092,A1418,06/29/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$247.19
+INV1363,C00092,A1419,03/04/2025 09:00 AM,Botox,Injectables,"Jessica Park, RN",$488.26
+INV1364,C00093,A1420,09/02/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$543.58
+INV1365,C00094,A1422,08/26/2026 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,$936.58
+INV1366,C00094,A1423,06/18/2026 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,$730.84
+INV1367,C00094,A1424,02/19/2026 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$751.51
+INV1368,C00094,A1425,09/18/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$879.32
+INV1369,C00094,A1426,10/14/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$931.99
+INV1370,C00094,A1427,08/11/2025 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$870.68
+INV1371,C00094,A1428,09/11/2024 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,$784.72
+INV1372,C00095,A1429,12/21/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$205.97
+INV1373,C00095,A1430,09/27/2025 09:00 AM,Chemical Peel,Facials,Dr. Rivera,$174.97
+INV1374,C00095,A1431,05/07/2025 09:00 AM,Chemical Peel,Facials,Dr. Rivera,$220.63
+INV1375,C00095,A1432,03/23/2025 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$219.65
+INV1376,C00096,A1433,08/09/2026 01:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",$352.31
+INV1377,C00097,A1435,03/19/2025 11:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$406.57
+INV1378,C00097,A1436,11/11/2024 10:00 AM,HydraFacial,Facials,Dr. Rivera,$268.04
+INV1379,C00097,A1437,09/13/2024 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$213.49
+INV1380,C00097,A1438,02/11/2024 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$680.33
+INV1381,C00098,A1440,05/28/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$780.07
+INV1382,C00098,A1441,02/09/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$911.32
+INV1383,C00098,A1442,12/14/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$899.09
+INV1384,C00098,A1443,11/13/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$685.12
+INV1385,C00099,A1444,09/16/2026 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$215.91
+INV1386,C00099,A1445,07/12/2026 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$835.80
+INV1387,C00099,A1446,05/05/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$206.29
+INV1388,C00099,A1447,01/31/2026 12:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$388.56
+INV1389,C00099,A1448,06/01/2025 01:00 PM,Chemical Peel,Facials,Dr. Rivera,$169.61
+INV1390,C00099,A1449,11/05/2025 11:00 AM,Chemical Peel,Facials,Dr. Rivera,$168.27
+INV1391,C00100,A1450,07/25/2026 01:00 PM,Botox,Injectables,Dr. Rivera,$412.42
+INV1392,C00101,A1451,11/06/2025 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",$290.06
+INV1393,C00102,A1452,07/15/2025 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$690.10
+INV1394,C00102,A1453,04/23/2025 08:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",$339.93
+INV1395,C00102,A1454,12/05/2024 11:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$301.12
+INV1396,C00102,A1455,09/06/2024 12:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$226.09
+INV1397,C00102,A1456,08/01/2024 11:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",$333.80
+INV1398,C00103,A1458,06/30/2025 11:00 AM,Botox,Injectables,"Jessica Park, RN",$525.95
+INV1399,C00103,A1460,11/22/2024 12:00 PM,Botox,Injectables,Dr. Rivera,$576.18
+INV1400,C00103,A1461,07/17/2024 08:00 AM,Botox,Injectables,"Sarah Kim, NP",$487.35
+INV1401,C00103,A1462,08/10/2024 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$516.47
+INV1402,C00103,A1463,06/05/2024 12:00 PM,Botox,Injectables,"Jessica Park, RN",$565.12
+INV1403,C00104,A1464,09/03/2026 01:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$184.22
+INV1404,C00104,A1465,06/15/2026 10:00 AM,Chemical Peel,Facials,Dr. Rivera,$190.15
+INV1405,C00104,A1467,11/19/2025 08:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$169.27
+INV1406,C00104,A1468,08/19/2025 09:00 AM,Microneedling,Skin,"Sarah Kim, NP",$408.28
+INV1407,C00104,A1469,10/18/2025 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$188.05
+INV1408,C00105,A1470,08/23/2025 10:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$217.50
+INV1409,C00105,A1471,06/24/2025 12:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",$330.96
+INV1410,C00105,A1472,03/06/2025 01:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$304.94
+INV1411,C00105,A1474,12/06/2024 08:00 AM,Microneedling,Skin,"Jessica Park, RN",$365.43
+INV1412,C00106,A1476,01/20/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$734.21
+INV1413,C00106,A1477,11/25/2025 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$793.19
+INV1414,C00107,A1478,11/04/2025 10:00 AM,Microneedling,Skin,"Sarah Kim, NP",$369.83
+INV1415,C00107,A1479,07/22/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$213.40
+INV1416,C00107,A1480,05/12/2025 08:00 AM,HydraFacial,Facials,"Jessica Park, RN",$253.48
+INV1417,C00107,A1482,07/28/2024 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$277.60
+INV1418,C00107,A1483,05/28/2024 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$259.55
+INV1419,C00107,A1484,02/19/2024 02:00 PM,Microneedling,Skin,"Jessica Park, RN",$432.49
+INV1420,C00107,A1485,03/19/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,$266.59
+INV1421,C00108,A1487,11/26/2025 01:00 PM,Botox,Injectables,"Jessica Park, RN",$546.93
+INV1422,C00108,A1488,08/05/2025 01:00 PM,Botox,Injectables,Dr. Rivera,$495.10
+INV1423,C00108,A1489,04/06/2025 12:00 PM,Microneedling,Skin,Dr. Rivera,$405.64
+INV1424,C00108,A1490,12/13/2024 09:00 AM,Botox,Injectables,"Jessica Park, RN",$417.12
+INV1425,C00108,A1491,10/30/2024 10:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$307.11
+INV1426,C00108,A1492,10/07/2024 09:00 AM,Botox,Injectables,Dr. Rivera,$469.75
+INV1427,C00108,A1493,03/12/2024 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$444.31
+INV1428,C00109,A1495,06/01/2025 10:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$303.81
+INV1429,C00110,A1496,11/23/2024 02:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$230.73
+INV1430,C00110,A1497,08/29/2024 01:00 PM,Chemical Peel,Facials,Dr. Rivera,$219.90
+INV1431,C00110,A1498,05/19/2024 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$196.41
+INV1432,C00110,A1499,05/03/2024 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$206.47
+INV1433,C00110,A1500,02/09/2024 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$182.35
+INV1434,C00111,A1501,05/17/2025 12:00 PM,Microneedling,Skin,"Jessica Park, RN",$416.08
+INV1435,C00112,A1502,03/07/2026 02:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$187.59
+INV1436,C00112,A1503,12/28/2025 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,$251.67
+INV1437,C00112,A1504,07/30/2025 12:00 PM,Botox,Injectables,Dr. Rivera,$557.99
+INV1438,C00112,A1505,06/01/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$450.35
+INV1439,C00112,A1506,07/06/2025 01:00 PM,Microneedling,Skin,"Jessica Park, RN",$368.78
+INV1440,C00112,A1507,08/29/2024 08:00 AM,Botox,Injectables,Dr. Rivera,$443.53
+INV1441,C00112,A1508,08/02/2024 10:00 AM,Botox,Injectables,Dr. Rivera,$488.47
+INV1442,C00113,A1510,02/20/2026 02:00 PM,Botox,Injectables,Dr. Rivera,$484.21
+INV1443,C00113,A1511,11/16/2025 10:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$236.77
+INV1444,C00113,A1512,10/17/2025 08:00 AM,Botox,Injectables,"Jessica Park, RN",$560.14
+INV1445,C00113,A1513,07/10/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$514.06
+INV1446,C00113,A1514,05/28/2025 11:00 AM,Botox,Injectables,Dr. Rivera,$549.00
+INV1447,C00113,A1515,07/20/2024 01:00 PM,Botox,Injectables,"Jessica Park, RN",$553.29
+INV1448,C00113,A1516,06/30/2024 09:00 AM,Botox,Injectables,Dr. Rivera,$549.49
+INV1449,C00114,A1518,10/05/2026 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$212.02
+INV1450,C00114,A1519,06/17/2026 11:00 AM,Botox,Injectables,Dr. Rivera,$505.06
+INV1451,C00115,A1520,08/10/2026 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$230.84
+INV1452,C00115,A1521,05/29/2026 09:00 AM,HydraFacial,Facials,Dr. Rivera,$251.65
+INV1453,C00115,A1522,02/27/2026 09:00 AM,HydraFacial,Facials,Dr. Rivera,$210.58
+INV1454,C00115,A1523,12/22/2025 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$257.08
+INV1455,C00116,A1525,08/06/2025 09:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$488.18
+INV1456,C00116,A1526,07/16/2025 01:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",$473.04
+INV1457,C00116,A1527,04/05/2025 08:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$421.17
+INV1458,C00117,A1528,08/30/2025 08:00 AM,Chemical Peel,Facials,Dr. Rivera,$200.31
+INV1459,C00117,A1529,06/25/2025 02:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",$418.74
+INV1460,C00117,A1530,02/23/2025 02:00 PM,HydraFacial,Facials,Dr. Rivera,$260.99
+INV1461,C00117,A1532,07/10/2024 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$761.22
+INV1462,C00117,A1533,01/18/2024 02:00 PM,Microneedling,Skin,Dr. Rivera,$400.48
+INV1463,C00118,A1534,07/24/2026 11:00 AM,HydraFacial,Facials,Dr. Rivera,$250.71
+INV1464,C00118,A1535,05/21/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$246.93
+INV1465,C00119,A1536,10/12/2025 11:00 AM,Chemical Peel,Facials,Dr. Rivera,$219.81
+INV1466,C00119,A1537,07/02/2025 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,$184.88
+INV1467,C00119,A1538,06/04/2025 01:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$275.48
+INV1468,C00119,A1539,01/15/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",$421.01
+INV1469,C00120,A1540,01/27/2026 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,$760.58
+INV1470,C00120,A1541,11/04/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$903.79
+INV1471,C00120,A1542,06/13/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$935.90
+INV1472,C00121,A1544,11/09/2025 01:00 PM,Microneedling,Skin,Dr. Rivera,$341.71
+INV1473,C00121,A1545,08/24/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$201.94
+INV1474,C00121,A1546,07/04/2025 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$206.00
+INV1475,C00121,A1547,11/17/2024 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$199.79
+INV1476,C00121,A1548,01/13/2025 10:00 AM,Chemical Peel,Facials,Dr. Rivera,$169.31
+INV1477,C00121,A1550,09/27/2024 02:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",$466.07
+INV1478,C00122,A1552,08/05/2026 11:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$465.03
+INV1479,C00122,A1553,04/26/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$945.48
+INV1480,C00122,A1554,03/28/2026 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$967.64
+INV1481,C00122,A1555,08/31/2025 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$956.83
+INV1482,C00122,A1556,08/30/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$744.93
+INV1483,C00123,A1558,12/22/2025 11:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$271.80
+INV1484,C00123,A1559,10/08/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$257.10
+INV1485,C00123,A1560,06/25/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$224.14
+INV1486,C00124,A1562,08/09/2025 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$755.68
+INV1487,C00124,A1563,04/11/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,$965.24
+INV1488,C00124,A1564,12/18/2024 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,$936.14
+INV1489,C00124,A1565,11/24/2024 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$871.02
+INV1490,C00124,A1566,08/06/2024 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$834.12
+INV1491,C00124,A1567,03/12/2024 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$732.81
+INV1492,C00124,A1568,07/21/2024 10:00 AM,Microneedling,Skin,"Jessica Park, RN",$448.92
+INV1493,C00125,A1569,05/31/2026 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$273.21
+INV1494,C00125,A1571,12/10/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$187.90
+INV1495,C00125,A1573,08/12/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$859.79
+INV1496,C00125,A1574,01/11/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$848.09
+INV1497,C00126,A1575,11/19/2024 10:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$226.24
+INV1498,C00126,A1576,08/02/2024 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$199.46
+INV1499,C00126,A1577,04/09/2024 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$182.73
+INV1500,C00126,A1578,12/04/2023 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$200.79
+INV1501,C00126,A1579,03/08/2024 08:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$198.91
+INV1502,C00127,A1580,09/18/2026 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$774.90
+INV1503,C00127,A1581,05/22/2026 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,$862.22
+INV1504,C00127,A1582,02/22/2026 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$777.51
+INV1505,C00127,A1584,07/01/2025 02:00 PM,Microneedling,Skin,"Jessica Park, RN",$317.33
+INV1506,C00127,A1585,08/19/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$850.86
+INV1507,C00128,A1586,09/13/2026 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",$309.82
+INV1508,C00128,A1587,07/12/2026 02:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",$304.90
+INV1509,C00128,A1588,02/25/2026 09:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$294.56
+INV1510,C00128,A1589,01/19/2026 09:00 AM,HydraFacial,Facials,Dr. Rivera,$244.16
+INV1511,C00128,A1590,10/24/2025 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",$356.54
+INV1512,C00128,A1591,11/02/2025 08:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$309.00
+INV1513,C00128,A1592,06/20/2025 01:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$325.41
+INV1514,C00128,A1593,04/27/2025 12:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",$374.39
+INV1515,C00129,A1594,02/08/2025 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",$389.90
+INV1516,C00129,A1595,10/22/2024 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$420.81
+INV1517,C00129,A1596,06/15/2024 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$171.28
+INV1518,C00129,A1597,05/17/2024 09:00 AM,Chemical Peel,Facials,Dr. Rivera,$223.37
+INV1519,C00130,A1598,01/16/2026 02:00 PM,Botox,Injectables,"Jessica Park, RN",$554.96
+INV1520,C00130,A1599,11/07/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$532.42
+INV1521,C00131,A1600,08/09/2026 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$206.07
+INV1522,C00131,A1601,05/26/2026 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$215.87
+INV1523,C00131,A1602,12/24/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",$278.88
+INV1524,C00132,A1603,12/19/2025 12:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",$315.39
+INV1525,C00132,A1604,10/13/2025 01:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",$362.37
+INV1526,C00132,A1606,05/23/2025 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",$348.71
+INV1527,C00132,A1607,01/17/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$232.78
+INV1528,C00133,A1608,10/07/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$185.55
+INV1529,C00133,A1609,08/07/2025 08:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$166.87
+INV1530,C00133,A1610,03/07/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$184.40
+INV1531,C00133,A1611,01/10/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$195.87
+INV1532,C00134,A1613,06/13/2026 02:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$226.13
+INV1533,C00134,A1615,12/31/2025 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$456.61
+INV1534,C00136,A1618,09/30/2026 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$193.56
+INV1535,C00136,A1619,07/31/2026 11:00 AM,Botox,Injectables,"Jessica Park, RN",$454.68
+INV1536,C00136,A1620,04/11/2026 01:00 PM,Botox,Injectables,Dr. Rivera,$544.29
+INV1537,C00136,A1621,11/01/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,$250.97
+INV1538,C00137,A1622,12/08/2024 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,$944.31
+INV1539,C00138,A1623,09/06/2026 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$177.73
+INV1540,C00138,A1624,07/03/2026 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$183.32
+INV1541,C00138,A1625,03/18/2026 11:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$216.63
+INV1542,C00138,A1626,02/02/2026 11:00 AM,Chemical Peel,Facials,Dr. Rivera,$178.77
+INV1543,C00138,A1627,10/13/2025 09:00 AM,Chemical Peel,Facials,Dr. Rivera,$187.49
+INV1544,C00138,A1628,06/28/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$208.48
+INV1545,C00138,A1629,03/21/2025 08:00 AM,Botox,Injectables,"Jessica Park, RN",$490.82
+INV1546,C00139,A1630,05/28/2025 08:00 AM,Microneedling,Skin,"Sarah Kim, NP",$331.16
+INV1547,C00139,A1631,01/31/2025 08:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$439.31
+INV1548,C00139,A1632,12/13/2024 10:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$462.27
+INV1549,C00139,A1633,08/31/2024 02:00 PM,Microneedling,Skin,"Jessica Park, RN",$394.14
+INV1550,C00140,A1634,12/01/2024 02:00 PM,HydraFacial,Facials,Dr. Rivera,$215.72
+INV1551,C00140,A1635,09/18/2024 01:00 PM,HydraFacial,Facials,"Jessica Park, RN",$289.91
+INV1552,C00140,A1636,04/09/2024 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,$805.21
+INV1553,C00140,A1637,04/29/2024 02:00 PM,Microneedling,Skin,"Jessica Park, RN",$437.21
+INV1554,C00140,A1639,01/11/2024 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$266.25
+INV1555,C00140,A1640,04/11/2023 01:00 PM,HydraFacial,Facials,Dr. Rivera,$220.27
+INV1556,C00141,A1641,10/04/2026 01:00 PM,Botox,Injectables,"Jessica Park, RN",$527.53
+INV1557,C00141,A1642,08/03/2026 08:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$162.99
+INV1558,C00141,A1643,04/11/2026 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$198.82
+INV1559,C00142,A1645,03/30/2025 11:00 AM,Microneedling,Skin,"Sarah Kim, NP",$448.77
+INV1560,C00142,A1646,12/01/2024 10:00 AM,Botox,Injectables,Dr. Rivera,$453.41
+INV1561,C00142,A1648,08/02/2024 12:00 PM,Botox,Injectables,"Jessica Park, RN",$465.63
+INV1562,C00143,A1649,08/08/2025 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,$856.84
+INV1563,C00144,A1650,05/02/2026 12:00 PM,Microneedling,Skin,"Jessica Park, RN",$454.71
+INV1564,C00144,A1651,02/04/2026 08:00 AM,Microneedling,Skin,"Sarah Kim, NP",$378.87
+INV1565,C00144,A1653,10/13/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$207.32
+INV1566,C00144,A1654,01/27/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$279.71
+INV1567,C00145,A1656,05/22/2025 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$753.08
+INV1568,C00146,A1657,09/11/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$263.88
+INV1569,C00146,A1658,05/27/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$289.08
+INV1570,C00146,A1659,01/16/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$231.14
+INV1571,C00146,A1660,09/28/2024 01:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$223.93
+INV1572,C00146,A1662,09/26/2024 12:00 PM,IPL Photofacial,Laser,Dr. Rivera,$517.06
+INV1573,C00146,A1664,11/09/2023 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$220.91
+INV1574,C00147,A1667,05/28/2026 02:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$441.19
+INV1575,C00147,A1668,04/10/2026 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$972.64
+INV1576,C00147,A1669,10/17/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$420.76
+INV1577,C00147,A1670,10/18/2025 12:00 PM,Botox,Injectables,"Sarah Kim, NP",$567.46
+INV1578,C00148,A1671,09/14/2025 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",$290.81
+INV1579,C00148,A1672,07/09/2025 08:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",$313.71
+INV1580,C00148,A1674,12/06/2024 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$252.11
+INV1581,C00148,A1675,10/21/2024 12:00 PM,HydraFacial,Facials,Dr. Rivera,$216.15
+INV1582,C00148,A1676,10/14/2024 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$845.13
+INV1583,C00148,A1677,08/14/2024 10:00 AM,HydraFacial,Facials,Dr. Rivera,$267.97
+INV1584,C00149,A1679,04/17/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$180.71
+INV1585,C00149,A1680,01/08/2026 12:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",$480.72
+INV1586,C00149,A1681,02/03/2026 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$192.80
+INV1587,C00150,A1682,09/18/2025 10:00 AM,Chemical Peel,Facials,Dr. Rivera,$178.48
+INV1588,C00151,A1683,06/25/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$741.78
+INV1589,C00151,A1684,04/01/2025 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,$700.45
+INV1590,C00151,A1685,02/19/2025 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$704.96
+INV1591,C00151,A1686,09/22/2024 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$952.48
+INV1592,C00151,A1687,06/06/2024 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$919.36
+INV1593,C00152,A1688,04/08/2026 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$435.70
+INV1594,C00152,A1689,12/16/2025 12:00 PM,Botox,Injectables,Dr. Rivera,$581.07
+INV1595,C00152,A1690,10/14/2025 01:00 PM,Botox,Injectables,"Jessica Park, RN",$482.52
+INV1596,C00152,A1691,08/26/2025 09:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$366.93
+INV1597,C00153,A1693,09/05/2025 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$202.26
+INV1598,C00153,A1694,06/23/2025 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$163.61
+INV1599,C00153,A1695,03/15/2025 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$181.86
+INV1600,C00153,A1696,10/13/2024 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,$472.70
+INV1601,C00154,A1697,10/16/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$221.16
+INV1602,C00154,A1698,08/03/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$259.67
+INV1603,C00154,A1699,03/22/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$239.37
+INV1604,C00154,A1700,01/28/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$274.90
+INV1605,C00154,A1701,12/24/2024 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$268.84
+INV1606,C00155,A1702,11/01/2025 01:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$496.44
+INV1607,C00155,A1703,08/12/2025 02:00 PM,Botox,Injectables,Dr. Rivera,$432.42
+INV1608,C00155,A1704,03/26/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$193.65
+INV1609,C00156,A1705,01/21/2026 09:00 AM,Botox,Injectables,"Jessica Park, RN",$508.09
+INV1610,C00157,A1706,01/15/2025 11:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$291.89
+INV1611,C00157,A1707,09/19/2024 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$291.28
+INV1612,C00158,A1708,02/22/2025 02:00 PM,HydraFacial,Facials,Dr. Rivera,$256.41
+INV1613,C00158,A1709,12/13/2024 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$216.88
+INV1614,C00158,A1711,06/30/2024 11:00 AM,Botox,Injectables,Dr. Rivera,$438.09
+INV1615,C00158,A1712,06/27/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$233.81
+INV1616,C00158,A1713,01/04/2024 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$212.76
+INV1617,C00158,A1714,11/12/2023 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$234.70
+INV1618,C00158,A1715,08/05/2023 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$271.03
+INV1619,C00159,A1716,11/03/2025 02:00 PM,Microneedling,Skin,"Jessica Park, RN",$389.41
+INV1620,C00159,A1717,08/12/2025 11:00 AM,Microneedling,Skin,"Jessica Park, RN",$379.02
+INV1621,C00159,A1718,03/22/2025 12:00 PM,Botox,Injectables,Dr. Rivera,$564.74
+INV1622,C00159,A1719,03/08/2025 09:00 AM,Microneedling,Skin,"Jessica Park, RN",$381.13
+INV1623,C00160,A1720,07/02/2025 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$708.38
+INV1624,C00160,A1721,04/16/2025 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$911.25
+INV1625,C00160,A1722,11/04/2024 10:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$224.21
+INV1626,C00160,A1723,08/12/2024 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$921.65
+INV1627,C00160,A1724,05/24/2024 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$955.17
+INV1628,C00161,A1725,08/06/2025 01:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$227.12
+INV1629,C00161,A1727,01/20/2025 09:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$232.56
+INV1630,C00162,A1730,01/15/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$190.52
+INV1631,C00162,A1732,07/09/2024 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$216.26
+INV1632,C00162,A1733,01/30/2024 08:00 AM,IPL Photofacial,Laser,Dr. Rivera,$415.59
+INV1633,C00162,A1734,10/20/2023 09:00 AM,HydraFacial,Facials,Dr. Rivera,$240.76
+INV1634,C00162,A1735,02/01/2024 11:00 AM,Chemical Peel,Facials,Dr. Rivera,$209.07
+INV1635,C00163,A1737,06/17/2025 08:00 AM,Microneedling,Skin,Dr. Rivera,$425.09
+INV1636,C00163,A1738,03/06/2025 11:00 AM,Microneedling,Skin,"Jessica Park, RN",$448.39
+INV1637,C00163,A1739,01/24/2025 08:00 AM,Microneedling,Skin,"Jessica Park, RN",$440.56
+INV1638,C00164,A1740,08/08/2026 10:00 AM,IPL Photofacial,Laser,Dr. Rivera,$431.09
+INV1639,C00164,A1741,04/14/2026 08:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$394.82
+INV1640,C00164,A1742,01/02/2026 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$387.51
+INV1641,C00164,A1743,12/05/2025 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$385.22
+INV1642,C00164,A1744,09/26/2025 01:00 PM,IPL Photofacial,Laser,Dr. Rivera,$369.59
+INV1643,C00164,A1745,04/15/2025 08:00 AM,Chemical Peel,Facials,Dr. Rivera,$180.41
+INV1644,C00164,A1746,09/29/2024 02:00 PM,IPL Photofacial,Laser,Dr. Rivera,$408.02
+INV1645,C00164,A1747,11/23/2024 01:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$426.17
+INV1646,C00165,A1748,05/17/2026 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,$860.62
+INV1647,C00165,A1749,01/26/2026 10:00 AM,Microneedling,Skin,"Jessica Park, RN",$431.32
+INV1648,C00165,A1750,11/18/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$738.33
+INV1649,C00165,A1752,05/02/2025 10:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$968.47
+INV1650,C00165,A1753,07/21/2025 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,$816.00
+INV1651,C00165,A1754,04/04/2025 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$955.04
+INV1652,C00166,A1756,03/02/2026 02:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",$366.97
+INV1653,C00167,A1760,06/30/2025 09:00 AM,Microneedling,Skin,"Jessica Park, RN",$354.03
+INV1654,C00167,A1761,05/17/2025 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$191.31
+INV1655,C00167,A1762,01/19/2025 08:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$220.43
+INV1656,C00167,A1763,10/15/2024 01:00 PM,Chemical Peel,Facials,Dr. Rivera,$191.97
+INV1657,C00167,A1765,10/21/2023 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$252.66
+INV1658,C00168,A1767,09/27/2026 12:00 PM,Microneedling,Skin,"Jessica Park, RN",$348.74
+INV1659,C00169,A1769,05/31/2025 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$850.70
+INV1660,C00169,A1770,03/13/2025 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,$703.24
+INV1661,C00169,A1771,11/26/2024 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$827.63
+INV1662,C00169,A1772,08/28/2024 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$403.81
+INV1663,C00169,A1773,05/04/2024 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$242.91
+INV1664,C00169,A1774,06/25/2024 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$679.57
+INV1665,C00169,A1775,03/01/2024 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$508.73
+INV1666,C00169,A1776,10/14/2023 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$873.20
+INV1667,C00170,A1778,04/04/2025 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,$422.48
+INV1668,C00170,A1779,01/25/2025 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$198.26
+INV1669,C00170,A1780,09/02/2024 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$282.79
+INV1670,C00170,A1781,07/11/2024 11:00 AM,IPL Photofacial,Laser,Dr. Rivera,$495.14
+INV1671,C00170,A1782,02/21/2024 01:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$444.81
+INV1672,C00171,A1783,08/30/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$193.72
+INV1673,C00171,A1785,03/13/2026 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$266.38
+INV1674,C00171,A1786,11/12/2025 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$221.66
+INV1675,C00171,A1787,12/21/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,$271.32
+INV1676,C00171,A1788,05/02/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$246.16
+INV1677,C00171,A1789,07/12/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$226.43
+INV1678,C00172,A1790,07/27/2026 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$286.32
+INV1679,C00172,A1792,02/01/2026 11:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$285.30
+INV1680,C00172,A1793,09/18/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",$264.03
+INV1681,C00172,A1794,04/15/2025 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$262.57
+INV1682,C00172,A1795,08/01/2025 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,$229.38
+INV1683,C00173,A1796,08/04/2026 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$207.39
+INV1684,C00173,A1797,05/10/2026 11:00 AM,Chemical Peel,Facials,Dr. Rivera,$185.26
+INV1685,C00173,A1798,01/20/2026 08:00 AM,Chemical Peel,Facials,Dr. Rivera,$163.93
+INV1686,C00174,A1799,09/04/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$209.42
+INV1687,C00174,A1800,06/05/2026 09:00 AM,Chemical Peel,Facials,Dr. Rivera,$170.34
+INV1688,C00174,A1801,02/20/2026 11:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",$349.80
+INV1689,C00174,A1802,01/16/2026 09:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$207.07
+INV1690,C00174,A1803,09/13/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$206.39
+INV1691,C00174,A1805,04/12/2025 10:00 AM,Botox,Injectables,"Jessica Park, RN",$519.21
+INV1692,C00174,A1806,10/25/2024 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$226.98
+INV1693,C00175,A1808,09/07/2026 10:00 AM,HydraFacial,Facials,Dr. Rivera,$224.75
+INV1694,C00175,A1809,06/06/2026 11:00 AM,HydraFacial,Facials,Dr. Rivera,$278.48
+INV1695,C00175,A1810,02/01/2026 12:00 PM,Botox,Injectables,"Sarah Kim, NP",$414.43
+INV1696,C00175,A1811,02/18/2026 01:00 PM,Botox,Injectables,"Jessica Park, RN",$527.68
+INV1697,C00175,A1812,07/06/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$214.54
+INV1698,C00175,A1813,08/08/2025 10:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$827.19
+INV1699,C00176,A1815,08/02/2026 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$202.81
+INV1700,C00176,A1816,05/17/2026 08:00 AM,Chemical Peel,Facials,Dr. Rivera,$206.26
+INV1701,C00176,A1817,02/17/2026 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$224.86
+INV1702,C00177,A1818,04/11/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$702.40
+INV1703,C00177,A1819,12/30/2025 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$690.81
+INV1704,C00177,A1820,08/14/2025 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$777.20
+INV1705,C00177,A1821,08/29/2025 10:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$417.94
+INV1706,C00177,A1822,01/10/2025 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$762.59
+INV1707,C00177,A1823,05/11/2025 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$934.21
+INV1708,C00177,A1824,08/19/2024 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$956.82
+INV1709,C00178,A1825,08/03/2026 11:00 AM,IPL Photofacial,Laser,Dr. Rivera,$449.14
+INV1710,C00178,A1826,04/19/2026 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,$767.31
+INV1711,C00178,A1827,01/31/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$761.32
+INV1712,C00178,A1828,08/23/2025 08:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$190.16
+INV1713,C00178,A1829,04/18/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$887.80
+INV1714,C00178,A1830,01/25/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$787.27
+INV1715,C00178,A1831,09/24/2024 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$973.68
+INV1716,C00178,A1832,07/22/2024 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$701.70
+INV1717,C00179,A1834,10/30/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$229.62
+INV1718,C00180,A1835,12/11/2025 01:00 PM,Chemical Peel,Facials,Dr. Rivera,$226.02
+INV1719,C00181,A1836,06/17/2025 10:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$336.40
+INV1720,C00181,A1837,03/08/2025 11:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$411.99
+INV1721,C00181,A1838,10/30/2024 09:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$431.31
+INV1722,C00182,A1839,08/18/2026 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,$841.47
+INV1723,C00182,A1840,05/26/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$808.39
+INV1724,C00182,A1841,12/31/2025 11:00 AM,IPL Photofacial,Laser,Dr. Rivera,$451.63
+INV1725,C00182,A1842,01/08/2026 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$903.18
+INV1726,C00182,A1843,07/30/2025 12:00 PM,Microneedling,Skin,Dr. Rivera,$395.54
+INV1727,C00183,A1844,08/06/2026 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$881.49
+INV1728,C00183,A1845,05/30/2026 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$205.05
+INV1729,C00183,A1846,01/06/2026 01:00 PM,Microneedling,Skin,Dr. Rivera,$356.55
+INV1730,C00183,A1847,08/17/2025 09:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$894.50
+INV1731,C00183,A1849,07/22/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$956.51
+INV1732,C00184,A1850,10/27/2025 08:00 AM,Microneedling,Skin,"Jessica Park, RN",$440.96
+INV1733,C00185,A1851,08/12/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$206.32
+INV1734,C00185,A1852,05/18/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$284.60
+INV1735,C00185,A1853,03/15/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,$282.34
+INV1736,C00185,A1854,02/07/2025 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$222.06
+INV1737,C00185,A1855,09/18/2024 08:00 AM,HydraFacial,Facials,Dr. Rivera,$262.36
+INV1738,C00185,A1856,08/07/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,$266.49
+INV1739,C00185,A1857,08/05/2024 02:00 PM,HydraFacial,Facials,Dr. Rivera,$248.68
+INV1740,C00185,A1858,05/23/2023 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$933.30
+INV1741,C00187,A1862,10/11/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$218.48
+INV1742,C00187,A1863,07/30/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,$290.19
+INV1743,C00187,A1864,02/13/2025 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$688.15
+INV1744,C00187,A1865,03/21/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$261.96
+INV1745,C00187,A1867,07/03/2024 02:00 PM,HydraFacial,Facials,Dr. Rivera,$269.08
+INV1746,C00188,A1868,08/24/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$281.06
+INV1747,C00189,A1869,09/02/2026 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$200.51
+INV1748,C00189,A1870,06/23/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$178.66
+INV1749,C00190,A1871,08/30/2026 11:00 AM,Chemical Peel,Facials,Dr. Rivera,$219.93
+INV1750,C00190,A1872,05/05/2026 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$238.62
+INV1751,C00190,A1874,11/18/2025 01:00 PM,Botox,Injectables,"Jessica Park, RN",$406.30
+INV1752,C00190,A1875,08/11/2025 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$192.66
+INV1753,C00190,A1876,06/26/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$199.25
+INV1754,C00190,A1877,07/12/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$168.50
+INV1755,C00190,A1878,06/29/2025 12:00 PM,Microneedling,Skin,Dr. Rivera,$397.85
+INV1756,C00191,A1879,06/27/2025 09:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$197.69
+INV1757,C00191,A1880,03/08/2025 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$490.79
+INV1758,C00191,A1882,08/13/2024 01:00 PM,Botox,Injectables,"Jessica Park, RN",$509.39
+INV1759,C00191,A1883,04/13/2024 08:00 AM,Botox,Injectables,"Jessica Park, RN",$406.41
+INV1760,C00192,A1884,08/12/2026 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,$377.73
+INV1761,C00192,A1885,05/18/2026 10:00 AM,Botox,Injectables,Dr. Rivera,$485.63
+INV1762,C00192,A1886,03/05/2026 10:00 AM,Botox,Injectables,"Jessica Park, RN",$516.31
+INV1763,C00192,A1888,10/08/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$241.98
+INV1764,C00192,A1889,12/30/2024 10:00 AM,Botox,Injectables,Dr. Rivera,$562.75
+INV1765,C00193,A1890,08/14/2026 01:00 PM,Botox,Injectables,Dr. Rivera,$428.14
+INV1766,C00193,A1891,04/18/2026 12:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$195.57
+INV1767,C00193,A1892,03/25/2026 09:00 AM,Botox,Injectables,"Jessica Park, RN",$452.73
+INV1768,C00193,A1893,10/09/2025 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$210.73
+INV1769,C00193,A1894,11/23/2025 08:00 AM,Botox,Injectables,"Jessica Park, RN",$449.74
+INV1770,C00193,A1895,07/20/2025 08:00 AM,Botox,Injectables,"Jessica Park, RN",$546.93
+INV1771,C00194,A1896,07/19/2025 02:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$317.72
+INV1772,C00194,A1897,04/01/2025 12:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",$293.86
+INV1773,C00194,A1898,12/09/2024 08:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$457.61
+INV1774,C00194,A1899,12/09/2024 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$203.36
+INV1775,C00194,A1900,06/10/2024 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$173.85
+INV1776,C00194,A1901,03/06/2024 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$224.94
+INV1777,C00195,A1903,10/02/2026 12:00 PM,Botox,Injectables,Dr. Rivera,$428.19
+INV1778,C00196,A1904,09/15/2026 01:00 PM,Microneedling,Skin,"Jessica Park, RN",$360.37
+INV1779,C00196,A1905,07/02/2026 11:00 AM,Microneedling,Skin,"Jessica Park, RN",$361.17
+INV1780,C00196,A1906,01/20/2026 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$841.22
+INV1781,C00196,A1907,11/19/2025 10:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$375.02
+INV1782,C00196,A1908,10/30/2025 08:00 AM,Microneedling,Skin,Dr. Rivera,$340.21
+INV1783,C00196,A1910,05/23/2025 02:00 PM,Microneedling,Skin,"Jessica Park, RN",$332.50
+INV1784,C00197,A1912,11/10/2025 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$259.06
+INV1785,C00197,A1913,07/29/2025 01:00 PM,HydraFacial,Facials,Dr. Rivera,$275.40
+INV1786,C00197,A1914,05/08/2025 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$284.72
+INV1787,C00197,A1915,02/01/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$214.99
+INV1788,C00197,A1916,09/24/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$202.61
+INV1789,C00197,A1917,10/31/2024 02:00 PM,HydraFacial,Facials,Dr. Rivera,$236.47
+INV1790,C00198,A1918,06/13/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$880.39
+INV1791,C00198,A1919,03/17/2025 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$774.40
+INV1792,C00198,A1920,11/23/2024 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$190.95
+INV1793,C00198,A1921,10/13/2024 11:00 AM,Microneedling,Skin,Dr. Rivera,$405.81
+INV1794,C00198,A1922,10/08/2024 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$771.57
+INV1795,C00198,A1923,05/29/2024 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$926.47
+INV1796,C00198,A1924,11/21/2023 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$779.04
+INV1797,C00198,A1925,04/07/2023 09:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$712.10
+INV1798,C00200,A1927,05/15/2026 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$561.21
+INV1799,C00200,A1928,03/02/2026 12:00 PM,Microneedling,Skin,"Jessica Park, RN",$330.58
+INV1800,C00200,A1929,01/15/2026 10:00 AM,Microneedling,Skin,"Jessica Park, RN",$420.22
+INV1801,C00200,A1931,02/21/2025 12:00 PM,Microneedling,Skin,Dr. Rivera,$397.52
+INV1802,C00200,A1932,11/01/2024 08:00 AM,Microneedling,Skin,"Jessica Park, RN",$358.93
+INV1803,C00201,A1933,02/16/2026 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",$286.54
+INV1804,C00201,A1935,09/05/2025 11:00 AM,HydraFacial,Facials,Dr. Rivera,$235.55
+INV1805,C00201,A1936,05/01/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",$243.78
+INV1806,C00201,A1937,01/20/2025 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",$211.33
+INV1807,C00202,A1938,06/27/2025 10:00 AM,Microneedling,Skin,Dr. Rivera,$435.25
+INV1808,C00202,A1939,04/27/2025 10:00 AM,Microneedling,Skin,Dr. Rivera,$426.72
+INV1809,C00202,A1940,11/15/2024 11:00 AM,Microneedling,Skin,"Jessica Park, RN",$356.43
+INV1810,C00202,A1941,11/23/2024 02:00 PM,Microneedling,Skin,"Jessica Park, RN",$333.46
+INV1811,C00202,A1942,08/27/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,$256.40
+INV1812,C00202,A1943,05/08/2024 12:00 PM,Microneedling,Skin,Dr. Rivera,$348.83
+INV1813,C00202,A1944,05/27/2024 11:00 AM,Microneedling,Skin,"Jessica Park, RN",$347.14
+INV1814,C00203,A1945,06/11/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$168.96
+INV1815,C00203,A1946,03/08/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$219.30
+INV1816,C00203,A1947,10/26/2024 01:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$196.03
+INV1817,C00203,A1948,09/14/2024 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$197.72
+INV1818,C00203,A1949,02/21/2024 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$233.63
+INV1819,C00203,A1950,02/22/2024 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$220.67
+INV1820,C00203,A1951,03/18/2024 01:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$198.26
+INV1821,C00204,A1952,05/08/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$175.53
+INV1822,C00204,A1953,02/04/2025 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$191.78
+INV1823,C00204,A1954,12/13/2024 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$176.53
+INV1824,C00204,A1955,05/22/2024 02:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",$369.27
+INV1825,C00204,A1956,03/26/2024 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$163.77
+INV1826,C00204,A1957,03/14/2024 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,$252.17
+INV1827,C00204,A1958,08/05/2023 10:00 AM,HydraFacial,Facials,Dr. Rivera,$277.28
+INV1828,C00204,A1959,05/18/2023 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$217.16
+INV1829,C00205,A1960,10/07/2026 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$702.86
+INV1830,C00205,A1961,06/16/2026 10:00 AM,Chemical Peel,Facials,Dr. Rivera,$170.67
+INV1831,C00205,A1964,06/18/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,$742.88
+INV1832,C00205,A1965,09/02/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$193.31
+INV1833,C00205,A1966,08/25/2025 10:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$220.50
+INV1834,C00205,A1967,09/04/2024 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$194.43
+INV1835,C00206,A1968,09/28/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,$214.66
+INV1836,C00206,A1969,06/21/2026 02:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$200.11
+INV1837,C00206,A1970,03/14/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$172.70
+INV1838,C00206,A1972,10/11/2025 12:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$196.45
+INV1839,C00207,A1973,12/03/2025 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$752.68
+INV1840,C00207,A1974,09/10/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$880.69
+INV1841,C00207,A1975,04/19/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$772.22
+INV1842,C00208,A1978,06/23/2026 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$227.05
+INV1843,C00209,A1979,08/12/2026 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$799.92
+INV1844,C00209,A1980,05/28/2026 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$730.29
+INV1845,C00209,A1981,03/29/2026 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$717.62
+INV1846,C00209,A1983,08/01/2025 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$698.10
+INV1847,C00209,A1985,01/07/2025 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$844.79
+INV1848,C00210,A1986,06/13/2025 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",$228.69
+INV1849,C00210,A1987,04/12/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$193.65
+INV1850,C00210,A1988,01/16/2025 11:00 AM,Chemical Peel,Facials,Dr. Rivera,$197.23
+INV1851,C00211,A1989,09/24/2025 11:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",$282.63
+INV1852,C00212,A1990,03/17/2026 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$215.46
+INV1853,C00212,A1991,12/16/2025 10:00 AM,Botox,Injectables,Dr. Rivera,$568.00
+INV1854,C00213,A1993,12/15/2025 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$785.65
+INV1855,C00213,A1994,10/05/2025 10:00 AM,Chemical Peel,Facials,Dr. Rivera,$197.06
+INV1856,C00214,A1995,08/23/2026 11:00 AM,Botox,Injectables,"Sarah Kim, NP",$427.75
+INV1857,C00214,A1996,05/02/2026 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$560.37
+INV1858,C00214,A1997,04/07/2026 01:00 PM,Botox,Injectables,Dr. Rivera,$476.57
+INV1859,C00214,A1998,10/09/2025 09:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",$341.35
+INV1860,C00214,A2000,09/17/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$429.06
+INV1861,C00214,A2001,08/28/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$460.61
+INV1862,C00214,A2002,06/23/2024 02:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$199.35
+INV1863,C00215,A2003,08/27/2026 12:00 PM,Microneedling,Skin,"Jessica Park, RN",$382.64
+INV1864,C00215,A2005,04/01/2026 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$168.21
+INV1865,C00216,A2007,10/19/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$186.29
+INV1866,C00216,A2008,08/05/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$231.75
+INV1867,C00217,A2009,02/26/2025 02:00 PM,Laser Hair Removal,Laser,Dr. Rivera,$374.01
+INV1868,C00218,A2011,09/23/2026 09:00 AM,Botox,Injectables,"Sarah Kim, NP",$503.37
+INV1869,C00219,A2012,05/22/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",$162.90
+INV1870,C00219,A2013,03/14/2025 02:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",$329.81
+INV1871,C00219,A2014,10/04/2024 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$714.23
+INV1872,C00219,A2015,11/20/2024 10:00 AM,Microneedling,Skin,"Sarah Kim, NP",$348.55
+INV1873,C00219,A2016,07/02/2024 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",$229.55
+INV1874,C00219,A2017,05/12/2024 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$163.88
+INV1875,C00219,A2018,06/26/2023 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$211.17
+INV1876,C00220,A2020,03/03/2025 10:00 AM,HydraFacial,Facials,Dr. Rivera,$286.81
+INV1877,C00220,A2021,11/02/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,$210.27
+INV1878,C00220,A2022,11/01/2024 10:00 AM,HydraFacial,Facials,Dr. Rivera,$271.12
+INV1879,C00220,A2023,08/16/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$211.67
+INV1880,C00220,A2024,12/25/2023 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",$277.69
+INV1881,C00220,A2025,09/23/2023 01:00 PM,HydraFacial,Facials,Dr. Rivera,$251.54
+INV1882,C00220,A2026,12/30/2023 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$777.43
+INV1883,C00221,A2030,05/07/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$268.24
+INV1884,C00221,A2031,02/19/2026 11:00 AM,Microneedling,Skin,"Sarah Kim, NP",$414.37
+INV1885,C00221,A2032,09/23/2025 10:00 AM,Microneedling,Skin,"Jessica Park, RN",$390.48
+INV1886,C00221,A2033,09/29/2025 01:00 PM,Microneedling,Skin,"Sarah Kim, NP",$324.33
+INV1887,C00221,A2034,06/09/2025 11:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",$306.68
+INV1888,C00221,A2035,06/16/2025 02:00 PM,Microneedling,Skin,"Sarah Kim, NP",$321.73
+INV1889,C00222,A2036,08/29/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,$877.70
+INV1890,C00222,A2037,06/06/2026 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,$871.14
+INV1891,C00222,A2038,04/11/2026 11:00 AM,Laser Hair Removal,Laser,Dr. Rivera,$348.13
+INV1892,C00222,A2039,11/08/2025 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$925.22
+INV1893,C00222,A2040,05/30/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$783.48
+INV1894,C00222,A2041,10/13/2025 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",$331.27
+INV1895,C00222,A2042,03/19/2025 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,$835.40
+INV1896,C00222,A2043,11/30/2024 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$693.29
+INV1897,C00223,A2045,01/31/2026 08:00 AM,Botox,Injectables,"Jessica Park, RN",$576.19
+INV1898,C00224,A2046,04/29/2025 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$816.82
+INV1899,C00224,A2047,02/28/2025 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$843.35
+INV1900,C00225,A2048,04/30/2026 11:00 AM,Botox,Injectables,"Sarah Kim, NP",$463.99
+INV1901,C00225,A2050,09/14/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$839.13
+INV1902,C00225,A2051,05/29/2025 10:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$974.89
+INV1903,C00226,A2052,03/22/2026 08:00 AM,Botox,Injectables,"Sarah Kim, NP",$477.43
+INV1904,C00226,A2054,08/24/2025 01:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",$366.32
+INV1905,C00226,A2056,12/05/2024 11:00 AM,Botox,Injectables,Dr. Rivera,$455.57
+INV1906,C00226,A2057,10/28/2024 11:00 AM,Botox,Injectables,"Sarah Kim, NP",$445.27
+INV1907,C00226,A2058,08/17/2024 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$480.93
+INV1908,C00227,A2059,01/12/2026 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",$904.65
+INV1909,C00227,A2060,10/10/2025 11:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",$378.72
+INV1910,C00227,A2061,09/06/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",$768.30
+INV1911,C00227,A2062,04/11/2025 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,$881.11
+INV1912,C00228,A2065,07/29/2026 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",$923.21
+INV1913,C00228,A2066,04/19/2026 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$721.78
+INV1914,C00229,A2067,09/13/2026 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$234.77
+INV1915,C00229,A2069,03/07/2026 02:00 PM,HydraFacial,Facials,Dr. Rivera,$237.27
+INV1916,C00230,A2070,01/17/2026 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,$741.79
+INV1917,C00230,A2071,10/10/2025 02:00 PM,Microneedling,Skin,Dr. Rivera,$372.35
+INV1918,C00230,A2072,06/11/2025 11:00 AM,Botox,Injectables,"Sarah Kim, NP",$419.91
+INV1919,C00231,A2074,08/14/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,$231.75
+INV1920,C00232,A2075,07/30/2026 01:00 PM,Chemical Peel,Facials,Dr. Rivera,$168.35
+INV1921,C00233,A2076,04/09/2026 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$242.35
+INV1922,C00233,A2077,12/30/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$211.29
+INV1923,C00233,A2078,11/30/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",$219.00
+INV1924,C00233,A2079,05/23/2025 11:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",$193.96
+INV1925,C00233,A2080,05/20/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$239.84
+INV1926,C00233,A2081,09/21/2024 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",$222.63
+INV1927,C00233,A2082,10/16/2024 11:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$438.93
+INV1928,C00233,A2083,02/13/2025 01:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",$385.06
+INV1929,C00234,A2084,09/15/2026 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",$678.06
+INV1930,C00234,A2085,06/09/2026 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",$250.07
+INV1931,C00234,A2086,04/26/2026 08:00 AM,HydraFacial,Facials,Dr. Rivera,$210.17
+INV1932,C00234,A2087,10/29/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,$227.96
+INV1933,C00234,A2088,09/24/2025 08:00 AM,Botox,Injectables,"Sarah Kim, NP",$417.32
+INV1934,C00234,A2089,03/09/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$262.53
+INV1935,C00234,A2090,07/22/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$278.93
+INV1936,C00234,A2091,10/15/2024 12:00 PM,Botox,Injectables,Dr. Rivera,$441.18
+INV1937,C00235,A2093,08/11/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,$943.44
+INV1938,C00235,A2094,05/07/2025 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",$170.88
+INV1939,C00236,A2095,01/09/2026 09:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",$367.85
+INV1940,C00236,A2096,09/18/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",$533.65
+INV1941,C00236,A2097,07/31/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",$544.28
+INV1942,C00236,A2098,04/08/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",$492.87
+INV1943,C00237,A2099,07/29/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",$564.22
+INV1944,C00237,A2100,05/11/2025 12:00 PM,Microneedling,Skin,Dr. Rivera,$427.65
+INV1945,C00237,A2101,02/27/2025 01:00 PM,Botox,Injectables,Dr. Rivera,$488.82
+INV1946,C00237,A2102,08/12/2024 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",$444.20
+INV1947,C00237,A2103,08/23/2024 10:00 AM,Botox,Injectables,Dr. Rivera,$576.43
+INV1948,C00238,A2104,01/04/2026 11:00 AM,Botox,Injectables,"Sarah Kim, NP",$553.34
+INV1949,C00238,A2105,11/03/2025 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",$387.12
+INV1950,C00238,A2106,07/14/2025 12:00 PM,Botox,Injectables,"Jessica Park, RN",$467.24
+INV1951,C00238,A2107,07/08/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",$424.03
+INV1952,C00239,A2108,11/21/2025 01:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,$186.44
+INV1953,C00239,A2109,07/26/2025 11:00 AM,Botox,Injectables,Dr. Rivera,$485.97
+INV1954,C00239,A2110,07/08/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",$274.02
+INV1955,C00239,A2112,11/10/2024 11:00 AM,Botox,Injectables,"Sarah Kim, NP",$576.96
+INV1956,C00239,A2113,10/22/2024 09:00 AM,Botox,Injectables,"Jessica Park, RN",$565.35
+INV1957,C00240,A2114,04/11/2026 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",$282.63
+INV1958,C00240,A2115,01/23/2026 12:00 PM,HydraFacial,Facials,Dr. Rivera,$251.04
+INV1959,C00240,A2116,12/10/2025 01:00 PM,HydraFacial,Facials,"Jessica Park, RN",$290.56
+INV1960,C00240,A2117,08/20/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,$247.72
+INV1961,C00240,A2118,08/14/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",$271.12
+INV1962,C00240,A2120,03/05/2025 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",$206.34

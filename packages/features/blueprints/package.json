@@ -1,0 +1,7 @@
+{
+  "name": "@clinic/feature-blueprints",
+  "private": true,
+  "scripts": {
+    "lint": "uv run ruff check src"
+  }
+}

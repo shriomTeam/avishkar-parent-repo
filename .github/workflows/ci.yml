@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: clinic_owner
+          POSTGRES_PASSWORD: clinic_owner
+          POSTGRES_DB: clinic
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U clinic_owner -d clinic" --health-interval 2s --health-retries 20
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: cp .env.example .env
+      - run: PGPASSWORD=clinic_owner psql -h localhost -U clinic_owner -d clinic -f infra/postgres/init.sql
+      - run: uv sync --frozen
+      - run: pnpm install --frozen-lockfile
+
+      - name: Migrations have a single head
+        run: pnpm --filter @clinic/db check-heads
+      - name: Migrate
+        run: pnpm db:migrate
+      - name: Models match migrations
+        working-directory: packages/db
+        run: uv run alembic check
+
+      - name: Python lint + format
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: Architecture boundaries
+        run: pnpm boundaries
+
+      - name: API client is up to date with the backend
+        run: pnpm api-client:generate && git diff --exit-code packages/api-client/src/schema.d.ts
+
+      - name: Typecheck, test, build (only what changed, cached)
+        run: pnpm turbo run typecheck test build

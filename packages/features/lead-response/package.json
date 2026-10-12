@@ -1,0 +1,7 @@
+{
+  "name": "@clinic/feature-lead-response",
+  "private": true,
+  "scripts": {
+    "lint": "uv run ruff check src"
+  }
+}

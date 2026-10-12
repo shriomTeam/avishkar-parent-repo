@@ -1,0 +1,19 @@
+{
+  "name": "@clinic/api-client",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "generate": "uv run python -m clinic_api.export_openapi openapi.json && openapi-typescript openapi.json -o src/schema.d.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.17.0"
+  },
+  "devDependencies": {
+    "@clinic/tsconfig": "workspace:*",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3"
+  }
+}

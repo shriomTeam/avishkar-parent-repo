@@ -1,0 +1,7 @@
+{
+  "name": "@clinic/feature-command-center",
+  "private": true,
+  "scripts": {
+    "lint": "uv run ruff check src"
+  }
+}

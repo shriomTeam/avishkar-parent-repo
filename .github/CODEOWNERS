@@ -1,0 +1,38 @@
+# Each team owns its feature folder, its Postgres schema's models, and its web pages.
+# Shared platform code needs a platform-team review. Replace @avishkar/* with real teams.
+
+*                                                       @avishkar/platform
+
+# Platform
+/packages/db/                                           @avishkar/platform
+/packages/core/                                         @avishkar/platform
+/packages/integrations/                                 @avishkar/platform @avishkar/integrations
+/packages/engagement/                                   @avishkar/platform
+/packages/ui/                                           @avishkar/platform @avishkar/design
+/apps/                                                  @avishkar/platform
+
+# Features: package, tables, web pages
+/packages/features/reactivation/                        @avishkar/team-reactivation
+/packages/db/src/clinic_db/models/reactivation.py       @avishkar/team-reactivation
+/apps/web/app/(features)/reactivation/                  @avishkar/team-reactivation
+
+/packages/features/blueprints/                          @avishkar/team-intelligence
+/apps/web/app/(features)/blueprints/                    @avishkar/team-intelligence
+/packages/features/command-center/                      @avishkar/team-intelligence
+/packages/db/src/clinic_db/models/command_center.py     @avishkar/team-intelligence
+
+/packages/features/lead-response/                       @avishkar/team-engagement
+/packages/db/src/clinic_db/models/lead_response.py      @avishkar/team-engagement
+/packages/features/reviews/                             @avishkar/team-engagement
+/packages/db/src/clinic_db/models/reviews.py            @avishkar/team-engagement
+
+/packages/features/voice-receptionist/                  @avishkar/team-voice
+/packages/db/src/clinic_db/models/voice.py              @avishkar/team-voice
+
+/packages/features/scribe/                              @avishkar/team-clinical
+/packages/db/src/clinic_db/models/scribe.py             @avishkar/team-clinical
+/packages/features/photos/                              @avishkar/team-clinical
+/packages/db/src/clinic_db/models/photos.py             @avishkar/team-clinical
+
+# Migrations touch everyone: platform reviews every one.
+/packages/db/migrations/                                @avishkar/platform

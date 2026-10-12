@@ -1,0 +1,1121 @@
+Appointment ID,Client ID,Date,Service,Category,Provider,Status
+A1001,C00001,08/04/2026 02:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1002,C00001,05/29/2026 01:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1003,C00001,02/15/2026 02:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1004,C00001,01/09/2026 10:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1005,C00001,07/12/2025 10:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1006,C00001,04/11/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1007,C00001,04/11/2025 11:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1008,C00002,04/05/2026 12:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1009,C00002,01/31/2026 08:00 AM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1010,C00002,10/23/2025 10:00 AM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1011,C00003,10/05/2026 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1012,C00003,07/12/2026 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1013,C00004,11/28/2025 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1014,C00004,08/26/2025 12:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1015,C00004,05/28/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1016,C00004,01/05/2025 08:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1017,C00004,11/03/2026 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Confirmed
+A1018,C00005,01/08/2026 12:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1019,C00005,10/31/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1020,C00005,10/29/2026 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Confirmed
+A1021,C00006,12/11/2025 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1022,C00006,09/01/2025 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1023,C00006,07/24/2025 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1024,C00006,01/21/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1025,C00006,02/18/2025 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1026,C00006,06/09/2024 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1027,C00007,12/21/2024 09:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1028,C00008,08/17/2026 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",No Show
+A1029,C00008,06/09/2026 10:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1030,C00008,02/08/2026 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1031,C00009,09/04/2026 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1032,C00010,03/08/2026 02:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1033,C00010,11/19/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1034,C00010,10/28/2026 02:00 PM,Botox,Injectables,"Jessica Park, RN",Confirmed
+A1035,C00011,09/04/2025 10:00 AM,Laser Hair Removal,Laser,Dr. Rivera,No Show
+A1036,C00011,05/14/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1037,C00011,02/12/2025 01:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1038,C00011,09/18/2024 08:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1039,C00012,09/14/2025 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1040,C00012,06/17/2025 11:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1041,C00012,05/09/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Cancelled
+A1042,C00012,03/03/2025 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,No Show
+A1043,C00012,11/10/2024 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1044,C00012,08/30/2024 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",No Show
+A1045,C00012,03/17/2024 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1046,C00013,09/04/2026 11:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1047,C00013,06/21/2026 02:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1048,C00013,02/16/2026 12:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1049,C00013,02/03/2026 12:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1050,C00013,01/03/2026 09:00 AM,Botox,Injectables,"Jessica Park, RN",Cancelled
+A1051,C00013,06/11/2025 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1052,C00014,08/24/2026 09:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1053,C00015,06/03/2026 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Cancelled
+A1054,C00015,03/22/2026 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1055,C00015,12/01/2025 09:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1056,C00015,07/02/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1057,C00015,07/22/2025 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1058,C00015,06/23/2025 09:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1059,C00015,11/06/2026 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Confirmed
+A1060,C00016,08/01/2026 02:00 PM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1061,C00016,05/05/2026 10:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1062,C00016,01/31/2026 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1063,C00016,08/15/2025 10:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1064,C00017,07/24/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1065,C00017,05/04/2025 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1066,C00017,03/26/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1067,C00017,12/17/2024 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1068,C00017,08/02/2024 08:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1069,C00017,10/29/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Confirmed
+A1070,C00018,01/13/2026 12:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1071,C00018,11/07/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1072,C00018,08/26/2025 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1073,C00018,05/12/2025 11:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1074,C00018,02/23/2025 08:00 AM,Botox,Injectables,Dr. Rivera,No Show
+A1075,C00019,10/28/2025 02:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1076,C00020,12/04/2024 10:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1077,C00020,09/05/2024 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1078,C00020,05/16/2024 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1079,C00020,03/24/2024 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1080,C00020,09/17/2023 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1081,C00020,09/21/2023 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1082,C00020,05/14/2023 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1083,C00020,11/10/2026 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Confirmed
+A1084,C00021,01/21/2026 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1085,C00021,11/03/2025 08:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1086,C00021,06/01/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1087,C00021,01/29/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1088,C00021,10/18/2026 02:00 PM,HydraFacial,Facials,Dr. Rivera,Confirmed
+A1089,C00022,09/21/2026 09:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1090,C00022,07/17/2026 02:00 PM,Botox,Injectables,Dr. Rivera,No Show
+A1091,C00022,04/06/2026 12:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1092,C00022,12/28/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1093,C00022,01/20/2026 11:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1094,C00023,12/01/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1095,C00023,09/20/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1096,C00023,04/13/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1097,C00023,04/23/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1098,C00024,09/23/2026 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1099,C00024,06/13/2026 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1100,C00024,05/14/2026 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1101,C00024,03/06/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1102,C00024,10/10/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1103,C00024,07/10/2025 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1104,C00025,12/21/2024 12:00 PM,Microneedling,Skin,Dr. Rivera,Cancelled
+A1105,C00025,10/06/2024 09:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",No Show
+A1106,C00025,08/23/2024 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1107,C00025,02/10/2024 11:00 AM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1108,C00025,03/24/2024 11:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1109,C00025,07/20/2023 08:00 AM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1110,C00026,08/26/2025 02:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1111,C00026,05/27/2025 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1112,C00026,01/04/2025 09:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1113,C00027,09/06/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1114,C00027,06/06/2026 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1115,C00027,05/05/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1116,C00028,11/13/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1117,C00029,03/02/2026 02:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1118,C00029,11/20/2025 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1119,C00030,05/26/2026 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",No Show
+A1120,C00030,01/29/2026 01:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1121,C00030,12/11/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1122,C00030,06/27/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1123,C00031,05/13/2026 10:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1124,C00031,01/21/2026 01:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1125,C00031,09/27/2025 01:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1126,C00031,08/07/2025 01:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1127,C00031,02/19/2025 01:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1128,C00031,10/25/2024 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1129,C00032,03/25/2026 01:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1130,C00032,12/04/2025 11:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1131,C00032,11/15/2025 08:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1132,C00032,09/02/2025 02:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1133,C00032,01/17/2025 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1134,C00032,10/11/2024 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1135,C00032,05/28/2024 08:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1136,C00032,08/28/2024 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1137,C00033,08/21/2026 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1138,C00033,06/06/2026 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1139,C00033,02/26/2026 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1140,C00033,11/12/2025 09:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1141,C00033,09/23/2025 12:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1142,C00033,10/10/2025 12:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1143,C00033,09/18/2024 12:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1144,C00034,04/11/2026 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1145,C00034,01/11/2026 01:00 PM,HydraFacial,Facials,Dr. Rivera,No Show
+A1146,C00034,09/13/2025 01:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1147,C00034,05/16/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1148,C00035,02/23/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1149,C00036,12/28/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1150,C00037,06/05/2025 08:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1151,C00037,03/05/2025 02:00 PM,Microneedling,Skin,"Jessica Park, RN",No Show
+A1152,C00037,01/12/2025 01:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1153,C00037,10/23/2024 11:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1154,C00037,03/06/2024 02:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1155,C00037,12/03/2023 01:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1156,C00037,04/17/2024 02:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1157,C00037,10/14/2026 02:00 PM,Microneedling,Skin,Dr. Rivera,Confirmed
+A1158,C00038,12/25/2024 08:00 AM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1159,C00038,10/24/2024 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1160,C00039,03/02/2026 12:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1161,C00039,11/12/2025 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1162,C00039,08/04/2025 02:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1163,C00039,07/11/2025 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1164,C00039,06/23/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1165,C00039,03/12/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Cancelled
+A1166,C00040,04/12/2026 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1167,C00040,01/29/2026 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",No Show
+A1168,C00040,11/23/2025 11:00 AM,Chemical Peel,Facials,Dr. Rivera,No Show
+A1169,C00040,07/04/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1170,C00040,01/07/2025 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1171,C00040,01/27/2025 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1172,C00041,08/02/2026 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1173,C00041,05/10/2026 01:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1174,C00041,03/23/2026 09:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1175,C00041,02/03/2026 11:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1176,C00041,09/24/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1177,C00041,02/13/2025 01:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1178,C00042,11/02/2025 08:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1179,C00042,08/01/2025 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1180,C00042,07/05/2025 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1181,C00043,09/10/2025 09:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1182,C00043,06/03/2025 12:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1183,C00043,05/13/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1184,C00043,11/23/2024 12:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1185,C00043,09/03/2024 01:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1186,C00043,03/14/2024 02:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1187,C00043,11/08/2023 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1188,C00043,03/13/2024 08:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1189,C00044,07/04/2025 11:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1190,C00044,04/16/2025 08:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1191,C00044,11/26/2024 01:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1192,C00044,01/05/2025 01:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1193,C00044,04/04/2024 01:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1194,C00044,05/05/2024 08:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1195,C00044,09/13/2023 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1196,C00044,02/16/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1197,C00045,08/07/2026 11:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1198,C00045,04/16/2026 12:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1199,C00045,02/10/2026 12:00 PM,Botox,Injectables,"Jessica Park, RN",Cancelled
+A1200,C00045,01/27/2026 01:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1201,C00045,12/02/2025 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1202,C00045,05/09/2025 08:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1203,C00045,04/08/2025 02:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1204,C00045,05/03/2024 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1205,C00046,08/05/2026 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,Cancelled
+A1206,C00046,04/17/2026 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1207,C00046,04/01/2026 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1208,C00046,11/08/2025 10:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1209,C00046,07/05/2025 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1210,C00046,09/14/2025 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1211,C00046,10/19/2026 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Confirmed
+A1212,C00047,11/01/2025 10:00 AM,HydraFacial,Facials,Dr. Rivera,No Show
+A1213,C00048,07/02/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1214,C00048,04/06/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1215,C00048,02/18/2025 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1216,C00048,08/18/2024 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1217,C00048,04/02/2024 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1218,C00048,04/13/2024 09:00 AM,Laser Hair Removal,Laser,Dr. Rivera,No Show
+A1219,C00048,10/11/2023 02:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1220,C00049,07/29/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,Cancelled
+A1221,C00049,04/20/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1222,C00049,12/21/2024 08:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1223,C00050,09/15/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1224,C00050,07/07/2025 10:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1225,C00050,01/28/2025 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Cancelled
+A1226,C00050,11/10/2024 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1227,C00051,05/31/2026 02:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1228,C00051,02/23/2026 10:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1229,C00051,01/05/2026 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1230,C00051,08/16/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1231,C00051,02/09/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1232,C00051,07/10/2025 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1233,C00051,05/30/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Cancelled
+A1234,C00051,09/01/2024 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1235,C00052,09/27/2026 09:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,No Show
+A1236,C00052,06/04/2026 10:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",No Show
+A1237,C00052,05/20/2026 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1238,C00052,11/25/2025 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1239,C00052,12/01/2025 09:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1240,C00052,11/16/2025 10:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1241,C00053,10/06/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1242,C00053,07/29/2025 09:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1243,C00053,05/19/2025 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",No Show
+A1244,C00053,10/23/2024 09:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1245,C00053,11/04/2024 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1246,C00054,03/20/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1247,C00054,01/09/2026 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1248,C00054,09/17/2025 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1249,C00054,04/15/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1250,C00054,05/20/2025 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1251,C00054,05/09/2025 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1252,C00054,05/23/2024 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1253,C00055,09/14/2026 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1254,C00055,05/29/2026 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1255,C00055,02/04/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1256,C00056,09/20/2026 08:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1257,C00056,05/29/2026 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",No Show
+A1258,C00056,05/15/2026 02:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1259,C00057,10/05/2026 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1260,C00057,08/05/2026 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1261,C00057,02/21/2026 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1262,C00057,03/21/2026 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1263,C00058,06/27/2025 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1264,C00058,03/06/2025 10:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1265,C00058,01/16/2025 11:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1266,C00058,09/12/2024 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1267,C00058,06/20/2024 01:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1268,C00058,08/31/2024 12:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1269,C00058,12/23/2023 09:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1270,C00059,07/30/2026 10:00 AM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1271,C00059,05/12/2026 12:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1272,C00059,12/06/2025 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1273,C00059,11/08/2025 02:00 PM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1274,C00059,09/25/2025 01:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1275,C00060,05/20/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Cancelled
+A1276,C00060,03/21/2026 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Cancelled
+A1277,C00060,11/11/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1278,C00060,06/27/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1279,C00060,10/26/2026 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Confirmed
+A1280,C00061,07/24/2025 08:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1281,C00061,03/28/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1282,C00062,10/16/2025 12:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1283,C00062,07/07/2025 12:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1284,C00062,05/11/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1285,C00062,12/29/2024 01:00 PM,Botox,Injectables,"Sarah Kim, NP",No Show
+A1286,C00062,07/21/2024 10:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1287,C00063,03/19/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1288,C00063,01/18/2025 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1289,C00063,09/30/2024 09:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1290,C00063,06/19/2024 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1291,C00063,03/12/2024 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1292,C00063,09/06/2023 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1293,C00063,05/17/2023 10:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1294,C00064,10/20/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1295,C00065,08/16/2026 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1296,C00065,05/15/2026 11:00 AM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1297,C00065,01/22/2026 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1298,C00066,09/09/2026 10:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1299,C00066,05/18/2026 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1300,C00066,02/25/2026 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,Cancelled
+A1301,C00066,01/27/2026 09:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1302,C00066,10/04/2025 09:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1303,C00066,09/24/2025 12:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1304,C00066,04/29/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1305,C00066,06/18/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",No Show
+A1306,C00067,09/18/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1307,C00067,05/28/2026 08:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1308,C00068,09/19/2025 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1309,C00068,07/16/2025 10:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1310,C00068,04/14/2025 02:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1311,C00068,02/09/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1312,C00069,12/04/2025 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1313,C00069,08/09/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1314,C00069,04/20/2025 11:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1315,C00070,09/13/2025 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",No Show
+A1316,C00071,05/20/2025 09:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1317,C00072,10/21/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1318,C00072,06/24/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1319,C00072,03/11/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1320,C00072,12/25/2024 01:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1321,C00072,11/27/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1322,C00072,05/14/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1323,C00072,02/05/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1324,C00072,08/01/2023 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1325,C00072,10/27/2026 02:00 PM,HydraFacial,Facials,Dr. Rivera,Confirmed
+A1326,C00073,10/06/2026 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1327,C00073,10/24/2026 02:00 PM,Microneedling,Skin,"Sarah Kim, NP",Confirmed
+A1328,C00074,10/08/2025 09:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1329,C00074,07/20/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1330,C00074,02/12/2025 09:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1331,C00074,11/21/2024 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1332,C00074,12/28/2024 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1333,C00075,11/27/2025 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1334,C00075,09/25/2025 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1335,C00075,05/15/2025 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1336,C00075,03/08/2025 09:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Cancelled
+A1337,C00076,09/14/2025 11:00 AM,Botox,Injectables,Dr. Rivera,Cancelled
+A1338,C00076,05/20/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1339,C00076,02/20/2025 12:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1340,C00076,12/21/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Cancelled
+A1341,C00076,08/14/2024 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1342,C00076,08/15/2024 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Cancelled
+A1343,C00077,07/01/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1344,C00077,04/21/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1345,C00077,02/07/2025 10:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1346,C00077,11/21/2024 10:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1347,C00077,06/12/2024 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1348,C00077,03/13/2024 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1349,C00077,01/14/2024 08:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1350,C00078,01/24/2026 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1351,C00078,10/10/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1352,C00078,06/24/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1353,C00079,06/24/2025 09:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1354,C00079,03/06/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1355,C00079,12/16/2024 12:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1356,C00079,09/15/2024 09:00 AM,Laser Hair Removal,Laser,Dr. Rivera,No Show
+A1357,C00079,10/23/2024 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1358,C00079,08/18/2024 02:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1359,C00080,05/29/2025 01:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1360,C00081,06/26/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1361,C00081,03/21/2025 01:00 PM,Botox,Injectables,Dr. Rivera,No Show
+A1362,C00081,11/08/2024 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1363,C00081,11/13/2024 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1364,C00081,08/06/2024 09:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1365,C00081,03/08/2024 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1366,C00081,07/31/2023 08:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1367,C00082,09/16/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1368,C00082,06/27/2026 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1369,C00082,03/22/2026 12:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1370,C00082,01/19/2026 01:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1371,C00082,08/12/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1372,C00083,02/05/2025 01:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1373,C00083,10/28/2024 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1374,C00083,08/07/2024 11:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1375,C00083,05/23/2024 08:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1376,C00083,01/10/2024 11:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1377,C00083,01/02/2024 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1378,C00084,10/01/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1379,C00084,06/18/2025 11:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1380,C00084,04/06/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1381,C00084,10/29/2026 02:00 PM,HydraFacial,Facials,Dr. Rivera,Confirmed
+A1382,C00085,06/21/2025 08:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",No Show
+A1383,C00085,03/06/2025 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1384,C00085,01/22/2025 11:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1385,C00085,10/12/2024 11:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1386,C00086,01/27/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1387,C00086,11/09/2025 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1388,C00086,06/03/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1389,C00086,07/31/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1390,C00086,02/09/2025 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1391,C00086,08/10/2024 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1392,C00086,03/08/2024 01:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1393,C00087,10/04/2025 12:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1394,C00087,06/22/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1395,C00087,03/10/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Cancelled
+A1396,C00087,03/26/2025 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1397,C00087,02/06/2025 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1398,C00087,07/01/2024 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1399,C00087,07/23/2024 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1400,C00087,10/22/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Confirmed
+A1401,C00088,11/02/2025 11:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1402,C00088,08/10/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1403,C00088,03/13/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1404,C00088,12/19/2024 11:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1405,C00088,08/19/2024 02:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1406,C00088,06/15/2024 11:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1407,C00089,11/12/2024 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1408,C00089,08/02/2024 01:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1409,C00089,06/01/2024 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1410,C00089,12/24/2023 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1411,C00089,01/17/2024 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1412,C00090,09/25/2025 09:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1413,C00090,06/29/2025 09:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1414,C00090,03/03/2025 01:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1415,C00090,12/20/2024 12:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1416,C00090,11/25/2024 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1417,C00091,01/07/2026 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1418,C00092,06/29/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1419,C00092,03/04/2025 09:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1420,C00093,09/02/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1421,C00093,10/21/2026 02:00 PM,Botox,Injectables,Dr. Rivera,Confirmed
+A1422,C00094,08/26/2026 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1423,C00094,06/18/2026 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1424,C00094,02/19/2026 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1425,C00094,09/18/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1426,C00094,10/14/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1427,C00094,08/11/2025 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1428,C00094,09/11/2024 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1429,C00095,12/21/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1430,C00095,09/27/2025 09:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1431,C00095,05/07/2025 09:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1432,C00095,03/23/2025 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1433,C00096,08/09/2026 01:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1434,C00097,06/01/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",No Show
+A1435,C00097,03/19/2025 11:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1436,C00097,11/11/2024 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1437,C00097,09/13/2024 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1438,C00097,02/11/2024 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1439,C00098,08/08/2026 10:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Cancelled
+A1440,C00098,05/28/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1441,C00098,02/09/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1442,C00098,12/14/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1443,C00098,11/13/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1444,C00099,09/16/2026 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1445,C00099,07/12/2026 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1446,C00099,05/05/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1447,C00099,01/31/2026 12:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1448,C00099,06/01/2025 01:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1449,C00099,11/05/2025 11:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1450,C00100,07/25/2026 01:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1451,C00101,11/06/2025 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1452,C00102,07/15/2025 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1453,C00102,04/23/2025 08:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1454,C00102,12/05/2024 11:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1455,C00102,09/06/2024 12:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1456,C00102,08/01/2024 11:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1457,C00102,11/23/2023 09:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",Cancelled
+A1458,C00103,06/30/2025 11:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1459,C00103,03/12/2025 12:00 PM,Botox,Injectables,"Sarah Kim, NP",No Show
+A1460,C00103,11/22/2024 12:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1461,C00103,07/17/2024 08:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1462,C00103,08/10/2024 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1463,C00103,06/05/2024 12:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1464,C00104,09/03/2026 01:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1465,C00104,06/15/2026 10:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1466,C00104,05/06/2026 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",No Show
+A1467,C00104,11/19/2025 08:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1468,C00104,08/19/2025 09:00 AM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1469,C00104,10/18/2025 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1470,C00105,08/23/2025 10:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1471,C00105,06/24/2025 12:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1472,C00105,03/06/2025 01:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1473,C00105,11/14/2024 02:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Cancelled
+A1474,C00105,12/06/2024 08:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1475,C00106,05/04/2026 12:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",Cancelled
+A1476,C00106,01/20/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1477,C00106,11/25/2025 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1478,C00107,11/04/2025 10:00 AM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1479,C00107,07/22/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1480,C00107,05/12/2025 08:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1481,C00107,03/03/2025 10:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Cancelled
+A1482,C00107,07/28/2024 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1483,C00107,05/28/2024 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1484,C00107,02/19/2024 02:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1485,C00107,03/19/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1486,C00107,11/06/2026 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Confirmed
+A1487,C00108,11/26/2025 01:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1488,C00108,08/05/2025 01:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1489,C00108,04/06/2025 12:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1490,C00108,12/13/2024 09:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1491,C00108,10/30/2024 10:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1492,C00108,10/07/2024 09:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1493,C00108,03/12/2024 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1494,C00109,09/02/2025 01:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",No Show
+A1495,C00109,06/01/2025 10:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1496,C00110,11/23/2024 02:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1497,C00110,08/29/2024 01:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1498,C00110,05/19/2024 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1499,C00110,05/03/2024 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1500,C00110,02/09/2024 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1501,C00111,05/17/2025 12:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1502,C00112,03/07/2026 02:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1503,C00112,12/28/2025 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1504,C00112,07/30/2025 12:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1505,C00112,06/01/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1506,C00112,07/06/2025 01:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1507,C00112,08/29/2024 08:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1508,C00112,08/02/2024 10:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1509,C00112,11/11/2026 02:00 PM,Botox,Injectables,"Jessica Park, RN",Confirmed
+A1510,C00113,02/20/2026 02:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1511,C00113,11/16/2025 10:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1512,C00113,10/17/2025 08:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1513,C00113,07/10/2025 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1514,C00113,05/28/2025 11:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1515,C00113,07/20/2024 01:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1516,C00113,06/30/2024 09:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1517,C00113,10/15/2026 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Confirmed
+A1518,C00114,10/05/2026 01:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1519,C00114,06/17/2026 11:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1520,C00115,08/10/2026 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1521,C00115,05/29/2026 09:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1522,C00115,02/27/2026 09:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1523,C00115,12/22/2025 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1524,C00116,11/19/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,No Show
+A1525,C00116,08/06/2025 09:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1526,C00116,07/16/2025 01:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1527,C00116,04/05/2025 08:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1528,C00117,08/30/2025 08:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1529,C00117,06/25/2025 02:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1530,C00117,02/23/2025 02:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1531,C00117,11/21/2024 01:00 PM,Microneedling,Skin,"Jessica Park, RN",No Show
+A1532,C00117,07/10/2024 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1533,C00117,01/18/2024 02:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1534,C00118,07/24/2026 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1535,C00118,05/21/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1536,C00119,10/12/2025 11:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1537,C00119,07/02/2025 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1538,C00119,06/04/2025 01:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1539,C00119,01/15/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1540,C00120,01/27/2026 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1541,C00120,11/04/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1542,C00120,06/13/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1543,C00120,11/04/2026 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Confirmed
+A1544,C00121,11/09/2025 01:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1545,C00121,08/24/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1546,C00121,07/04/2025 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1547,C00121,11/17/2024 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1548,C00121,01/13/2025 10:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1549,C00121,08/16/2024 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",No Show
+A1550,C00121,09/27/2024 02:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1551,C00121,04/07/2024 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Cancelled
+A1552,C00122,08/05/2026 11:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1553,C00122,04/26/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1554,C00122,03/28/2026 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1555,C00122,08/31/2025 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1556,C00122,08/30/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1557,C00122,05/12/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",No Show
+A1558,C00123,12/22/2025 11:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1559,C00123,10/08/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1560,C00123,06/25/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1561,C00123,10/27/2026 02:00 PM,HydraFacial,Facials,Dr. Rivera,Confirmed
+A1562,C00124,08/09/2025 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1563,C00124,04/11/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1564,C00124,12/18/2024 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1565,C00124,11/24/2024 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1566,C00124,08/06/2024 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1567,C00124,03/12/2024 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1568,C00124,07/21/2024 10:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1569,C00125,05/31/2026 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1570,C00125,03/18/2026 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Cancelled
+A1571,C00125,12/10/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1572,C00125,07/29/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Cancelled
+A1573,C00125,08/12/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1574,C00125,01/11/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1575,C00126,11/19/2024 10:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1576,C00126,08/02/2024 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1577,C00126,04/09/2024 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1578,C00126,12/04/2023 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1579,C00126,03/08/2024 08:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1580,C00127,09/18/2026 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1581,C00127,05/22/2026 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1582,C00127,02/22/2026 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1583,C00127,12/19/2025 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",No Show
+A1584,C00127,07/01/2025 02:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1585,C00127,08/19/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1586,C00128,09/13/2026 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1587,C00128,07/12/2026 02:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1588,C00128,02/25/2026 09:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1589,C00128,01/19/2026 09:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1590,C00128,10/24/2025 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1591,C00128,11/02/2025 08:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1592,C00128,06/20/2025 01:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1593,C00128,04/27/2025 12:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1594,C00129,02/08/2025 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1595,C00129,10/22/2024 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1596,C00129,06/15/2024 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1597,C00129,05/17/2024 09:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1598,C00130,01/16/2026 02:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1599,C00130,11/07/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1600,C00131,08/09/2026 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1601,C00131,05/26/2026 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1602,C00131,12/24/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1603,C00132,12/19/2025 12:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1604,C00132,10/13/2025 01:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1605,C00132,06/10/2025 08:00 AM,Botox,Injectables,"Jessica Park, RN",Cancelled
+A1606,C00132,05/23/2025 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1607,C00132,01/17/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1608,C00133,10/07/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1609,C00133,08/07/2025 08:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1610,C00133,03/07/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1611,C00133,01/10/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1612,C00134,10/06/2026 10:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Cancelled
+A1613,C00134,06/13/2026 02:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1614,C00134,04/15/2026 02:00 PM,Microneedling,Skin,Dr. Rivera,Cancelled
+A1615,C00134,12/31/2025 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1616,C00134,10/25/2026 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Confirmed
+A1617,C00135,07/18/2025 08:00 AM,HydraFacial,Facials,"Jessica Park, RN",Cancelled
+A1618,C00136,09/30/2026 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1619,C00136,07/31/2026 11:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1620,C00136,04/11/2026 01:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1621,C00136,11/01/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1622,C00137,12/08/2024 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1623,C00138,09/06/2026 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1624,C00138,07/03/2026 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1625,C00138,03/18/2026 11:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1626,C00138,02/02/2026 11:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1627,C00138,10/13/2025 09:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1628,C00138,06/28/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1629,C00138,03/21/2025 08:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1630,C00139,05/28/2025 08:00 AM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1631,C00139,01/31/2025 08:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1632,C00139,12/13/2024 10:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1633,C00139,08/31/2024 02:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1634,C00140,12/01/2024 02:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1635,C00140,09/18/2024 01:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1636,C00140,04/09/2024 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1637,C00140,04/29/2024 02:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1638,C00140,09/26/2023 01:00 PM,HydraFacial,Facials,Dr. Rivera,Cancelled
+A1639,C00140,01/11/2024 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1640,C00140,04/11/2023 01:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1641,C00141,10/04/2026 01:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1642,C00141,08/03/2026 08:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1643,C00141,04/11/2026 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1644,C00141,10/15/2026 02:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Confirmed
+A1645,C00142,03/30/2025 11:00 AM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1646,C00142,12/01/2024 10:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1647,C00142,08/08/2024 01:00 PM,Botox,Injectables,"Jessica Park, RN",Cancelled
+A1648,C00142,08/02/2024 12:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1649,C00143,08/08/2025 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1650,C00144,05/02/2026 12:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1651,C00144,02/04/2026 08:00 AM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A1652,C00144,09/14/2025 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",Cancelled
+A1653,C00144,10/13/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1654,C00144,01/27/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1655,C00145,07/29/2025 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,No Show
+A1656,C00145,05/22/2025 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1657,C00146,09/11/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1658,C00146,05/27/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1659,C00146,01/16/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1660,C00146,09/28/2024 01:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1661,C00146,12/21/2024 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Cancelled
+A1662,C00146,09/26/2024 12:00 PM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1663,C00146,07/30/2024 11:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Cancelled
+A1664,C00146,11/09/2023 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1665,C00146,10/23/2026 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Confirmed
+A1666,C00147,08/22/2026 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,Cancelled
+A1667,C00147,05/28/2026 02:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1668,C00147,04/10/2026 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1669,C00147,10/17/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1670,C00147,10/18/2025 12:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1671,C00148,09/14/2025 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1672,C00148,07/09/2025 08:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1673,C00148,02/22/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",Cancelled
+A1674,C00148,12/06/2024 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1675,C00148,10/21/2024 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1676,C00148,10/14/2024 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1677,C00148,08/14/2024 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1678,C00149,08/14/2026 08:00 AM,Chemical Peel,Facials,Dr. Rivera,Cancelled
+A1679,C00149,04/17/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1680,C00149,01/08/2026 12:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1681,C00149,02/03/2026 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1682,C00150,09/18/2025 10:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1683,C00151,06/25/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1684,C00151,04/01/2025 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1685,C00151,02/19/2025 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1686,C00151,09/22/2024 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1687,C00151,06/06/2024 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1688,C00152,04/08/2026 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1689,C00152,12/16/2025 12:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1690,C00152,10/14/2025 01:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1691,C00152,08/26/2025 09:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1692,C00152,10/21/2026 02:00 PM,Botox,Injectables,Dr. Rivera,Confirmed
+A1693,C00153,09/05/2025 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1694,C00153,06/23/2025 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1695,C00153,03/15/2025 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1696,C00153,10/13/2024 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1697,C00154,10/16/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1698,C00154,08/03/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1699,C00154,03/22/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1700,C00154,01/28/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1701,C00154,12/24/2024 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1702,C00155,11/01/2025 01:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1703,C00155,08/12/2025 02:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1704,C00155,03/26/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1705,C00156,01/21/2026 09:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1706,C00157,01/15/2025 11:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1707,C00157,09/19/2024 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1708,C00158,02/22/2025 02:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1709,C00158,12/13/2024 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1710,C00158,10/13/2024 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,No Show
+A1711,C00158,06/30/2024 11:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1712,C00158,06/27/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1713,C00158,01/04/2024 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1714,C00158,11/12/2023 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1715,C00158,08/05/2023 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1716,C00159,11/03/2025 02:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1717,C00159,08/12/2025 11:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1718,C00159,03/22/2025 12:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1719,C00159,03/08/2025 09:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1720,C00160,07/02/2025 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1721,C00160,04/16/2025 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1722,C00160,11/04/2024 10:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1723,C00160,08/12/2024 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1724,C00160,05/24/2024 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1725,C00161,08/06/2025 01:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1726,C00161,05/30/2025 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,No Show
+A1727,C00161,01/20/2025 09:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1728,C00161,12/12/2024 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Cancelled
+A1729,C00162,04/02/2025 08:00 AM,Chemical Peel,Facials,Dr. Rivera,No Show
+A1730,C00162,01/15/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1731,C00162,11/05/2024 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Cancelled
+A1732,C00162,07/09/2024 10:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1733,C00162,01/30/2024 08:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1734,C00162,10/20/2023 09:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1735,C00162,02/01/2024 11:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1736,C00162,10/25/2023 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",No Show
+A1737,C00163,06/17/2025 08:00 AM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1738,C00163,03/06/2025 11:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1739,C00163,01/24/2025 08:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1740,C00164,08/08/2026 10:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1741,C00164,04/14/2026 08:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1742,C00164,01/02/2026 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1743,C00164,12/05/2025 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1744,C00164,09/26/2025 01:00 PM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1745,C00164,04/15/2025 08:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1746,C00164,09/29/2024 02:00 PM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1747,C00164,11/23/2024 01:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1748,C00165,05/17/2026 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1749,C00165,01/26/2026 10:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1750,C00165,11/18/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1751,C00165,11/09/2025 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,Cancelled
+A1752,C00165,05/02/2025 10:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1753,C00165,07/21/2025 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1754,C00165,04/04/2025 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1755,C00165,10/26/2026 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Confirmed
+A1756,C00166,03/02/2026 02:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1757,C00166,12/25/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Cancelled
+A1758,C00166,11/06/2026 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Confirmed
+A1759,C00167,09/28/2025 11:00 AM,Microneedling,Skin,"Sarah Kim, NP",Cancelled
+A1760,C00167,06/30/2025 09:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1761,C00167,05/17/2025 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1762,C00167,01/19/2025 08:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1763,C00167,10/15/2024 01:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1764,C00167,11/22/2024 10:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",No Show
+A1765,C00167,10/21/2023 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1766,C00167,10/23/2026 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Confirmed
+A1767,C00168,09/27/2026 12:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1768,C00168,06/06/2026 02:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Cancelled
+A1769,C00169,05/31/2025 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1770,C00169,03/13/2025 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1771,C00169,11/26/2024 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1772,C00169,08/28/2024 12:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1773,C00169,05/04/2024 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1774,C00169,06/25/2024 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1775,C00169,03/01/2024 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1776,C00169,10/14/2023 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1777,C00169,10/29/2026 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Confirmed
+A1778,C00170,04/04/2025 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1779,C00170,01/25/2025 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1780,C00170,09/02/2024 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1781,C00170,07/11/2024 11:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1782,C00170,02/21/2024 01:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1783,C00171,08/30/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1784,C00171,05/22/2026 11:00 AM,Dermal Filler,Injectables,Dr. Rivera,Cancelled
+A1785,C00171,03/13/2026 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1786,C00171,11/12/2025 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1787,C00171,12/21/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1788,C00171,05/02/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1789,C00171,07/12/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1790,C00172,07/27/2026 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1791,C00172,04/17/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",No Show
+A1792,C00172,02/01/2026 11:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1793,C00172,09/18/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1794,C00172,04/15/2025 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1795,C00172,08/01/2025 12:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1796,C00173,08/04/2026 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1797,C00173,05/10/2026 11:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1798,C00173,01/20/2026 08:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1799,C00174,09/04/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1800,C00174,06/05/2026 09:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1801,C00174,02/20/2026 11:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1802,C00174,01/16/2026 09:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1803,C00174,09/13/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1804,C00174,07/26/2025 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",No Show
+A1805,C00174,04/12/2025 10:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1806,C00174,10/25/2024 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1807,C00174,10/23/2026 02:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Confirmed
+A1808,C00175,09/07/2026 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1809,C00175,06/06/2026 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1810,C00175,02/01/2026 12:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1811,C00175,02/18/2026 01:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1812,C00175,07/06/2025 02:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1813,C00175,08/08/2025 10:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1814,C00175,11/09/2026 02:00 PM,HydraFacial,Facials,Dr. Rivera,Confirmed
+A1815,C00176,08/02/2026 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1816,C00176,05/17/2026 08:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1817,C00176,02/17/2026 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1818,C00177,04/11/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1819,C00177,12/30/2025 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1820,C00177,08/14/2025 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1821,C00177,08/29/2025 10:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1822,C00177,01/10/2025 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1823,C00177,05/11/2025 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1824,C00177,08/19/2024 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1825,C00178,08/03/2026 11:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1826,C00178,04/19/2026 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1827,C00178,01/31/2026 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1828,C00178,08/23/2025 08:00 AM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1829,C00178,04/18/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1830,C00178,01/25/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1831,C00178,09/24/2024 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1832,C00178,07/22/2024 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1833,C00179,02/09/2026 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Cancelled
+A1834,C00179,10/30/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1835,C00180,12/11/2025 01:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1836,C00181,06/17/2025 10:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1837,C00181,03/08/2025 11:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1838,C00181,10/30/2024 09:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1839,C00182,08/18/2026 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1840,C00182,05/26/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1841,C00182,12/31/2025 11:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1842,C00182,01/08/2026 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1843,C00182,07/30/2025 12:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1844,C00183,08/06/2026 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1845,C00183,05/30/2026 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1846,C00183,01/06/2026 01:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1847,C00183,08/17/2025 09:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1848,C00183,11/11/2025 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Cancelled
+A1849,C00183,07/22/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1850,C00184,10/27/2025 08:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1851,C00185,08/12/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1852,C00185,05/18/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1853,C00185,03/15/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1854,C00185,02/07/2025 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1855,C00185,09/18/2024 08:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1856,C00185,08/07/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1857,C00185,08/05/2024 02:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1858,C00185,05/23/2023 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1859,C00185,10/20/2026 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Confirmed
+A1860,C00186,08/06/2026 08:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Cancelled
+A1861,C00186,04/30/2026 08:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Cancelled
+A1862,C00187,10/11/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1863,C00187,07/30/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1864,C00187,02/13/2025 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1865,C00187,03/21/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1866,C00187,12/11/2024 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",No Show
+A1867,C00187,07/03/2024 02:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1868,C00188,08/24/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1869,C00189,09/02/2026 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1870,C00189,06/23/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1871,C00190,08/30/2026 11:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1872,C00190,05/05/2026 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1873,C00190,03/21/2026 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",No Show
+A1874,C00190,11/18/2025 01:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1875,C00190,08/11/2025 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1876,C00190,06/26/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1877,C00190,07/12/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1878,C00190,06/29/2025 12:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1879,C00191,06/27/2025 09:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1880,C00191,03/08/2025 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1881,C00191,11/29/2024 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Cancelled
+A1882,C00191,08/13/2024 01:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1883,C00191,04/13/2024 08:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1884,C00192,08/12/2026 09:00 AM,IPL Photofacial,Laser,Dr. Rivera,Checked Out
+A1885,C00192,05/18/2026 10:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1886,C00192,03/05/2026 10:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1887,C00192,08/26/2025 10:00 AM,Botox,Injectables,"Jessica Park, RN",No Show
+A1888,C00192,10/08/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1889,C00192,12/30/2024 10:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1890,C00193,08/14/2026 01:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1891,C00193,04/18/2026 12:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1892,C00193,03/25/2026 09:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1893,C00193,10/09/2025 09:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1894,C00193,11/23/2025 08:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1895,C00193,07/20/2025 08:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A1896,C00194,07/19/2025 02:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1897,C00194,04/01/2025 12:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A1898,C00194,12/09/2024 08:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A1899,C00194,12/09/2024 08:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1900,C00194,06/10/2024 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1901,C00194,03/06/2024 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1902,C00194,10/19/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Confirmed
+A1903,C00195,10/02/2026 12:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1904,C00196,09/15/2026 01:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1905,C00196,07/02/2026 11:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1906,C00196,01/20/2026 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1907,C00196,11/19/2025 10:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A1908,C00196,10/30/2025 08:00 AM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1909,C00196,01/28/2025 08:00 AM,Microneedling,Skin,"Sarah Kim, NP",No Show
+A1910,C00196,05/23/2025 02:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1911,C00196,02/18/2025 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",No Show
+A1912,C00197,11/10/2025 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1913,C00197,07/29/2025 01:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1914,C00197,05/08/2025 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1915,C00197,02/01/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1916,C00197,09/24/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1917,C00197,10/31/2024 02:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1918,C00198,06/13/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1919,C00198,03/17/2025 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1920,C00198,11/23/2024 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1921,C00198,10/13/2024 11:00 AM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1922,C00198,10/08/2024 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1923,C00198,05/29/2024 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1924,C00198,11/21/2023 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1925,C00198,04/07/2023 09:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1926,C00199,11/11/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",No Show
+A1927,C00200,05/15/2026 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1928,C00200,03/02/2026 12:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1929,C00200,01/15/2026 10:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1930,C00200,05/20/2025 08:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",No Show
+A1931,C00200,02/21/2025 12:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1932,C00200,11/01/2024 08:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1933,C00201,02/16/2026 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1934,C00201,10/19/2025 11:00 AM,Laser Hair Removal,Laser,Dr. Rivera,No Show
+A1935,C00201,09/05/2025 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1936,C00201,05/01/2025 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A1937,C00201,01/20/2025 12:00 PM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A1938,C00202,06/27/2025 10:00 AM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1939,C00202,04/27/2025 10:00 AM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1940,C00202,11/15/2024 11:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1941,C00202,11/23/2024 02:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1942,C00202,08/27/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1943,C00202,05/08/2024 12:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A1944,C00202,05/27/2024 11:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A1945,C00203,06/11/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1946,C00203,03/08/2025 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1947,C00203,10/26/2024 01:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1948,C00203,09/14/2024 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1949,C00203,02/21/2024 11:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1950,C00203,02/22/2024 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1951,C00203,03/18/2024 01:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1952,C00204,05/08/2025 11:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1953,C00204,02/04/2025 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1954,C00204,12/13/2024 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1955,C00204,05/22/2024 02:00 PM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A1956,C00204,03/26/2024 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1957,C00204,03/14/2024 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A1958,C00204,08/05/2023 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A1959,C00204,05/18/2023 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1960,C00205,10/07/2026 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1961,C00205,06/16/2026 10:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1962,C00205,04/30/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Cancelled
+A1963,C00205,11/29/2025 08:00 AM,HydraFacial,Facials,"Jessica Park, RN",Cancelled
+A1964,C00205,06/18/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A1965,C00205,09/02/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1966,C00205,08/25/2025 10:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1967,C00205,09/04/2024 01:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1968,C00206,09/28/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1969,C00206,06/21/2026 02:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1970,C00206,03/14/2026 10:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1971,C00206,10/18/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,No Show
+A1972,C00206,10/11/2025 12:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A1973,C00207,12/03/2025 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1974,C00207,09/10/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1975,C00207,04/19/2025 12:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1976,C00207,11/09/2026 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Confirmed
+A1977,C00208,09/11/2026 10:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Cancelled
+A1978,C00208,06/23/2026 01:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A1979,C00209,08/12/2026 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1980,C00209,05/28/2026 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1981,C00209,03/29/2026 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1982,C00209,09/19/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Cancelled
+A1983,C00209,08/01/2025 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A1984,C00209,06/28/2025 09:00 AM,Dermal Filler,Injectables,Dr. Rivera,Cancelled
+A1985,C00209,01/07/2025 10:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1986,C00210,06/13/2025 09:00 AM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A1987,C00210,04/12/2025 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1988,C00210,01/16/2025 11:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1989,C00211,09/24/2025 11:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1990,C00212,03/17/2026 12:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A1991,C00212,12/16/2025 10:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A1992,C00213,03/08/2026 10:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",No Show
+A1993,C00213,12/15/2025 11:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A1994,C00213,10/05/2025 10:00 AM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A1995,C00214,08/23/2026 11:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1996,C00214,05/02/2026 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A1997,C00214,04/07/2026 01:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A1998,C00214,10/09/2025 09:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A1999,C00214,12/14/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",No Show
+A2000,C00214,09/17/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2001,C00214,08/28/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2002,C00214,06/23/2024 02:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A2003,C00215,08/27/2026 12:00 PM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A2004,C00215,06/24/2026 08:00 AM,IV Vitamin Drip,Wellness,Dr. Rivera,Cancelled
+A2005,C00215,04/01/2026 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A2006,C00215,10/26/2026 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Confirmed
+A2007,C00216,10/19/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A2008,C00216,08/05/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A2009,C00217,02/26/2025 02:00 PM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A2010,C00217,11/08/2026 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Confirmed
+A2011,C00218,09/23/2026 09:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2012,C00219,05/22/2025 02:00 PM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A2013,C00219,03/14/2025 02:00 PM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A2014,C00219,10/04/2024 11:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A2015,C00219,11/20/2024 10:00 AM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A2016,C00219,07/02/2024 12:00 PM,Chemical Peel,Facials,"Jessica Park, RN",Checked Out
+A2017,C00219,05/12/2024 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A2018,C00219,06/26/2023 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A2019,C00220,05/03/2025 11:00 AM,HydraFacial,Facials,"Sarah Kim, NP",No Show
+A2020,C00220,03/03/2025 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A2021,C00220,11/02/2024 11:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A2022,C00220,11/01/2024 10:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A2023,C00220,08/16/2024 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2024,C00220,12/25/2023 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2025,C00220,09/23/2023 01:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A2026,C00220,12/30/2023 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A2027,C00220,11/10/2026 02:00 PM,HydraFacial,Facials,"Jessica Park, RN",Confirmed
+A2028,C00221,09/14/2026 02:00 PM,Chemical Peel,Facials,Dr. Rivera,No Show
+A2029,C00221,07/12/2026 08:00 AM,Microneedling,Skin,"Sarah Kim, NP",No Show
+A2030,C00221,05/07/2026 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2031,C00221,02/19/2026 11:00 AM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A2032,C00221,09/23/2025 10:00 AM,Microneedling,Skin,"Jessica Park, RN",Checked Out
+A2033,C00221,09/29/2025 01:00 PM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A2034,C00221,06/09/2025 11:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A2035,C00221,06/16/2025 02:00 PM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A2036,C00222,08/29/2026 01:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A2037,C00222,06/06/2026 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A2038,C00222,04/11/2026 11:00 AM,Laser Hair Removal,Laser,Dr. Rivera,Checked Out
+A2039,C00222,11/08/2025 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A2040,C00222,05/30/2025 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A2041,C00222,10/13/2025 08:00 AM,Laser Hair Removal,Laser,"Jessica Park, RN",Checked Out
+A2042,C00222,03/19/2025 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A2043,C00222,11/30/2024 09:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A2044,C00222,11/02/2026 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Confirmed
+A2045,C00223,01/31/2026 08:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A2046,C00224,04/29/2025 02:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A2047,C00224,02/28/2025 01:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A2048,C00225,04/30/2026 11:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2049,C00225,02/25/2026 10:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Cancelled
+A2050,C00225,09/14/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A2051,C00225,05/29/2025 10:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A2052,C00226,03/22/2026 08:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2053,C00226,12/19/2025 08:00 AM,Botox,Injectables,Dr. Rivera,Cancelled
+A2054,C00226,08/24/2025 01:00 PM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A2055,C00226,05/17/2025 08:00 AM,Botox,Injectables,"Sarah Kim, NP",No Show
+A2056,C00226,12/05/2024 11:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A2057,C00226,10/28/2024 11:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2058,C00226,08/17/2024 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2059,C00227,01/12/2026 08:00 AM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A2060,C00227,10/10/2025 11:00 AM,IPL Photofacial,Laser,"Sarah Kim, NP",Checked Out
+A2061,C00227,09/06/2025 02:00 PM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A2062,C00227,04/11/2025 12:00 PM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A2063,C00227,01/09/2025 01:00 PM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",No Show
+A2064,C00227,10/18/2026 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Confirmed
+A2065,C00228,07/29/2026 08:00 AM,Dermal Filler,Injectables,"Sarah Kim, NP",Checked Out
+A2066,C00228,04/19/2026 12:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A2067,C00229,09/13/2026 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A2068,C00229,06/13/2026 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Cancelled
+A2069,C00229,03/07/2026 02:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A2070,C00230,01/17/2026 10:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A2071,C00230,10/10/2025 02:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A2072,C00230,06/11/2025 11:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2073,C00230,11/08/2026 02:00 PM,Dermal Filler,Injectables,Dr. Rivera,Confirmed
+A2074,C00231,08/14/2025 12:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A2075,C00232,07/30/2026 01:00 PM,Chemical Peel,Facials,Dr. Rivera,Checked Out
+A2076,C00233,04/09/2026 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2077,C00233,12/30/2025 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A2078,C00233,11/30/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2079,C00233,05/23/2025 11:00 AM,IV Vitamin Drip,Wellness,"Sarah Kim, NP",Checked Out
+A2080,C00233,05/20/2025 10:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A2081,C00233,09/21/2024 08:00 AM,HydraFacial,Facials,"Sarah Kim, NP",Checked Out
+A2082,C00233,10/16/2024 11:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A2083,C00233,02/13/2025 01:00 PM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A2084,C00234,09/15/2026 01:00 PM,Dermal Filler,Injectables,"Jessica Park, RN",Checked Out
+A2085,C00234,06/09/2026 02:00 PM,IV Vitamin Drip,Wellness,"Jessica Park, RN",Checked Out
+A2086,C00234,04/26/2026 08:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A2087,C00234,10/29/2025 08:00 AM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A2088,C00234,09/24/2025 08:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2089,C00234,03/09/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2090,C00234,07/22/2025 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2091,C00234,10/15/2024 12:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A2092,C00234,11/07/2026 02:00 PM,HydraFacial,Facials,Dr. Rivera,Confirmed
+A2093,C00235,08/11/2025 08:00 AM,Dermal Filler,Injectables,Dr. Rivera,Checked Out
+A2094,C00235,05/07/2025 09:00 AM,Chemical Peel,Facials,"Sarah Kim, NP",Checked Out
+A2095,C00236,01/09/2026 09:00 AM,Laser Hair Removal,Laser,"Sarah Kim, NP",Checked Out
+A2096,C00236,09/18/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2097,C00236,07/31/2025 02:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A2098,C00236,04/08/2025 01:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2099,C00237,07/29/2025 10:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2100,C00237,05/11/2025 12:00 PM,Microneedling,Skin,Dr. Rivera,Checked Out
+A2101,C00237,02/27/2025 01:00 PM,Botox,Injectables,Dr. Rivera,Checked Out
+A2102,C00237,08/12/2024 08:00 AM,IPL Photofacial,Laser,"Jessica Park, RN",Checked Out
+A2103,C00237,08/23/2024 10:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A2104,C00238,01/04/2026 11:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2105,C00238,11/03/2025 12:00 PM,Microneedling,Skin,"Sarah Kim, NP",Checked Out
+A2106,C00238,07/14/2025 12:00 PM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A2107,C00238,07/08/2025 02:00 PM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2108,C00239,11/21/2025 01:00 PM,IV Vitamin Drip,Wellness,Dr. Rivera,Checked Out
+A2109,C00239,07/26/2025 11:00 AM,Botox,Injectables,Dr. Rivera,Checked Out
+A2110,C00239,07/08/2025 12:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2111,C00239,03/26/2025 08:00 AM,Botox,Injectables,"Jessica Park, RN",Cancelled
+A2112,C00239,11/10/2024 11:00 AM,Botox,Injectables,"Sarah Kim, NP",Checked Out
+A2113,C00239,10/22/2024 09:00 AM,Botox,Injectables,"Jessica Park, RN",Checked Out
+A2114,C00240,04/11/2026 11:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2115,C00240,01/23/2026 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A2116,C00240,12/10/2025 01:00 PM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2117,C00240,08/20/2025 12:00 PM,HydraFacial,Facials,Dr. Rivera,Checked Out
+A2118,C00240,08/14/2025 10:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out
+A2119,C00240,09/28/2024 02:00 PM,HydraFacial,Facials,Dr. Rivera,No Show
+A2120,C00240,03/05/2025 09:00 AM,HydraFacial,Facials,"Jessica Park, RN",Checked Out

@@ -1,0 +1,11 @@
+{
+  "name": "@clinic/api",
+  "private": true,
+  "scripts": {
+    "dev": "uv run uvicorn clinic_api.main:app --reload --port 8000 --reload-dir ../../packages --reload-dir src",
+    "lint": "uv run ruff check src tests",
+    "test": "uv run pytest tests -q",
+    "openapi": "uv run python -m clinic_api.export_openapi",
+    "seed": "uv run python -m clinic_api.seed"
+  }
+}

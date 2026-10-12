@@ -1,0 +1,7 @@
+{
+  "name": "@clinic/engagement",
+  "private": true,
+  "scripts": {
+    "lint": "uv run ruff check src"
+  }
+}

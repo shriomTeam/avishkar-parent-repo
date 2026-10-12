@@ -1,0 +1,10 @@
+{
+  "name": "@clinic/db",
+  "private": true,
+  "scripts": {
+    "migrate": "uv run alembic upgrade head",
+    "revision": "uv run alembic revision --autogenerate -m",
+    "check-heads": "uv run python -m clinic_db.check_heads",
+    "lint": "uv run ruff check src migrations"
+  }
+}

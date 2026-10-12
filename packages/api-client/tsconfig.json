@@ -1,0 +1,4 @@
+{
+  "extends": "@clinic/tsconfig/library.json",
+  "include": ["src"]
+}

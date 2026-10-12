@@ -1,0 +1,22 @@
+{
+  "name": "always-on-clinic",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @clinic/db migrate",
+    "db:revision": "pnpm --filter @clinic/db revision",
+    "db:seed": "pnpm --filter @clinic/api seed",
+    "api-client:generate": "pnpm --filter @clinic/api-client generate",
+    "boundaries": "uv run lint-imports"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0"
+  }
+}

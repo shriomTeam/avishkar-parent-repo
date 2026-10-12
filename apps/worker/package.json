@@ -1,0 +1,8 @@
+{
+  "name": "@clinic/worker",
+  "private": true,
+  "scripts": {
+    "dev": "uv run clinic-worker",
+    "lint": "uv run ruff check src"
+  }
+}

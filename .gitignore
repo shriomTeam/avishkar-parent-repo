@@ -1,0 +1,23 @@
+node_modules/
+.turbo/
+.next/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+.env
+.env.local
+!.env.example
+
+# Client data must never be committed (PHI).
+/data/
+*.client.csv
+
+.DS_Store
+packages/api-client/openapi.json
