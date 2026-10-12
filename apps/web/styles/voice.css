@@ -1,0 +1,1507 @@
+/* Source design scoped to auth and voice screens. */
+.voice-scope {
+  --purple: #a1ff62;
+  --ink: #201d1d;
+  --bg: #f4f4f4;
+  --lilac: #edffe1;
+  --line: #e8e7ec;
+  --muted: #74717d;
+}
+.voice-scope * {
+  box-sizing: border-box;
+}
+.voice-scope {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font:
+    16px/1.5 "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+.voice-scope a {
+  color: inherit;
+  text-decoration: none;
+}
+.voice-scope button,
+.voice-scope input,
+.voice-scope select,
+.voice-scope textarea {
+  font: inherit;
+}
+.voice-scope button,
+.voice-scope .button {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 10px 16px;
+  background: white;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.voice-scope button:hover,
+.voice-scope .button:hover {
+  border-color: var(--purple);
+  color: var(--purple);
+}
+.voice-scope button.primary,
+.voice-scope .primary {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple);
+}
+.voice-scope button.danger {
+  color: #b72c43;
+}
+.voice-scope button:focus-visible,
+.voice-scope a:focus-visible,
+.voice-scope input:focus-visible,
+.voice-scope textarea:focus-visible,
+.voice-scope select:focus-visible {
+  outline: 3px solid #80cc4e;
+  outline-offset: 3px;
+}
+.voice-scope aside {
+  width: 245px;
+  position: fixed;
+  inset: 0 auto 0 0;
+  background: white;
+  border-right: 1px solid var(--line);
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+}
+.voice-scope .brand {
+  font-size: 29px;
+  font-weight: 750;
+  letter-spacing: -1.5px;
+  padding: 0 10px;
+}
+.voice-scope .brand span {
+  color: var(--purple);
+  margin-left: 4px;
+}
+.voice-scope .workspace {
+  display: flex;
+  gap: 12px;
+  padding: 17px 10px;
+  margin: 28px 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 14px;
+}
+.voice-scope .avatar {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  background: var(--lilac);
+  color: var(--purple);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.voice-scope small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+.voice-scope .navlabel {
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  color: #96929f;
+  margin: 0 12px 10px;
+}
+.voice-scope nav a {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px;
+  border-radius: 9px;
+  font-size: 14px;
+  margin: 3px 0;
+  color: #625d6b;
+}
+.voice-scope nav a.active {
+  background: var(--lilac);
+  color: var(--purple);
+  font-weight: 600;
+}
+.voice-scope nav svg {
+  width: 19px;
+  height: 19px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+}
+.voice-scope .sidebottom {
+  margin-top: auto;
+}
+.voice-scope .pilot {
+  padding: 14px;
+  background: #f7faf5;
+  border-radius: 10px;
+  font-size: 12px;
+}
+.voice-scope .pilot p {
+  margin: 4px 0;
+  color: var(--muted);
+}
+.voice-scope .profile {
+  display: flex;
+  gap: 12px;
+  padding: 20px 5px 0;
+  font-size: 14px;
+}
+.voice-scope .dark {
+  background: var(--ink);
+  color: white;
+}
+.voice-scope .shell {
+  margin-left: 245px;
+}
+.voice-scope header {
+  height: 79px;
+  background: white;
+  border-bottom: 1px solid var(--line);
+  padding: 0 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--muted);
+}
+.voice-scope .headerRight {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.voice-scope main {
+  max-width: 1440px;
+  margin: auto;
+  padding: 34px 38px 45px;
+  min-height: calc(100vh - 138px);
+}
+.voice-scope .heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  gap: 16px;
+}
+.voice-scope h1 {
+  font-size: 30px;
+  letter-spacing: -1px;
+  margin: 0 0 5px;
+  font-weight: 650;
+}
+.voice-scope h2 {
+  font-size: 18px;
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+.voice-scope h3 {
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+.voice-scope p {
+  margin: 7px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.voice-scope .actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.voice-scope .badge {
+  display: inline-flex;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #edf8f0;
+  color: #237047;
+}
+.voice-scope .pale {
+  background: var(--lilac);
+  color: var(--purple);
+}
+.voice-scope .warn {
+  background: #fff0e5;
+  color: #9a5424;
+}
+.voice-scope .bad {
+  background: #ffedf0;
+  color: #ae3049;
+}
+.voice-scope .neutral {
+  background: #f1f0f3;
+  color: #777180;
+}
+.voice-scope .cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 23px;
+}
+.voice-scope .card,
+.voice-scope .panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 23px;
+}
+.voice-scope .metric label {
+  font-size: 14px;
+  color: var(--muted);
+}
+.voice-scope .metric .value {
+  font-size: 32px;
+  font-weight: 650;
+  letter-spacing: -1px;
+  margin: 10px 0 7px;
+}
+.voice-scope .metric small {
+  font-size: 12px;
+}
+.voice-scope .metric.feature {
+  background: var(--purple);
+  border-color: var(--purple);
+  color: white;
+}
+.voice-scope .feature label,
+.voice-scope .feature small {
+  color: #365522;
+}
+.voice-scope .two {
+  display: grid;
+  grid-template-columns: 1.65fr 1fr;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+.voice-scope .panelHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.voice-scope .panelHead a {
+  font-size: 14px;
+  color: var(--purple);
+}
+.voice-scope .chart {
+  height: 195px;
+  display: flex;
+  align-items: flex-end;
+  gap: 17px;
+  padding: 0 12px 24px;
+  position: relative;
+  background: repeating-linear-gradient(
+    to top,
+    transparent 0,
+    transparent 44px,
+    #f0eff4 45px,
+    #f0eff4 46px
+  );
+}
+.voice-scope .bar {
+  flex: 1;
+  height: var(--h);
+  background: #d1f5bc;
+  border-radius: 5px 5px 0 0;
+  position: relative;
+}
+.voice-scope .bar:last-child {
+  background: var(--purple);
+}
+.voice-scope .bar span {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--muted);
+}
+.voice-scope .bar:hover {
+  background: var(--purple);
+}
+.voice-scope .legend {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+.voice-scope .agentmini {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 18px 0;
+}
+.voice-scope .agentmini .grow {
+  flex: 1;
+}
+.voice-scope .agentmini strong {
+  font-size: 14px;
+}
+.voice-scope .rowline {
+  border-top: 1px solid var(--line);
+  margin-top: 20px;
+  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.voice-scope .tablewrap {
+  overflow: auto;
+}
+.voice-scope table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.voice-scope th {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+  background: #fafafa;
+}
+.voice-scope th,
+.voice-scope td {
+  padding: 15px 13px;
+  border-bottom: 1px solid var(--line);
+}
+.voice-scope tr:last-child td {
+  border: 0;
+}
+.voice-scope tbody tr {
+  cursor: pointer;
+}
+.voice-scope tbody tr:hover {
+  background: #f6fff0;
+}
+.voice-scope .callname {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.voice-scope .circle {
+  border-radius: 50%;
+  width: 31px;
+  height: 31px;
+  background: var(--lilac);
+  display: grid;
+  place-items: center;
+  color: var(--purple);
+}
+.voice-scope .filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.voice-scope .filters input {
+  flex: 1;
+}
+.voice-scope .field {
+  margin-bottom: 21px;
+}
+.voice-scope .field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.voice-scope input,
+.voice-scope select,
+.voice-scope textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid #dedce5;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  color: var(--ink);
+}
+.voice-scope textarea {
+  resize: vertical;
+  line-height: 1.7;
+  min-height: 170px;
+}
+.voice-scope .field small {
+  margin-top: 7px;
+}
+.voice-scope .filters select {
+  width: auto;
+  max-width: 190px;
+}
+.voice-scope .agentgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.voice-scope .agentcard {
+  padding: 24px;
+  transition: transform 0.15s;
+}
+.voice-scope .agentcard:hover {
+  transform: translateY(-3px);
+}
+.voice-scope .agentcard .avatar {
+  width: 45px;
+  height: 45px;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+.voice-scope .agentcard h2 {
+  margin: 14px 0 4px;
+}
+.voice-scope .agentstats {
+  display: flex;
+  gap: 25px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+  margin: 22px 0;
+}
+.voice-scope .agentstats strong {
+  font-size: 16px;
+}
+.voice-scope .agentcard .button {
+  width: 100%;
+}
+.voice-scope .tabs {
+  display: flex;
+  gap: 23px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 25px;
+  overflow: auto;
+}
+.voice-scope .tabs button {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 13px 0;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.voice-scope .tabs .selected {
+  color: var(--purple);
+  border-bottom: 2px solid var(--purple);
+}
+.voice-scope .editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 22px;
+}
+.voice-scope .note {
+  background: var(--lilac);
+  border-radius: 10px;
+  padding: 17px;
+  font-size: 14px;
+  color: #365522;
+}
+.voice-scope .note p {
+  color: #557445;
+}
+.voice-scope .formtwo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.voice-scope .code {
+  font-family: monospace;
+  font-size: 13px;
+  background: #f7f6fa;
+  padding: 15px;
+  border-radius: 9px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.voice-scope .summarylist {
+  display: grid;
+  gap: 15px;
+  font-size: 14px;
+}
+.voice-scope .summarylist div {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+.voice-scope .summarylist span {
+  color: var(--muted);
+}
+.voice-scope .chat {
+  display: flex;
+  gap: 15px;
+  margin: 22px 0;
+}
+.voice-scope .chat .bubble {
+  max-width: 80%;
+  padding: 14px 17px;
+  background: #f6f5f8;
+  border-radius: 0 12px 12px 12px;
+  font-size: 14px;
+}
+.voice-scope .chat.agent .bubble {
+  background: var(--lilac);
+}
+.voice-scope .chat strong {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.voice-scope .chat small {
+  margin-top: 5px;
+}
+.voice-scope .wave {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 55px;
+  flex: 1;
+  overflow: hidden;
+}
+.voice-scope .wave i {
+  background: #b8e99b;
+  width: 4px;
+  min-width: 4px;
+  height: var(--h);
+  border-radius: 3px;
+}
+.voice-scope .player {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  background: #f7fff2;
+  padding: 12px;
+  border-radius: 10px;
+}
+.voice-scope .player button {
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  background: var(--purple);
+  color: white;
+}
+.voice-scope .testcenter {
+  text-align: center;
+  padding: 42px 25px;
+}
+.voice-scope .orb {
+  width: 110px;
+  height: 110px;
+  margin: 25px auto;
+  background: var(--lilac);
+  border: 13px solid #f4ffed;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--purple);
+  font-size: 32px;
+}
+.voice-scope .orb.live {
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  50% {
+    box-shadow: 0 0 0 20px #edffe170;
+  }
+}
+.voice-scope .checkrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.voice-scope .checkrow input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--purple);
+}
+.voice-scope .empty {
+  padding: 55px;
+  text-align: center;
+}
+.voice-scope .empty h2 {
+  margin: 15px 0;
+}
+.voice-scope .progress {
+  height: 7px;
+  border-radius: 6px;
+  background: #edeaf4;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.voice-scope .progress i {
+  height: 100%;
+  display: block;
+  background: var(--purple);
+}
+.voice-scope footer {
+  padding: 18px 38px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  display: flex;
+  gap: 24px;
+  color: var(--muted);
+}
+.voice-scope footer a {
+  margin-left: auto;
+  color: var(--purple);
+}
+.voice-scope #toast {
+  display: none;
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: white;
+  padding: 13px 22px;
+  border-radius: 10px;
+  z-index: 10;
+  font-size: 14px;
+}
+.voice-scope dialog {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px;
+  width: min(520px, 90vw);
+  box-shadow: 0 20px 80px #201d1d25;
+}
+.voice-scope dialog::backdrop {
+  background: #201d1d60;
+}
+.voice-scope dialog h2 {
+  margin-bottom: 20px;
+}
+.voice-scope .auth {
+  max-width: 440px;
+  margin: 60px auto;
+}
+.voice-scope .auth .brand {
+  display: block;
+  text-align: center;
+  margin-bottom: 35px;
+}
+.voice-scope .auth h1 {
+  font-size: 26px;
+}
+.voice-scope .auth .primary {
+  width: 100%;
+}
+.voice-scope .authlinks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--purple);
+  margin-top: 16px;
+}
+.voice-scope .guidegrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+.voice-scope .guidegrid .card {
+  display: flex;
+  gap: 18px;
+}
+.voice-scope .number {
+  color: var(--purple);
+  font-size: 25px;
+  font-weight: 650;
+}
+.voice-scope .pill {
+  background: #f3f8ef;
+  padding: 5px 9px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+.voice-scope .dangerpanel {
+  border-color: #f2ccd4;
+}
+.voice-scope .inline {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.voice-scope .muted {
+  color: var(--muted);
+}
+@media (min-width: 1500px) {
+  .voice-scope main {
+    padding-top: 45px;
+  }
+  .voice-scope .chart {
+    height: 240px;
+  }
+}
+@media (max-width: 1100px) {
+  .voice-scope aside {
+    width: 205px;
+    padding: 25px 12px;
+  }
+  .voice-scope .shell {
+    margin-left: 205px;
+  }
+  .voice-scope main {
+    padding: 28px 24px;
+  }
+  .voice-scope .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .voice-scope .agentgrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .voice-scope .editor {
+    grid-template-columns: 1fr;
+  }
+  .voice-scope .two {
+    grid-template-columns: 1fr;
+  }
+  .voice-scope header {
+    padding: 0 24px;
+  }
+}
+@media (max-width: 700px) {
+  .voice-scope aside {
+    position: relative;
+    width: 100%;
+    padding: 16px;
+  }
+  .voice-scope .brand {
+    font-size: 24px;
+  }
+  .voice-scope .workspace,
+  .voice-scope .navlabel,
+  .voice-scope .sidebottom {
+    display: none;
+  }
+  .voice-scope nav {
+    display: flex;
+    overflow: auto;
+    gap: 5px;
+    margin-top: 12px;
+  }
+  .voice-scope nav a {
+    white-space: nowrap;
+    padding: 9px;
+    font-size: 13px;
+  }
+  .voice-scope nav svg {
+    display: none;
+  }
+  .voice-scope .shell {
+    margin: 0;
+  }
+  .voice-scope header {
+    height: 60px;
+    padding: 0 18px;
+  }
+  .voice-scope .headerRight .badge {
+    display: none;
+  }
+  .voice-scope main {
+    padding: 25px 18px;
+  }
+  .voice-scope .heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .voice-scope h1 {
+    font-size: 26px;
+  }
+  .voice-scope .cards {
+    gap: 10px;
+  }
+  .voice-scope .card,
+  .voice-scope .panel {
+    padding: 18px;
+  }
+  .voice-scope .metric .value {
+    font-size: 27px;
+  }
+  .voice-scope .agentgrid,
+  .voice-scope .guidegrid,
+  .voice-scope .formtwo {
+    grid-template-columns: 1fr;
+  }
+  .voice-scope .filters {
+    flex-wrap: wrap;
+  }
+  .voice-scope .filters input {
+    flex-basis: 100%;
+  }
+  .voice-scope footer {
+    padding: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .voice-scope .tabs {
+    gap: 18px;
+  }
+  .voice-scope .chat .bubble {
+    max-width: 100%;
+  }
+}
+
+/* Avishkar brand: lime surfaces with dark, accessible text. */
+.voice-scope .brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  letter-spacing: -1.2px;
+}
+.voice-scope .brand img {
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.voice-scope .auth .brand {
+  display: flex;
+  justify-content: center;
+}
+.voice-scope .brand span {
+  color: var(--ink);
+}
+.voice-scope button.primary,
+.voice-scope .primary {
+  color: var(--ink);
+}
+.voice-scope button:hover,
+.voice-scope .button:hover {
+  color: var(--ink);
+}
+.voice-scope nav a.active {
+  color: #315218;
+  background: var(--lilac);
+}
+.voice-scope .avatar {
+  color: #315218;
+}
+.voice-scope .dark {
+  color: white;
+}
+.voice-scope .badge.pale {
+  color: #315218;
+}
+.voice-scope .metric.feature {
+  color: var(--ink);
+}
+.voice-scope .feature label,
+.voice-scope .feature small {
+  color: #365522;
+}
+.voice-scope .panelHead a,
+.voice-scope footer a,
+.voice-scope .authlinks {
+  color: #38691d;
+}
+.voice-scope .tabs .selected {
+  color: #315218;
+}
+.voice-scope .number,
+.voice-scope .circle,
+.voice-scope .orb {
+  color: #315218;
+}
+.voice-scope .player button {
+  color: var(--ink);
+}
+.voice-scope .bar:last-child {
+  background: var(--purple);
+}
+.voice-scope .bar:hover {
+  background: #7fda44;
+}
+.voice-scope .progress i {
+  background: #74bd42;
+}
+
+/* React application adaptations and accessible interaction states. */
+.voice-scope {
+  --accent: #a1ff62;
+  --accent-text: #315218;
+}
+.voice-scope {
+  font-size: 15px;
+}
+.voice-scope button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.voice-scope button.primary:hover,
+.voice-scope .button.primary:hover {
+  background: #8ee84f;
+}
+.voice-scope input:focus,
+.voice-scope textarea:focus,
+.voice-scope select:focus {
+  border-color: #80cc4e;
+}
+.voice-scope input[type="checkbox"] {
+  flex-shrink: 0;
+}
+.voice-scope .sidebar .workspace strong {
+  display: block;
+  max-width: 140px;
+  overflow-wrap: anywhere;
+}
+.voice-scope .sidebar .brand {
+  padding: 0 7px;
+}
+.voice-scope .signout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin: 16px 5px 0;
+  color: var(--muted);
+}
+.voice-scope .breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.voice-scope .breadcrumb strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.voice-scope .period-select {
+  width: auto;
+  min-width: 130px;
+}
+.voice-scope .metric-label {
+  font-size: 14px;
+  color: var(--muted);
+}
+.voice-scope .feature .metric-label {
+  color: #365522;
+}
+.voice-scope .metric .value {
+  font-size: clamp(22px, 2.3vw, 32px);
+  overflow-wrap: anywhere;
+}
+.voice-scope .agent-pills {
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.voice-scope .spaced {
+  margin-top: 20px;
+}
+.voice-scope .short-textarea {
+  min-height: 90px;
+}
+.voice-scope .form-intro {
+  margin-bottom: 25px;
+}
+.voice-scope .settings-panel {
+  max-width: 1000px;
+}
+.voice-scope .tool-list {
+  display: grid;
+  gap: 20px;
+}
+.voice-scope .wrap-text {
+  overflow-wrap: anywhere;
+  min-width: 0;
+  text-align: right;
+}
+.voice-scope .summarylist strong {
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+.voice-scope .backlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #38691d;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+.voice-scope .toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: white;
+  padding: 13px 22px;
+  border-radius: 10px;
+  z-index: 100;
+  font-size: 14px;
+  box-shadow: 0 8px 30px #201d1d20;
+  max-width: calc(100vw - 32px);
+}
+.voice-scope .dialog-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 15px;
+}
+.voice-scope .dialog-title h2 {
+  margin: 0;
+}
+.voice-scope .dialog-title button {
+  padding: 7px;
+  border: 0;
+}
+.voice-scope .dialog-actions {
+  justify-content: flex-end;
+  margin-top: 22px;
+}
+.voice-scope dialog {
+  max-height: 85vh;
+  overflow: auto;
+}
+.voice-scope dialog .field {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.voice-scope .form-error {
+  color: #ae3049;
+  background: #ffedf0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+.voice-scope .error-note {
+  margin-bottom: 18px;
+}
+.voice-scope .guide-note {
+  margin-bottom: 22px;
+}
+.voice-scope details summary {
+  cursor: pointer;
+  color: #38691d;
+}
+.voice-scope .chart-month {
+  gap: 5px;
+}
+.voice-scope .chart-month .bar {
+  min-width: 3px;
+}
+.voice-scope .chart-month .bar span {
+  font-size: 10px;
+}
+.voice-scope .is-playing .wave i {
+  animation: wave 1s ease-in-out infinite alternate;
+}
+.voice-scope .is-playing .wave i:nth-child(2n) {
+  animation-delay: -0.4s;
+}
+@keyframes wave {
+  to {
+    transform: scaleY(0.4);
+  }
+}
+.voice-scope .skip-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 200;
+  background: var(--ink);
+  color: white;
+  padding: 12px;
+}
+.voice-scope .skip-link:focus {
+  top: 12px;
+}
+.voice-scope .login-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: none;
+  padding: 0;
+  min-height: 100vh;
+}
+.voice-scope .login-story {
+  background: var(--ink);
+  color: white;
+  padding: 44px 56px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+.voice-scope .login-story .brand {
+  color: white;
+  align-self: flex-start;
+  padding: 0;
+}
+.voice-scope .login-pitch {
+  margin: auto 0;
+  max-width: 520px;
+  padding: 65px 0 45px;
+}
+.voice-scope .login-pitch .pill {
+  background: #35482c;
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+}
+.voice-scope .login-pitch h2 {
+  font-size: clamp(38px, 4vw, 64px);
+  line-height: 1.12;
+  letter-spacing: -2px;
+  margin: 24px 0;
+}
+.voice-scope .login-pitch > p {
+  color: #b5b2b2;
+  font-size: 16px;
+  line-height: 1.8;
+  max-width: 400px;
+}
+.voice-scope .login-visual {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  background: #ffffff08;
+  border: 1px solid #ffffff18;
+  border-radius: 15px;
+  padding: 24px;
+  margin-top: 36px;
+}
+.voice-scope .login-visual svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.voice-scope .login-visual strong {
+  font-size: 14px;
+}
+.voice-scope .login-visual small {
+  color: #b5b2b2;
+  margin-top: 5px;
+}
+.voice-scope .login-bars {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 125px;
+  gap: 10px;
+  margin: 26px 0 0;
+  opacity: 0.65;
+}
+.voice-scope .login-bars i {
+  display: block;
+  background: var(--accent);
+  width: 7px;
+  border-radius: 8px;
+}
+.voice-scope .story-footer {
+  color: #aaa;
+  font-size: 12px;
+}
+.voice-scope .login-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 45px;
+  background: #fafbf9;
+  position: relative;
+}
+.voice-scope .login-card {
+  width: 100%;
+  max-width: 420px;
+}
+.voice-scope .login-card h1 {
+  font-size: 36px;
+  margin: 22px 0 10px;
+  letter-spacing: -1.2px;
+}
+.voice-scope .login-card > p {
+  font-size: 15px;
+  max-width: 350px;
+  line-height: 1.8;
+}
+.voice-scope .google-button {
+  width: 100%;
+  padding: 16px 20px;
+  margin-top: 32px;
+  justify-content: flex-start;
+  gap: 15px;
+  box-shadow: 0 3px 8px #201d1d05;
+}
+.voice-scope .google-button svg:last-child {
+  margin-left: auto;
+}
+.voice-scope .login-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 26px;
+  border-radius: 10px;
+  background: var(--lilac);
+  padding: 16px;
+}
+.voice-scope .login-preview svg {
+  margin-top: 5px;
+  color: #315218;
+  flex-shrink: 0;
+}
+.voice-scope .login-preview p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #557445;
+}
+.voice-scope .login-preview strong {
+  color: #315218;
+  font-weight: 600;
+}
+.voice-scope .setup-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #38691d;
+  margin-top: 24px;
+}
+.voice-scope .login-foot {
+  position: absolute;
+  bottom: 26px;
+  font-size: 12px;
+}
+.voice-scope .onboarding-page {
+  max-width: 900px;
+  padding: 36px;
+  min-height: 100vh;
+}
+.voice-scope .onboarding {
+  max-width: 620px;
+  margin: 60px auto;
+}
+.voice-scope .standalone {
+  max-width: 700px;
+  padding: 70px 30px;
+}
+.voice-scope table .code {
+  max-width: 360px;
+}
+.voice-scope tbody tr {
+  cursor: default;
+}
+.voice-scope th {
+  text-transform: none;
+}
+.voice-scope .checkrow label {
+  cursor: pointer;
+}
+.voice-scope .empty {
+  padding: 40px 20px;
+}
+.voice-scope main {
+  min-width: 0;
+}
+.voice-scope .two > * {
+  min-width: 0;
+}
+.voice-scope .actions {
+  flex-wrap: wrap;
+}
+.voice-scope .chart .bar {
+  transition: height 0.2s;
+}
+.voice-scope .panelHead {
+  gap: 12px;
+}
+.voice-scope .panelHead h2 {
+  flex-shrink: 0;
+}
+@media (max-width: 1100px) {
+  .voice-scope .login-story {
+    padding: 35px;
+  }
+  .voice-scope .login-content {
+    padding: 35px;
+  }
+  .voice-scope .login-pitch h2 {
+    font-size: 43px;
+  }
+  .voice-scope .login-visual {
+    padding: 18px;
+  }
+  .voice-scope .agentgrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .voice-scope .sidebar {
+    position: relative;
+  }
+  .voice-scope .sidebar nav svg {
+    display: block;
+    width: 15px;
+    height: 15px;
+  }
+  .voice-scope .sidebar nav {
+    gap: 4px;
+  }
+  .voice-scope .sidebar nav a {
+    gap: 6px;
+  }
+  .voice-scope .headerRight {
+    gap: 8px;
+  }
+  .voice-scope .breadcrumb {
+    font-size: 12px;
+  }
+  .voice-scope .headerRight .button {
+    padding: 8px 12px;
+  }
+  .voice-scope .heading .actions {
+    width: 100%;
+  }
+  .voice-scope .heading .actions .period-select {
+    flex: 1;
+  }
+  .voice-scope .login-page {
+    grid-template-columns: 1fr;
+  }
+  .voice-scope .login-story {
+    padding: 28px;
+    min-height: 280px;
+  }
+  .voice-scope .login-pitch {
+    padding: 25px 0 0;
+    margin: 0;
+    max-width: none;
+  }
+  .voice-scope .login-pitch h2 {
+    font-size: 36px;
+    letter-spacing: -1px;
+    margin: 20px 0 12px;
+  }
+  .voice-scope .login-pitch h2 br {
+    display: none;
+  }
+  .voice-scope .login-pitch > p {
+    font-size: 14px;
+    max-width: none;
+  }
+  .voice-scope .login-visual,
+  .voice-scope .login-bars,
+  .voice-scope .story-footer {
+    display: none;
+  }
+  .voice-scope .login-content {
+    padding: 38px 24px 70px;
+    min-height: 440px;
+  }
+  .voice-scope .login-card h1 {
+    font-size: 30px;
+  }
+  .voice-scope .login-foot {
+    bottom: 15px;
+  }
+  .voice-scope .onboarding-page {
+    padding: 24px 18px;
+  }
+  .voice-scope .onboarding {
+    margin: 35px auto;
+  }
+  .voice-scope .metric .value {
+    font-size: 24px;
+  }
+  .voice-scope .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .voice-scope .tablewrap {
+    max-width: 100%;
+  }
+  .voice-scope .rowline {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .voice-scope .filters select {
+    max-width: 100%;
+    flex: 1;
+  }
+  .voice-scope .panelHead {
+    flex-wrap: wrap;
+  }
+  .voice-scope .inline {
+    flex-wrap: wrap;
+  }
+  .voice-scope .chart {
+    gap: 10px;
+  }
+  .voice-scope .chart-month {
+    gap: 3px;
+  }
+  .voice-scope .editor > .panel {
+    min-width: 0;
+  }
+  .voice-scope .chat {
+    gap: 8px;
+  }
+  .voice-scope .player {
+    gap: 10px;
+  }
+  .voice-scope .panel .summarylist {
+    font-size: 13px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .voice-scope *,
+  .voice-scope *::before,
+  .voice-scope *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Match the preferred 90% view without changing the user's browser zoom. */
+@media (min-width: 701px) {
+  .voice-scope body:has(.shell),
+  .voice-scope body:has(.login-page) {
+    zoom: 0.9;
+  }
+  .voice-scope .shell main {
+    min-height: calc(100vh / 0.9 - 138px);
+  }
+  .voice-scope .login-page {
+    min-height: calc(100vh / 0.9);
+  }
+}
+
+.voice-scope {
+  min-height: 100%;
+}
+.voice-scope .voice-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: white;
+  border-radius: 12px;
+  padding: 8px;
+}
+.voice-scope .voice-navigation a {
+  margin: 0;
+}
+.voice-scope .voice-sample-notice {
+  padding: 12px 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.voice-scope #voice-content {
+  min-width: 0;
+}
+.voice-scope footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+}

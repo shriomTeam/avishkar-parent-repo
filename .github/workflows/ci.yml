@@ -8,6 +8,10 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://clinic_app:clinic_app@localhost:5432/clinic
+      TEST_AUTH_DATABASE_URL: postgresql+psycopg://clinic_auth:clinic_auth@localhost:5432/clinic
+      TEST_SYSTEM_DATABASE_URL: postgresql+psycopg://clinic_system:clinic_system@localhost:5432/clinic
     services:
       postgres:
         image: postgres:17
@@ -50,5 +54,10 @@ jobs:
       - name: API client is up to date with the backend
         run: pnpm api-client:generate && git diff --exit-code packages/api-client/src/schema.d.ts
 
-      - name: Typecheck, test, build (only what changed, cached)
+      - name: Typecheck, database tests and production build
         run: pnpm turbo run typecheck test build
+
+      - name: Install browser for voice journeys
+        run: pnpm --filter @clinic/web exec playwright install --with-deps chromium
+      - name: Auth and voice browser journeys
+        run: pnpm --filter @clinic/web test:e2e

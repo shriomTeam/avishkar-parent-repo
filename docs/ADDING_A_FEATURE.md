@@ -49,7 +49,7 @@ feature = Feature(
 - Never send SMS/email directly. Declare a `SequenceDef` and `enroll()`.
 
 ## 3. Web
-Pages go in `apps/web/app/(features)/<path>/`. Start each page with
+Pages go in `apps/web/app/(platform)/(features)/<path>/`. Start each page with
 `await requireFeature("<key>")`, use `@clinic/ui` components, and call the API
 through the typed client (`pnpm api-client:generate` after backend changes).
 

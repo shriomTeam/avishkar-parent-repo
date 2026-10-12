@@ -1,8 +1,16 @@
 import type { NextConfig } from "next";
-
+import { loadEnvConfig } from "@next/env";
+import { resolve } from "node:path";
+loadEnvConfig(resolve(process.cwd(), "../.."));
 const config: NextConfig = {
-  // Workspace packages ship TypeScript source; Next compiles them.
   transpilePackages: ["@clinic/ui", "@clinic/api-client"],
+  output: "standalone",
+  async rewrites() {
+    const backend = process.env.BACKEND_INTERNAL_URL ?? "http://127.0.0.1:8000";
+    return [
+      { source: "/api/v1/:path*", destination: `${backend}/api/v1/:path*` },
+      { source: "/api/platform/:path*", destination: `${backend}/:path*` },
+    ];
+  },
 };
-
 export default config;

@@ -2,6 +2,7 @@
   "name": "@clinic/core",
   "private": true,
   "scripts": {
-    "lint": "uv run ruff check src"
+    "lint": "uv run ruff check src",
+    "test": "uv run pytest tests"
   }
 }

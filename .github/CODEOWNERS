@@ -14,10 +14,10 @@
 # Features: package, tables, web pages
 /packages/features/reactivation/                        @avishkar/team-reactivation
 /packages/db/src/clinic_db/models/reactivation.py       @avishkar/team-reactivation
-/apps/web/app/(features)/reactivation/                  @avishkar/team-reactivation
+/apps/web/app/(platform)/(features)/reactivation/                  @avishkar/team-reactivation
 
 /packages/features/blueprints/                          @avishkar/team-intelligence
-/apps/web/app/(features)/blueprints/                    @avishkar/team-intelligence
+/apps/web/app/(platform)/(features)/blueprints/                    @avishkar/team-intelligence
 /packages/features/command-center/                      @avishkar/team-intelligence
 /packages/db/src/clinic_db/models/command_center.py     @avishkar/team-intelligence
 
@@ -36,3 +36,9 @@
 
 # Migrations touch everyone: platform reviews every one.
 /packages/db/migrations/                                @avishkar/platform
+
+/apps/web/app/(platform)/(features)/voice-receptionist/ @avishkar/team-voice
+/apps/web/components/voice/                            @avishkar/team-voice
+/apps/web/lib/voice/                                   @avishkar/team-voice
+/apps/web/styles/voice.css                             @avishkar/team-voice @avishkar/design
+/docs/voice-receptionist/                              @avishkar/team-voice

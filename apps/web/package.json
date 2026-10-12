@@ -6,7 +6,9 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start --port 3000",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@clinic/api-client": "workspace:*",
@@ -14,7 +16,9 @@
     "next": "^16.4.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "lucide-react": "^0.468.0",
+    "@next/env": "^16.4.0"
   },
   "devDependencies": {
     "@clinic/tsconfig": "workspace:*",
@@ -23,6 +27,10 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "@playwright/test": "^1.56.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.9.9",
+    "eslint-config-next": "^16.4.0"
   }
 }

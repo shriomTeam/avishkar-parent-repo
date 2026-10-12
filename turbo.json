@@ -1,25 +1,42 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalDependencies": [".env", "pyproject.toml", "uv.lock"],
+  "globalDependencies": [
+    ".env",
+    "pyproject.toml",
+    "uv.lock"
+  ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**"
+      ]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
     },
     "typecheck": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "test": {
-      "dependsOn": ["^build"],
-      "outputs": []
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [],
+      "cache": false
     },
     "migrate": {
       "cache": false
@@ -32,6 +49,33 @@
     },
     "generate": {
       "cache": false
+    },
+    "test:e2e": {
+      "cache": false
     }
-  }
+  },
+  "globalEnv": [
+    "APP_ENV",
+    "ALLOW_DEV_AUTH",
+    "DATABASE_URL",
+    "DATABASE_SYSTEM_URL",
+    "DATABASE_AUTH_URL",
+    "REDIS_URL",
+    "PUBLIC_APP_ORIGIN",
+    "BACKEND_INTERNAL_URL",
+    "GOOGLE_REDIRECT_URI",
+    "SESSION_COOKIE_NAME",
+    "COOKIE_SECURE",
+    "TRUSTED_HOSTS"
+  ],
+  "globalPassThroughEnv": [
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "TWILIO_ACCOUNT_SID",
+    "TWILIO_AUTH_TOKEN",
+    "TWILIO_FROM_NUMBER",
+    "TEST_DATABASE_URL",
+    "TEST_SYSTEM_DATABASE_URL",
+    "TEST_AUTH_DATABASE_URL"
+  ]
 }
