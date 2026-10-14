@@ -1,0 +1,78 @@
+# Always-On Clinic
+
+One multi-tenant platform sold as components (features), built as a **modular monolith**: one API, one worker, one web app, one Postgres. Do not split features into services; extraction later is a new `apps/<name>` that mounts the same feature package.
+
+Read before building: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (why it is shaped this way), [docs/ADDING_A_FEATURE.md](docs/ADDING_A_FEATURE.md) (feature walkthrough, `reactivation` is the reference), [README.md](README.md) (local setup and commands).
+
+## Layout
+
+```
+apps/
+  web/                one Next.js app (thin routes that pull in each feature's pages)
+  api/                one FastAPI app (discovers and mounts the installed features)
+  worker/             one background worker
+packages/
+  db/                 all tables (SQLAlchemy) and the single Alembic migration stream
+  core/               tenancy (RLS), feature contract, entitlements, events, audit
+  integrations/       client data import
+  engagement/         shared SMS and email engine
+  features/
+    reactivation/
+      src/            backend
+      web/            frontend pages for this feature
+    voice-receptionist/   (same shape)
+    lead-response/        (same shape)
+    ...
+  ui/                 shared React components
+  api-client/         generated TypeScript API types
+  tsconfig/           shared TS configs
+infra/
+  postgres/           local Docker init (roles)
+  terraform/          production GCP
+.github/workflows/    ci.yml (checks), terraform.yml (infra), migrate.yml (prod DB)
+```
+
+Each feature owns its `src/` and `web/`; `apps/web` imports a feature's pages through a one-line route, so removing a feature is deleting its package, its route line and its entry point. Today the `reactivation` and `blueprints` pages still live in `apps/web/app/(features)/`; new features start in `web/`, and those two move when their teams get to it.
+
+Layers run apps → features → integrations/engagement → core → db. Features never import each other; they talk through `core` tables and `emit()` events. `pnpm boundaries` enforces this, so a new package must be added to the import-linter lists in the root `pyproject.toml` and to the uv workspace `members`/`sources`.
+
+## Migrations
+
+All tables live in `packages/db`. One stream, one head. No other package creates tables.
+
+1. Edit or add `packages/db/src/clinic_db/models/<schema>.py`; import it in `models/__init__.py`.
+2. `pnpm db:revision "short description"`, then **read the generated file**.
+3. For every new table with `tenant_id`, add `enable_tenant_rls(op, "<schema>.<table>")` after its `create_table`. A new schema needs `create_schema_with_grants(op, "<schema>")` first. Both helpers are in `clinic_db/rls.py`; a test fails if RLS is missing.
+4. `pnpm db:migrate`, then `uv run alembic check` (inside `packages/db`) to confirm models and migrations match.
+5. `pnpm --filter @clinic/db check-heads` must report a single head. Two open PRs that both add a migration fork the history: rebase and set `down_revision` to the current head.
+
+Rules:
+- A migration that has been merged is immutable; fix forward with a new one.
+- Migrations run while the old API and worker are still serving, so keep each one backward compatible (add columns nullable or defaulted; drop in a later release).
+- Enum-like values are plain strings validated in Python, and per-client extras go in `attributes` JSONB, so many changes need no migration.
+
+How it reaches production: merging a change under `packages/db/**` to `main` runs `migrate.yml`. It builds `packages/db/Dockerfile`, takes a Cloud SQL backup, points the Cloud Run Job at the new image, and executes it. The image runs `bootstrap_roles` (creates `clinic_app` and `clinic_system` once; never rotates their passwords) and then `alembic upgrade head`. There is no approval step.
+
+## Infra (`infra/terraform`)
+
+Layout: root files wire modules together; `modules/<name>/{main,variables,outputs}.tf` holds resources; `envs/<env>.tfvars` and `envs/<env>.backend.hcl` hold per-environment values.
+
+- **Naming:** every resource is named from `local.name` (`<environment>-avishkar`), so prod resources start `prod-`. Pass `name = local.name` and `labels = local.labels` into each module and build names as `"${var.name}-<thing>"`.
+- **Environments:** one codebase, one state prefix per environment in the shared GCS bucket. All share one GCP project, so the name prefix and the `environment` label are what separate them.
+- **Add a resource:** create `modules/<name>/`, call it from `main.tf`, and expose only what other modules need through outputs. Add any new GCP API to the `google_project_service` list in `main.tf`.
+- **Add an environment:** add `envs/<env>.tfvars` and `envs/<env>.backend.hcl`. `terraform.yml` hardcodes `TF_ENV: prod`, and the subnet range is not yet a root variable; give each VPC a distinct CIDR when you add that variable.
+- **Sensitive values** (API keys, tokens, anything not generated by Terraform): never put them in `*.tfvars` or the repo. Store the value as a GitHub **repository secret**, declare the Terraform variable with `sensitive = true`, and pass it in the `terraform.yml` plan and apply steps as `TF_VAR_<name>: ${{ secrets.<NAME> }}`. Then have Terraform write it to a `google_secret_manager_secret` plus version in GCP, and let services read it from there. Non-sensitive values (project, region, environment) stay in `envs/<env>.tfvars`.
+- **Secrets:** generated with `random_password` and stored in Secret Manager. Anything referencing a secret's `latest` version must depend on the version resource, not just the secret, or Cloud Run fails with "was not found".
+- **Image:** Terraform creates the Cloud Run Job with a placeholder image and ignores image changes; `migrate.yml` sets the real image. The job must exist (Terraform applied) before `migrate.yml` can run.
+
+Deploy flow: PRs touching `infra/terraform/**` run fmt, validate and plan (shown in the run summary). A merge to `main` runs plan and apply automatically. The org is on GitHub Free, so there are no required reviewers and no branch protection: the PR review is the only gate.
+
+Gotchas:
+- Created by hand, outside Terraform: the state bucket, the Workload Identity pool/provider, and the `github-cicd` service account. Do not recreate them in Terraform without importing.
+- Repo variables `PROJECT_ID`, `REGION`, `WIF_PROVIDER`, `CICD_SA` hold the bare value only. `WIF_PROVIDER` must start with `projects/`; a leading `=` or `WIF_PROVIDER=` breaks authentication.
+- The database has a private IP only. Reach it through the Cloud Run Job or Cloud SQL Studio, not from a laptop or a GitHub runner.
+- Generated passwords are in the Terraform state; keep the state bucket private.
+
+## Checks before a PR
+
+`pnpm lint`, `pnpm test`, `pnpm boundaries`, and `pnpm typecheck` (needs the local DB from `pnpm db:up` and `pnpm db:migrate`). After an API change run `pnpm api-client:generate` and commit the result. For infra: `terraform fmt -recursive` and `terraform validate` from `infra/terraform`.
