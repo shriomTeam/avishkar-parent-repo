@@ -1,7 +1,7 @@
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from clinic_core.database import current_tenant
@@ -44,7 +44,22 @@ async def launch_campaign(session: AsyncSession, campaign: Campaign) -> int:
             select(CampaignTarget).where(CampaignTarget.campaign_id == campaign.id, CampaignTarget.status == "pending")
         )
     ).all()
+    now = datetime.now(UTC)
+    rebooked = set(
+        (
+            await session.scalars(
+                select(Appointment.patient_id).where(
+                    Appointment.patient_id.in_([t.patient_id for t in targets]),
+                    Appointment.status == "booked",
+                    Appointment.starts_at >= now,
+                )
+            )
+        ).all()
+    )
+    enrolled = 0
     for t in targets:
+        if t.patient_id in rebooked:
+            continue  # booked since the campaign was created: leave pending, don't text them
         await enroll(
             session,
             sequence_key=campaign.sequence_key,
@@ -53,8 +68,9 @@ async def launch_campaign(session: AsyncSession, campaign: Campaign) -> int:
             owner_ref=t.id,
         )
         t.status = "contacted"
-    campaign.status, campaign.launched_at = "running", datetime.now(UTC)
-    return len(targets)
+        enrolled += 1
+    campaign.status, campaign.launched_at = "running", now
+    return enrolled
 
 
 async def campaign_stats(session: AsyncSession, campaign_id: uuid.UUID) -> dict:
@@ -105,3 +121,19 @@ async def on_appointment_booked(ctx: JobContext, event: Event) -> None:
     target.status = "booked"
     target.booked_appointment_id = appointment.id if appointment else None
     target.booked_at = datetime.now(UTC)
+
+
+async def on_consent_changed(ctx: JobContext, event: Event) -> None:
+    """Withdrawn consent: mark the patient's contacted targets in running campaigns as opted out."""
+    if event.payload.get("granted"):
+        return
+    running = select(Campaign.id).where(Campaign.status == "running")
+    await ctx.session.execute(
+        update(CampaignTarget)
+        .where(
+            CampaignTarget.patient_id == uuid.UUID(str(event.payload["patient_id"])),
+            CampaignTarget.status == "contacted",
+            CampaignTarget.campaign_id.in_(running),
+        )
+        .values(status="opted_out")
+    )

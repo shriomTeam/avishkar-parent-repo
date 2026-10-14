@@ -6,7 +6,8 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from clinic_core.api import get_session
+from clinic_core.api import get_session, require_role
+from clinic_db.models.core import StaffRole
 from clinic_db.models.reactivation import Campaign
 from clinic_reactivation import service
 from clinic_reactivation.rules import find_lapsed_patients
@@ -77,7 +78,10 @@ async def _out(session: AsyncSession, c: Campaign) -> CampaignOut:
     )
 
 
-@router.post("/campaigns", response_model=CampaignOut, status_code=201)
+MANAGERS = [Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER))]
+
+
+@router.post("/campaigns", response_model=CampaignOut, status_code=201, dependencies=MANAGERS)
 async def create_campaign(body: CampaignIn, session: AsyncSession = Depends(get_session)) -> CampaignOut:
     days = body.lapsed_days or await service.default_lapsed_days(session)
     campaign = await service.create_campaign(session, name=body.name, lapsed_days=days)
@@ -91,7 +95,7 @@ async def list_campaigns(session: AsyncSession = Depends(get_session)) -> list[C
     return [await _out(session, c) for c in campaigns]
 
 
-@router.post("/campaigns/{campaign_id}/launch", response_model=CampaignOut)
+@router.post("/campaigns/{campaign_id}/launch", response_model=CampaignOut, dependencies=MANAGERS)
 async def launch(campaign_id: uuid.UUID, session: AsyncSession = Depends(get_session)) -> CampaignOut:
     campaign = await session.get(Campaign, campaign_id)
     if campaign is None:
