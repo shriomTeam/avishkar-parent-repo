@@ -20,5 +20,5 @@ variable "subnet_id" {
 
 variable "secret_ids" {
   type        = map(string)
-  description = "Secret Manager secret ids with keys owner-url, app-password, system-password."
+  description = "Secret Manager secret ids with keys owner-url, app-password, system-password, auth-password, auth-url."
 }

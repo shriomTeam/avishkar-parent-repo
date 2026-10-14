@@ -113,3 +113,9 @@ Run the Next frontend separately with `pnpm --filter @clinic/web dev`. Do not al
 - [Architecture blueprint](Open_Source_Retell_AI_Architecture_Blueprint.pdf)
 
 Original guides describe the source folder layout and are retained as historical references. Use this README for current setup. The migration plan separates relocation of existing code from future voice API/runtime implementation.
+
+## Production auth role
+
+Terraform generates the `clinic_auth` password and stores `auth-password` and `auth-url` in Secret Manager using the environment name prefix. The migration job receives `CLINIC_AUTH_PASSWORD`; `clinic_db.bootstrap_roles` creates the restricted login before Alembic grants access to the auth schema. An existing NOLOGIN placeholder is enabled, while existing login passwords are preserved. No superuser or BYPASSRLS privileges are granted to the auth role.
+
+Apply the infrastructure before running the new migration image. The backend Cloud Run service is not yet defined in this Terraform tree: when deploying it, grant its service account access to the `auth-url` secret and inject that secret as `DATABASE_AUTH_URL`. The migration service account only receives the role-password secret, not the runtime auth URL. Do not use the example local password in production.
