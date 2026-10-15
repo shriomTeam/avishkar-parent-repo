@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Always-On Clinic",
-  icons: { icon: "/voice/avishkar-logo.png" },
+  icons: { icon: "/brand/avishkar-logo.png" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

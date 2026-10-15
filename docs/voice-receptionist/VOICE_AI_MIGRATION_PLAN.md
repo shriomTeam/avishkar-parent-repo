@@ -90,7 +90,7 @@ apps/
         services/                     dashboard adapter + future API implementation
         demo/                         fixtures and mock state, explicitly sample-only
     styles/voice.module.css           NEW scoped voice design styles
-    public/voice/                     NEW source logo/assets
+    public/brand/                     NEW source logo/assets
     tests/voice/                      NEW ported Playwright journeys
   worker/                             existing background process
   voice-agent/                        NEW later: independently run live audio
@@ -145,12 +145,12 @@ The `(platform)` move is needed because the current root layout hides all childr
 
 | Source | Destination/action |
 | --- | --- |
-| `frontend/src/app/dashboard/**` | `apps/web/app/(platform)/(features)/voice-receptionist/**`; rewrite all links, redirects, active nav and test expectations |
+| `frontend/src/app/dashboard/**` | `apps/web/app/(fullscreen)/voice-receptionist/**`; rewrite all links, redirects, active nav and test expectations |
 | `frontend/src/components/*` | Voice screens to `apps/web/components/voice`; auth/onboarding/sign-out to `components/auth`; split shared settings from voice privacy settings |
 | `frontend/src/lib/auth/*` | `apps/web/lib/auth`; adapt session shape to platform tenant identity |
 | `frontend/src/lib/{types,format}.ts`, `demo/*`, `services/*` | `apps/web/lib/voice`; update `@/` imports to prevent collisions |
 | `frontend/src/app/globals.css` | Extract scoped voice styles; review body, aside, inputs, buttons, links and CSS variables rather than appending global CSS |
-| `frontend/public/*` | `apps/web/public/voice/*`; update asset URLs and metadata |
+| `frontend/public/*` | `apps/web/public/brand/*`; update asset URLs and metadata |
 | `backend/app/modules/auth/*` | HTTP routes into `clinic_api.routers.auth`; policy/provider/repositories into `clinic_core.auth`; models into `clinic_db.models.auth` |
 | `backend/app/modules/users/*` | Global identity logic in `clinic_core.auth`; user models in `clinic_db.models.auth` |
 | `backend/app/modules/workspaces/*` | Shared clinic onboarding/access policies in `clinic_core.tenancy`, routes in API; map to existing tenants/staff |

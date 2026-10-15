@@ -8,9 +8,11 @@ There is no standalone `apps/voice-receptionist` folder. Voice receptionist is a
 
 | Responsibility | Location |
 | --- | --- |
-| Voice pages | `apps/web/app/(platform)/(features)/voice-receptionist` |
+| Voice pages | `apps/web/app/(fullscreen)/voice-receptionist` |
 | Voice screens and scoped CSS | `apps/web/components/voice`, `apps/web/styles/voice.css` |
 | Sample data/service adapter | `apps/web/lib/voice` |
+| Shared auth components/styles | `packages/ui/src/auth.tsx`, `packages/ui/styles/auth.css` |
+| Platform branding | `apps/web/public/brand` |
 | Login/onboarding pages | `apps/web/app/(auth)`, `apps/web/components/auth` |
 | Backend auth/provider/session policy | `packages/core/src/clinic_core/auth` |
 | Tenant onboarding/membership lookup | `packages/core/src/clinic_core/tenancy` |

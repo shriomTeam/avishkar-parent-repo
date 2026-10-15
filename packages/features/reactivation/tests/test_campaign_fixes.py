@@ -4,9 +4,11 @@ import httpx
 from fastapi import FastAPI
 from sqlalchemy import select
 
+from clinic_core.auth.database import create_database
 from clinic_core.database import tenant_session
 from clinic_core.events import CONSENT_CHANGED
 from clinic_core.features import Event, JobContext
+from clinic_core.settings import Settings
 from clinic_core.testing import create_test_tenant
 from clinic_db.models.core import Appointment, Patient
 from clinic_db.models.engagement import Enrollment
@@ -15,6 +17,9 @@ from clinic_reactivation import service
 from clinic_reactivation.router import router
 
 app = FastAPI()
+# This isolated router test intentionally exercises the explicit dev-header adapter.
+app.state.settings = Settings(allow_dev_auth=True)
+app.state.engine, app.state.session_factory = create_database(app.state.settings)
 app.include_router(router)
 
 

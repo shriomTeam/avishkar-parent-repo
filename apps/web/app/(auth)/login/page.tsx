@@ -1,5 +1,5 @@
 import { ArrowRight, AudioLines, ShieldCheck } from "lucide-react";
-import { Brand } from "@/components/voice/ui";
+import { Brand } from "@clinic/ui";
 export const metadata = { title: "Sign in" };
 export default async function Login({
   searchParams,

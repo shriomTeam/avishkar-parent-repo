@@ -1,8 +1,8 @@
-import "@/styles/voice.css";
+import "@clinic/ui/auth.css";
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="voice-scope">{children}</div>;
+  return <div className="auth-scope">{children}</div>;
 }

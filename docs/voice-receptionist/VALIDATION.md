@@ -18,3 +18,13 @@ No source database, credentials, generated caches or nested Git repository were 
 ## Voice shell restoration
 
 Restored the original Avishkar sidebar, workspace identity, profile, breadcrumbs, header actions, footer and desktop scale. Voice routes replace the parent shell; a return link preserves access to other clinic products. Scoped browser defaults protect source typography from Tailwind preflight. Nine browser journeys passed against a separate `voice_ui_test` database, including shell geometry and navigation to/from the platform at 1440, 820 and 390 pixels. Desktop and mobile screenshots were visually inspected.
+
+## Pre-merge review fixes — 15 October 2026
+
+- Rebased onto main including reactivation settings/runs. Auth migration now follows `ba9df5563ea9`; one Alembic head remains. A fresh Docker PostgreSQL database upgraded through the complete chain, and `alembic check` reports no model drift.
+- Shared Brand/Field/Select/FormError now live in `packages/ui/src/auth.tsx`; platform authentication styles are in `packages/ui/styles/auth.css`, and branding is under `apps/web/public/brand`. Login/onboarding and root metadata have no imports or assets from the voice feature.
+- Voice pages moved to `apps/web/app/(fullscreen)/voice-receptionist`; the fullscreen group provides shared authentication, while the platform frame has no feature path checks. URLs and entitlement enforcement are unchanged.
+- All nine voice browser journeys passed. A new independent platform-auth browser test also passed with voice routes, components, libraries, stylesheet and voice tests temporarily removed; the platform production build passed in that state. All removed files were restored automatically.
+- All 63 Python tests passed across API, shared auth, DB bootstrap, reactivation and integrations. Normal production build, web/shared UI typechecks, ESLint, Ruff and import boundaries passed. This frontend-removal smoke check does not claim complete backend-package removal coverage.
+
+Follow-up after merge: move voice frontend implementation/tests into `packages/features/voice-receptionist/web/` with thin app routes; agree and implement live voice API contracts. New features must already follow the feature-owned `web/` convention. The full package/route/entry-point removal acceptance check belongs to that modularization follow-up.

@@ -11,6 +11,7 @@ apps/
   web/                         one Next.js app
     app/
       (auth)/                  login and clinic onboarding
+      (fullscreen)/voice-receptionist/  voice routes with their own shell
       (platform)/              authenticated platform routes
         layout.tsx             shared auth provider and platform shell
         page.tsx               clinic product overview
@@ -18,17 +19,15 @@ apps/
         (features)/
           blueprints/          existing patient blueprint pages
           reactivation/        existing reactivation pages
-          voice-receptionist/  voice overview, agents, numbers, calls, test,
-                               tools, variables, settings and guide
     components/
       auth/                    onboarding and sign-out controls
       voice/                   original Avishkar voice shell and screens
-      platform-frame.tsx       selects platform or voice shell by route
+      platform-frame.tsx       generic platform shell (no feature path checks)
     lib/
       auth/                    verified session loading and auth provider
       voice/                   voice types, formatting, demo state and adapters
     styles/voice.css            scoped source design and responsive styling
-    public/voice/               voice branding assets
+    public/brand/               platform branding assets
     tests/voice/                Playwright auth and voice journeys
     playwright.config.ts       isolated browser-test API and frontend
   api/                         one FastAPI app; mounts installed features
@@ -72,9 +71,9 @@ infra/
 .github/workflows/             ci.yml, terraform.yml, migrate.yml
 ```
 
-This tree describes the implemented `migration/voice-ai` layout. There is no standalone `apps/voice-receptionist`, `backend/` or `frontend/` app. Voice UI is served at `/voice-receptionist` by `apps/web`; route groups `(platform)` and `(features)` do not appear in URLs. Its original branded sidebar and header replace the platform shell on voice routes; “All clinic products” returns to the platform.
+This tree describes the implemented `migration/voice-ai` layout. There is no standalone `apps/voice-receptionist`, `backend/` or `frontend/` app. Voice UI is served at `/voice-receptionist` by `apps/web`; route groups `(fullscreen)`, `(platform)` and `(features)` do not appear in URLs. Its original branded sidebar and header replace the platform shell on voice routes; “All clinic products” returns to the platform.
 
-Feature backend code belongs in its package's `src/`. The current reactivation, blueprints and migrated voice frontend pages live in `apps/web/app/(platform)/(features)/`, with voice components and adapters namespaced under `components/voice` and `lib/voice`. A feature-owned `web/` directory with thin app routes is a future organization convention, not a directory already created by this migration.
+Feature backend code belongs in its package's `src/`. The current reactivation and blueprints pages live in `apps/web/app/(platform)/(features)/`; voice routes live in `apps/web/app/(fullscreen)/voice-receptionist/`, with voice components and adapters namespaced under `components/voice` and `lib/voice`. New features must start in `packages/features/<name>/web/`, with thin one-line route files in `apps/web` importing their pages. The migrated voice frontend remains an explicit transitional exception; moving its screens, adapters, styles, assets and tests into `packages/features/voice-receptionist/web/` is a follow-up after merge.
 
 ## Voice AI migration
 

@@ -5,28 +5,15 @@ import {
   useRef,
   useState,
   type ReactNode,
-  type InputHTMLAttributes,
-  type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from "react";
-import Link from "next/link";
-import Image from "next/image";
+import { Brand as SharedBrand } from "@clinic/ui";
 import { X } from "lucide-react";
 import { useDemo } from "@/lib/voice/demo/provider";
 export function Brand() {
-  return (
-    <Link className="brand" href="/voice-receptionist">
-      <Image
-        src="/voice/avishkar-logo.png"
-        alt=""
-        width={34}
-        height={34}
-        priority
-      />
-      avishkar
-    </Link>
-  );
+  return <SharedBrand href="/voice-receptionist" />;
 }
+export { Field, Select, FormError } from "@clinic/ui";
 export function Heading({
   title,
   description,
@@ -53,33 +40,6 @@ export function Badge({ children }: { children: string }) {
     >
       {children}
     </span>
-  );
-}
-export function Field({
-  label,
-  ...props
-}: InputHTMLAttributes<HTMLInputElement> & { label: string }) {
-  const id = useId();
-  return (
-    <div className="field">
-      <label htmlFor={id}>{label}</label>
-      <input {...props} id={id} />
-    </div>
-  );
-}
-export function Select({
-  label,
-  children,
-  ...props
-}: SelectHTMLAttributes<HTMLSelectElement> & { label: string }) {
-  const id = useId();
-  return (
-    <div className="field">
-      <label htmlFor={id}>{label}</label>
-      <select {...props} id={id}>
-        {children}
-      </select>
-    </div>
   );
 }
 export function Textarea({
@@ -189,13 +149,7 @@ export function Dialog({
     </dialog>
   );
 }
-export function FormError({ message }: { message: string }) {
-  return message ? (
-    <p className="form-error" role="alert">
-      {message}
-    </p>
-  ) : null;
-}
+
 export function Empty({
   title,
   description,

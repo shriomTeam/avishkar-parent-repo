@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Brand, Field, Select, FormError } from "@/components/voice/ui";
+import { Brand, Field, Select, FormError } from "@clinic/ui";
 import { useAuth } from "@/lib/auth/provider";
 import { SignOut } from "./sign-out";
 export function Onboarding() {

@@ -37,7 +37,7 @@
 # Migrations touch everyone: platform reviews every one.
 /packages/db/migrations/                                @avishkar/platform
 
-/apps/web/app/(platform)/(features)/voice-receptionist/ @avishkar/team-voice
+/apps/web/app/(fullscreen)/voice-receptionist/ @avishkar/team-voice
 /apps/web/components/voice/                            @avishkar/team-voice
 /apps/web/lib/voice/                                   @avishkar/team-voice
 /apps/web/styles/voice.css                             @avishkar/team-voice @avishkar/design
