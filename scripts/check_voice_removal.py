@@ -71,8 +71,10 @@ def main():
         env.pop("GOOGLE_CLIENT_SECRET", None)
         env["UV_PROJECT_ENVIRONMENT"] = str(root / ".venv")
         commands = [
-            ["pnpm", "install", "--offline", "--no-frozen-lockfile"],
-            ["uv", "sync", "--offline"],
+            # Removing a workspace changes dependency/peer resolution. A frozen
+            # install does not necessarily cache registry metadata on a fresh runner.
+            ["pnpm", "install", "--prefer-offline", "--no-frozen-lockfile"],
+            ["uv", "sync"],
             ["pnpm", "build"],
             ["pnpm", "test"],
             ["pnpm", "boundaries"],
