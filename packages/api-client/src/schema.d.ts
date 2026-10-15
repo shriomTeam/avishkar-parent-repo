@@ -232,6 +232,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/reactivation/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Settings */
+        get: operations["get_settings_features_reactivation_settings_get"];
+        /** Put Settings */
+        put: operations["put_settings_features_reactivation_settings_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Schedule */
+        get: operations["get_schedule_features_reactivation_schedule_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/reactivation/preview": {
         parameters: {
             query?: never;
@@ -342,6 +377,39 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AnalysisPoints */
+        AnalysisPoints: {
+            /**
+             * Best Offer
+             * @default true
+             */
+            best_offer: boolean;
+            /**
+             * Best Time
+             * @default true
+             */
+            best_time: boolean;
+            /**
+             * Reachable
+             * @default true
+             */
+            reachable: boolean;
+            /**
+             * Provider Continuity
+             * @default true
+             */
+            provider_continuity: boolean;
+            /**
+             * Seasonality
+             * @default false
+             */
+            seasonality: boolean;
+            /**
+             * Change Since Last
+             * @default true
+             */
+            change_since_last: boolean;
+        };
         /** BatchOut */
         BatchOut: {
             /**
@@ -482,11 +550,59 @@ export interface components {
             /** Dormant Lifetime Value Cents */
             dormant_lifetime_value_cents: number;
         };
+        /** ChurnedMember */
+        ChurnedMember: {
+            /**
+             * Priority
+             * @default 2
+             */
+            priority: number;
+            /**
+             * Membership Months
+             * @default 6
+             */
+            membership_months: number;
+        };
         /**
          * ClinicType
          * @enum {string}
          */
         ClinicType: "medspa" | "wellness" | "hrt";
+        /** ConsultNotConverted */
+        ConsultNotConverted: {
+            /**
+             * Priority
+             * @default 3
+             */
+            priority: number;
+            /**
+             * Conversion Window Days
+             * @default 60
+             */
+            conversion_window_days: number;
+        };
+        /** DormantRule */
+        DormantRule: {
+            /**
+             * Min Days Since Visit
+             * @default 180
+             */
+            min_days_since_visit: number;
+            /**
+             * Default Rebooking Days
+             * @default 120
+             */
+            default_rebooking_days: number;
+            /** Rebooking Days By Category */
+            rebooking_days_by_category?: {
+                [key: string]: number;
+            };
+            /**
+             * At Risk Ratio Min
+             * @default 0.8
+             */
+            at_risk_ratio_min: number;
+        };
         /** FeatureOut */
         FeatureOut: {
             /** Key */
@@ -569,6 +685,24 @@ export interface components {
              */
             channel: string;
         };
+        /** LapsedHighValue */
+        LapsedHighValue: {
+            /**
+             * Priority
+             * @default 1
+             */
+            priority: number;
+            /**
+             * Spend Percentile Min
+             * @default 80
+             */
+            spend_percentile_min: number;
+            /**
+             * Overdue Ratio Min
+             * @default 2
+             */
+            overdue_ratio_min: number;
+        };
         /** LapsedPatientOut */
         LapsedPatientOut: {
             /**
@@ -591,6 +725,29 @@ export interface components {
             visits: number;
             /** Lifetime Value Cents */
             lifetime_value_cents: number;
+        };
+        /** LastRunOut */
+        LastRunOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Trigger */
+            trigger: string;
+            /** Status */
+            status: string;
+            /**
+             * Queued At
+             * Format: date-time
+             */
+            queued_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            /** Progress Pct */
+            progress_pct: number;
         };
         /** MappingConfig */
         MappingConfig: {
@@ -627,6 +784,29 @@ export interface components {
             /** Nav */
             nav: components["schemas"]["NavItemOut"][];
         };
+        /** ModuleSwitches */
+        ModuleSwitches: {
+            /**
+             * Analysis Enabled
+             * @default true
+             */
+            analysis_enabled: boolean;
+            /**
+             * Export Enabled
+             * @default true
+             */
+            export_enabled: boolean;
+            /**
+             * Campaign Handoff Enabled
+             * @default false
+             */
+            campaign_handoff_enabled: boolean;
+            /**
+             * Ai Summary Enabled
+             * @default false
+             */
+            ai_summary_enabled: boolean;
+        };
         /** NavItemOut */
         NavItemOut: {
             /** Feature */
@@ -635,6 +815,42 @@ export interface components {
             label: string;
             /** Path */
             path: string;
+        };
+        /** OneAndDone */
+        OneAndDone: {
+            /**
+             * Priority
+             * @default 5
+             */
+            priority: number;
+            /**
+             * Min Days Since Visit
+             * @default 90
+             */
+            min_days_since_visit: number;
+        };
+        /** OverdueMaintenance */
+        OverdueMaintenance: {
+            /**
+             * Priority
+             * @default 4
+             */
+            priority: number;
+            /**
+             * Min Visits
+             * @default 2
+             */
+            min_visits: number;
+            /**
+             * Overdue Ratio Min
+             * @default 1
+             */
+            overdue_ratio_min: number;
+            /**
+             * Overdue Ratio Max
+             * @default 2
+             */
+            overdue_ratio_max: number;
         };
         /** PreviewOut */
         PreviewOut: {
@@ -668,6 +884,15 @@ export interface components {
             /** Avg Purchases */
             avg_purchases: number;
         };
+        /** ReactivationSettings */
+        ReactivationSettings: {
+            dormant?: components["schemas"]["DormantRule"];
+            types?: components["schemas"]["TypeRules"];
+            revenue?: components["schemas"]["RevenueRules"];
+            points?: components["schemas"]["AnalysisPoints"];
+            schedule?: components["schemas"]["RunSchedule"];
+            modules?: components["schemas"]["ModuleSwitches"];
+        };
         /** Report */
         Report: {
             /**
@@ -682,12 +907,82 @@ export interface components {
             /** Profiles */
             profiles: components["schemas"]["Profile"][];
         };
+        /** RevenueRules */
+        RevenueRules: {
+            /**
+             * Rate Low
+             * @default 0.08
+             */
+            rate_low: number;
+            /**
+             * Rate High
+             * @default 0.15
+             */
+            rate_high: number;
+            /**
+             * Min Sample
+             * @default 30
+             */
+            min_sample: number;
+            /**
+             * Attribution Window Days
+             * @default 30
+             */
+            attribution_window_days: number;
+        };
         /** RowError */
         RowError: {
             /** Row */
             row: number;
             /** Error */
             error: string;
+        };
+        /**
+         * RunSchedule
+         * @description Local time is in the tenant's own time zone (core.tenants.timezone).
+         */
+        RunSchedule: {
+            /**
+             * Frequency
+             * @default weekly
+             * @enum {string}
+             */
+            frequency: "weekly" | "monthly";
+            /**
+             * Day Of Week
+             * @description Monday is 0; used when weekly
+             * @default 0
+             */
+            day_of_week: number;
+            /**
+             * Day Of Month
+             * @description used when monthly
+             * @default 1
+             */
+            day_of_month: number;
+            /**
+             * Local Time
+             * @default 06:00
+             */
+            local_time: string;
+        };
+        /** ScheduleOut */
+        ScheduleOut: {
+            /** Next Run At */
+            next_run_at: string | null;
+            last_run: components["schemas"]["LastRunOut"] | null;
+        };
+        /** SettingsOut */
+        SettingsOut: {
+            /** Version */
+            version: number;
+            config: components["schemas"]["ReactivationSettings"];
+            /** Next Run At */
+            next_run_at: string | null;
+            /** Timezone */
+            timezone: string;
+            /** Updated By */
+            updated_by: string | null;
         };
         /**
          * StaffRole
@@ -751,6 +1046,23 @@ export interface components {
             status: string;
             /** Features */
             features: string[];
+        };
+        /** TypeRules */
+        TypeRules: {
+            lapsed_high_value?: components["schemas"]["LapsedHighValue"];
+            churned_member?: components["schemas"]["ChurnedMember"];
+            consult_not_converted?: components["schemas"]["ConsultNotConverted"];
+            overdue_maintenance?: components["schemas"]["OverdueMaintenance"];
+            one_and_done?: components["schemas"]["OneAndDone"];
+            unused_balance?: components["schemas"]["UnusedBalance"];
+        };
+        /** UnusedBalance */
+        UnusedBalance: {
+            /**
+             * Priority
+             * @default 6
+             */
+            priority: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -1247,6 +1559,110 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_settings_features_reactivation_settings_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_settings_features_reactivation_settings_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReactivationSettings"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_schedule_features_reactivation_schedule_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleOut"];
                 };
             };
             /** @description Validation Error */
