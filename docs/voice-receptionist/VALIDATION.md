@@ -28,3 +28,11 @@ Restored the original Avishkar sidebar, workspace identity, profile, breadcrumbs
 - All 63 Python tests passed across API, shared auth, DB bootstrap, reactivation and integrations. Normal production build, web/shared UI typechecks, ESLint, Ruff and import boundaries passed. This frontend-removal smoke check does not claim complete backend-package removal coverage.
 
 Follow-up after merge: move voice frontend implementation/tests into `packages/features/voice-receptionist/web/` with thin app routes; agree and implement live voice API contracts. New features must already follow the feature-owned `web/` convention. The full package/route/entry-point removal acceptance check belongs to that modularization follow-up.
+
+## Complete feature modularization — 15 October 2026
+
+This supersedes the earlier note deferring frontend modularization. Voice now owns `web/pages`, `web/components`, `web/lib`, `web/styles` and `web/tests` below its feature package. App routes are thin package exports. Shared session/API helpers live in `packages/core/web`; shared auth controls/styles and branding remain independent of voice. Voice-only backend entitlement assertions also moved into the voice package. Trial enrollment uses discovered `trial_eligible` metadata instead of a hard-coded feature list.
+
+Validation with voice installed: production frontend build, all 64 workspace Python tests, all 10 browser journeys, web/core/voice/UI typechecks, ESLint, Ruff and Python/frontend import boundaries passed.
+
+Full removal acceptance passed in an isolated temporary copy, twice: removed the entire `packages/features/voice-receptionist` directory, its route folder and explicit npm/Python/import-linter registrations; refreshed lockfiles and installed a separate virtualenv. The remaining platform passed `pnpm build`, `pnpm test` (63 Python tests), `pnpm boundaries`, `pnpm typecheck` and its platform-only Google-provider/onboarding/sign-out browser test. The source checkout and shared database migrations were preserved. The repeatable check is `scripts/check_voice_removal.py`, now run by CI after regular browser tests. The only functional follow-up is the separately scoped live voice API/runtime implementation.

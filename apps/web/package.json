@@ -18,7 +18,9 @@
     "react-dom": "^19.3.0",
     "server-only": "^0.0.1",
     "lucide-react": "^0.468.0",
-    "@next/env": "^16.4.0"
+    "@next/env": "^16.4.0",
+    "@clinic/core": "workspace:*",
+    "@clinic/feature-voice-receptionist": "workspace:*"
   },
   "devDependencies": {
     "@clinic/tsconfig": "workspace:*",

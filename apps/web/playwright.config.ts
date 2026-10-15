@@ -1,6 +1,24 @@
 import { defineConfig } from "@playwright/test";
+import { readdirSync, readFileSync, existsSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+const appRoot = dirname(fileURLToPath(import.meta.url));
+const featuresRoot = resolve(appRoot, "../../packages/features");
+const featureProjects = readdirSync(featuresRoot).flatMap((name) => {
+  const root = resolve(featuresRoot, name);
+  const manifest = JSON.parse(
+    readFileSync(resolve(root, "package.json"), "utf8"),
+  );
+  const tests = manifest.clinic?.webTests;
+  return tests && existsSync(resolve(root, tests))
+    ? [{ name, testDir: resolve(root, tests) }]
+    : [];
+});
 export default defineConfig({
-  testDir: "./tests",
+  projects: [
+    { name: "platform", testDir: resolve(appRoot, "tests") },
+    ...featureProjects,
+  ],
   fullyParallel: false,
   workers: 1,
   use: {

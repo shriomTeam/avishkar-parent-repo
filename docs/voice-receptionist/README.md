@@ -4,13 +4,14 @@ The implemented Avishkar Voice AI authentication, onboarding and dashboard now l
 
 ## Code locations
 
-There is no standalone `apps/voice-receptionist` folder. Voice receptionist is a feature inside the existing `apps/web` frontend and `apps/api` backend. Its browser URL is `/voice-receptionist`; Next.js route groups `(platform)` and `(features)` do not appear in that URL.
+There is no standalone `apps/voice-receptionist` folder. Voice receptionist is a feature inside the existing `apps/web` frontend and `apps/api` backend. Its browser URL is `/voice-receptionist`; Next.js route groups `(fullscreen)`, `(platform)` and `(features)` do not appear in that URL.
 
 | Responsibility | Location |
 | --- | --- |
-| Voice pages | `apps/web/app/(fullscreen)/voice-receptionist` |
-| Voice screens and scoped CSS | `apps/web/components/voice`, `apps/web/styles/voice.css` |
-| Sample data/service adapter | `apps/web/lib/voice` |
+| Voice pages | `packages/features/voice-receptionist/web/pages`; thin routes in `apps/web/app/(fullscreen)/voice-receptionist` |
+| Voice screens and scoped CSS | `packages/features/voice-receptionist/web/components`, `packages/features/voice-receptionist/web/styles/voice.css` |
+| Sample data/service adapter | `packages/features/voice-receptionist/web/lib` |
+| Shared frontend session/API helpers | `packages/core/web` |
 | Shared auth components/styles | `packages/ui/src/auth.tsx`, `packages/ui/styles/auth.css` |
 | Platform branding | `apps/web/public/brand` |
 | Login/onboarding pages | `apps/web/app/(auth)`, `apps/web/components/auth` |
@@ -20,7 +21,7 @@ There is no standalone `apps/voice-receptionist` folder. Voice receptionist is a
 | Identity models and migration | `packages/db/src/clinic_db/models/auth.py`, `packages/db/migrations/versions/20261012_0002_auth.py` |
 | Voice backend entry point | `packages/features/voice-receptionist` (control-plane stub; no source voice APIs existed) |
 | Source auth tests | `packages/core/tests/auth`, `apps/api/tests/auth` |
-| Browser journeys | `apps/web/tests/voice`, `apps/web/playwright.config.ts` |
+| Browser journeys | `packages/features/voice-receptionist/web/tests`, `apps/web/playwright.config.ts` |
 
 The source `agent/`, `jobs/`, and `infra/` contained only placeholders. Live audio is future work; create `apps/voice-agent` when implementing it. Background work uses the existing worker. There is one SQLAlchemy Base, one Alembic history, and one pair of uv/pnpm lockfiles.
 
@@ -121,3 +122,9 @@ Original guides describe the source folder layout and are retained as historical
 Terraform generates the `clinic_auth` password and stores `auth-password` and `auth-url` in Secret Manager using the environment name prefix. The migration job receives `CLINIC_AUTH_PASSWORD`; `clinic_db.bootstrap_roles` creates the restricted login before Alembic grants access to the auth schema. An existing NOLOGIN placeholder is enabled, while existing login passwords are preserved. No superuser or BYPASSRLS privileges are granted to the auth role.
 
 Apply the infrastructure before running the new migration image. The backend Cloud Run service is not yet defined in this Terraform tree: when deploying it, grant its service account access to the `auth-url` secret and inject that secret as `DATABASE_AUTH_URL`. The migration service account only receives the role-password secret, not the runtime auth URL. Do not use the example local password in production.
+
+## Feature isolation
+
+All voice frontend code and tests belong to `packages/features/voice-receptionist/web`. Shared authentication/API helpers belong to `packages/core/web`, shared controls/styles to `packages/ui`, and shared branding to `apps/web/public/brand`. Voice currently has no additional feature-owned assets. Onboarding enrolls only installed trial-eligible features through the feature registry.
+
+Run `python scripts/check_voice_removal.py` with DATABASE_* and TEST_* URLs set to a disposable migrated database to verify the removal contract in an isolated copy. This removes the whole voice package, its thin route folder and explicit dependency/architecture registrations, refreshes lockfiles, and runs the remaining platform build, tests, boundaries, typechecks and auth browser journey. The original checkout is untouched. Historical DB migrations remain shared and must never be deleted as part of removing a feature.

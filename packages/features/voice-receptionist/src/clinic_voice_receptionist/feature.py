@@ -23,5 +23,6 @@ feature = Feature(
     description="AI voice agent that answers, books, reschedules and escalates around the clock.",
     router=router,
     nav=[NavItem(label="Voice Receptionist", path="/voice-receptionist")],
+    trial_eligible=True,
     phi_sensitive=True,
 )

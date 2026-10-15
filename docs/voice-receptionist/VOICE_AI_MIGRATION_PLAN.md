@@ -1,3 +1,5 @@
+> Current implementation: voice frontend code/tests now live in `packages/features/voice-receptionist/web`, with thin app routes. Shared frontend auth/API helpers live in `packages/core/web`. See [current paths and removal verification](README.md#feature-isolation); the proposed tree below records the original migration design and future runtime work.
+
 # Voice AI migration into the parent repository
 
 Status: implementation reference, originally written from local inspection on 12 October 2026. The existing Google auth, onboarding and sample dashboard have now been migrated. See [current setup](README.md). New voice CRUD APIs, voice models and the live runtime remain future phases; the proposed final tree below includes those future paths.
@@ -146,9 +148,9 @@ The `(platform)` move is needed because the current root layout hides all childr
 | Source | Destination/action |
 | --- | --- |
 | `frontend/src/app/dashboard/**` | `apps/web/app/(fullscreen)/voice-receptionist/**`; rewrite all links, redirects, active nav and test expectations |
-| `frontend/src/components/*` | Voice screens to `apps/web/components/voice`; auth/onboarding/sign-out to `components/auth`; split shared settings from voice privacy settings |
+| `frontend/src/components/*` | Voice screens to `packages/features/voice-receptionist/web/components`; auth/onboarding/sign-out to `components/auth`; split shared settings from voice privacy settings |
 | `frontend/src/lib/auth/*` | `apps/web/lib/auth`; adapt session shape to platform tenant identity |
-| `frontend/src/lib/{types,format}.ts`, `demo/*`, `services/*` | `apps/web/lib/voice`; update `@/` imports to prevent collisions |
+| `frontend/src/lib/{types,format}.ts`, `demo/*`, `services/*` | `packages/features/voice-receptionist/web/lib`; update `@/` imports to prevent collisions |
 | `frontend/src/app/globals.css` | Extract scoped voice styles; review body, aside, inputs, buttons, links and CSS variables rather than appending global CSS |
 | `frontend/public/*` | `apps/web/public/brand/*`; update asset URLs and metadata |
 | `backend/app/modules/auth/*` | HTTP routes into `clinic_api.routers.auth`; policy/provider/repositories into `clinic_core.auth`; models into `clinic_db.models.auth` |

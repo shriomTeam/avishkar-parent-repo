@@ -49,9 +49,19 @@ feature = Feature(
 - Never send SMS/email directly. Declare a `SequenceDef` and `enroll()`.
 
 ## 3. Web
-Pages go in `apps/web/app/(platform)/(features)/<path>/`. Start each page with
-`await requireFeature("<key>")`, use `@clinic/ui` components, and call the API
-through the typed client (`pnpm api-client:generate` after backend changes).
+New feature frontend code belongs in `packages/features/<name>/web/`: pages,
+components, state, styles and browser tests. Export pages from the feature's
+`package.json`; `apps/web/app/.../<path>/` contains only thin route exports.
+Voice receptionist is the reference for this frontend structure.
+
+Enforce `await requireFeature("<key>")` in the feature's server layout using
+`@clinic/core/web/api`; shared session helpers are under `@clinic/core/web/auth/*`.
+Use `@clinic/ui` controls and the generated API client. Features must never
+import the web app's `@/` alias, app files or another feature.
+
+Declare `clinic.webTests` in the feature workspace manifest so Playwright
+can discover its tests automatically. Keep shared branding and auth outside
+feature folders. `pnpm boundaries` checks Python and frontend dependencies.
 
 ## 4. Tests
 Put tests next to your package (`tests/`), with a fresh tenant per test from

@@ -21,14 +21,11 @@ apps/
           reactivation/        existing reactivation pages
     components/
       auth/                    onboarding and sign-out controls
-      voice/                   original Avishkar voice shell and screens
       platform-frame.tsx       generic platform shell (no feature path checks)
     lib/
-      auth/                    verified session loading and auth provider
-      voice/                   voice types, formatting, demo state and adapters
-    styles/voice.css            scoped source design and responsive styling
+      auth/                    compatibility exports of shared core auth
     public/brand/               platform branding assets
-    tests/voice/                Playwright auth and voice journeys
+    tests/auth/                 platform-only authentication journeys
     playwright.config.ts       isolated browser-test API and frontend
   api/                         one FastAPI app; mounts installed features
     src/clinic_api/routers/
@@ -45,6 +42,7 @@ packages/
       core.py                  canonical tenants and staff-to-user links
     migrations/versions/       existing schema plus shared auth migration
   core/                        RLS, feature contract, entitlements, events, audit
+    web/                       shared frontend auth, sessions and API access
     src/clinic_core/
       auth/                    Google provider, sessions, CSRF and repositories
       tenancy/                 verified memberships and clinic provisioning
@@ -54,7 +52,15 @@ packages/
   features/
     reactivation/src/          reactivation backend
     blueprints/src/            blueprint backend
-    voice-receptionist/src/    voice backend entry point (control-plane stub)
+    voice-receptionist/
+      src/                     voice backend entry point (control-plane stub)
+      tests/                   feature backend/entitlement tests
+      web/
+        pages/                 screen implementations and feature layout
+        components/            voice shell and controls
+        lib/                   types, state and service adapters
+        styles/                voice-specific CSS
+        tests/                 voice browser journeys
     lead-response/src/         lead-response backend
     ...
   ui/                          shared React components
@@ -73,7 +79,11 @@ infra/
 
 This tree describes the implemented `migration/voice-ai` layout. There is no standalone `apps/voice-receptionist`, `backend/` or `frontend/` app. Voice UI is served at `/voice-receptionist` by `apps/web`; route groups `(fullscreen)`, `(platform)` and `(features)` do not appear in URLs. Its original branded sidebar and header replace the platform shell on voice routes; “All clinic products” returns to the platform.
 
-Feature backend code belongs in its package's `src/`. The current reactivation and blueprints pages live in `apps/web/app/(platform)/(features)/`; voice routes live in `apps/web/app/(fullscreen)/voice-receptionist/`, with voice components and adapters namespaced under `components/voice` and `lib/voice`. New features must start in `packages/features/<name>/web/`, with thin one-line route files in `apps/web` importing their pages. The migrated voice frontend remains an explicit transitional exception; moving its screens, adapters, styles, assets and tests into `packages/features/voice-receptionist/web/` is a follow-up after merge.
+Feature backend code belongs in its package's `src/`. New features must start in `packages/features/<name>/web/`, with thin one-line route files in `apps/web` importing their pages. Voice follows this convention now. Existing reactivation and blueprints pages remain in `apps/web/app/(platform)/(features)/` until their teams move them.
+
+Shared browser/server auth helpers and API access live in `packages/core/web`, exported through `@clinic/core/web/*`. Feature code must never import `apps/web` or its `@/` alias. Python and frontend boundaries are checked by `pnpm boundaries`. Browser tests are discovered from installed feature workspace manifests (`clinic.webTests`), so deleting a feature removes its tests automatically.
+
+To verify voice removal, run `python scripts/check_voice_removal.py` with all DATABASE_* and TEST_* URLs pointing to a disposable migrated database. It creates an isolated copy, removes the voice package/routes and explicit npm/Python/import-linter registrations, refreshes lockfiles and runs build, tests, boundaries, typechecks and platform auth browser tests. Shared migrations and database data remain intact.
 
 ## Voice AI migration
 

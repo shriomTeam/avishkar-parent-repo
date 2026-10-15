@@ -236,29 +236,21 @@ async def test_removed_membership_rejected(system):
     ).status_code == 403
 
 
-async def test_platform_context_and_voice_entitlements(system):
+async def test_platform_context_and_tenant_authorization(system):
     app, client = system
     assert (await client.get("/me", headers={"X-Tenant-Id": str(uuid.uuid4())})).status_code == 401
     await login(client)
     workspace = (
         await client.post(
-            "/api/v1/workspaces", headers=await headers(client), json={"name": "Voice clinic", "timezone": "UTC"}
+            "/api/v1/workspaces", headers=await headers(client), json={"name": "Platform clinic", "timezone": "UTC"}
         )
     ).json()
     tenant_id = workspace["id"]
     me = await client.get("/me", headers={"X-Tenant-Id": tenant_id, "X-Staff-Role": "provider", "X-Staff-Id": "forged"})
     assert me.status_code == 200
     assert me.json()["role"] == "owner"
-    assert any(n["feature"] == "voice_receptionist" for n in me.json()["nav"])
     assert (await client.get("/me", headers={"X-Tenant-Id": str(uuid.uuid4())})).status_code == 403
-    assert (await client.get("/features/voice_receptionist/status")).status_code == 200
     assert (await client.post("/features/reactivation/campaigns", json={"name": "No CSRF"})).status_code == 403
-    from clinic_core.database import tenant_session
-    from clinic_core.entitlements import set_feature
-
-    async with tenant_session(uuid.UUID(tenant_id), database_url=app.state.settings.database_url) as db:
-        await set_feature(db, uuid.UUID(tenant_id), "voice_receptionist", enabled=False)
-    assert (await client.get("/features/voice_receptionist/status")).status_code == 403
 
 
 async def test_auth_role_cannot_read_clinic_data(system):

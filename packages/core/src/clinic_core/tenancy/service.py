@@ -9,6 +9,7 @@ from sqlalchemy import select
 from clinic_core.auth.security import now
 from clinic_core.database import system_session
 from clinic_core.entitlements import set_feature
+from clinic_core.features import load_features
 from clinic_core.settings import Settings
 from clinic_core.tenancy.schemas import WorkspaceCreate
 from clinic_db.models.auth import User
@@ -57,6 +58,7 @@ async def create_workspace(user_id: uuid.UUID, data: WorkspaceCreate, settings: 
             )
         )
         # Initial preview trial; expiry is enforced by platform entitlement checks.
-        for key in ("reactivation", "blueprints", "voice_receptionist"):
-            await set_feature(db, tenant.id, key, expires_at=expires)
+        for feature in load_features().values():
+            if feature.trial_eligible:
+                await set_feature(db, tenant.id, feature.key, expires_at=expires)
         return tenant

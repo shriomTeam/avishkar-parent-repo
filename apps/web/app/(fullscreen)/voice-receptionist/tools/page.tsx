@@ -1,5 +1,1 @@
-import { Tools } from "@/components/voice/tools";
-export const metadata = { title: "Tools" };
-export default function Page() {
-  return <Tools />;
-}
+export { default, metadata } from "@clinic/feature-voice-receptionist/web/tools/page";

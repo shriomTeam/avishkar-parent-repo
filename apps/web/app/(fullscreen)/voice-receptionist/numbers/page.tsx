@@ -1,5 +1,1 @@
-import { Numbers } from "@/components/voice/numbers";
-export const metadata = { title: "Phone numbers" };
-export default function Page() {
-  return <Numbers />;
-}
+export { default, metadata } from "@clinic/feature-voice-receptionist/web/numbers/page";

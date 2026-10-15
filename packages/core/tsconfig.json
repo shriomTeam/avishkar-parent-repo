@@ -1,0 +1,10 @@
+{
+  "extends": "@clinic/tsconfig/library.json",
+  "include": [
+    "web/**/*.ts",
+    "web/**/*.tsx"
+  ],
+  "exclude": [
+    "web/tests"
+  ]
+}
