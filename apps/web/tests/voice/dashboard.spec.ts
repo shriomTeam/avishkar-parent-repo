@@ -309,7 +309,7 @@ test("original voice shell and platform return work across screen sizes", async 
       "Overview",
     );
     await expect(
-      page.getByText("Always-On Clinic", { exact: true }),
+      page.getByRole("link", { name: "Always-On Clinic", exact: true }),
     ).toHaveCount(0);
     await expect(page.locator(".voice-navigation")).toHaveCount(0);
     if (width > 700) {
@@ -338,8 +338,10 @@ test("original voice shell and platform return work across screen sizes", async 
   await page.getByRole("link", { name: "All clinic products" }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(
-    page.getByText("Always-On Clinic", { exact: true }),
+    page.getByRole("link", { name: "Always-On Clinic", exact: true }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Voice Receptionist", exact: true }).click();
+  await page
+    .getByRole("link", { name: "Voice Receptionist", exact: true })
+    .click();
   await expect(page.locator(".sidebar .brand")).toBeVisible();
 });
