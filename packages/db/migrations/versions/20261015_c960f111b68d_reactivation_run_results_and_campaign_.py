@@ -1,7 +1,7 @@
 """reactivation run results and campaign customization
 
 Revision ID: c960f111b68d
-Revises: ba9df5563ea9
+Revises: 20261012_0002
 Create Date: 2026-10-15 15:39:17.417544
 
 Checklist for tenant-scoped tables (anything with tenant_id):
@@ -19,7 +19,7 @@ from sqlalchemy.dialects import postgresql
 from clinic_db.rls import disable_tenant_rls, enable_tenant_rls
 
 revision: str = "c960f111b68d"
-down_revision: str | None = "ba9df5563ea9"
+down_revision: str | None = "20261012_0002"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
