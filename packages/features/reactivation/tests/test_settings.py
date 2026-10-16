@@ -1,4 +1,6 @@
+import uuid
 from datetime import UTC, datetime
+from fractions import Fraction
 
 import httpx
 import pytest
@@ -12,7 +14,12 @@ from clinic_core.settings import Settings
 from clinic_core.testing import create_test_tenant
 from clinic_db.models.ops import AuditLog
 from clinic_db.models.reactivation import Run
-from clinic_reactivation.analysis.settings import ReactivationSettings, RunSchedule, compute_next_run
+from clinic_reactivation.analysis.settings import (
+    ReactivationSettings,
+    RunSchedule,
+    compute_next_run,
+    ratio_fraction,
+)
 from clinic_reactivation.router import router
 
 app = FastAPI()
@@ -251,3 +258,110 @@ def test_strictly_after_now_and_year_rollover():
     exactly = _utc(2026, 12, 1, 11)  # 06:00 EST
     assert compute_next_run(s, NY, exactly) == _utc(2027, 1, 1, 11)
     assert compute_next_run(_weekly(0, "06:00"), NY, _utc(2026, 6, 1, 10)) == _utc(2026, 6, 8, 10)
+
+
+# --- R6 step 1: engine settings --------------------------------------------------------------
+
+TYPE_KEYS = [
+    "lapsed_high_value",
+    "churned_member",
+    "consult_not_converted",
+    "overdue_maintenance",
+    "one_and_done",
+    "unused_balance",
+]
+
+
+def test_new_settings_defaults():
+    s = ReactivationSettings()
+    assert s.dormant.rebooking_days_by_service == {}
+    assert (s.limits.spend_cohort_minimum, s.limits.patient_error_tolerance) == (20, 0.02)
+    assert s.limits.seasonality_window_days == 45
+    assert all(getattr(s.types, key).enabled is True for key in TYPE_KEYS)
+
+
+def test_a_config_saved_before_these_fields_still_loads():
+    legacy = ReactivationSettings().model_dump(mode="json")
+    del legacy["limits"]
+    del legacy["dormant"]["rebooking_days_by_service"]
+    for key in TYPE_KEYS:
+        del legacy["types"][key]["enabled"]
+    loaded = ReactivationSettings.model_validate(legacy)
+    assert loaded == ReactivationSettings()
+
+
+def test_service_interval_map_round_trips_with_string_keys():
+    sid = uuid.uuid4()
+    cfg = _config(**{"dormant.rebooking_days_by_service": {str(sid): 90}})
+    s = ReactivationSettings.model_validate(cfg)
+    assert s.dormant.rebooking_days_by_service == {sid: 90}
+    assert s.model_dump(mode="json")["dormant"]["rebooking_days_by_service"] == {str(sid): 90}
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"dormant.rebooking_days_by_service": {str(uuid.uuid4()): 0}},
+        {"dormant.rebooking_days_by_service": {str(uuid.uuid4()): -5}},
+        {"dormant.rebooking_days_by_service": {str(uuid.uuid4()): 4000}},
+        {"dormant.rebooking_days_by_service": {"not-a-uuid": 90}},
+        {"dormant.rebooking_days_by_category": {"Botox": 90, " botox ": 100}},
+        {"limits.spend_cohort_minimum": 1},
+        {"limits.patient_error_tolerance": 1.5},
+        {"limits.patient_error_tolerance": -0.1},
+        {"limits.seasonality_window_days": 0},
+        {"limits.nope": 1},
+        {"types.overdue_maintenance.overdue_ratio_max": 2.5},  # overlaps lapsed_high_value (min 2.0)
+        {"types.lapsed_high_value.overdue_ratio_min": 1.5},  # same overlap, from the other side
+    ],
+)
+async def test_new_settings_validation_gives_422(client, overrides):
+    t = await create_test_tenant()
+    r = await client.put("/settings", headers=_h(t, **{"If-Match": "0"}), json=_config(**overrides))
+    assert r.status_code == 422, r.text
+
+
+def test_overlapping_ratio_thresholds_are_rejected_and_a_gap_is_allowed():
+    with pytest.raises(ValidationError, match="overdue_ratio_max must be <= lapsed_high_value"):
+        ReactivationSettings.model_validate(_config(**{"types.overdue_maintenance.overdue_ratio_max": 2.5}))
+    equal = ReactivationSettings.model_validate(_config())  # 2.0 and 2.0: they touch, no overlap
+    assert equal.types.overdue_maintenance.overdue_ratio_max == equal.types.lapsed_high_value.overdue_ratio_min
+    gap = ReactivationSettings.model_validate(_config(**{"types.lapsed_high_value.overdue_ratio_min": 3.0}))
+    assert gap.types.lapsed_high_value.overdue_ratio_min == 3.0
+
+
+def test_ratio_thresholds_become_exact_fractions_from_their_decimal_string():
+    assert ratio_fraction(0.8) == Fraction(4, 5)
+    assert ratio_fraction(0.79) == Fraction(79, 100)
+    assert ratio_fraction(2.0) == Fraction(2)
+    assert ratio_fraction(1.1) == Fraction(11, 10)  # a float would give 1.100000000000000088...
+    assert ratio_fraction("0.15") == Fraction(3, 20)
+
+
+@pytest.mark.parametrize("key", TYPE_KEYS)
+async def test_each_type_can_be_switched_off_and_read_back(client, key):
+    t = await create_test_tenant()
+    r = await client.put(
+        "/settings", headers=_h(t, **{"If-Match": "0"}), json=_config(**{f"types.{key}.enabled": False})
+    )
+    assert r.status_code == 200 and r.json()["config"]["types"][key]["enabled"] is False
+    got = (await client.get("/settings", headers=_h(t))).json()["config"]["types"]
+    assert got[key]["enabled"] is False
+    assert all(got[other]["enabled"] for other in TYPE_KEYS if other != key)
+
+
+def test_revenue_at_risk_switch_defaults_on_and_old_configs_still_load():
+    assert ReactivationSettings().points.revenue_at_risk is True
+    legacy = ReactivationSettings().model_dump(mode="json")
+    del legacy["points"]["revenue_at_risk"]
+    assert ReactivationSettings.model_validate(legacy).points.revenue_at_risk is True
+
+
+async def test_revenue_at_risk_switch_can_be_saved_and_read_back(client):
+    t = await create_test_tenant()
+    r = await client.put(
+        "/settings", headers=_h(t, **{"If-Match": "0"}), json=_config(**{"points.revenue_at_risk": False})
+    )
+    assert r.status_code == 200 and r.json()["config"]["points"]["revenue_at_risk"] is False
+    got = (await client.get("/settings", headers=_h(t))).json()["config"]["points"]
+    assert got["revenue_at_risk"] is False and got["best_offer"] is True

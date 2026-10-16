@@ -545,6 +545,11 @@ export interface components {
              * @default true
              */
             change_since_last: boolean;
+            /**
+             * Revenue At Risk
+             * @default true
+             */
+            revenue_at_risk: boolean;
         };
         /** AuthMeOut */
         AuthMeOut: {
@@ -700,6 +705,11 @@ export interface components {
         /** ChurnedMember */
         ChurnedMember: {
             /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
              * Priority
              * @default 2
              */
@@ -717,6 +727,11 @@ export interface components {
         ClinicType: "medspa" | "wellness" | "hrt";
         /** ConsultNotConverted */
         ConsultNotConverted: {
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
             /**
              * Priority
              * @default 3
@@ -745,10 +760,37 @@ export interface components {
                 [key: string]: number;
             };
             /**
+             * Rebooking Days By Service
+             * @description service id -> days; checked before the category map
+             */
+            rebooking_days_by_service?: {
+                [key: string]: number;
+            };
+            /**
              * At Risk Ratio Min
              * @default 0.8
              */
             at_risk_ratio_min: number;
+        };
+        /** EngineLimits */
+        EngineLimits: {
+            /**
+             * Spend Cohort Minimum
+             * @description D10: smaller cohorts get no percentile
+             * @default 20
+             */
+            spend_cohort_minimum: number;
+            /**
+             * Patient Error Tolerance
+             * @description D9: share of patients that may error before the run fails
+             * @default 0.02
+             */
+            patient_error_tolerance: number;
+            /**
+             * Seasonality Window Days
+             * @default 45
+             */
+            seasonality_window_days: number;
         };
         /** FeatureOut */
         FeatureOut: {
@@ -834,6 +876,11 @@ export interface components {
         };
         /** LapsedHighValue */
         LapsedHighValue: {
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
             /**
              * Priority
              * @default 1
@@ -977,6 +1024,11 @@ export interface components {
         /** OneAndDone */
         OneAndDone: {
             /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
              * Priority
              * @default 5
              */
@@ -989,6 +1041,11 @@ export interface components {
         };
         /** OverdueMaintenance */
         OverdueMaintenance: {
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
             /**
              * Priority
              * @default 4
@@ -1050,6 +1107,7 @@ export interface components {
             points?: components["schemas"]["AnalysisPoints"];
             schedule?: components["schemas"]["RunSchedule"];
             modules?: components["schemas"]["ModuleSwitches"];
+            limits?: components["schemas"]["EngineLimits"];
         };
         /** Report */
         Report: {
@@ -1216,6 +1274,11 @@ export interface components {
         };
         /** UnusedBalance */
         UnusedBalance: {
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
             /**
              * Priority
              * @default 6
