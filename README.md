@@ -5,6 +5,7 @@ It's a Turborepo monorepo built on **Next.js**, **FastAPI**, **PostgreSQL** and
 **BullMQ** (Redis).
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains how it fits together and why.
+- [Voice receptionist setup and migration docs](docs/voice-receptionist/README.md) cover Google login and the imported dashboard.
 - [docs/ADDING_A_FEATURE.md](docs/ADDING_A_FEATURE.md) is the guide for teams building a feature.
 
 ---
@@ -43,6 +44,11 @@ uv sync
 `pnpm install` installs the JavaScript packages. `uv sync` creates `.venv/` at
 the repo root with every Python package, including dev tools (pytest, ruff).
 
+After copying the environment example, configure `GOOGLE_CLIENT_ID` and
+`GOOGLE_CLIENT_SECRET` in the ignored root `.env`. Register
+`http://localhost:3000/api/v1/auth/google/callback` with your Google web OAuth
+client. See the [voice setup guide](docs/voice-receptionist/README.md).
+
 ## 3. Start the database and load demo data
 
 ```bash
@@ -51,9 +57,10 @@ pnpm db:up
 ```bash
 pnpm db:migrate
 ```
-```bash
-pnpm db:seed
-```
+`pnpm db:seed` is optional: it creates the original synthetic-data demo clinic.
+Google onboarding creates your own clinic; the seed clinic is not automatically
+assigned to your Google account. Existing database volumes also need the new
+auth login role; follow the [existing-volume instructions](docs/voice-receptionist/README.md#local-setup).
 
 | Command | What it does |
 |---|---|
@@ -91,28 +98,19 @@ Stop with `Ctrl+C`. Stop the database with `pnpm db:down`.
 
 ## 5. Try it
 
-1. Open http://localhost:3000 and paste the tenant id from `pnpm db:seed`.
-2. **Overview** lists every product component. The demo is a trial, so only
-   **Dormant Revenue Finder** and **Patient Blueprints** are active.
-3. **Reactivation** shows dormant patients and their past spend. Click
-   **Create campaign**, then **Launch**.
-   - In dev, messages are not really sent. The worker prints them as `[sms -> +1...]`.
-   - Messages only go out between 8am and 9pm clinic time (America/New_York for the demo).
-     Outside those hours they are scheduled for the next 8am.
-4. **Patient Blueprints** shows the top three buying profiles.
-5. **Import data** loads your own CSV or Excel file. Try the files in
-   `packages/integrations/samples/medspa/` (import patients first, then
-   appointments, then transactions).
+1. Open http://localhost:3000/login and **Continue with Google**.
+2. Complete clinic onboarding. Your owner account gets a 14-day trial of
+   **Dormant Revenue Finder**, **Patient Blueprints**, and **Voice Receptionist**.
+3. Open **Voice Receptionist** to use the voice dashboard: agents, numbers, call history,
+   tools, variables and test studio. Voice actions use sample data and are
+   simulated; authentication and clinic identity are real.
+4. Reactivation, blueprints and import pages retain their existing URLs and
+   APIs. Real data imports still require a signed BAA.
 
-To call the API directly, send the tenant id as a header. This is dev-only
-auth; real login is not built yet.
-
-```bash
-curl -H "X-Tenant-Id: <tenant-id>" http://localhost:8000/features/reactivation/preview
-```
-
-To create another clinic with chosen features, use `POST /admin/tenants` at
-http://localhost:8000/docs (only available in dev).
+The API verifies session membership and derives staff roles. Authenticated
+writes require a session CSRF token and the configured public origin. The
+original header-based synthetic-data API demo is available only when explicitly
+setting `ALLOW_DEV_AUTH=true` with `APP_ENV=dev`; the web app uses Google sessions.
 
 ## 6. Tests and checks
 
@@ -128,7 +126,7 @@ The database must be up and migrated (steps 3 and 4).
 | `pnpm turbo run test lint --filter=@clinic/feature-reactivation` | Only one package |
 | `uv run ruff format .` | Auto-format Python code |
 
-Turborepo caches results, so unchanged packages are skipped on re-runs. CI
+Turborepo caches builds and static checks; database tests run every time. CI
 (`.github/workflows/ci.yml`) runs all of the above on every pull request.
 
 ## 7. Working on the database
@@ -155,7 +153,7 @@ Then run step 3 again.
 | `Cannot connect to the Docker daemon` | Start Docker Desktop, then run `pnpm db:up` again. |
 | `role "clinic_app" does not exist` | Your database volume predates the role setup. Reset with `docker compose down -v`, then run step 3. |
 | `port is already allocated` / `EADDRINUSE` | Something else is using 5432, 6379, 3000 or 8000. Stop it, or change the port in `docker-compose.yml` / `.env`. |
-| Web shows "Pick a tenant" | Paste the id printed by `pnpm db:seed`. Running the seed again prints the existing id. |
+| Cannot sign in | Configure Google credentials in root `.env`, ensure callback origin matches, and check `/api/v1/health/ready`. |
 | Feature page shows 404 | That feature isn't enabled for this clinic (see the Overview page). |
 | `uv: command not found` | `brew install uv`, then open a new terminal. |
 
@@ -181,5 +179,6 @@ packages/api-client         Generated TypeScript API types
 | Platform: tenancy/RLS, entitlements, events, audit, import, engagement engine | Working, tested |
 | Dormant Revenue Finder (`reactivation`) | Working end to end (the reference feature) |
 | Patient Blueprints (`blueprints`) | Working, simple heuristic v1 |
-| Lead response, reviews, voice receptionist, scribe, command center, photos | Stubs, ready for their teams |
-| Login / auth | Dev headers only; must be replaced before real patient data |
+| Voice receptionist | Imported sample dashboard; live voice APIs/runtime remain to build |
+| Lead response, reviews, scribe, command center, photos | Stubs, ready for their teams |
+| Login / auth | Google sessions and clinic onboarding; production HTTPS acceptance remains |

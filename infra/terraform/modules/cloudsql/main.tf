@@ -38,9 +38,9 @@ resource "google_sql_database" "app" {
 }
 
 # Migrations run as clinic_owner (DATABASE_OWNER_URL). The migration job creates clinic_app and
-# clinic_system with the passwords below (see clinic_db.bootstrap_roles).
+# clinic_system and clinic_auth with the passwords below (see clinic_db.bootstrap_roles).
 resource "random_password" "db" {
-  for_each = toset(["owner", "app", "system"])
+  for_each = toset(["owner", "app", "system", "auth"])
 
   length  = 32
   special = false
@@ -57,11 +57,13 @@ locals {
     "owner-url"       = "postgresql+psycopg://clinic_owner:${random_password.db["owner"].result}@${google_sql_database_instance.postgres.private_ip_address}:5432/${var.db_name}"
     "app-password"    = random_password.db["app"].result
     "system-password" = random_password.db["system"].result
+    "auth-password"   = random_password.db["auth"].result
+    "auth-url"        = "postgresql+psycopg://clinic_auth:${random_password.db["auth"].result}@${google_sql_database_instance.postgres.private_ip_address}:5432/${var.db_name}"
   }
 }
 
 resource "google_secret_manager_secret" "db" {
-  for_each = toset(["owner-url", "app-password", "system-password"])
+  for_each = toset(["owner-url", "app-password", "system-password", "auth-password", "auth-url"])
 
   secret_id = "${var.name}-db-${each.key}"
   labels    = var.labels

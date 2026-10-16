@@ -26,3 +26,7 @@ packages/api-client/openapi.json
 .terraform/
 *.tfplan
 *.tfstate*
+
+playwright-report/
+test-results/
+.import_linter_cache/

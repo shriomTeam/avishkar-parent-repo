@@ -6,33 +6,96 @@ Read before building: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (why it is sh
 
 ## Layout
 
-```
+```text
 apps/
-  web/                one Next.js app (thin routes that pull in each feature's pages)
-  api/                one FastAPI app (discovers and mounts the installed features)
-  worker/             one background worker
+  web/                         one Next.js app
+    app/
+      (auth)/                  login and clinic onboarding
+      (fullscreen)/voice-receptionist/  voice routes with their own shell
+      (platform)/              authenticated platform routes
+        layout.tsx             shared auth provider and platform shell
+        page.tsx               clinic product overview
+        import/                patient data import
+        (features)/
+          blueprints/          existing patient blueprint pages
+          reactivation/        existing reactivation pages
+    components/
+      auth/                    onboarding and sign-out controls
+      platform-frame.tsx       generic platform shell (no feature path checks)
+    lib/
+      auth/                    compatibility exports of shared core auth
+    public/brand/               platform branding assets
+    tests/auth/                 platform-only authentication journeys
+    playwright.config.ts       isolated browser-test API and frontend
+  api/                         one FastAPI app; mounts installed features
+    src/clinic_api/routers/
+      auth.py                  /api/v1/auth/* Google login and sessions
+      onboarding.py            /api/v1/workspaces clinic onboarding
+    tests/auth/                auth, tenant and entitlement integration tests
+    tests/browser_server.py    test-only simulated Google provider
+    Dockerfile                 optional API/worker container image
+  worker/                      one background worker
 packages/
-  db/                 all tables (SQLAlchemy) and the single Alembic migration stream
-  core/               tenancy (RLS), feature contract, entitlements, events, audit
-  integrations/       client data import
-  engagement/         shared SMS and email engine
+  db/                          all SQLAlchemy tables and one Alembic stream
+    src/clinic_db/models/
+      auth.py                  global identities, OAuth transactions, sessions
+      core.py                  canonical tenants and staff-to-user links
+    migrations/versions/       existing schema plus shared auth migration
+  core/                        RLS, feature contract, entitlements, events, audit
+    web/                       shared frontend auth, sessions and API access
+    src/clinic_core/
+      auth/                    Google provider, sessions, CSRF and repositories
+      tenancy/                 verified memberships and clinic provisioning
+    tests/auth/                shared auth unit tests
+  integrations/                client data import
+  engagement/                  shared SMS and email engine
   features/
-    reactivation/
-      src/            backend
-      web/            frontend pages for this feature
-    voice-receptionist/   (same shape)
-    lead-response/        (same shape)
+    reactivation/src/          reactivation backend
+    blueprints/src/            blueprint backend
+    voice-receptionist/
+      src/                     voice backend entry point (control-plane stub)
+      tests/                   feature backend/entitlement tests
+      web/
+        pages/                 screen implementations and feature layout
+        components/            voice shell and controls
+        lib/                   types, state and service adapters
+        styles/                voice-specific CSS
+        tests/                 voice browser journeys
+    lead-response/src/         lead-response backend
     ...
-  ui/                 shared React components
-  api-client/         generated TypeScript API types
-  tsconfig/           shared TS configs
+  ui/                          shared React components
+  api-client/                  generated TypeScript API types and shared client
+  tsconfig/                    shared TS configs
+docs/
+  voice-receptionist/          current setup, migration plan, validation,
+                               provenance and archived source documents
 infra/
-  postgres/           local Docker init (roles)
-  terraform/          production GCP
-.github/workflows/    ci.yml (checks), terraform.yml (infra), migrate.yml (prod DB)
+  postgres/
+    init.sql                   fresh-volume development role initialization
+    auth-role.sql              auth login role for existing development volumes
+  terraform/                   production GCP
+.github/workflows/             ci.yml, terraform.yml, migrate.yml
 ```
 
-Each feature owns its `src/` and `web/`; `apps/web` imports a feature's pages through a one-line route, so removing a feature is deleting its package, its route line and its entry point. Today the `reactivation` and `blueprints` pages still live in `apps/web/app/(features)/`; new features start in `web/`, and those two move when their teams get to it.
+This tree describes the implemented `migration/voice-ai` layout. There is no standalone `apps/voice-receptionist`, `backend/` or `frontend/` app. Voice UI is served at `/voice-receptionist` by `apps/web`; route groups `(fullscreen)`, `(platform)` and `(features)` do not appear in URLs. Its original branded sidebar and header replace the platform shell on voice routes; “All clinic products” returns to the platform.
+
+Feature backend code belongs in its package's `src/`. New features must start in `packages/features/<name>/web/`, with thin one-line route files in `apps/web` importing their pages. Voice follows this convention now. Existing reactivation and blueprints pages remain in `apps/web/app/(platform)/(features)/` until their teams move them.
+
+Shared browser/server auth helpers and API access live in `packages/core/web`, exported through `@clinic/core/web/*`. Feature code must never import `apps/web` or its `@/` alias. Python and frontend boundaries are checked by `pnpm boundaries`. Browser tests are discovered from installed feature workspace manifests (`clinic.webTests`), so deleting a feature removes its tests automatically.
+
+To verify voice removal, run `python scripts/check_voice_removal.py` with all DATABASE_* and TEST_* URLs pointing to a disposable migrated database. It creates an isolated copy, removes the voice package/routes and explicit npm/Python/import-linter registrations, refreshes lockfiles and runs build, tests, boundaries, typechecks and platform auth browser tests. Shared migrations and database data remain intact.
+
+## Voice AI migration
+
+Read [docs/voice-receptionist/README.md](docs/voice-receptionist/README.md) for current setup and paths, [the migration plan](docs/voice-receptionist/VOICE_AI_MIGRATION_PLAN.md) for architecture and future phases, and [validation](docs/voice-receptionist/VALIDATION.md) for checks and limits. Archived source guides retain the old repository paths; do not use their commands for this monorepo.
+
+- Google OAuth, opaque database sessions, CSRF and clinic onboarding are implemented in the shared API/core/DB layers. Source workspace records map to canonical `core.tenants` and `core.staff`; supplied tenant IDs must be checked against verified membership.
+- Authentication tables are global in the `auth` schema, using the restricted `clinic_auth` role. Tenant feature data continues to use the `clinic_app` connection and RLS; narrow cross-tenant membership/provisioning operations use `clinic_system`.
+- The ignored root `.env` is the local configuration source. Configure all four database URLs (`DATABASE_OWNER_URL`, `DATABASE_URL`, `DATABASE_SYSTEM_URL`, `DATABASE_AUTH_URL`), Google credentials, public origin and callback. Keep secrets out of frontend variables and Git.
+- Start Docker Postgres/Redis, initialize `clinic_auth` for an existing volume with `infra/postgres/auth-role.sql`, then run `pnpm db:migrate`. If changing `POSTGRES_PORT`, match all local database URL host ports. Restart backend/frontend after configuration changes.
+- Voice agents, calls, numbers, tools and test calls currently use explicitly simulated data. Live voice APIs and audio runtime are future work. The source `agent/`, `jobs/` and `infra/` contained only placeholders; `apps/voice-agent` has not been created.
+- Source credentials and database records were not copied. The original checkout remains intact.
+- Browser tests require a disposable migrated database with `TEST_DATABASE_URL`, `TEST_AUTH_DATABASE_URL` and `TEST_SYSTEM_DATABASE_URL`. Run `pnpm --filter @clinic/web test:e2e` separately from the production build or another Next dev server in the same checkout.
 
 Layers run apps → features → integrations/engagement → core → db. Features never import each other; they talk through `core` tables and `emit()` events. `pnpm boundaries` enforces this, so a new package must be added to the import-linter lists in the root `pyproject.toml` and to the uv workspace `members`/`sources`.
 
@@ -51,7 +114,7 @@ Rules:
 - Migrations run while the old API and worker are still serving, so keep each one backward compatible (add columns nullable or defaulted; drop in a later release).
 - Enum-like values are plain strings validated in Python, and per-client extras go in `attributes` JSONB, so many changes need no migration.
 
-How it reaches production: merging a change under `packages/db/**` to `main` runs `migrate.yml`. It builds `packages/db/Dockerfile`, takes a Cloud SQL backup, points the Cloud Run Job at the new image, and executes it. The image runs `bootstrap_roles` (creates `clinic_app` and `clinic_system` once; never rotates their passwords) and then `alembic upgrade head`. There is no approval step.
+How it reaches production: merging a change under `packages/db/**` to `main` runs `migrate.yml`. It builds `packages/db/Dockerfile`, takes a Cloud SQL backup, points the Cloud Run Job at the new image, and executes it. The image runs `bootstrap_roles` (creates `clinic_app` and `clinic_system` once; never rotates their passwords) and then `alembic upgrade head`. There is no approval step. Terraform manages the `clinic_auth` password and auth connection URL in Secret Manager. The migration job receives `CLINIC_AUTH_PASSWORD`; role bootstrap creates the restricted login or enables an existing NOLOGIN placeholder without rotating existing login passwords. Backend deployments must grant their service account access to the `auth-url` secret and inject it as `DATABASE_AUTH_URL`. Local `auth-role.sql` is for development only.
 
 ## Infra (`infra/terraform`)
 

@@ -1,0 +1,680 @@
+/* Shared platform authentication design, independent of feature assets. */
+.auth-scope :where(h1, h2, h3, h4, h5, h6, p, ul, ol, figure, blockquote) {
+  margin-block: revert;
+}
+.auth-scope :where(h1, h2, h3, h4, h5, h6, strong, b) {
+  font-weight: revert;
+}
+.auth-scope :where(ul, ol) {
+  padding-inline-start: revert;
+  list-style: revert;
+}
+.auth-scope {
+  --purple: #a1ff62;
+  --ink: #201d1d;
+  --bg: #f4f4f4;
+  --lilac: #edffe1;
+  --line: #e8e7ec;
+  --muted: #74717d;
+}
+.auth-scope * {
+  box-sizing: border-box;
+}
+.auth-scope {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font:
+    16px/1.5 "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+.auth-scope a {
+  color: inherit;
+  text-decoration: none;
+}
+.auth-scope button,
+.auth-scope input,
+.auth-scope select,
+.auth-scope textarea {
+  font: inherit;
+}
+.auth-scope button,
+.auth-scope .button {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 10px 16px;
+  background: white;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.auth-scope button:hover,
+.auth-scope .button:hover {
+  border-color: var(--purple);
+  color: var(--purple);
+}
+.auth-scope button.primary,
+.auth-scope .primary {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple);
+}
+.auth-scope button:focus-visible,
+.auth-scope a:focus-visible,
+.auth-scope input:focus-visible,
+.auth-scope textarea:focus-visible,
+.auth-scope select:focus-visible {
+  outline: 3px solid #80cc4e;
+  outline-offset: 3px;
+}
+.auth-scope aside {
+  width: 245px;
+  position: fixed;
+  inset: 0 auto 0 0;
+  background: white;
+  border-right: 1px solid var(--line);
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+}
+.auth-scope .brand {
+  font-size: 29px;
+  font-weight: 750;
+  letter-spacing: -1.5px;
+  padding: 0 10px;
+}
+.auth-scope .brand span {
+  color: var(--purple);
+  margin-left: 4px;
+}
+.auth-scope small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+.auth-scope nav a {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px;
+  border-radius: 9px;
+  font-size: 14px;
+  margin: 3px 0;
+  color: #625d6b;
+}
+.auth-scope nav svg {
+  width: 19px;
+  height: 19px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+}
+.auth-scope header {
+  height: 79px;
+  background: white;
+  border-bottom: 1px solid var(--line);
+  padding: 0 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--muted);
+}
+.auth-scope main {
+  max-width: 1440px;
+  margin: auto;
+  padding: 34px 38px 45px;
+  min-height: calc(100vh - 138px);
+}
+.auth-scope h1 {
+  font-size: 30px;
+  letter-spacing: -1px;
+  margin: 0 0 5px;
+  font-weight: 650;
+}
+.auth-scope h2 {
+  font-size: 18px;
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+.auth-scope h3 {
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+.auth-scope p {
+  margin: 7px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.auth-scope .badge {
+  display: inline-flex;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #edf8f0;
+  color: #237047;
+}
+.auth-scope .pale {
+  background: var(--lilac);
+  color: var(--purple);
+}
+.auth-scope .panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 23px;
+}
+.auth-scope table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.auth-scope th {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+  background: #fafafa;
+}
+.auth-scope th,
+.auth-scope td {
+  padding: 15px 13px;
+  border-bottom: 1px solid var(--line);
+}
+.auth-scope tr:last-child td {
+  border: 0;
+}
+.auth-scope tbody tr {
+  cursor: pointer;
+}
+.auth-scope tbody tr:hover {
+  background: #f6fff0;
+}
+.auth-scope .field {
+  margin-bottom: 21px;
+}
+.auth-scope .field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.auth-scope input,
+.auth-scope select,
+.auth-scope textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid #dedce5;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  color: var(--ink);
+}
+.auth-scope textarea {
+  resize: vertical;
+  line-height: 1.7;
+  min-height: 170px;
+}
+.auth-scope .field small {
+  margin-top: 7px;
+}
+@keyframes pulse {
+  50% {
+    box-shadow: 0 0 0 20px #edffe170;
+  }
+}
+.auth-scope footer {
+  padding: 18px 38px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  display: flex;
+  gap: 24px;
+  color: var(--muted);
+}
+.auth-scope footer a {
+  margin-left: auto;
+  color: var(--purple);
+}
+.auth-scope #toast {
+  display: none;
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: white;
+  padding: 13px 22px;
+  border-radius: 10px;
+  z-index: 10;
+  font-size: 14px;
+}
+.auth-scope dialog {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px;
+  width: min(520px, 90vw);
+  box-shadow: 0 20px 80px #201d1d25;
+}
+.auth-scope dialog::backdrop {
+  background: #201d1d60;
+}
+.auth-scope dialog h2 {
+  margin-bottom: 20px;
+}
+.auth-scope .auth {
+  max-width: 440px;
+  margin: 60px auto;
+}
+.auth-scope .auth .brand {
+  display: block;
+  text-align: center;
+  margin-bottom: 35px;
+}
+.auth-scope .auth h1 {
+  font-size: 26px;
+}
+.auth-scope .auth .primary {
+  width: 100%;
+}
+.auth-scope .pill {
+  background: #f3f8ef;
+  padding: 5px 9px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+@media (min-width: 1500px) {
+  .auth-scope main {
+    padding-top: 45px;
+  }
+}
+@media (max-width: 1100px) {
+  .auth-scope aside {
+    width: 205px;
+    padding: 25px 12px;
+  }
+  .auth-scope main {
+    padding: 28px 24px;
+  }
+  .auth-scope header {
+    padding: 0 24px;
+  }
+}
+@media (max-width: 700px) {
+  .auth-scope aside {
+    position: relative;
+    width: 100%;
+    padding: 16px;
+  }
+  .auth-scope .brand {
+    font-size: 24px;
+  }
+  .auth-scope nav {
+    display: flex;
+    overflow: auto;
+    gap: 5px;
+    margin-top: 12px;
+  }
+  .auth-scope nav a {
+    white-space: nowrap;
+    padding: 9px;
+    font-size: 13px;
+  }
+  .auth-scope nav svg {
+    display: none;
+  }
+  .auth-scope header {
+    height: 60px;
+    padding: 0 18px;
+  }
+  .auth-scope main {
+    padding: 25px 18px;
+  }
+  .auth-scope h1 {
+    font-size: 26px;
+  }
+  .auth-scope .panel {
+    padding: 18px;
+  }
+  .auth-scope footer {
+    padding: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+.auth-scope .brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  letter-spacing: -1.2px;
+}
+.auth-scope .brand img {
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.auth-scope .auth .brand {
+  display: flex;
+  justify-content: center;
+}
+.auth-scope .brand span {
+  color: var(--ink);
+}
+.auth-scope button.primary,
+.auth-scope .primary {
+  color: var(--ink);
+}
+.auth-scope button:hover,
+.auth-scope .button:hover {
+  color: var(--ink);
+}
+.auth-scope .badge.pale {
+  color: #315218;
+}
+.auth-scope footer a {
+  color: #38691d;
+}
+.auth-scope {
+  --accent: #a1ff62;
+  --accent-text: #315218;
+}
+.auth-scope {
+  font-size: 15px;
+}
+.auth-scope button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.auth-scope button.primary:hover,
+.auth-scope .button.primary:hover {
+  background: #8ee84f;
+}
+.auth-scope input:focus,
+.auth-scope textarea:focus,
+.auth-scope select:focus {
+  border-color: #80cc4e;
+}
+.auth-scope input[type="checkbox"] {
+  flex-shrink: 0;
+}
+.auth-scope .spaced {
+  margin-top: 20px;
+}
+.auth-scope .form-intro {
+  margin-bottom: 25px;
+}
+.auth-scope dialog {
+  max-height: 85vh;
+  overflow: auto;
+}
+.auth-scope dialog .field {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.auth-scope .form-error {
+  color: #ae3049;
+  background: #ffedf0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+.auth-scope details summary {
+  cursor: pointer;
+  color: #38691d;
+}
+@keyframes wave {
+  to {
+    transform: scaleY(0.4);
+  }
+}
+.auth-scope .login-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: none;
+  padding: 0;
+  min-height: 100vh;
+}
+.auth-scope .login-story {
+  background: var(--ink);
+  color: white;
+  padding: 44px 56px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+.auth-scope .login-story .brand {
+  color: white;
+  align-self: flex-start;
+  padding: 0;
+}
+.auth-scope .login-pitch {
+  margin: auto 0;
+  max-width: 520px;
+  padding: 65px 0 45px;
+}
+.auth-scope .login-pitch .pill {
+  background: #35482c;
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+}
+.auth-scope .login-pitch h2 {
+  font-size: clamp(38px, 4vw, 64px);
+  line-height: 1.12;
+  letter-spacing: -2px;
+  margin: 24px 0;
+}
+.auth-scope .login-pitch > p {
+  color: #b5b2b2;
+  font-size: 16px;
+  line-height: 1.8;
+  max-width: 400px;
+}
+.auth-scope .login-visual {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  background: #ffffff08;
+  border: 1px solid #ffffff18;
+  border-radius: 15px;
+  padding: 24px;
+  margin-top: 36px;
+}
+.auth-scope .login-visual svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.auth-scope .login-visual strong {
+  font-size: 14px;
+}
+.auth-scope .login-visual small {
+  color: #b5b2b2;
+  margin-top: 5px;
+}
+.auth-scope .login-bars {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 125px;
+  gap: 10px;
+  margin: 26px 0 0;
+  opacity: 0.65;
+}
+.auth-scope .login-bars i {
+  display: block;
+  background: var(--accent);
+  width: 7px;
+  border-radius: 8px;
+}
+.auth-scope .story-footer {
+  color: #aaa;
+  font-size: 12px;
+}
+.auth-scope .login-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 45px;
+  background: #fafbf9;
+  position: relative;
+}
+.auth-scope .login-card {
+  width: 100%;
+  max-width: 420px;
+}
+.auth-scope .login-card h1 {
+  font-size: 36px;
+  margin: 22px 0 10px;
+  letter-spacing: -1.2px;
+}
+.auth-scope .login-card > p {
+  font-size: 15px;
+  max-width: 350px;
+  line-height: 1.8;
+}
+.auth-scope .google-button {
+  width: 100%;
+  padding: 16px 20px;
+  margin-top: 32px;
+  justify-content: flex-start;
+  gap: 15px;
+  box-shadow: 0 3px 8px #201d1d05;
+}
+.auth-scope .google-button svg:last-child {
+  margin-left: auto;
+}
+.auth-scope .login-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 26px;
+  border-radius: 10px;
+  background: var(--lilac);
+  padding: 16px;
+}
+.auth-scope .login-preview svg {
+  margin-top: 5px;
+  color: #315218;
+  flex-shrink: 0;
+}
+.auth-scope .login-preview p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #557445;
+}
+.auth-scope .login-preview strong {
+  color: #315218;
+  font-weight: 600;
+}
+.auth-scope .login-foot {
+  position: absolute;
+  bottom: 26px;
+  font-size: 12px;
+}
+.auth-scope .onboarding-page {
+  max-width: 900px;
+  padding: 36px;
+  min-height: 100vh;
+}
+.auth-scope .onboarding {
+  max-width: 620px;
+  margin: 60px auto;
+}
+.auth-scope tbody tr {
+  cursor: default;
+}
+.auth-scope th {
+  text-transform: none;
+}
+.auth-scope main {
+  min-width: 0;
+}
+@media (max-width: 1100px) {
+  .auth-scope .login-story {
+    padding: 35px;
+  }
+  .auth-scope .login-content {
+    padding: 35px;
+  }
+  .auth-scope .login-pitch h2 {
+    font-size: 43px;
+  }
+  .auth-scope .login-visual {
+    padding: 18px;
+  }
+}
+@media (max-width: 700px) {
+  .auth-scope .login-page {
+    grid-template-columns: 1fr;
+  }
+  .auth-scope .login-story {
+    padding: 28px;
+    min-height: 280px;
+  }
+  .auth-scope .login-pitch {
+    padding: 25px 0 0;
+    margin: 0;
+    max-width: none;
+  }
+  .auth-scope .login-pitch h2 {
+    font-size: 36px;
+    letter-spacing: -1px;
+    margin: 20px 0 12px;
+  }
+  .auth-scope .login-pitch h2 br {
+    display: none;
+  }
+  .auth-scope .login-pitch > p {
+    font-size: 14px;
+    max-width: none;
+  }
+  .auth-scope .login-visual,
+  .auth-scope .login-bars,
+  .auth-scope .story-footer {
+    display: none;
+  }
+  .auth-scope .login-content {
+    padding: 38px 24px 70px;
+    min-height: 440px;
+  }
+  .auth-scope .login-card h1 {
+    font-size: 30px;
+  }
+  .auth-scope .login-foot {
+    bottom: 15px;
+  }
+  .auth-scope .onboarding-page {
+    padding: 24px 18px;
+  }
+  .auth-scope .onboarding {
+    margin: 35px auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-scope *,
+  .auth-scope *::before,
+  .auth-scope *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (min-width: 701px) {
+  .auth-scope:has(.login-page) {
+    zoom: 0.9;
+  }
+  .auth-scope .login-page {
+    min-height: calc(100vh / 0.9);
+  }
+}

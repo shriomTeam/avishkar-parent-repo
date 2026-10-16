@@ -116,7 +116,9 @@ class Location(IdMixin, TenantMixin, TimestampMixin, Base):
 
 class Staff(IdMixin, TenantMixin, TimestampMixin, Base):
     __tablename__ = "staff"
-    __table_args__ = (UniqueConstraint("tenant_id", "email"), SCHEMA)
+    __table_args__ = (UniqueConstraint("tenant_id", "email"), UniqueConstraint("tenant_id", "user_id"), SCHEMA)
+
+    user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("auth.users.id", ondelete="SET NULL"), index=True)
 
     email: Mapped[str] = mapped_column(String(320))
     name: Mapped[str] = mapped_column(String(200))

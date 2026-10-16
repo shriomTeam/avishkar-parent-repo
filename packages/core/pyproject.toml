@@ -9,6 +9,9 @@ dependencies = [
     "pydantic>=2.10",
     "pydantic-settings>=2.7",
     "bullmq>=2.11",
+    "authlib>=1.6,<2",
+    "joserfc>=1.6,<2",
+    "httpx>=0.28,<1",
 ]
 
 [build-system]
