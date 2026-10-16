@@ -4,7 +4,7 @@ resource "google_service_account" "migrate" {
 }
 
 resource "google_secret_manager_secret_iam_member" "migrate" {
-  for_each = var.secret_ids
+  for_each = { for key, value in var.secret_ids : key => value if key != "auth-url" }
 
   secret_id = each.value
   role      = "roles/secretmanager.secretAccessor"
@@ -61,6 +61,16 @@ resource "google_cloud_run_v2_job" "migrate" {
             }
           }
         }
+        env {
+          name = "CLINIC_AUTH_PASSWORD"
+          value_source {
+            secret_key_ref {
+              secret  = var.secret_ids["auth-password"]
+              version = "latest"
+            }
+          }
+        }
+
       }
 
       # Direct VPC egress: reaches the private Cloud SQL IP with no connector to pay for.

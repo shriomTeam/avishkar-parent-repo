@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: clinic_owner
       POSTGRES_DB: clinic
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
@@ -23,6 +23,56 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       interval: 2s
       retries: 20
+
+  api:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment: &api-env
+      APP_ENV: ${APP_ENV:-dev}
+      ALLOW_DEV_AUTH: ${ALLOW_DEV_AUTH:-false}
+      DATABASE_URL: postgresql+psycopg://clinic_app:clinic_app@postgres:5432/clinic
+      DATABASE_SYSTEM_URL: postgresql+psycopg://clinic_system:clinic_system@postgres:5432/clinic
+      DATABASE_AUTH_URL: postgresql+psycopg://clinic_auth:clinic_auth@postgres:5432/clinic
+      REDIS_URL: redis://redis:6379
+      PUBLIC_APP_ORIGIN: ${PUBLIC_APP_ORIGIN:-http://localhost:3000}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:3000/api/v1/auth/google/callback}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-avishkar_session}
+      TRUSTED_HOSTS: '["localhost","127.0.0.1","api"]'
+      MESSAGING_PROVIDER: ${MESSAGING_PROVIDER:-console}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+    ports: ["8000:8000"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  migrate:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_OWNER_URL: postgresql+psycopg://clinic_owner:clinic_owner@postgres:5432/clinic
+    command: ["alembic", "-c", "packages/db/alembic.ini", "upgrade", "head"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  worker:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment: *api-env
+    command: ["python", "-m", "clinic_worker.main"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
 
 volumes:
   pgdata:

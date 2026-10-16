@@ -19,21 +19,27 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from clinic_core.settings import get_settings
 
-
-@lru_cache
-def _app_engine() -> AsyncEngine:
-    return create_async_engine(get_settings().database_url, pool_pre_ping=True)
+_engines: list[AsyncEngine] = []
 
 
 @lru_cache
-def _system_engine() -> AsyncEngine:
-    return create_async_engine(get_settings().database_system_url, pool_pre_ping=True, pool_size=2)
+def _app_engine(url: str) -> AsyncEngine:
+    engine = create_async_engine(url, pool_pre_ping=True)
+    _engines.append(engine)
+    return engine
+
+
+@lru_cache
+def _system_engine(url: str) -> AsyncEngine:
+    engine = create_async_engine(url, pool_pre_ping=True, pool_size=2)
+    _engines.append(engine)
+    return engine
 
 
 @asynccontextmanager
-async def tenant_session(tenant_id: uuid.UUID) -> AsyncIterator[AsyncSession]:
+async def tenant_session(tenant_id: uuid.UUID, *, database_url: str | None = None) -> AsyncIterator[AsyncSession]:
     """One transaction scoped to one tenant. Commits on success, rolls back on error."""
-    maker = async_sessionmaker(_app_engine(), expire_on_commit=False)
+    maker = async_sessionmaker(_app_engine(database_url or get_settings().database_url), expire_on_commit=False)
     async with maker() as session, session.begin():
         await session.execute(text("SELECT set_config('app.tenant_id', :tid, true)"), {"tid": str(tenant_id)})
         session.info["tenant_id"] = tenant_id
@@ -41,8 +47,10 @@ async def tenant_session(tenant_id: uuid.UUID) -> AsyncIterator[AsyncSession]:
 
 
 @asynccontextmanager
-async def system_session() -> AsyncIterator[AsyncSession]:
-    maker = async_sessionmaker(_system_engine(), expire_on_commit=False)
+async def system_session(*, database_url: str | None = None) -> AsyncIterator[AsyncSession]:
+    maker = async_sessionmaker(
+        _system_engine(database_url or get_settings().database_system_url), expire_on_commit=False
+    )
     async with maker() as session, session.begin():
         yield session
 
@@ -55,7 +63,8 @@ def current_tenant(session: AsyncSession) -> uuid.UUID:
 
 
 async def dispose_engines() -> None:
-    for factory in (_app_engine, _system_engine):
-        if factory.cache_info().currsize:
-            await factory().dispose()
-            factory.cache_clear()
+    for engine in _engines:
+        await engine.dispose()
+    _engines.clear()
+    _app_engine.cache_clear()
+    _system_engine.cache_clear()

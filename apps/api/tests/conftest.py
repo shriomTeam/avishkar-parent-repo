@@ -6,9 +6,11 @@ from pathlib import Path
 import httpx
 import pytest
 
-from clinic_api.main import app
-from clinic_core.settings import REPO_ROOT
+from clinic_api.main import create_app
+from clinic_core.settings import REPO_ROOT, Settings
 from clinic_core.testing import create_test_tenant
+
+app = create_app(Settings(allow_dev_auth=True))
 
 SAMPLES = REPO_ROOT / "packages/integrations/samples/medspa"
 
@@ -20,7 +22,7 @@ def make_tenant():
 
 @pytest.fixture
 async def client():
-    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as c:
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://localhost:3000") as c:
         yield c
 
 

@@ -60,6 +60,14 @@ features through the `clinic.features` entry point, so nothing else changes.
   migration). Client-specific extra columns go into `attributes` JSONB.
 
 ### 3. Tenant isolation in Postgres, not just in code
+Global Google identities and sessions live in `auth.*`, using a restricted
+`clinic_auth` connection. `core.staff.user_id` links verified users to clinics.
+A session plus active staff membership produces the platform RequestContext;
+tenant selection never grants access. Onboarding and membership discovery use
+narrow system-session operations, followed by normal tenant RLS sessions.
+The imported voice UI lives under `/voice-receptionist`, with scoped styles and
+sample service adapters. See [the voice guide](voice-receptionist/README.md).
+
 Every table with `tenant_id` has row-level security. The API and worker connect
 as `clinic_app` (not the table owner) and every transaction sets
 `app.tenant_id`, so a query that forgets `WHERE tenant_id = ...` still can't
@@ -100,6 +108,6 @@ type error in the PR.
 - `voice_receptionist`, `scribe` and `photos` are flagged `phi_sensitive`;
   call/visit recording consent rules depend on `core.locations.state`.
 - `ops.audit_log` is append-only for the app role (UPDATE/DELETE revoked).
-- Before production: real auth (replace dev headers in `clinic_core/api.py`),
+- Before production: production HTTPS acceptance for Google auth,
   field-level encryption for clinical notes, secrets management, backups,
   and a BAA with every vendor in the PHI path (DB host, Twilio, speech-to-text, LLM).
