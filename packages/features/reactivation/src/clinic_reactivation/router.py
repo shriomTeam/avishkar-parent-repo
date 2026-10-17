@@ -10,11 +10,13 @@ from clinic_core.api import get_session, require_role
 from clinic_db.models.core import StaffRole
 from clinic_db.models.reactivation import Campaign
 from clinic_reactivation import service
+from clinic_reactivation.api.runs import router as runs_router
 from clinic_reactivation.api.settings import router as settings_router
 from clinic_reactivation.rules import find_lapsed_patients
 
 router = APIRouter(tags=["reactivation"])
 router.include_router(settings_router)
+router.include_router(runs_router)
 
 
 class LapsedPatientOut(BaseModel):
