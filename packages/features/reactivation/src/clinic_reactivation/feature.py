@@ -42,7 +42,7 @@ feature = Feature(
         CONSENT_CHANGED: [on_consent_changed],
         RUN_REQUESTED: [on_run_requested],
     },
-    nav=[NavItem(label="Reactivation", path="/reactivation", roles=("owner", "office_manager", "front_desk"))],
+    nav=[NavItem(label="Dormant patients", path="/reactivation", roles=("owner", "office_manager", "front_desk"))],
     sequences=[DEFAULT_SEQUENCE],
     trial_eligible=True,
 )

@@ -1,0 +1,412 @@
+/* Dormant patients. The app has no theme variables of its own, so the colours used by @clinic/ui
+   (Tailwind stone and teal) are defined once here and everything below reads them. */
+.dp-scope {
+  --dp-ink: #1c1917;
+  --dp-muted: #57534e;
+  --dp-faint: #78716c;
+  --dp-line: #e7e5e4;
+  --dp-line-strong: #d6d3d1;
+  --dp-surface: #ffffff;
+  --dp-subtle: #f5f5f4;
+  --dp-accent: #0f766e;
+  --dp-accent-strong: #115e59;
+  --dp-accent-soft: #f0fdfa;
+  --dp-warn-ink: #92400e;
+  --dp-warn-soft: #fffbeb;
+  --dp-warn-line: #fcd34d;
+  --dp-bad-ink: #991b1b;
+  --dp-bad-soft: #fef2f2;
+  --dp-bad-line: #fca5a5;
+  --dp-info-ink: #1e3a5f;
+  --dp-info-soft: #f0f6ff;
+  --dp-info-line: #bcd3f2;
+  --dp-focus: #0f766e;
+  color: var(--dp-ink);
+}
+.dp-scope :where(h1, h2, h3, p, ul, ol) {
+  margin: 0;
+}
+.dp-scope :where(ul, ol) {
+  padding: 0;
+  list-style: none;
+}
+.dp-scope :where(a, button, summary):focus-visible {
+  outline: 2px solid var(--dp-focus);
+  outline-offset: 2px;
+}
+
+/* Section header and tabs */
+.dp-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dp-faint);
+}
+.dp-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 8px 0 24px;
+  border-bottom: 1px solid var(--dp-line);
+  overflow-x: auto;
+}
+.dp-tab {
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--dp-muted);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+.dp-tab:hover {
+  color: var(--dp-ink);
+  background: var(--dp-subtle);
+}
+.dp-tab[aria-current="page"] {
+  color: var(--dp-accent-strong);
+  font-weight: 600;
+  border-bottom-color: var(--dp-accent);
+}
+
+/* Page head */
+.dp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.dp-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+.dp-sub {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--dp-muted);
+}
+.dp-sub abbr {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+.dp-stack > * + * {
+  margin-top: 20px;
+}
+.dp-tiles {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 900px) {
+  .dp-tiles {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Notices */
+.dp-notice {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.dp-notice svg {
+  flex: none;
+  margin-top: 2px;
+}
+.dp-notice strong {
+  font-weight: 600;
+}
+.dp-notice[data-tone="info"] {
+  background: var(--dp-info-soft);
+  border-color: var(--dp-info-line);
+  color: var(--dp-info-ink);
+}
+.dp-notice[data-tone="warn"] {
+  background: var(--dp-warn-soft);
+  border-color: var(--dp-warn-line);
+  color: var(--dp-warn-ink);
+}
+.dp-notice[data-tone="error"] {
+  background: var(--dp-bad-soft);
+  border-color: var(--dp-bad-line);
+  color: var(--dp-bad-ink);
+}
+.dp-notice-actions {
+  margin-left: auto;
+  flex: none;
+}
+
+/* Progress card */
+.dp-progress-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.dp-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--dp-subtle);
+  border: 1px solid var(--dp-line);
+  overflow: hidden;
+}
+.dp-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--dp-accent);
+  transition: width 0.4s ease;
+}
+.dp-hint {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--dp-faint);
+}
+
+/* Types table */
+.dp-table-wrap {
+  position: relative; /* keeps the visually hidden header text inside the scroll area */
+  overflow-x: auto;
+}
+.dp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 640px;
+}
+.dp-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dp-faint);
+  border-bottom: 1px solid var(--dp-line-strong);
+}
+.dp-table td {
+  padding: 14px 12px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--dp-line);
+}
+.dp-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.dp-table tbody tr[data-link] {
+  cursor: pointer;
+}
+.dp-table tbody tr[data-link]:hover {
+  background: var(--dp-subtle);
+}
+.dp-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.dp-table th.dp-num {
+  text-align: right;
+}
+.dp-type-link {
+  font-weight: 600;
+  color: var(--dp-ink);
+  text-decoration: none;
+}
+.dp-type-link:hover {
+  color: var(--dp-accent-strong);
+  text-decoration: underline;
+}
+.dp-type-desc {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--dp-muted);
+}
+.dp-money {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.dp-small {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--dp-faint);
+}
+.dp-range {
+  position: relative;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: var(--dp-subtle);
+  border: 1px solid var(--dp-line);
+  min-width: 140px;
+}
+.dp-range > span {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  min-width: 4px;
+  border-radius: 999px;
+  background: var(--dp-accent);
+}
+.dp-unavailable {
+  color: var(--dp-warn-ink);
+  font-weight: 600;
+}
+.dp-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--dp-subtle);
+  color: var(--dp-muted);
+  border: 1px solid var(--dp-line);
+  vertical-align: 1px;
+}
+.dp-chevron {
+  width: 40px;
+  color: var(--dp-faint);
+}
+
+/* About this data */
+.dp-details {
+  border: 1px solid var(--dp-line);
+  border-radius: 8px;
+  background: var(--dp-surface);
+}
+.dp-details > summary {
+  cursor: pointer;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dp-details > summary::-webkit-details-marker {
+  display: none;
+}
+.dp-details > summary::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--dp-muted);
+  border-bottom: 2px solid var(--dp-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+.dp-details[open] > summary::before {
+  transform: rotate(45deg);
+}
+.dp-details-body {
+  padding: 0 18px 16px;
+}
+.dp-notes li {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  font-size: 14px;
+  border-top: 1px solid var(--dp-line);
+}
+.dp-notes li:first-child {
+  border-top: 0;
+}
+.dp-notes b {
+  flex: none;
+  min-width: 88px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.dp-notes [data-tone="warn"] b {
+  color: var(--dp-warn-ink);
+}
+.dp-notes [data-tone="info"] b {
+  color: var(--dp-muted);
+}
+
+/* Empty and skeleton */
+.dp-empty {
+  text-align: center;
+  padding: 40px 24px;
+}
+.dp-empty h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+.dp-empty p {
+  max-width: 460px;
+  margin: 8px auto 20px;
+  color: var(--dp-muted);
+  font-size: 14px;
+}
+.dp-skeleton {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--dp-subtle), #ececea, var(--dp-subtle));
+  background-size: 200% 100%;
+  animation: dp-shimmer 1.4s infinite linear;
+}
+@keyframes dp-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dp-skeleton {
+    animation: none;
+  }
+  .dp-bar > span {
+    transition: none;
+  }
+}
+.dp-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.dp-placeholder p + p {
+  margin-top: 8px;
+}
+.dp-back {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--dp-accent-strong);
+}
+
+/* Equal-height tiles */
+.dp-tiles > div > * {
+  height: 100%;
+}
+
+/* Tablet: let the table wrap instead of scrolling sideways, and drop the row arrow. */
+@media (max-width: 1100px) {
+  .dp-table {
+    min-width: 0;
+  }
+  .dp-table th,
+  .dp-table td {
+    padding-inline: 8px;
+  }
+  .dp-chevron {
+    display: none;
+  }
+  .dp-range {
+    min-width: 0;
+  }
+  .dp-num {
+    white-space: normal;
+  }
+}
