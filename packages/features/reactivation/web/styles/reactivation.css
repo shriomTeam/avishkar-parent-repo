@@ -658,18 +658,12 @@
   text-transform: none;
   white-space: normal;
   text-align: left;
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.12s;
-  pointer-events: none;
+  /* display:none, not visibility:hidden: a hidden tooltip near the right edge would still widen the page. */
+  display: none;
 }
 .dp-hint-wrap:hover .dp-tooltip,
 .dp-hint-wrap:focus-within .dp-tooltip {
-  visibility: visible;
-  opacity: 1;
-}
-.dp-hint-wrap:hover .dp-tooltip {
-  pointer-events: auto; /* hoverable, so the text can be read without it vanishing */
+  display: block;
 }
 .dp-unsized {
   color: var(--dp-muted);
@@ -951,6 +945,11 @@
   }
   .dp-patients .dp-patient-row > .dp-cell-patient {
     grid-column: 1 / -1;
+  }
+  /* Cards have two columns: keep the right-hand column's tooltips inside the card. */
+  .dp-patients .dp-patient-row > td:nth-child(odd):not(:first-child) .dp-tooltip {
+    left: auto;
+    right: 0;
   }
   .dp-patients .dp-patient-row > .dp-cell-patient::before {
     display: none;

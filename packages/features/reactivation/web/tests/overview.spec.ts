@@ -164,7 +164,7 @@ test("the overview shows tiles, the types table and the unavailable state", asyn
   }
 });
 
-test("a first analysis says so, and the placeholder routes exist", async ({ page }) => {
+test("a first analysis says so, and the section pages exist", async ({ page }) => {
   helper("seed", workspace, ["--scenario", "first"]);
   await page.goto("/reactivation");
   await expect(tid(page, "tile-change")).toContainText("First analysis");
@@ -172,7 +172,7 @@ test("a first analysis says so, and the placeholder routes exist", async ({ page
   for (const [path, heading] of [
     ["/reactivation/runs", "Runs"],
     ["/reactivation/settings", "Settings"],
-    ["/reactivation/types/one_and_done", "Patients of this type"],
+    ["/reactivation/types/one_and_done", "One-and-done"],
   ]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();

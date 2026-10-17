@@ -182,7 +182,7 @@ test("the Unclassified page is the only one with a status filter, and defaults t
   await page.goto("/reactivation/types/unclassified");
   await expect(tid(page, "result-count")).toHaveText("6 patients");
   await expect(tid(page, "summary-worth")).toContainText("Not sized");
-  await tid(page, "summary-worth").getByTestId("not-sized").focus();
+  await tid(page, "summary-worth").getByTestId("not-sized").locator(".dp-hint-trigger").focus();
   await expect(tid(page, "summary-worth").getByRole("tooltip")).toContainText("don't fit any patient type");
   await page.getByTestId("status-filter").selectOption("at_risk");
   await expect(page).toHaveURL(/status=at_risk/);
@@ -230,14 +230,17 @@ test("front desk sees the totals but not the patients, and the patients endpoint
 
 test("an error can be retried", async ({ page }) => {
   helper("seed", workspace, ["--scenario", "full"]);
-  let failures = 1;
+  // Fail every request until told otherwise: in development React runs an effect twice, so "fail once" would be
+  // used up by the first, discarded request.
+  let failing = true;
   await page.route("**/runs/*/patients*", async (route) => {
-    if (failures-- > 0) return route.abort();
+    if (failing) return route.abort();
     await route.continue();
   });
   await page.goto("/reactivation/types/overdue_maintenance");
   const alert = page.getByRole("main").getByRole("alert");
   await expect(alert).toContainText("We couldn't load the patients.");
+  failing = false;
   await alert.getByRole("button", { name: "Try again" }).click();
   await expect(rowsOf(page)).toHaveCount(25);
 });

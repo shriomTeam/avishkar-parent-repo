@@ -363,7 +363,12 @@ function PatientList({ typeKey, entry, source }: { typeKey: string; entry: TypeE
   const isFile = source.kind === "file";
 
   // The search text is kept out of the URL (names must not reach the address bar or history).
-  const base: ListState = isFile ? fileState : parseUrlState(new URLSearchParams(params.toString()));
+  // Saved mode: the URL is the source of truth, but it updates a moment after a click. Until it does, show the
+  // state just asked for, so a checkbox or menu never looks like it ignored the click.
+  const urlKey = params.toString();
+  const [optimistic, setOptimistic] = useState<ListState | null>(null);
+  useEffect(() => setOptimistic(null), [urlKey]);
+  const base: ListState = isFile ? fileState : (optimistic ?? parseUrlState(new URLSearchParams(urlKey)));
   useEffect(() => {
     const id = setTimeout(() => setTyped(search), isFile ? 0 : SEARCH_PAUSE_MS);
     return () => clearTimeout(id);
@@ -374,7 +379,10 @@ function PatientList({ typeKey, entry, source }: { typeKey: string; entry: TypeE
     (patch: Partial<ListState>) => {
       const next = { ...base, ...patch, page: patch.page ?? 1 };
       if (isFile) setFileState(next);
-      else router.replace(`${pathname}${serializeUrlState(next)}`, { scroll: false });
+      else {
+        setOptimistic(next);
+        router.replace(`${pathname}${serializeUrlState(next)}`, { scroll: false });
+      }
     },
     [base, isFile, pathname, router],
   );
@@ -435,7 +443,10 @@ function PatientList({ typeKey, entry, source }: { typeKey: string; entry: TypeE
     setTyped("");
     const cleared = clearFilters(state);
     if (isFile) setFileState(cleared);
-    else router.replace(`${pathname}${serializeUrlState(cleared)}`, { scroll: false });
+    else {
+      setOptimistic(cleared);
+      router.replace(`${pathname}${serializeUrlState(cleared)}`, { scroll: false });
+    }
     searchRef.current?.focus();
   };
 
