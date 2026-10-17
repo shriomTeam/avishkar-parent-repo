@@ -109,13 +109,15 @@ export function EmptyState({
   title,
   children,
   action,
+  testId,
 }: {
   title: string;
   children: ReactNode;
   action?: ReactNode;
+  testId?: string;
 }) {
   return (
-    <div className="dp-empty">
+    <div className="dp-empty" data-testid={testId}>
       <h2>{title}</h2>
       <p>{children}</p>
       {action}

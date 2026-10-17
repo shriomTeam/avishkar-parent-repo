@@ -150,3 +150,40 @@ export function fileNotes(notes: { code: string; patients: number }[]): Note[] {
   }
   return out;
 }
+
+/** What to do about a patient type that can't be measured because the data isn't there. */
+export function unavailableAction(typeKey: string, source: "saved" | "file") {
+  const saved: Record<string, string> = {
+    churned_member: "Import your membership records on the Import data page, then run the analysis again.",
+    unused_balance: "Import your membership or prepaid package records on the Import data page, then run the analysis again.",
+    consult_not_converted: "Make sure consultation visits are recorded as consults in your booking system, import them, then run the analysis again.",
+    lapsed_high_value: "This needs at least 20 patients with visits. Import more of your patient history, then run the analysis again.",
+  };
+  const file: Record<string, string> = {
+    churned_member: "Add the membership_status column (and membership_ended_on and membership_monthly_fee if you have them) to your file, then import it again.",
+    unused_balance: "Add the prepaid_balance column, or membership_status, to your file, then import it again.",
+    consult_not_converted: "Add the visit_type column and mark consult visits as consult, then import the file again.",
+    lapsed_high_value: "This needs at least 20 patients with visits. Import a file with more patient history.",
+  };
+  const fallback =
+    source === "file"
+      ? "Check the file guide for the columns this needs, then import the file again."
+      : "Import the missing records on the Import data page, then run the analysis again.";
+  return (source === "file" ? file : saved)[typeKey] ?? fallback;
+}
+
+/** Why a patient or a whole group has no value estimate. Plain words, shown in a tooltip. */
+export const NOT_SIZED = {
+  atRisk: "At-risk patients haven't lapsed yet, so we don't estimate new revenue from them.",
+  unclassified: "These patients don't fit any patient type, so there's no basis for an estimate.",
+  noBasis: "We don't have enough payment history for this patient to estimate what they could be worth.",
+  groupNoBasis: "There isn't enough payment history in this group to estimate what it could be worth.",
+  noService: "Patients without a type don't have a single most common service.",
+} as const;
+
+export const LIKELIHOOD_HELP =
+  "A score out of 100 for how likely they are to come back, based on how recently and how often they came, what they spent, and whether past messages worked. It isn't a percentage chance.";
+export const WORTH_HELP =
+  "About figures: what this patient usually spends, multiplied by the return-rate range and rounded for each patient. They won't add up exactly to the group's total.";
+export const OVERDUE_HELP =
+  "How long since their last visit compared with how often they usually come. 2.0× means twice their usual gap.";

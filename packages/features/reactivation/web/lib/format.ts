@@ -54,3 +54,34 @@ export function relativeTime(iso: string, now: Date) {
   }
   return "just now";
 }
+
+/** A clinic-local calendar day ("2026-03-14") as "Mar 14, 2026". The day is not shifted by any timezone. */
+export function formatDay(isoDay: string) {
+  const d = new Date(`${isoDay}T12:00:00Z`);
+  if (Number.isNaN(d.getTime())) return isoDay;
+  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" }).format(d);
+}
+
+/** "today", "1 day ago", "412 days ago". */
+export function formatDaysAgo(days: number) {
+  if (days <= 0) return "today";
+  return days === 1 ? "1 day ago" : `${count.format(days)} days ago`;
+}
+
+/** "2.4× their usual gap". One decimal place, so 1.04 reads "1.0×". */
+export function formatOverdue(ratio: number) {
+  return `${ratio.toFixed(1)}× their usual gap`;
+}
+
+/** "About $340 to $640", or "About $340" when both ends are the same. */
+export function formatAbout(lowCents: number, highCents: number) {
+  return `About ${formatRange(lowCents, highCents)}`;
+}
+
+/** The return-rate basis in plain words, for a type's summary line. */
+export function rateBasisText(source: string | null, low: number, high: number) {
+  const range = formatRateRange(low, high);
+  return source === "measured"
+    ? `At your measured return rate of ${range}, from past campaigns`
+    : `At an assumed return rate of ${range}`;
+}

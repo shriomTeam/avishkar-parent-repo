@@ -144,7 +144,7 @@ test("importing a file shows its results with a banner, keeps them across pages,
 
   // The results survive moving around the section, and say so on every page.
   await tid(page, "type-row-unclassified").getByRole("link").click();
-  await expect(page).toHaveURL(/\/reactivation\/types\/unclassified$/);
+  await expect(page).toHaveURL(/\/reactivation\/types\/unclassified\?source=file$/);
   await expect(tid(page, "csv-banner")).toContainText("march-export.csv");
   const tabs = page.getByRole("navigation", { name: "Dormant patients sections" });
   await tabs.getByRole("link", { name: "Runs" }).click();

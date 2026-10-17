@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Card } from "@clinic/ui";
 import { useAuth } from "@clinic/core/web/auth/provider";
 
@@ -59,6 +59,17 @@ export function Overview({ data }: { data: OverviewData }) {
   const [now, setNow] = useState<Date | null>(null);
   const [importing, setImporting] = useState(false);
   const { result: csv } = useCsvResult();
+  const params = useSearchParams();
+  const forceSaved = params.get("view") === "saved";
+  const [cleared, setCleared] = useState(false);
+
+  // Arriving from a type page whose file results were lost to a refresh: say so once, then tidy the address.
+  useEffect(() => {
+    if (params.get("notice") === "file-cleared") {
+      setCleared(true);
+      router.replace("/reactivation");
+    }
+  }, [params, router]);
 
   useEffect(() => {
     setNow(new Date());
@@ -146,7 +157,7 @@ export function Overview({ data }: { data: OverviewData }) {
   }
 
   // File results replace the page body but not this component, so a run in flight keeps polling underneath.
-  if (csv)
+  if (csv && !forceSaved)
     return (
       <CsvResults
         result={csv}
@@ -155,7 +166,13 @@ export function Overview({ data }: { data: OverviewData }) {
         onBack={() => router.refresh()}
       />
     );
-  if (data.welcome) return <Welcome canImport={canRun} />;
+  const clearedNotice = cleared ? (
+    <Notice tone="info" title="Your file results were cleared.">
+      They were only held in this tab, so a refresh removes them. Nothing from the file was saved.
+      {canRun ? " Import the file again to see them." : ""}
+    </Notice>
+  ) : null;
+  if (data.welcome) return <Welcome canImport={canRun} notice={clearedNotice} />;
 
   const { latest, types } = data;
   const busy = starting || run !== null;
@@ -178,6 +195,20 @@ export function Overview({ data }: { data: OverviewData }) {
 
   return (
     <div className="dp-stack">
+      {clearedNotice}
+      {csv && forceSaved && (
+        <Notice
+          tone="info"
+          title="File results are open in this tab."
+          action={
+            <button type="button" className="dp-link-button" onClick={() => router.replace("/reactivation")} data-testid="view-file-results">
+              View file results
+            </button>
+          }
+        >
+          What you see below is your saved data.
+        </Notice>
+      )}
       <div className="dp-head">
         <div>
           <h1 className="dp-title">Overview</h1>

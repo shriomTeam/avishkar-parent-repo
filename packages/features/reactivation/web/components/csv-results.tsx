@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button, Card } from "@clinic/ui";
 
@@ -29,24 +28,6 @@ export function CsvBanner({
       >
         This data is not saved. Refreshing the page clears it.
       </Notice>
-    </div>
-  );
-}
-
-/** Shown on other pages of this section while file results are in memory, so they can't be mistaken for saved data. */
-export function CsvModeNote() {
-  const { result } = useCsvResult();
-  if (!result) return null;
-  return (
-    <div className="dp-mode-note">
-      <CsvBanner
-        fileName={result.fileName}
-        actions={
-          <Link href="/reactivation" className="dp-link-button">
-            Back to overview
-          </Link>
-        }
-      />
     </div>
   );
 }

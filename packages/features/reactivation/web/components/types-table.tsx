@@ -9,7 +9,9 @@ import {
   formatRange,
   formatRateRange,
 } from "../lib/format";
-import { unavailableReason } from "../lib/messages";
+import { NOT_SIZED, unavailableReason } from "../lib/messages";
+import { NotSized } from "./hint";
+import { typeHref } from "../lib/patient-list";
 import { RangeBar } from "./kit";
 
 export function TypesTable({ types, source = "saved" }: { types: TypeEntry[]; source?: "saved" | "file" }) {
@@ -30,7 +32,7 @@ export function TypesTable({ types, source = "saved" }: { types: TypeEntry[]; so
               Patients
             </th>
             <th scope="col">Could be worth</th>
-            <th scope="col">Most common service</th>
+            <th scope="col">Top service</th>
             <th scope="col" className="dp-chevron">
               <span className="dp-visually-hidden">Open</span>
             </th>
@@ -38,7 +40,7 @@ export function TypesTable({ types, source = "saved" }: { types: TypeEntry[]; so
         </thead>
         <tbody>
           {types.map((t) => {
-            const href = `/reactivation/types/${t.type_key}`;
+            const href = typeHref(t.type_key, source === "file");
             return (
               <tr
                 key={t.type_key}
@@ -68,9 +70,13 @@ export function TypesTable({ types, source = "saved" }: { types: TypeEntry[]; so
                   <Revenue entry={t} scale={scale} source={source} />
                 </td>
                 <td>
-                  {t.available && t.type_key !== "unclassified"
-                    ? (t.top_service_name ?? "Not recorded")
-                    : "—"}
+                  {t.available && t.type_key !== "unclassified" ? (
+                    (t.top_service_name ?? "Not recorded")
+                  ) : t.available ? (
+                    <NotSized reason={NOT_SIZED.noService} />
+                  ) : (
+                    <span className="dp-unavailable">Not available</span>
+                  )}
                 </td>
                 <td className="dp-chevron" aria-hidden>
                   ›
@@ -105,7 +111,7 @@ function Revenue({
   if (t.type_key === "unclassified")
     return (
       <>
-        <span>Not estimated</span>
+        <NotSized reason={NOT_SIZED.unclassified} />
         <p className="dp-small">
           Dormant, but they don&apos;t fit any patient type, so there is no
           revenue figure.

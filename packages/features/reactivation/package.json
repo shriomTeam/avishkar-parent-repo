@@ -5,7 +5,8 @@
   "scripts": {
     "lint": "uv run ruff check src tests",
     "typecheck": "tsc --noEmit",
-    "test": "uv run pytest tests -q"
+    "test": "uv run pytest tests -q && node --test web/unit/*.test.ts",
+    "test:web": "node --test web/unit/*.test.ts"
   },
   "exports": {
     "./web/*": "./web/pages/*.tsx"

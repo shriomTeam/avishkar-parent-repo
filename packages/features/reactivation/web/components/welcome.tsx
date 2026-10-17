@@ -1,16 +1,17 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Button } from "@clinic/ui";
 
 import { CsvHelp, TemplateButton } from "./csv-help";
 import { CsvImportPanel } from "./csv-import";
 
 /** The first visit to Dormant patients for a clinic with no patient data and no analysis. */
-export function Welcome({ canImport }: { canImport: boolean }) {
+export function Welcome({ canImport, notice }: { canImport: boolean; notice?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
   return (
     <div className="dp-stack" data-testid="welcome">
+      {notice}
       <section className="dp-welcome" aria-labelledby="dp-welcome-title">
         <h1 className="dp-title dp-welcome-title" id="dp-welcome-title">
           Upload your data to find your dormant patients

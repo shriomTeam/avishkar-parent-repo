@@ -624,3 +624,357 @@
 .dp-mode-note {
   margin-bottom: 16px;
 }
+
+/* Type page: hints, controls, patient list */
+.dp-hint-wrap {
+  position: relative;
+  display: inline-block;
+}
+.dp-hint-trigger {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  border-radius: 3px;
+}
+.dp-hint-trigger:focus-visible {
+  outline: 2px solid var(--dp-focus);
+  outline-offset: 2px;
+}
+.dp-tooltip {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  width: max-content;
+  max-width: min(280px, 70vw);
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--dp-ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+  text-align: left;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.12s;
+  pointer-events: none;
+}
+.dp-hint-wrap:hover .dp-tooltip,
+.dp-hint-wrap:focus-within .dp-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+.dp-hint-wrap:hover .dp-tooltip {
+  pointer-events: auto; /* hoverable, so the text can be read without it vanishing */
+}
+.dp-unsized {
+  color: var(--dp-muted);
+  font-weight: 600;
+}
+.dp-unavailable-card h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--dp-warn-ink);
+}
+.dp-unavailable-card > * + * {
+  margin-top: 10px;
+}
+.dp-what-to-do {
+  max-width: 640px;
+  font-size: 14px;
+  color: var(--dp-muted);
+}
+
+.dp-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+}
+.dp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dp-muted);
+}
+.dp-field input,
+.dp-field select {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--dp-line-strong);
+  border-radius: 6px;
+  background: var(--dp-surface);
+  font: inherit;
+  font-size: 14px;
+  color: var(--dp-ink);
+}
+.dp-field input:focus-visible,
+.dp-field select:focus-visible,
+.dp-check input:focus-visible,
+.dp-toggle:focus-visible {
+  outline: 2px solid var(--dp-focus);
+  outline-offset: 2px;
+}
+.dp-field-search {
+  flex: 1 1 240px;
+}
+.dp-field-search input {
+  width: 100%;
+}
+.dp-toggle {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--dp-line-strong);
+  border-radius: 6px;
+  background: var(--dp-surface);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.dp-toggle:hover {
+  background: var(--dp-subtle);
+}
+.dp-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  font-size: 14px;
+}
+.dp-check input {
+  width: 16px;
+  height: 16px;
+}
+.dp-count {
+  margin: 12px 0 8px;
+  min-height: 20px; /* the line is always there, so nothing moves when it changes */
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dp-muted);
+}
+
+.dp-list {
+  container-type: inline-size;
+}
+.dp-list[data-busy] .dp-patients tbody {
+  opacity: 0.55;
+}
+.dp-patients {
+  min-width: 0;
+  table-layout: auto;
+}
+.dp-patients th {
+  white-space: nowrap;
+}
+.dp-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.dp-sort:focus-visible {
+  outline: 2px solid var(--dp-focus);
+  outline-offset: 2px;
+}
+.dp-sort-arrow {
+  font-size: 10px;
+}
+.dp-patients th[aria-sort="ascending"],
+.dp-patients th[aria-sort="descending"] {
+  color: var(--dp-accent-strong);
+}
+.dp-expand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  color: var(--dp-ink);
+  cursor: pointer;
+}
+.dp-expand:hover .dp-patient-name {
+  color: var(--dp-accent-strong);
+  text-decoration: underline;
+}
+.dp-expand:focus-visible {
+  outline: 2px solid var(--dp-focus);
+  outline-offset: 2px;
+}
+.dp-expand-arrow {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--dp-muted);
+  border-bottom: 2px solid var(--dp-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+.dp-expand[aria-expanded="true"] .dp-expand-arrow {
+  transform: rotate(45deg);
+}
+.dp-block {
+  display: block;
+}
+.dp-band {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dp-band[data-band="high"] {
+  background: var(--dp-accent-soft);
+  border-color: var(--dp-accent);
+  color: var(--dp-accent-strong);
+}
+.dp-band[data-band="medium"] {
+  background: var(--dp-warn-soft);
+  border-color: var(--dp-warn-line);
+  color: var(--dp-warn-ink);
+}
+.dp-band[data-band="low"] {
+  background: var(--dp-subtle);
+  border-color: var(--dp-line-strong);
+  color: var(--dp-muted);
+}
+.dp-why-row > td {
+  padding: 0 12px 16px 28px;
+  background: var(--dp-subtle);
+  border-bottom: 1px solid var(--dp-line);
+}
+.dp-why h3 {
+  margin: 14px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.dp-why-list li {
+  padding: 2px 0;
+  font-size: 14px;
+}
+.dp-points {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px 24px;
+  margin: 0;
+}
+.dp-points dt {
+  font-size: 12px;
+  color: var(--dp-faint);
+}
+.dp-points dd {
+  margin: 0;
+  font-size: 14px;
+}
+
+.dp-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+.dp-pager-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dp-pager-page {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.dp-skel-row {
+  display: flex;
+  gap: 5%;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--dp-line);
+}
+
+/* Narrow lists become cards. The container is the list itself, because the sidebar takes a quarter of a small
+   screen, so the viewport width says little about how much room the table has. */
+@container (max-width: 860px) {
+  .dp-patients,
+  .dp-patients tbody {
+    display: block;
+  }
+  .dp-patients thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .dp-patients .dp-patient-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--dp-line);
+    border-radius: 8px;
+    background: var(--dp-surface);
+  }
+  .dp-patients .dp-patient-row > td {
+    display: block;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .dp-patients .dp-patient-row > td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--dp-faint);
+  }
+  .dp-patients .dp-patient-row > .dp-cell-patient {
+    grid-column: 1 / -1;
+  }
+  .dp-patients .dp-patient-row > .dp-cell-patient::before {
+    display: none;
+  }
+  .dp-patients .dp-why-row {
+    display: block;
+    margin-top: -4px;
+  }
+  .dp-patients .dp-why-row[hidden] {
+    display: none;
+  }
+  .dp-patients .dp-why-row > td {
+    display: block;
+    padding: 0 14px 14px;
+    border: 1px solid var(--dp-line);
+    border-top: 0;
+    border-radius: 0 0 8px 8px;
+  }
+  .dp-pager {
+    justify-content: center;
+  }
+}
+@media (max-width: 480px) {
+  .dp-patients .dp-patient-row {
+    grid-template-columns: 1fr;
+  }
+}

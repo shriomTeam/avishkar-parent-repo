@@ -62,7 +62,7 @@ from sqlalchemy import delete, select  # noqa: E402
 
 from clinic_core.database import dispose_engines, system_session, tenant_session  # noqa: E402
 from clinic_db.models.core import Patient, Service, Tenant  # noqa: E402
-from clinic_db.models.reactivation import Run, RunType  # noqa: E402
+from clinic_db.models.reactivation import Run, RunPatient, RunType  # noqa: E402
 from clinic_reactivation.analysis.settings import ReactivationSettings  # noqa: E402
 from clinic_reactivation.runs import execute_run  # noqa: E402
 
@@ -110,7 +110,79 @@ def _quality() -> dict:
     }
 
 
-async def _seed_run(tenant_id, *, first_run: bool, finished: datetime, services: dict) -> Run:
+FIRST = ["Maya", "Dan", "Priya", "Luis", "Hannah", "Omar", "Sofia", "Ethan", "Grace", "Noah", "Lena", "Victor"]
+LAST = ["Rao", "Ortiz", "Shah", "Miller", "Chen", "Haddad", "Rossi", "Kim", "Okafor", "Lopez", "Novak", "Silva"]
+SPECIAL = "Zelda Quillfeather"  # a name no other seeded patient has, for the search test
+
+
+def _points(i: int, service_id) -> dict:
+    email, sms = [(True, True), (True, False), (False, True), (False, False)][i % 4]
+    return {
+        "reachable": {"email": email, "sms": sms, "either": email or sms},
+        "best_offer": {"service_id": str(service_id), "source": "usual_service"},
+        "best_time": {"weekday": i % 7, "band": (i % 6) + 1, "visits_used": 4},
+        "provider_continuity": {"status": ["active", "inactive", "unknown"][i % 3]},
+        "change_since_last": {"change": "new" if i % 3 == 0 else "unchanged"},
+    }
+
+
+async def _seed_patients(tenant_id, run: Run, rows: list, services: dict, finished: datetime, at_risk: int) -> None:
+    """One run-patient row per counted patient of every type (names, scores, reasons, points), so the
+    patient list has something to show and every count on the Overview matches its list."""
+    n = 0
+    plan = [(r[0], r[1], r[2], r[9], r[8]) for r in rows]  # type, count, basis, top service, kind
+    plan += [(None, UNCLASSIFIED_ROWS, 0, "Facial", "new")]
+    async with tenant_session(tenant_id) as s:
+        for key, count, basis, service, kind in plan:
+            for i in range(count):
+                n += 1
+                name = (
+                    SPECIAL
+                    if (key == "overdue_maintenance" and i == 5)
+                    else f"{FIRST[n % 12]} {LAST[(n // 12 + n) % 12]}"
+                )
+                first, _, last = name.partition(" ")
+                patient = Patient(tenant_id=tenant_id, first_name=first, last_name=last, attributes=dict(MARK))
+                s.add(patient)
+                await s.flush()
+                days = 120 + (n * 13) % 500
+                s.add(
+                    RunPatient(
+                        tenant_id=tenant_id, run_id=run.id, patient_id=patient.id, status="dormant", primary_type=key,
+                        matched_types=[key] if key else [], last_visit_at=finished - timedelta(days=days),
+                        days_since_last_visit=days, overdue_ratio=round(1.1 + (n % 25) / 10, 2), visit_count=2 + n % 5,
+                        total_spend_cents=20_000 + n * 150, usual_service_id=services[service],
+                        revenue_basis_cents=(basis // count + (i % 9) * 700) if count and basis else 0, revenue_kind=kind,
+                        likelihood_score=88 if (key == "overdue_maintenance" and i == 0) else 30 + (n * 7) % 55,
+                        points=_points(n, services[service]), change="new" if n % 3 == 0 else "unchanged",
+                        reasons=[f"Last visit {days} days ago, usual {service} every 120 days",
+                                 "Dormant, but matches none of the enabled patient types" if key is None
+                                 else f"Matches {key.replace('_', ' ')}"],
+                    )
+                )  # fmt: skip
+        for i in range(at_risk):
+            n += 1
+            patient = Patient(
+                tenant_id=tenant_id, first_name="Risky", last_name=f"Patient{i:02d}", attributes=dict(MARK)
+            )
+            s.add(patient)
+            await s.flush()
+            s.add(
+                RunPatient(
+                    tenant_id=tenant_id, run_id=run.id, patient_id=patient.id, status="at_risk", primary_type=None,
+                    matched_types=[], last_visit_at=finished - timedelta(days=100), days_since_last_visit=100,
+                    overdue_ratio=0.9, visit_count=3, total_spend_cents=30_000, usual_service_id=services["Facial"],
+                    revenue_basis_cents=0, revenue_kind="new", likelihood_score=40 + i,
+                    points=_points(n, services["Facial"]),
+                    reasons=["Last visit 100 days ago, due again soon"],
+                )
+            )  # fmt: skip
+
+
+UNCLASSIFIED_ROWS = 6
+
+
+async def _seed_run(tenant_id, *, first_run: bool, finished: datetime, services: dict, patients: bool = False) -> Run:
     config = ReactivationSettings().model_dump(mode="json")
     config["types"]["churned_member"]["enabled"] = True
     low = high = 0
@@ -184,7 +256,9 @@ async def _seed_run(tenant_id, *, first_run: bool, finished: datetime, services:
                     revenue_kind=kind, top_service_id=services[service],
                 )
             )  # fmt: skip
-        return run
+    if patients:
+        await _seed_patients(tenant_id, run, rows, services, finished, at_risk=summary["at_risk_count"])
+    return run
 
 
 async def seed(args) -> dict:
@@ -213,6 +287,7 @@ async def seed(args) -> dict:
         first_run=args.scenario == "first",
         finished=now - timedelta(hours=3, minutes=5),
         services=services,
+        patients=True,
     )
     s_ = latest.summary
     facts.update(

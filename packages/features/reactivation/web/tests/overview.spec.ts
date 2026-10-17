@@ -111,7 +111,7 @@ test("the overview shows tiles, the types table and the unavailable state", asyn
   await expect(rows).toHaveCount(8); // seven types plus unclassified
   await expect(rows.last()).toHaveAttribute("data-testid", "type-row-unclassified");
   await expect(rows.last()).toContainText(String(f.unclassified));
-  await expect(rows.last()).toContainText("Not estimated");
+  await expect(rows.last()).toContainText("Not sized");
 
   const overdue = tid(page, "type-row-overdue_maintenance");
   await expect(overdue).toContainText("Overdue maintenance");

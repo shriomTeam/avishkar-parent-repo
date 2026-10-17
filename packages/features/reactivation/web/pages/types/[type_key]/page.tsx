@@ -1,23 +1,6 @@
-import Link from "next/link";
-import { Card, PageHeader } from "@clinic/ui";
+import { TypeDetail } from "../../../components/type-detail";
 
-import { CsvModeNote } from "../../../components/csv-results";
-import { EmptyState } from "../../../components/kit";
-
-export default function TypePage() {
-  return (
-    <>
-      <Link href="/reactivation" className="dp-back">
-        ← Back to overview
-      </Link>
-      <CsvModeNote />
-      <PageHeader title="Patients of this type" />
-      <Card>
-        <EmptyState title="The patient list is coming soon">
-          You&apos;ll see each patient, why they matched, and how likely they
-          are to come back.
-        </EmptyState>
-      </Card>
-    </>
-  );
+export default async function TypePage({ params }: { params: Promise<{ type_key: string }> }) {
+  const { type_key } = await params;
+  return <TypeDetail typeKey={type_key} />;
 }
