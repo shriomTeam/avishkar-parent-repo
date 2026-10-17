@@ -403,6 +403,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/reactivation/csv-analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Csv Analysis
+         * @description Body: the CSV file as raw bytes with ``Content-Type: text/csv``.
+         */
+        post: operations["csv_analysis_features_reactivation_csv_analysis_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/csv-columns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Csv Columns */
+        get: operations["csv_columns_features_reactivation_csv_columns_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/csv-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Csv Template */
+        get: operations["csv_template_features_reactivation_csv_template_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/data-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Data Status
+         * @description No data means no patients and no completed run; the Overview shows the welcome page then.
+         */
+        get: operations["data_status_features_reactivation_data_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/reactivation/runs/latest": {
         parameters: {
             query?: never;
@@ -826,6 +900,33 @@ export interface components {
          * @enum {string}
          */
         ClinicType: "medspa" | "wellness" | "hrt";
+        /** ColumnOut */
+        ColumnOut: {
+            /** Name */
+            name: string;
+            /** Kind */
+            kind: string;
+            /** Required */
+            required: boolean;
+            /** Description */
+            description: string;
+            /** If Missing */
+            if_missing: string;
+            /** Example */
+            example: string;
+            /** Values */
+            values: string[];
+            /** Max Length */
+            max_length: number;
+        };
+        /** ColumnsOut */
+        ColumnsOut: {
+            /** Columns */
+            columns: components["schemas"]["ColumnOut"][];
+            /** Notes */
+            notes: string[];
+            limits: components["schemas"]["CsvLimits"];
+        };
         /** ConsultNotConverted */
         ConsultNotConverted: {
             /**
@@ -843,6 +944,98 @@ export interface components {
              * @default 60
              */
             conversion_window_days: number;
+        };
+        /** CsvAnalysis */
+        CsvAnalysis: {
+            /** Source */
+            source: string;
+            /** Settings Source */
+            settings_source: string;
+            /** Rate Basis */
+            rate_basis: string;
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            counts: components["schemas"]["CsvCounts"];
+            /** Notes */
+            notes: components["schemas"]["CsvNote"][];
+            /** Summary */
+            summary: {
+                [key: string]: unknown;
+            };
+            /** Quality */
+            quality: {
+                [key: string]: unknown;
+            };
+            /** Types */
+            types: components["schemas"]["TypeOut"][];
+            /** Patients */
+            patients: components["schemas"]["CsvPatientOut"][];
+        };
+        /** CsvCounts */
+        CsvCounts: {
+            /** Rows */
+            rows: number;
+            /** Patients */
+            patients: number;
+            /** Visit Days */
+            visit_days: number;
+        };
+        /** CsvLimits */
+        CsvLimits: {
+            /** Max Bytes */
+            max_bytes: number;
+            /** Max Rows */
+            max_rows: number;
+            /** Max Patients */
+            max_patients: number;
+        };
+        /** CsvNote */
+        CsvNote: {
+            /** Code */
+            code: string;
+            /** Patients */
+            patients: number;
+        };
+        /** CsvPatientOut */
+        CsvPatientOut: {
+            /** Patient Id */
+            patient_id: string;
+            /** External Id */
+            external_id: string;
+            /** Display Name */
+            display_name: string | null;
+            /** Status */
+            status: string;
+            /** Primary Type */
+            primary_type: string | null;
+            /** Matched Types */
+            matched_types: string[];
+            /** Reasons */
+            reasons: string[];
+            /** Usual Service Name */
+            usual_service_name: string | null;
+            /** Last Visit Day */
+            last_visit_day: string | null;
+            /** Days Since Last Visit */
+            days_since_last_visit: number;
+            /** Likelihood Score */
+            likelihood_score: number;
+            /** Revenue Basis Cents */
+            revenue_basis_cents: number;
+            /** Points */
+            points: {
+                [key: string]: unknown;
+            };
+        };
+        /** DataStatus */
+        DataStatus: {
+            /** Has Patients */
+            has_patients: boolean;
+            /** Has Completed Run */
+            has_completed_run: boolean;
         };
         /** DormantRule */
         DormantRule: {
@@ -2433,6 +2626,138 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScheduleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    csv_analysis_features_reactivation_csv_analysis_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CsvAnalysis"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    csv_columns_features_reactivation_csv_columns_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ColumnsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    csv_template_features_reactivation_csv_template_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    data_status_features_reactivation_data_status_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataStatus"];
                 };
             };
             /** @description Validation Error */

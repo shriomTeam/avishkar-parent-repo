@@ -1,4 +1,5 @@
 import uuid
+from collections.abc import Mapping
 from datetime import datetime
 from typing import Any, Literal
 
@@ -95,33 +96,27 @@ async def latest_run(session: AsyncSession = Depends(get_session)) -> LatestRun:
     )
 
 
-def _enabled_type_keys(run: Run, stored: set[str]) -> list[str]:
+def _enabled_type_keys(run_settings: dict | None, summary: dict | None, stored: set[str]) -> list[str]:
     """Every type the run had switched on (from its settings copy), plus any with a stored row or an
     availability flag, in priority order."""
-    configured = (run.settings or {}).get("types") or {}
-    keys = set(stored) | set((run.summary or {}).get("types_data_available") or {})
+    configured = (run_settings or {}).get("types") or {}
+    keys = set(stored) | set((summary or {}).get("types_data_available") or {})
     keys |= {k for k in TYPE_KEYS if (configured.get(k) or {}).get("enabled")}
     keys &= set(TYPE_KEYS)
     return sorted(keys, key=lambda k: ((configured.get(k) or {}).get("priority", 99), k))  # a tie sorts by key
 
 
-@router.get("/runs/{run_id}/types", response_model=list[TypeOut], dependencies=VIEWERS)
-async def run_types(run_id: uuid.UUID, session: AsyncSession = Depends(get_session)) -> list[TypeOut]:
-    run = await _completed_run(session, run_id)
-    summary = run.summary or {}
-    rows = {
-        t.type_key: (t, name)
-        for t, name in (
-            await session.execute(
-                select(RunType, Service.name)
-                .outerjoin(Service, Service.id == RunType.top_service_id)
-                .where(RunType.run_id == run_id)
-            )
-        ).all()
-    }
+def type_entries(
+    run_settings: dict | None, summary: dict | None, rows: Mapping[str, tuple[Any, str | None]]
+) -> list[TypeOut]:
+    """The per-type rows of a run, shared by the saved results and the file analysis.
+
+    ``rows`` maps a type key to (a row with the RunType fields, the top service's name).
+    """
+    summary = summary or {}
     availability = summary.get("types_data_available") or {}
     out: list[TypeOut] = []
-    for key in _enabled_type_keys(run, set(rows)):
+    for key in _enabled_type_keys(run_settings, summary, set(rows)):
         info = TYPE_INFO[key]
         row = rows.get(key)
         available = bool(availability.get(key, row is not None))
@@ -178,6 +173,22 @@ async def run_types(run_id: uuid.UUID, session: AsyncSession = Depends(get_sessi
         )
     )
     return out
+
+
+@router.get("/runs/{run_id}/types", response_model=list[TypeOut], dependencies=VIEWERS)
+async def run_types(run_id: uuid.UUID, session: AsyncSession = Depends(get_session)) -> list[TypeOut]:
+    run = await _completed_run(session, run_id)
+    rows = {
+        t.type_key: (t, name)
+        for t, name in (
+            await session.execute(
+                select(RunType, Service.name)
+                .outerjoin(Service, Service.id == RunType.top_service_id)
+                .where(RunType.run_id == run_id)
+            )
+        ).all()
+    }
+    return type_entries(run.settings, run.summary, rows)
 
 
 @router.get("/runs/{run_id}/patients", response_model=PatientPage, dependencies=MANAGERS)
