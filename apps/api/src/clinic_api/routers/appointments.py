@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from clinic_core.api import RequestContext, get_request_context, get_session
-from clinic_core.events import APPOINTMENT_BOOKED, emit
+from clinic_core.events import APPOINTMENT_BOOKED, APPOINTMENT_COMPLETED, emit
 from clinic_db.models.core import Appointment, AppointmentStatus, Patient
 
 router = APIRouter(prefix="/appointments", tags=["appointments"])
@@ -47,4 +47,25 @@ async def book(
         APPOINTMENT_BOOKED,
         {"appointment_id": str(appt.id), "patient_id": str(appt.patient_id), "booked_via": appt.booked_via},
     )
+    return BookOut(id=appt.id, status=appt.status)
+
+
+@router.post("/{appointment_id}/complete", response_model=BookOut)
+async def complete(
+    appointment_id: uuid.UUID, session: AsyncSession = Depends(get_session)
+) -> BookOut:
+    """Mark a visit completed and emit ``appointment.completed`` for review automation."""
+    appt = await session.get(Appointment, appointment_id)
+    if appt is None:
+        raise HTTPException(404, "appointment not found")
+    if appt.status in (AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW):
+        raise HTTPException(409, "appointment is not completable")
+    if appt.status != AppointmentStatus.COMPLETED:
+        appt.status = AppointmentStatus.COMPLETED
+        await session.flush()
+        await emit(
+            session,
+            APPOINTMENT_COMPLETED,
+            {"appointment_id": str(appt.id), "patient_id": str(appt.patient_id)},
+        )
     return BookOut(id=appt.id, status=appt.status)

@@ -1,27 +1,56 @@
-"""The 5-Star Machine (stub). Owning team: see .github/CODEOWNERS.
+"""The 5-Star Machine: post-appointment review automation."""
 
-Tables go in packages/db/src/clinic_db/models/reviews.py (Postgres schema "reviews").
-Read shared data from core.*, react to other features through events, and send
-SMS/email through clinic_engagement. See docs/ADDING_A_FEATURE.md.
-"""
+from datetime import timedelta
 
-from fastapi import APIRouter
+from clinic_core.events import APPOINTMENT_COMPLETED, CONSENT_CHANGED
+from clinic_core.features import Feature, NavItem, Schedule
+from clinic_engagement import SequenceDef, Step
+from clinic_reviews.constants import FEATURE_KEY
+from clinic_reviews.public import router as public_router
+from clinic_reviews.router import router
+from clinic_reviews.service import dispatch_due, on_appointment_completed, on_consent_changed
 
-from clinic_core.features import Feature, NavItem
+SMS_SEQUENCE = SequenceDef(
+    key="reviews.sms",
+    steps=(
+        Step(
+            delay=timedelta(0),
+            channel="sms",
+            template=(
+                "Hi {first_name}, thank you for visiting {clinic_name}. "
+                "We'd appreciate hearing about your experience: {review_request_link} "
+                "Reply STOP to opt out."
+            ),
+        ),
+    ),
+)
 
-router = APIRouter(tags=["reviews"])
-
-
-@router.get("/status")
-async def status() -> dict:
-    return {"feature": "reviews", "status": "not yet implemented"}
-
+EMAIL_SEQUENCE = SequenceDef(
+    key="reviews.email",
+    steps=(
+        Step(
+            delay=timedelta(0),
+            channel="email",
+            subject="How was your visit to {clinic_name}?",
+            template=(
+                "Hi {first_name},\n\nThank you for visiting {clinic_name}. "
+                "We'd appreciate hearing about your experience:\n{review_request_link}\n\n"
+                "{clinic_name}"
+            ),
+        ),
+    ),
+)
 
 feature = Feature(
-    key="reviews",
+    key=FEATURE_KEY,
     name="The 5-Star Machine",
-    description="Requests reviews from happy patients and routes unhappy ones privately.",
+    description="Asks patients for a rating after a completed visit, and invites 4- and 5-star ratings to Google.",
     router=router,
-    nav=[NavItem(label="Reviews", path="/reviews")],
-    phi_sensitive=False,
+    public_router=public_router,
+    jobs={"dispatch_due": dispatch_due},
+    schedules=[Schedule(job="dispatch_due", every_seconds=60)],
+    event_handlers={APPOINTMENT_COMPLETED: [on_appointment_completed], CONSENT_CHANGED: [on_consent_changed]},
+    nav=[NavItem(label="Reviews", path="/reviews", roles=("owner", "office_manager", "front_desk"))],
+    sequences=[SMS_SEQUENCE, EMAIL_SEQUENCE],
+    trial_eligible=True,
 )

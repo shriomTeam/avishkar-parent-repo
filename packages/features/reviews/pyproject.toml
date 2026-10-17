@@ -1,9 +1,9 @@
 [project]
 name = "clinic-feature-reviews"
 version = "0.1.0"
-description = "The 5-Star Machine: Requests reviews from happy patients and routes unhappy ones privately."
+description = "The 5-Star Machine: post-appointment ratings, with a Google review invite for 4- and 5-star responses."
 requires-python = ">=3.12"
-dependencies = ["clinic-core", "clinic-db"]
+dependencies = ["clinic-core", "clinic-db", "clinic-engagement"]
 
 [project.entry-points."clinic.features"]
 reviews = "clinic_reviews.feature:feature"

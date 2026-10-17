@@ -66,6 +66,8 @@ class Feature:
     name: str  # the name we sell it under
     description: str
     router: APIRouter | None = None
+    # Unauthenticated patient-facing routes (token-gated). Mounted at /public/<key>.
+    public_router: APIRouter | None = None
     jobs: dict[str, JobHandler] = field(default_factory=dict)
     schedules: Sequence[Schedule] = ()
     event_handlers: dict[str, Sequence[EventHandler]] = field(default_factory=dict)

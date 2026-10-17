@@ -3,7 +3,7 @@ import { loadEnvConfig } from "@next/env";
 import { resolve } from "node:path";
 loadEnvConfig(resolve(process.cwd(), "../.."));
 const config: NextConfig = {
-  transpilePackages: ["@clinic/ui", "@clinic/api-client", "@clinic/core"],
+  transpilePackages: ["@clinic/ui", "@clinic/api-client", "@clinic/core", "@clinic/feature-reviews"],
   output: "standalone",
   async rewrites() {
     const backend = process.env.BACKEND_INTERNAL_URL ?? "http://127.0.0.1:8000";

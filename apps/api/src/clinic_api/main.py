@@ -98,6 +98,8 @@ def create_app(settings: Settings | None = None, google=None) -> FastAPI:
                 prefix=f"/features/{key}",
                 dependencies=[Depends(require_feature(key))],
             )
+        if feature.public_router is not None:
+            app.include_router(feature.public_router, prefix=f"/public/{key}")
     return app
 
 
