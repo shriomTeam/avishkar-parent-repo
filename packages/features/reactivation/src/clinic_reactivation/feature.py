@@ -4,6 +4,7 @@ from clinic_core.events import APPOINTMENT_BOOKED, CONSENT_CHANGED
 from clinic_core.features import Feature, NavItem
 from clinic_engagement import SequenceDef, Step
 from clinic_reactivation.router import router
+from clinic_reactivation.runs import RUN_REQUESTED, on_run_requested
 from clinic_reactivation.service import FEATURE_KEY, on_appointment_booked, on_consent_changed
 
 DEFAULT_SEQUENCE = SequenceDef(
@@ -36,7 +37,11 @@ feature = Feature(
     name="Dormant Revenue Finder",
     description="Finds lapsed patients in the clinic's own data and brings them back automatically.",
     router=router,
-    event_handlers={APPOINTMENT_BOOKED: [on_appointment_booked], CONSENT_CHANGED: [on_consent_changed]},
+    event_handlers={
+        APPOINTMENT_BOOKED: [on_appointment_booked],
+        CONSENT_CHANGED: [on_consent_changed],
+        RUN_REQUESTED: [on_run_requested],
+    },
     nav=[NavItem(label="Reactivation", path="/reactivation", roles=("owner", "office_manager", "front_desk"))],
     sequences=[DEFAULT_SEQUENCE],
     trial_eligible=True,
