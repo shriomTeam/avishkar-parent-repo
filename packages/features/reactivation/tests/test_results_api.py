@@ -297,7 +297,10 @@ async def test_patients_read_is_audited_and_types_is_not(client):
     assert len(rows) == 1
     a = rows[0]
     assert (a.action, a.entity_id, a.actor_id) == ("reactivation.patients.read", run_id, "dev-user")
-    assert a.details == {"type": "one_and_done", "status": None, "limit": 5, "offset": 0, "returned": 1}
+    assert a.details == {
+        "type": "one_and_done", "status": None, "limit": 5, "offset": 0, "returned": 1,
+        "sort": "likelihood", "dir": "desc", "reachable": False, "searched": False,
+    }  # fmt: skip
 
 
 async def test_run_not_completed_and_bad_params(client):
@@ -314,3 +317,134 @@ async def test_run_not_completed_and_bad_params(client):
     assert (await client.get(base, params={"status": "active"}, headers=_h(t))).status_code == 422
     assert (await client.get(base, params={"type": "nope"}, headers=_h(t))).status_code == 422
     assert (await client.get(f"/runs/{uuid.uuid4()}/types", headers=_h(t))).status_code == 404
+
+
+# --- search, reachable, sort, ranges and offer names (R17) ---------------------------------------------------------
+
+
+async def test_search_matches_names_and_id_prefix_and_escapes_wildcards(client):
+    t = await create_test_tenant()
+    run_id = await _run(t)
+    maya = await _patient(t, run_id, first="Maya", last="Rao", likelihood_score=10)
+    await _patient(t, run_id, first="Dan", last="Ortiz", likelihood_score=20)
+    await _patient(t, run_id, first="Rao%", last="Underscore_", likelihood_score=30)
+    base = f"/runs/{run_id}/patients"
+
+    def names(r):
+        return sorted(i["display_name"] for i in r.json()["items"])
+
+    assert names(await client.get(base, params={"q": "maya"}, headers=_h(t))) == ["Maya Rao"]
+    assert names(await client.get(base, params={"q": "ORTIZ"}, headers=_h(t))) == ["Dan Ortiz"]
+    assert names(await client.get(base, params={"q": "n ort"}, headers=_h(t))) == ["Dan Ortiz"]  # across the space
+    assert names(await client.get(base, params={"q": "Rao"}, headers=_h(t))) == ["Maya Rao", "Rao% Underscore_"]
+    by_id = (await client.get(base, params={"q": str(maya)[:8]}, headers=_h(t))).json()
+    assert [i["patient_id"] for i in by_id["items"]] == [str(maya)] and by_id["total"] == 1
+    assert names(await client.get(base, params={"q": "%"}, headers=_h(t))) == ["Rao% Underscore_"]
+    assert names(await client.get(base, params={"q": "_"}, headers=_h(t))) == ["Rao% Underscore_"]
+    assert (await client.get(base, params={"q": "nobody"}, headers=_h(t))).json()["total"] == 0
+    assert (await client.get(base, params={"q": "   "}, headers=_h(t))).json()["total"] == 3  # blank is no search
+    assert (await client.get(base, params={"q": "x" * 101}, headers=_h(t))).status_code == 422
+    # total follows the filter, so paging works on a search
+    page = (await client.get(base, params={"q": "Rao", "limit": 1, "offset": 1}, headers=_h(t))).json()
+    assert (page["total"], len(page["items"])) == (2, 1)
+
+
+async def test_reachable_only_and_sorting(client):
+    t = await create_test_tenant()
+    run_id = await _run(t)
+    both = await _patient(t, run_id, first="A", likelihood_score=50, revenue_basis_cents=100, overdue_ratio=3.0,
+                          points={"reachable": {"either": True, "email": True, "sms": True}})  # fmt: skip
+    text = await _patient(t, run_id, first="B", likelihood_score=70, revenue_basis_cents=900, overdue_ratio=1.5,
+                          points={"reachable": {"either": True, "email": False, "sms": True}})  # fmt: skip
+    none = await _patient(t, run_id, first="C", likelihood_score=60, revenue_basis_cents=500, overdue_ratio=2.0,
+                          points={"reachable": {"either": False, "email": False, "sms": False}})  # fmt: skip
+    off = await _patient(
+        t, run_id, first="D", likelihood_score=40, revenue_basis_cents=300, overdue_ratio=None
+    )  # point off
+    base = f"/runs/{run_id}/patients"
+
+    async def ids(**params):
+        return [i["patient_id"] for i in (await client.get(base, params=params, headers=_h(t))).json()["items"]]
+
+    assert await ids(reachable="true") == [str(text), str(both)]
+    assert (await client.get(base, params={"reachable": "true"}, headers=_h(t))).json()["total"] == 2
+    assert await ids(reachable="false") == [str(text), str(none), str(both), str(off)]  # false is not a filter
+    assert await ids() == [str(text), str(none), str(both), str(off)]  # likelihood desc by default
+    assert await ids(sort="likelihood", dir="asc") == [str(off), str(both), str(none), str(text)]
+    assert await ids(sort="value") == [str(text), str(none), str(off), str(both)]
+    assert await ids(sort="value", dir="asc") == [str(both), str(off), str(none), str(text)]
+    assert await ids(sort="overdue") == [str(both), str(none), str(text), str(off)]  # no ratio sorts last
+    assert await ids(sort="overdue", dir="asc") == [str(text), str(none), str(both), str(off)]
+    assert (await client.get(base, params={"sort": "name"}, headers=_h(t))).status_code == 422
+    assert (await client.get(base, params={"dir": "up"}, headers=_h(t))).status_code == 422
+
+
+async def test_ties_in_the_sort_key_fall_back_to_score_spend_then_id(client):
+    t = await create_test_tenant()
+    run_id = await _run(t)
+    a = await _patient(t, run_id, likelihood_score=40, total_spend_cents=100, revenue_basis_cents=500)
+    b = await _patient(t, run_id, likelihood_score=60, total_spend_cents=100, revenue_basis_cents=500)
+    c = await _patient(t, run_id, likelihood_score=60, total_spend_cents=900, revenue_basis_cents=500)
+    got = (await client.get(f"/runs/{run_id}/patients", params={"sort": "value"}, headers=_h(t))).json()["items"]
+    assert [i["patient_id"] for i in got] == [str(c), *sorted([str(b)])] + [str(a)]
+
+
+async def test_each_patient_gets_an_about_range_from_their_types_rates(client):
+    t = await create_test_tenant()
+    run_id = await _run(t)
+    async with tenant_session(t) as s:
+        s.add(_type_row(t, run_id, "one_and_done", rate_low=0.08, rate_high=0.15))
+        s.add(_type_row(t, run_id, "unused_balance", rate_low=1.0, rate_high=1.0, revenue_kind="retention"))
+    sized = await _patient(t, run_id, first="Sized", revenue_basis_cents=12345)
+    retained = await _patient(t, run_id, first="Paid", primary_type="unused_balance", revenue_basis_cents=7000)
+    zero = await _patient(t, run_id, first="Zero", revenue_basis_cents=0)
+    risk = await _patient(t, run_id, first="Risk", status="at_risk", primary_type=None, revenue_basis_cents=500)
+    unc = await _patient(t, run_id, first="Unc", primary_type=None, revenue_basis_cents=500)
+    norate = await _patient(t, run_id, first="Norate", primary_type="lapsed_regular", revenue_basis_cents=500)
+    items = {
+        i["patient_id"]: i
+        for i in (await client.get(f"/runs/{run_id}/patients", params={"limit": 100}, headers=_h(t))).json()["items"]
+    }
+    # 12345 * 0.08 = 987.6 -> 988; 12345 * 0.15 = 1851.75 -> 1852 (half up, each end on its own)
+    assert (items[str(sized)]["revenue_low_cents"], items[str(sized)]["revenue_high_cents"]) == (988, 1852)
+    assert items[str(sized)]["revenue_kind"] == "new"
+    assert (items[str(retained)]["revenue_low_cents"], items[str(retained)]["revenue_high_cents"]) == (7000, 7000)
+    assert items[str(retained)]["revenue_kind"] == "retention"
+    for not_sized in (zero, risk, unc, norate):
+        row = items[str(not_sized)]
+        assert (row["revenue_low_cents"], row["revenue_high_cents"], row["revenue_kind"]) == (None, None, None)
+
+
+async def test_overdue_ratio_and_offer_service_name_are_returned(client):
+    t = await create_test_tenant()
+    run_id = await _run(t)
+    async with tenant_session(t) as s:
+        svc = Service(tenant_id=t, name="Botox touch-up")
+        s.add(svc)
+        await s.flush()
+        sid = str(svc.id)
+    await _patient(t, run_id, overdue_ratio=2.4, points={"best_offer": {"service_id": sid, "source": "usual_service"}})
+    await _patient(t, run_id, first="No", last="Offer", points={"best_offer": {"service_id": None}})
+    items = (await client.get(f"/runs/{run_id}/patients", headers=_h(t))).json()["items"]
+    by = {i["display_name"]: i for i in items}
+    assert by["A B"]["overdue_ratio"] == 2.4 and by["A B"]["offer_service_name"] == "Botox touch-up"
+    assert by["No Offer"]["offer_service_name"] is None and by["No Offer"]["overdue_ratio"] is None
+
+
+async def test_the_audit_entry_records_the_options_but_never_the_search_text(client):
+    t = await create_test_tenant()
+    run_id = await _run(t)
+    await _patient(t, run_id, first="Zelda", last="Canaryname")
+    r = await client.get(
+        f"/runs/{run_id}/patients",
+        params={"q": "Canaryname", "reachable": "true", "sort": "value", "dir": "asc"},
+        headers=_h(t),
+    )
+    assert r.status_code == 200
+    async with tenant_session(t) as s:
+        entry = (await s.scalars(select(AuditLog).where(AuditLog.action == "reactivation.patients.read"))).one()
+    assert entry.details == {
+        "type": None, "status": None, "limit": 25, "offset": 0, "returned": 0,
+        "sort": "value", "dir": "asc", "reachable": True, "searched": True,
+    }  # fmt: skip
+    assert "Canaryname" not in str(entry.details)

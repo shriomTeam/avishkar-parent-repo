@@ -26,7 +26,7 @@ from clinic_db.models.core import Patient, StaffRole, Tenant
 from clinic_db.models.reactivation import Run, Settings
 from clinic_reactivation.analysis.engine import RunFailed, RunResult, analyse
 from clinic_reactivation.analysis.settings import ReactivationSettings
-from clinic_reactivation.api.results import TypeOut, type_entries
+from clinic_reactivation.api.results import TypeOut, offer_service_id, patient_value_range, type_entries
 from clinic_reactivation.csv_import import columns as cols
 from clinic_reactivation.csv_import import parser
 from clinic_reactivation.csv_import.build import Built, build_facts
@@ -60,6 +60,11 @@ class CsvPatientOut(BaseModel):
     days_since_last_visit: int
     likelihood_score: int
     revenue_basis_cents: int
+    overdue_ratio: float
+    revenue_kind: str | None
+    revenue_low_cents: int | None
+    revenue_high_cents: int | None
+    offer_service_name: str | None
     points: dict[str, Any]
 
 
@@ -155,6 +160,8 @@ def _present(result: RunResult, built: Built, columns: frozenset[str]) -> dict[s
     data = result.to_dict()
     names = built.service_names
     facts = {f.patient_id: f for f in built.facts}
+    rates = {t.type_key: t for t in result.types}
+    by_str_id = {str(k): v for k, v in names.items()}
     patients: list[CsvPatientOut] = []
     for row, j in zip(result.patients, data["patients"], strict=True):
         points = j["points"]
@@ -162,6 +169,10 @@ def _present(result: RunResult, built: Built, columns: frozenset[str]) -> dict[s
             points["best_time"] = {"weekday": None, "band": None, "reason": "needs_visit_times"}
         last = facts[row.patient_id].last_visit_day
         external = built.external_ids[row.patient_id]
+        rate = rates.get(row.primary_type) if row.status == "dormant" and row.primary_type else None
+        low, high = (None, None)
+        if rate is not None:
+            low, high = patient_value_range(row.revenue_basis_cents, rate.revenue_kind, rate.rate_low, rate.rate_high)
         patients.append(
             CsvPatientOut(
                 patient_id=str(row.patient_id),
@@ -176,6 +187,11 @@ def _present(result: RunResult, built: Built, columns: frozenset[str]) -> dict[s
                 days_since_last_visit=row.days_since_last_visit,
                 likelihood_score=row.likelihood_score,
                 revenue_basis_cents=row.revenue_basis_cents,
+                overdue_ratio=float(row.overdue_ratio),
+                revenue_kind=rate.revenue_kind if low is not None and rate is not None else None,
+                revenue_low_cents=low,
+                revenue_high_cents=high,
+                offer_service_name=by_str_id.get(offer_service_id(points) or ""),
                 points=points,
             )
         )

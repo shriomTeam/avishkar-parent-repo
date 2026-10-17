@@ -1,11 +1,12 @@
 import uuid
 from collections.abc import Mapping
 from datetime import datetime
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
-from sqlalchemy import func, select
+from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from clinic_core.api import RequestContext, get_request_context, get_session, require_role
@@ -59,6 +60,11 @@ class PatientOut(BaseModel):
     days_since_last_visit: int | None
     likelihood_score: int | None
     revenue_basis_cents: int
+    overdue_ratio: float | None
+    revenue_kind: str | None  # "new" or "retention"; None when the patient is not sized
+    revenue_low_cents: int | None  # an "about" range: this patient's basis times the type's return rates
+    revenue_high_cents: int | None
+    offer_service_name: str | None  # the recommended service (points.best_offer), by name
     points: dict[str, Any]
 
 
@@ -67,6 +73,33 @@ class PatientPage(BaseModel):
     limit: int
     offset: int
     items: list[PatientOut]
+
+
+def patient_value_range(
+    basis_cents: int, kind: str | None, rate_low: Any, rate_high: Any
+) -> tuple[int | None, int | None]:
+    """One patient's about-range, shared by the saved list and the file analysis so they cannot differ.
+
+    A retention type is money already paid, so it is the basis itself. A new-revenue type is the basis times
+    the type's return-rate range, each end rounded half up to a cent. No basis, no type or no rate: not sized.
+    Patients' ranges are rounded one by one, so they need not add up exactly to the type's total.
+    """
+    if kind is None or basis_cents <= 0:
+        return None, None
+    if kind == "retention":
+        return basis_cents, basis_cents
+    if rate_low is None or rate_high is None:
+        return None, None
+
+    def scaled(rate: Any) -> int:
+        return int((Decimal(basis_cents) * Decimal(str(rate))).quantize(Decimal(1), rounding=ROUND_HALF_UP))
+
+    return scaled(rate_low), scaled(rate_high)
+
+
+def offer_service_id(points: dict[str, Any] | None) -> str | None:
+    offer = (points or {}).get("best_offer") or {}
+    return offer.get("service_id") if isinstance(offer, dict) else None
 
 
 async def _completed_run(session: AsyncSession, run_id: uuid.UUID) -> Run:
@@ -196,6 +229,12 @@ async def run_patients(
     run_id: uuid.UUID,
     type: str | None = None,
     status: Literal["dormant", "at_risk"] | None = None,
+    # Search text can appear in request logs (the URL is logged by proxies and load balancers), so it is never
+    # written to the audit entry; only whether a search was used is recorded.
+    q: str | None = Query(default=None, max_length=100),
+    reachable: bool | None = None,
+    sort: Literal["likelihood", "value", "overdue"] = "likelihood",
+    dir: Literal["asc", "desc"] = "desc",  # noqa: A002 - the query parameter is called dir
     limit: int = Query(default=25, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     session: AsyncSession = Depends(get_session),
@@ -212,8 +251,27 @@ async def run_patients(
         where.append(RunPatient.primary_type == type)
     if status is not None:
         where.append(RunPatient.status == status)
+    term = (q or "").strip()
+    if term:
+        full_name = func.concat_ws(" ", Patient.first_name, Patient.last_name)
+        where.append(
+            or_(
+                full_name.icontains(term, autoescape=True),
+                cast(RunPatient.patient_id, String).istartswith(term, autoescape=True),
+            )
+        )
+    if reachable:
+        where.append(RunPatient.points["reachable"]["either"].as_boolean().is_(True))
 
-    total = await session.scalar(select(func.count()).select_from(RunPatient).where(*where)) or 0
+    joined = select(RunPatient).outerjoin(Patient, Patient.id == RunPatient.patient_id).where(*where)
+    total = await session.scalar(select(func.count()).select_from(joined.subquery())) or 0
+
+    key = {
+        "likelihood": RunPatient.likelihood_score,
+        "value": RunPatient.revenue_basis_cents,
+        "overdue": RunPatient.overdue_ratio,
+    }[sort]
+    primary = key.desc().nulls_last() if dir == "desc" else key.asc().nulls_last()
     rows = (
         await session.execute(
             select(RunPatient, Patient.first_name, Patient.last_name, Service.name)
@@ -221,6 +279,7 @@ async def run_patients(
             .outerjoin(Service, Service.id == RunPatient.usual_service_id)
             .where(*where)
             .order_by(
+                primary,
                 RunPatient.likelihood_score.desc().nulls_last(),
                 RunPatient.total_spend_cents.desc(),
                 RunPatient.patient_id,
@@ -229,23 +288,48 @@ async def run_patients(
             .offset(offset)
         )
     ).all()
-    items = [
-        PatientOut(
-            patient_id=p.patient_id,
-            display_name=" ".join(n.strip() for n in (first, last) if n and n.strip()) or None,
-            status=p.status,
-            primary_type=p.primary_type,
-            matched_types=list(p.matched_types or []),
-            reasons=list(p.reasons or []),
-            usual_service_name=service_name,
-            last_visit_at=p.last_visit_at,
-            days_since_last_visit=p.days_since_last_visit,
-            likelihood_score=p.likelihood_score,
-            revenue_basis_cents=p.revenue_basis_cents,
-            points=p.points or {},
+
+    rates = {t.type_key: t for t in (await session.scalars(select(RunType).where(RunType.run_id == run_id))).all()}
+    offer_ids = {sid for p, *_ in rows if (sid := offer_service_id(p.points))}
+    offer_names = {}
+    if offer_ids:
+        offer_names = {
+            str(sid): name
+            for sid, name in (
+                await session.execute(select(Service.id, Service.name).where(Service.id.in_(offer_ids)))
+            ).all()
+        }
+
+    def sized(p: RunPatient) -> tuple[int | None, int | None]:
+        rate = rates.get(p.primary_type) if p.status == "dormant" and p.primary_type else None
+        if rate is None:
+            return None, None
+        return patient_value_range(p.revenue_basis_cents, rate.revenue_kind, rate.rate_low, rate.rate_high)
+
+    items = []
+    for p, first, last, service_name in rows:
+        low, high = sized(p)
+        items.append(
+            PatientOut(
+                patient_id=p.patient_id,
+                display_name=" ".join(n.strip() for n in (first, last) if n and n.strip()) or None,
+                status=p.status,
+                primary_type=p.primary_type,
+                matched_types=list(p.matched_types or []),
+                reasons=list(p.reasons or []),
+                usual_service_name=service_name,
+                last_visit_at=p.last_visit_at,
+                days_since_last_visit=p.days_since_last_visit,
+                likelihood_score=p.likelihood_score,
+                revenue_basis_cents=p.revenue_basis_cents,
+                overdue_ratio=float(p.overdue_ratio) if p.overdue_ratio is not None else None,
+                revenue_kind=rates[p.primary_type].revenue_kind if low is not None else None,
+                revenue_low_cents=low,
+                revenue_high_cents=high,
+                offer_service_name=offer_names.get(offer_service_id(p.points) or ""),
+                points=p.points or {},
+            )
         )
-        for p, first, last, service_name in rows
-    ]
     await audit(
         session,
         "reactivation.patients.read",
@@ -253,6 +337,16 @@ async def run_patients(
         actor_id=ctx.actor_id,
         entity_type="reactivation_run",
         entity_id=run_id,
-        details={"type": type, "status": status, "limit": limit, "offset": offset, "returned": len(items)},
+        details={
+            "type": type,
+            "status": status,
+            "limit": limit,
+            "offset": offset,
+            "returned": len(items),
+            "sort": sort,
+            "dir": dir,
+            "reachable": bool(reachable),
+            "searched": bool(term),
+        },
     )
     return PatientPage(total=total, limit=limit, offset=offset, items=items)

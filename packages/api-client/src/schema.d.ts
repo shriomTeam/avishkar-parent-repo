@@ -1025,6 +1025,16 @@ export interface components {
             likelihood_score: number;
             /** Revenue Basis Cents */
             revenue_basis_cents: number;
+            /** Overdue Ratio */
+            overdue_ratio: number;
+            /** Revenue Kind */
+            revenue_kind: string | null;
+            /** Revenue Low Cents */
+            revenue_low_cents: number | null;
+            /** Revenue High Cents */
+            revenue_high_cents: number | null;
+            /** Offer Service Name */
+            offer_service_name: string | null;
             /** Points */
             points: {
                 [key: string]: unknown;
@@ -1442,6 +1452,16 @@ export interface components {
             likelihood_score: number | null;
             /** Revenue Basis Cents */
             revenue_basis_cents: number;
+            /** Overdue Ratio */
+            overdue_ratio: number | null;
+            /** Revenue Kind */
+            revenue_kind: string | null;
+            /** Revenue Low Cents */
+            revenue_low_cents: number | null;
+            /** Revenue High Cents */
+            revenue_high_cents: number | null;
+            /** Offer Service Name */
+            offer_service_name: string | null;
             /** Points */
             points: {
                 [key: string]: unknown;
@@ -2844,6 +2864,10 @@ export interface operations {
             query?: {
                 type?: string | null;
                 status?: ("dormant" | "at_risk") | null;
+                q?: string | null;
+                reachable?: boolean | null;
+                sort?: "likelihood" | "value" | "overdue";
+                dir?: "asc" | "desc";
                 limit?: number;
                 offset?: number;
             };

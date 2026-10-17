@@ -110,6 +110,18 @@ async def test_a_file_is_analysed_and_returned_in_the_results_shape(client):
     first = body["patients"][0]
     assert first["external_id"].startswith("P") and first["display_name"].startswith("Person ")
     assert first["last_visit_day"] and first["points"]["best_time"]["reason"] == "needs_visit_times"
+    # what the patient list needs: how overdue, an about-range from the type's rates, and the offer by name
+    assert first["overdue_ratio"] > 1 and first["offer_service_name"] in ("Botox", "Facial")
+    rates = {t["type_key"]: t for t in body["types"]}
+    sized = [p for p in body["patients"] if p["revenue_low_cents"] is not None]
+    assert sized and all(p["primary_type"] and p["status"] == "dormant" for p in sized)
+    for p in sized:
+        t = rates[p["primary_type"]]
+        assert p["revenue_low_cents"] == round(p["revenue_basis_cents"] * t["rate_low"])
+        assert p["revenue_high_cents"] == round(p["revenue_basis_cents"] * t["rate_high"])
+        assert p["revenue_low_cents"] <= p["revenue_high_cents"] and p["revenue_kind"] == t["kind"]
+    unsized = [p for p in body["patients"] if p["primary_type"] is None or p["status"] != "dormant"]
+    assert all(p["revenue_low_cents"] is None and p["revenue_kind"] is None for p in unsized)
     assert [p["likelihood_score"] for p in body["patients"]] == sorted(
         (p["likelihood_score"] for p in body["patients"]), reverse=True
     )
