@@ -27,6 +27,7 @@ TYPE_KEYS = [
     "churned_member",
     "consult_not_converted",
     "overdue_maintenance",
+    "lapsed_regular",  # priority 5 ties with one_and_done; a tie sorts by type key
     "one_and_done",
     "unused_balance",
 ]
@@ -239,7 +240,7 @@ def test_reasons_are_short_plain_english_with_the_service_name_when_known():
     assert (
         run([fx(2, 214, usual_service_id=None)]).patients[0].reasons[0].startswith("Last visit 214 days ago, standard")
     )
-    unclassified = run([f]).patients[0]
+    unclassified = run([f], disable(S, "lapsed_regular")).patients[0]  # a repeat patient is otherwise a regular
     assert unclassified.primary_type is None and unclassified.reasons[-1].startswith("Dormant, but matches none")
     one = run([fx(3, 100, visits=1)]).patients[0]
     assert one.primary_type == "one_and_done" and "Only one visit, 100 days ago." in one.reasons
@@ -491,11 +492,18 @@ def _golden_result():
 
 def test_the_golden_fixture_covers_what_the_snapshot_is_for():
     got = _golden_result()
-    assert {t["type_key"]: t["patient_count"] > 0 for t in got["types"]} == dict.fromkeys(TYPE_KEYS, True)
+    # unused_balance sits below lapsed_regular, so with default settings it is rarely a patient's primary type;
+    # the golden fixture covers it through matched_types and the retention figure instead
+    counted = {t["type_key"]: t["patient_count"] > 0 for t in got["types"]}
+    assert counted == {**dict.fromkeys(TYPE_KEYS, True), "unused_balance": counted["unused_balance"]}
+    assert any("unused_balance" in p["matched_types"] for p in got["patients"])
+    assert got["summary"]["retention_value_cents"] > 0
     assert {t["rate_source"] for t in got["types"]} == {"assumed", "measured"}
     assert {p["status"] for p in got["patients"]} == {"dormant", "at_risk"}
     assert {p["change"] for p in got["patients"]} == {"new", "unchanged", "returned_since_last"}
-    assert got["summary"]["unclassified_dormant"] > 0 and got["summary"]["patients_excluded"] > 0
+    # D13: with default settings every general-rule-dormant patient is a lapsed regular (2+ visits) or one-and-done,
+    # so none is unclassified here; that path is covered in test_types and by test_all_types_disabled_still_completes
+    assert got["summary"]["unclassified_dormant"] == 0 and got["summary"]["patients_excluded"] > 0
     assert all(got["quality"][k]["count"] > 0 for k in ("duplicate_appointments", "outlier_amounts", "excluded_minor"))
 
 

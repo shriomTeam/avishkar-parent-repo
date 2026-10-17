@@ -7,10 +7,10 @@ are for people only and decide nothing.
 
 A patient is dormant when they have no future booking and either the general rule holds
 (``days > min_days_since_visit`` or ``days > interval``) or an enabled type with its own entry rule matches
-(lapsed_high_value, churned_member with an end date, consult_not_converted, one_and_done). overdue_maintenance
-and a churned_member with no end date also need the general rule, and unused_balance only needs the patient to
-be dormant by any route; none of those three can make a patient dormant by itself. A future booking
-overrides every route.
+(lapsed_high_value, churned_member with an end date, consult_not_converted, one_and_done). overdue_maintenance,
+lapsed_regular and a churned_member with no end date also need the general rule, and unused_balance only needs
+the patient to be dormant by any route; none of those four can make a patient dormant by itself. A future
+booking overrides every route.
 """
 
 from __future__ import annotations
@@ -36,6 +36,7 @@ TYPE_KEYS = (
     "consult_not_converted",
     "overdue_maintenance",
     "one_and_done",
+    "lapsed_regular",
     "unused_balance",
 )
 CHURNED_STATUSES = frozenset({"cancelled", "lapsed", "expired"})
@@ -140,7 +141,7 @@ def _money(cents: int) -> str:
     return f"${cents / 100:,.2f}"
 
 
-# --- the six type entry rules (spec 4.7) -----------------------------------------------------
+# --- the seven type entry rules (spec 4.7) -----------------------------------------------------
 # Each returns a plain-English reason when the type's entry rule and its extra requirements hold, else None.
 # Whether the patient must also be dormant by the general rule is decided by the caller.
 
@@ -204,6 +205,15 @@ def _one_and_done(f: PatientFacts, s: ReactivationSettings, days: int, interval:
     return f"Only one visit, {days} days ago."
 
 
+def _lapsed_regular(f: PatientFacts, s: ReactivationSettings, days: int, interval: int, today: date) -> str | None:
+    if f.visit_count < 2:
+        return None  # the caller adds the general-rule requirement; this type never creates dormancy (D13)
+    return (
+        f"Repeat patient with {f.visit_count} visits, {days} days since the last visit "
+        f"against a {interval} day interval."
+    )
+
+
 def _unused_balance(f: PatientFacts, s: ReactivationSettings, days: int, interval: int, today: date) -> str | None:
     if f.prepaid_balance_cents <= 0:
         return None
@@ -216,6 +226,7 @@ _ENTRY = {
     "consult_not_converted": _consult_not_converted,
     "overdue_maintenance": _overdue_maintenance,
     "one_and_done": _one_and_done,
+    "lapsed_regular": _lapsed_regular,
     "unused_balance": _unused_balance,
 }
 _OWN_ENTRY = ("lapsed_high_value", "consult_not_converted", "one_and_done")  # create dormancy by themselves
@@ -295,7 +306,7 @@ def classify(facts: PatientFacts, settings: ReactivationSettings, now: datetime,
 
     matched = set(own)
     if general:
-        matched |= {key for key in ("overdue_maintenance", "churned_member") if key in reasons}
+        matched |= {key for key in ("overdue_maintenance", "lapsed_regular", "churned_member") if key in reasons}
     if "unused_balance" in reasons:
         matched.add("unused_balance")  # dormant by any route, never creates dormancy
     ordered = sorted(matched, key=lambda key: (getattr(settings.types, key).priority, key))

@@ -202,11 +202,13 @@ def test_a_one_visit_patient_at_100_days_is_dormant_through_the_types_own_rule()
 def test_ratio_exactly_two_is_lapsed_high_value_and_not_maintenance():
     top = dict(spend_percentile=Fraction(9, 10), usual_service_visit_days=4)
     exactly_two = run(facts(240, **top))
-    assert exactly_two.matched_types == ("lapsed_high_value",) and exactly_two.primary_type == "lapsed_high_value"
+    # lapsed_regular also matches any repeat dormant patient (D13); the priority picks the primary type
+    assert exactly_two.matched_types == ("lapsed_high_value", "lapsed_regular")
+    assert exactly_two.primary_type == "lapsed_high_value"
     just_under = run(facts(239, **top))
-    assert just_under.matched_types == ("overdue_maintenance",)
+    assert just_under.matched_types == ("overdue_maintenance", "lapsed_regular")
     just_over = run(facts(241, **top))
-    assert just_over.matched_types == ("lapsed_high_value",)
+    assert just_over.matched_types == ("lapsed_high_value", "lapsed_regular")
 
 
 def test_lapsed_high_value_needs_the_percentile_and_the_ratio():
@@ -220,7 +222,7 @@ def test_lapsed_high_value_is_skipped_when_the_cohort_is_under_20():
     r = run(f)
     assert "lapsed_high_value" not in r.matched_types
     assert r.skipped_types == ("lapsed_high_value:cohort_too_small",)
-    assert r.status == "dormant" and r.primary_type is None  # ratio 2.5 is above maintenance's range
+    assert r.status == "dormant" and r.primary_type == "lapsed_regular"  # ratio 2.5 is above maintenance's range
     # end to end: 19 scored patients get no percentile, 20 do, with the cohort minimum from settings
     cohort = [facts(300, spend_cents=i * 100, patient_id=uuid.uuid4()) for i in range(19)]
     small = assign_spend_percentiles(cohort, cohort_min=S.limits.spend_cohort_minimum)
@@ -233,10 +235,10 @@ def test_lapsed_high_value_is_skipped_when_the_cohort_is_under_20():
 
 
 def test_overdue_maintenance_needs_two_visits_of_the_usual_service_and_the_range():
-    assert run(facts(150, usual_service_visit_days=2)).matched_types == ("overdue_maintenance",)
-    assert run(facts(150, usual_service_visit_days=1)).matched_types == ()
+    assert run(facts(150, usual_service_visit_days=2)).matched_types == ("overdue_maintenance", "lapsed_regular")
+    assert run(facts(150, usual_service_visit_days=1)).matched_types == ("lapsed_regular",)
     assert run(facts(120, usual_service_visit_days=2)).status == "at_risk"  # not above the interval yet
-    assert run(facts(121, usual_service_visit_days=2)).matched_types == ("overdue_maintenance",)
+    assert run(facts(121, usual_service_visit_days=2)).matched_types == ("overdue_maintenance", "lapsed_regular")
 
 
 # --- consult_not_converted -------------------------------------------------------------------
@@ -283,20 +285,20 @@ def member(status="cancelled", end=date(2026, 1, 31), last_visit=date(2026, 3, 1
 def test_a_churned_member_who_has_not_visited_since_the_membership_ended_is_matched():
     for status in ("cancelled", "lapsed", "expired"):
         r = run(member(status, last_visit=date(2026, 1, 15)))
-        assert r.matched_types == ("churned_member",) and r.status == "dormant"
+        assert r.matched_types == ("churned_member", "lapsed_regular") and r.status == "dormant"
     on_the_day = run(member(last_visit=date(2026, 1, 31)))
-    assert on_the_day.matched_types == ("churned_member",)  # a visit on the end date is not after it
+    assert on_the_day.matched_types == ("churned_member", "lapsed_regular")  # a visit on the end date is not after it
 
 
 def test_a_churned_member_who_visited_after_the_membership_ended_is_not_matched():
     r = run(member(end=date(2025, 12, 31), last_visit=date(2026, 1, 15)))  # back 15 days after it ended
     assert "churned_member" not in r.matched_types
-    assert r.status == "dormant" and r.primary_type is None  # still dormant by the general rule, unclassified
+    assert r.status == "dormant" and r.primary_type == "lapsed_regular"  # dormant by the general rule, a repeat patient
 
 
 def test_a_member_with_an_active_membership_is_not_churned():
-    assert run(member(has_active_membership=True, last_visit=date(2026, 1, 15))).matched_types == ()
-    assert run(member("active", last_visit=date(2026, 1, 15))).matched_types == ()
+    assert run(member(has_active_membership=True, last_visit=date(2026, 1, 15))).matched_types == ("lapsed_regular",)
+    assert run(member("active", last_visit=date(2026, 1, 15))).matched_types == ("lapsed_regular",)
 
 
 def test_an_unknown_membership_status_is_not_churned_and_is_counted():
@@ -309,7 +311,7 @@ def test_an_unknown_membership_status_is_not_churned_and_is_counted():
 def test_without_an_end_date_a_churned_member_needs_the_general_rule():
     no_end = dict(end=None)
     dormant = run(member(last_visit=date(2026, 1, 15), **no_end))  # 137 days: over the 120 day interval
-    assert dormant.matched_types == ("churned_member",)
+    assert dormant.matched_types == ("churned_member", "lapsed_regular")
     recent = run(member(last_visit=TODAY - timedelta(days=50), **no_end))
     assert recent.matched_types == () and recent.status == "active"  # cannot make a patient dormant alone
     with_end = run(member(end=date(2026, 5, 1), last_visit=TODAY - timedelta(days=50)))
@@ -330,8 +332,10 @@ def test_unused_balance_matches_any_dormant_patient_but_never_creates_dormancy()
     assert one_and_done.matched_types == ("one_and_done", "unused_balance")  # dormant through a type's own rule
     assert one_and_done.primary_type == "one_and_done"
     alone = run(facts(130, prepaid_balance_cents=9000))
-    assert alone.matched_types == ("unused_balance",) and alone.primary_type == "unused_balance"
-    assert run(facts(130, prepaid_balance_cents=0)).matched_types == ()
+    assert alone.matched_types == ("lapsed_regular", "unused_balance") and alone.primary_type == "lapsed_regular"
+    only = run(facts(130, prepaid_balance_cents=9000), type_rule(S, "lapsed_regular", enabled=False))
+    assert only.matched_types == ("unused_balance",) and only.primary_type == "unused_balance"
+    assert run(facts(130, prepaid_balance_cents=0)).matched_types == ("lapsed_regular",)
 
 
 # --- primary type, unclassified, disabled ----------------------------------------------------
@@ -356,7 +360,7 @@ def test_equal_priorities_fall_back_to_the_type_key():
 
 
 def test_a_dormant_patient_matching_nothing_is_unclassified():
-    r = run(facts(130))
+    r = run(facts(130), type_rule(S, "lapsed_regular", enabled=False))  # a repeat patient would be a lapsed regular
     assert r.status == "dormant" and r.primary_type is None and r.matched_types == ()
     assert any("matches none of the enabled patient types" in line for line in r.reasons)
 
@@ -369,8 +373,9 @@ def test_disabled_types_are_skipped():
     assert still.matched_types == ("overdue_maintenance",)
     no_lapsed = type_rule(S, "lapsed_high_value", enabled=False)
     r = run(facts(300, spend_percentile=Fraction(1)), no_lapsed)
-    assert r.matched_types == () and r.skipped_types == ()  # a disabled type is not "skipped for the cohort"
-    assert run(member(last_visit=date(2026, 1, 15)), type_rule(S, "churned_member", enabled=False)).matched_types == ()
+    assert r.matched_types == ("lapsed_regular",) and r.skipped_types == ()  # a disabled type is not "skipped"
+    no_churn = run(member(last_visit=date(2026, 1, 15)), type_rule(S, "churned_member", enabled=False))
+    assert no_churn.matched_types == ("lapsed_regular",)
 
 
 def test_all_types_disabled():
@@ -380,6 +385,7 @@ def test_all_types_disabled():
         "consult_not_converted",
         "overdue_maintenance",
         "one_and_done",
+        "lapsed_regular",
         "unused_balance",
     )
     s = S

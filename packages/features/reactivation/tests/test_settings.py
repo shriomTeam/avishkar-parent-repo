@@ -65,7 +65,7 @@ def test_defaults_validate_and_match_the_spec():
     assert (s.dormant.min_days_since_visit, s.dormant.default_rebooking_days) == (180, 120)
     assert (s.revenue.rate_low, s.revenue.rate_high, s.revenue.min_sample) == (0.08, 0.15, 30)
     assert (s.revenue.attribution_window_days, s.types.churned_member.membership_months) == (30, 6)
-    assert [getattr(s.types, n).priority for n in type(s.types).model_fields] == [1, 2, 3, 4, 5, 6]
+    assert [getattr(s.types, n).priority for n in type(s.types).model_fields] == [1, 2, 3, 4, 5, 5, 6]
     assert s.points.seasonality is False
     assert all(v for k, v in s.points.model_dump().items() if k != "seasonality")
     assert s.schedule.frequency in ("weekly", "monthly")
@@ -125,7 +125,6 @@ async def test_get_returns_defaults_with_version_zero_when_nothing_saved(client)
 @pytest.mark.parametrize(
     "overrides",
     [
-        {"types.one_and_done.priority": 1},  # duplicate priority
         {"revenue.rate_low": 0.5, "revenue.rate_high": 0.1},  # low > high
         {"revenue.rate_high": 1.5},
         {"dormant.min_days_since_visit": 0},
@@ -151,9 +150,9 @@ async def test_unknown_and_campaign_shaped_fields_give_422(client):
         assert r.status_code == 422, extra
 
 
-def test_priorities_validator_raises_value_error_message():
-    with pytest.raises(ValidationError, match="priorities must be unique"):
-        ReactivationSettings.model_validate(_config(**{"types.unused_balance.priority": 5}))
+def test_equal_priorities_are_allowed():
+    tied = ReactivationSettings.model_validate(_config(**{"types.unused_balance.priority": 5}))
+    assert tied.types.unused_balance.priority == tied.types.one_and_done.priority == 5
 
 
 # --- versioning and roles -------------------------------------------------------------------
@@ -268,6 +267,7 @@ TYPE_KEYS = [
     "consult_not_converted",
     "overdue_maintenance",
     "one_and_done",
+    "lapsed_regular",
     "unused_balance",
 ]
 

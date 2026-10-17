@@ -51,7 +51,8 @@
    "last_visit_at": "2026-01-18T15:00:00+00:00",
    "likelihood_score": 80,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.12",
    "patient_id": "00000000-0000-0000-0000-0000000000b7",
@@ -80,7 +81,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 134 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 134 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 134 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 134 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 15469,
    "revenue_kind": "new",
@@ -186,7 +188,8 @@
    "last_visit_at": "2026-01-04T15:00:00+00:00",
    "likelihood_score": 77,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.23",
    "patient_id": "00000000-0000-0000-0000-0000000000b9",
@@ -215,7 +218,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 148 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 148 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 148 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 148 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 18954,
    "revenue_kind": "new",
@@ -231,7 +235,8 @@
    "last_visit_at": "2026-01-06T15:00:00+00:00",
    "likelihood_score": 77,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.22",
    "patient_id": "00000000-0000-0000-0000-0000000000ef",
@@ -260,7 +265,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 146 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 146 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 146 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 146 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 14382,
    "revenue_kind": "new",
@@ -365,7 +371,9 @@
    "days_since_last_visit": 141,
    "last_visit_at": "2026-01-11T15:00:00+00:00",
    "likelihood_score": 75,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.18",
    "patient_id": "00000000-0000-0000-0000-0000000000b8",
    "points": {
@@ -390,12 +398,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 141 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 141 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 23448,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 93791,
@@ -409,7 +417,8 @@
    "last_visit_at": "2025-11-18T15:00:00+00:00",
    "likelihood_score": 75,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.63",
    "patient_id": "00000000-0000-0000-0000-0000000000f6",
@@ -438,7 +447,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 195 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 195 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 195 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 195 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 10727,
    "revenue_kind": "new",
@@ -499,7 +509,8 @@
    "last_visit_at": "2025-12-31T15:00:00+00:00",
    "likelihood_score": 73,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.27",
    "patient_id": "00000000-0000-0000-0000-00000000004d",
@@ -528,7 +539,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 152 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 152 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 152 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 152 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 15850,
    "revenue_kind": "new",
@@ -636,6 +648,7 @@
    "matched_types": [
     "consult_not_converted",
     "overdue_maintenance",
+    "lapsed_regular",
     "unused_balance"
    ],
    "overdue_ratio": "1.68",
@@ -667,6 +680,7 @@
     "Last visit 201 days ago, usual Consult every 120 days",
     "Had a consult 79 days ago and no treatment visit in the 60 days after it.",
     "Has come 3 times for their usual service and is overdue: 201 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 201 days since the last visit against a 120 day interval.",
     "Has $70.00 of prepaid balance unused."
    ],
    "revenue_basis_cents": 20627,
@@ -683,7 +697,8 @@
    "last_visit_at": "2026-01-25T15:00:00+00:00",
    "likelihood_score": 71,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.06",
    "patient_id": "00000000-0000-0000-0000-0000000000b6",
@@ -712,7 +727,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 127 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 127 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 127 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 127 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 22959,
    "revenue_kind": "new",
@@ -729,6 +745,7 @@
    "likelihood_score": 71,
    "matched_types": [
     "overdue_maintenance",
+    "lapsed_regular",
     "unused_balance"
    ],
    "overdue_ratio": "1.28",
@@ -759,6 +776,7 @@
    "reasons": [
     "Last visit 153 days ago, usual Consult every 120 days",
     "Has come 3 times for their usual service and is overdue: 153 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 153 days since the last visit against a 120 day interval.",
     "Has $80.00 of prepaid balance unused."
    ],
    "revenue_basis_cents": 9750,
@@ -820,7 +838,8 @@
    "last_visit_at": "2025-11-19T15:00:00+00:00",
    "likelihood_score": 70,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.62",
    "patient_id": "00000000-0000-0000-0000-000000000053",
@@ -849,7 +868,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 194 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 194 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 194 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 194 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 21279,
    "revenue_kind": "new",
@@ -910,7 +930,8 @@
    "last_visit_at": "2026-01-14T15:00:00+00:00",
    "likelihood_score": 69,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.15",
    "patient_id": "00000000-0000-0000-0000-00000000004b",
@@ -939,7 +960,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 138 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 138 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 138 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 138 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 12883,
    "revenue_kind": "new",
@@ -955,7 +977,8 @@
    "last_visit_at": "2025-10-01T15:00:00+00:00",
    "likelihood_score": 68,
    "matched_types": [
-    "lapsed_high_value"
+    "lapsed_high_value",
+    "lapsed_regular"
    ],
    "overdue_ratio": "2.03",
    "patient_id": "00000000-0000-0000-0000-00000000005a",
@@ -984,7 +1007,8 @@
    "primary_type": "lapsed_high_value",
    "reasons": [
     "Last visit 243 days ago, usual Consult every 120 days",
-    "In the top 20% of patients by spend and 243 days since the last visit, 2.0 times the usual 120 day interval."
+    "In the top 20% of patients by spend and 243 days since the last visit, 2.0 times the usual 120 day interval.",
+    "Repeat patient with 6 visits, 243 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 15326,
    "revenue_kind": "new",
@@ -1000,7 +1024,8 @@
    "last_visit_at": "2025-12-26T15:00:00+00:00",
    "likelihood_score": 68,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.31",
    "patient_id": "00000000-0000-0000-0000-000000000084",
@@ -1029,7 +1054,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 157 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 157 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 157 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 157 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 7164,
    "revenue_kind": "new",
@@ -1089,7 +1115,9 @@
    "days_since_last_visit": 147,
    "last_visit_at": "2026-01-05T15:00:00+00:00",
    "likelihood_score": 68,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.23",
    "patient_id": "00000000-0000-0000-0000-000000000016",
    "points": {
@@ -1114,12 +1142,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 147 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 147 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 6379,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 25517,
@@ -1133,7 +1161,8 @@
    "last_visit_at": "2026-01-21T15:00:00+00:00",
    "likelihood_score": 67,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.09",
    "patient_id": "00000000-0000-0000-0000-00000000004a",
@@ -1162,7 +1191,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 131 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 131 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 131 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 131 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 19080,
    "revenue_kind": "new",
@@ -1177,7 +1207,9 @@
    "days_since_last_visit": 139,
    "last_visit_at": "2026-01-13T15:00:00+00:00",
    "likelihood_score": 67,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.16",
    "patient_id": "00000000-0000-0000-0000-0000000000ee",
    "points": {
@@ -1202,12 +1234,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 139 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 139 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 14137,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 56549,
@@ -1266,7 +1298,8 @@
    "last_visit_at": "2025-10-08T15:00:00+00:00",
    "likelihood_score": 66,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.97",
    "patient_id": "00000000-0000-0000-0000-000000000059",
@@ -1295,7 +1328,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 236 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 236 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 236 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 236 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 18195,
    "revenue_kind": "new",
@@ -1312,7 +1346,8 @@
    "likelihood_score": 66,
    "matched_types": [
     "churned_member",
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.57",
    "patient_id": "00000000-0000-0000-0000-0000000000f5",
@@ -1342,7 +1377,8 @@
    "reasons": [
     "Last visit 188 days ago, usual Facial every 120 days",
     "Membership cancelled on 2026-01-11, no active membership and they have not visited since.",
-    "Has come 2 times for their usual service and is overdue: 188 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 188 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 188 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 59400,
    "revenue_kind": "new",
@@ -1358,7 +1394,8 @@
    "last_visit_at": "2026-01-20T15:00:00+00:00",
    "likelihood_score": 66,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.10",
    "patient_id": "00000000-0000-0000-0000-0000000000ed",
@@ -1387,7 +1424,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 132 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 132 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 132 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 132 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 18524,
    "revenue_kind": "new",
@@ -1403,7 +1441,8 @@
    "last_visit_at": "2025-11-17T15:00:00+00:00",
    "likelihood_score": 66,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.63",
    "patient_id": "00000000-0000-0000-0000-00000000001d",
@@ -1432,7 +1471,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 196 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 196 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 196 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 196 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 6471,
    "revenue_kind": "new",
@@ -1494,7 +1534,8 @@
    "likelihood_score": 65,
    "matched_types": [
     "lapsed_high_value",
-    "churned_member"
+    "churned_member",
+    "lapsed_regular"
    ],
    "overdue_ratio": "2.14",
    "patient_id": "00000000-0000-0000-0000-00000000005c",
@@ -1524,7 +1565,8 @@
    "reasons": [
     "Last visit 257 days ago, usual Facial every 120 days",
     "In the top 20% of patients by spend and 257 days since the last visit, 2.1 times the usual 120 day interval.",
-    "Membership expired on 2026-01-04, no active membership and they have not visited since."
+    "Membership expired on 2026-01-04, no active membership and they have not visited since.",
+    "Repeat patient with 2 visits, 257 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 46954,
    "revenue_kind": "new",
@@ -1584,7 +1626,9 @@
    "days_since_last_visit": 245,
    "last_visit_at": "2025-09-29T15:00:00+00:00",
    "likelihood_score": 65,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.04",
    "patient_id": "00000000-0000-0000-0000-000000000024",
    "points": {
@@ -1609,12 +1653,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 245 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 245 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 6533,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 39195,
@@ -1717,7 +1761,9 @@
    "days_since_last_visit": 229,
    "last_visit_at": "2025-10-15T15:00:00+00:00",
    "likelihood_score": 64,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.91",
    "patient_id": "00000000-0000-0000-0000-000000000058",
    "points": {
@@ -1742,12 +1788,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 229 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 229 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 22500,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 89999,
@@ -1761,7 +1807,8 @@
    "last_visit_at": "2025-12-10T15:00:00+00:00",
    "likelihood_score": 64,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.44",
    "patient_id": "00000000-0000-0000-0000-000000000050",
@@ -1790,7 +1837,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 173 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 173 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 173 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 173 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 20546,
    "revenue_kind": "new",
@@ -1805,7 +1853,9 @@
    "days_since_last_visit": 145,
    "last_visit_at": "2026-01-07T15:00:00+00:00",
    "likelihood_score": 64,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.21",
    "patient_id": "00000000-0000-0000-0000-00000000004c",
    "points": {
@@ -1830,12 +1880,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 145 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 145 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 19569,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 78275,
@@ -1849,7 +1899,8 @@
    "last_visit_at": "2025-10-07T15:00:00+00:00",
    "likelihood_score": 64,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.98",
    "patient_id": "00000000-0000-0000-0000-0000000000fc",
@@ -1878,7 +1929,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 237 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 237 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 237 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 237 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 11704,
    "revenue_kind": "new",
@@ -1893,7 +1945,9 @@
    "days_since_last_visit": 181,
    "last_visit_at": "2025-12-02T15:00:00+00:00",
    "likelihood_score": 64,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.51",
    "patient_id": "00000000-0000-0000-0000-0000000000f4",
    "points": {
@@ -1918,12 +1972,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 181 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 181 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 15603,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 62411,
@@ -1937,7 +1991,8 @@
    "last_visit_at": "2025-11-14T15:00:00+00:00",
    "likelihood_score": 64,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.66",
    "patient_id": "00000000-0000-0000-0000-00000000008a",
@@ -1966,7 +2021,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 199 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 199 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 199 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 199 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 8141,
    "revenue_kind": "new",
@@ -1982,7 +2038,8 @@
    "last_visit_at": "2025-12-12T15:00:00+00:00",
    "likelihood_score": 64,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.43",
    "patient_id": "00000000-0000-0000-0000-000000000086",
@@ -2011,7 +2068,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 171 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 171 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 171 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 171 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 11235,
    "revenue_kind": "new",
@@ -2026,7 +2084,9 @@
    "days_since_last_visit": 143,
    "last_visit_at": "2026-01-09T15:00:00+00:00",
    "likelihood_score": 64,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.19",
    "patient_id": "00000000-0000-0000-0000-000000000082",
    "points": {
@@ -2051,12 +2111,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 143 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 143 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 10258,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 41033,
@@ -2071,7 +2131,8 @@
    "likelihood_score": 64,
    "matched_types": [
     "churned_member",
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.34",
    "patient_id": "00000000-0000-0000-0000-000000000018",
@@ -2101,7 +2162,8 @@
    "reasons": [
     "Last visit 161 days ago, usual Consult every 120 days",
     "Membership expired on 2025-12-23, no active membership and they have not visited since.",
-    "Has come 3 times for their usual service and is overdue: 161 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 161 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 161 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 59400,
    "revenue_kind": "new",
@@ -2162,7 +2224,8 @@
    "last_visit_at": "2026-01-01T15:00:00+00:00",
    "likelihood_score": 63,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.26",
    "patient_id": "00000000-0000-0000-0000-000000000126",
@@ -2191,7 +2254,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 151 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 151 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 151 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 151 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 3543,
    "revenue_kind": "new",
@@ -2207,7 +2271,8 @@
    "last_visit_at": "2025-10-22T15:00:00+00:00",
    "likelihood_score": 62,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.85",
    "patient_id": "00000000-0000-0000-0000-000000000057",
@@ -2236,7 +2301,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 222 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 222 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 222 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 222 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 14837,
    "revenue_kind": "new",
@@ -2297,7 +2363,8 @@
    "last_visit_at": "2025-12-09T15:00:00+00:00",
    "likelihood_score": 62,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.45",
    "patient_id": "00000000-0000-0000-0000-0000000000f3",
@@ -2326,7 +2393,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 174 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 174 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 174 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 174 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 10239,
    "revenue_kind": "new",
@@ -2342,7 +2410,8 @@
    "last_visit_at": "2025-10-24T15:00:00+00:00",
    "likelihood_score": 62,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.83",
    "patient_id": "00000000-0000-0000-0000-00000000008d",
@@ -2371,7 +2440,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 220 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 220 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 220 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 220 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 17260,
    "revenue_kind": "new",
@@ -2387,7 +2457,8 @@
    "last_visit_at": "2026-01-16T15:00:00+00:00",
    "likelihood_score": 62,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.13",
    "patient_id": "00000000-0000-0000-0000-000000000081",
@@ -2416,7 +2487,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 136 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 136 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 136 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 136 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 13352,
    "revenue_kind": "new",
@@ -2432,7 +2504,8 @@
    "last_visit_at": "2025-12-29T15:00:00+00:00",
    "likelihood_score": 62,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.28",
    "patient_id": "00000000-0000-0000-0000-000000000017",
@@ -2461,7 +2534,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 154 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 154 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 154 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 154 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 6624,
    "revenue_kind": "new",
@@ -2521,7 +2595,9 @@
    "days_since_last_visit": 241,
    "last_visit_at": "2025-10-03T15:00:00+00:00",
    "likelihood_score": 61,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.01",
    "patient_id": "00000000-0000-0000-0000-000000000090",
    "points": {
@@ -2546,12 +2622,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 241 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 241 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 9119,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 54711,
@@ -2610,7 +2686,8 @@
    "last_visit_at": "2026-01-08T15:00:00+00:00",
    "likelihood_score": 61,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.20",
    "patient_id": "00000000-0000-0000-0000-000000000125",
@@ -2639,7 +2716,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 144 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 144 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 144 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 144 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 4057,
    "revenue_kind": "new",
@@ -2654,7 +2732,9 @@
    "days_since_last_visit": 223,
    "last_visit_at": "2025-10-21T15:00:00+00:00",
    "likelihood_score": 60,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.86",
    "patient_id": "00000000-0000-0000-0000-0000000000fa",
    "points": {
@@ -2679,12 +2759,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 223 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 223 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 17068,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 68273,
@@ -2698,7 +2778,8 @@
    "last_visit_at": "2025-12-16T15:00:00+00:00",
    "likelihood_score": 60,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.39",
    "patient_id": "00000000-0000-0000-0000-0000000000f2",
@@ -2727,7 +2808,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 167 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 167 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 167 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 167 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 15114,
    "revenue_kind": "new",
@@ -2743,7 +2825,8 @@
    "last_visit_at": "2026-01-23T15:00:00+00:00",
    "likelihood_score": 60,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.08",
    "patient_id": "00000000-0000-0000-0000-000000000080",
@@ -2772,7 +2855,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 129 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 129 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 129 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 129 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 9770,
    "revenue_kind": "new",
@@ -2788,7 +2872,8 @@
    "last_visit_at": "2025-11-10T15:00:00+00:00",
    "likelihood_score": 60,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.69",
    "patient_id": "00000000-0000-0000-0000-00000000001e",
@@ -2817,7 +2902,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 203 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 203 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 203 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 203 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 5555,
    "revenue_kind": "new",
@@ -2877,7 +2963,9 @@
    "days_since_last_visit": 272,
    "last_visit_at": "2025-09-02T15:00:00+00:00",
    "likelihood_score": 59,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.27",
    "patient_id": "00000000-0000-0000-0000-000000000101",
    "points": {
@@ -2902,12 +2990,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 272 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 5 visits, 272 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 15022,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 75112,
@@ -2967,7 +3055,9 @@
    "days_since_last_visit": 318,
    "last_visit_at": "2025-07-18T15:00:00+00:00",
    "likelihood_score": 59,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.65",
    "patient_id": "00000000-0000-0000-0000-00000000009b",
    "points": {
@@ -2992,12 +3082,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 318 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 5 visits, 318 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 13092,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 65458,
@@ -3012,7 +3102,8 @@
    "likelihood_score": 59,
    "matched_types": [
     "churned_member",
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.95",
    "patient_id": "00000000-0000-0000-0000-00000000008f",
@@ -3042,7 +3133,8 @@
    "reasons": [
     "Last visit 234 days ago, usual Facial every 120 days",
     "Membership cancelled on 2025-12-24, no active membership and they have not visited since.",
-    "Has come 2 times for their usual service and is overdue: 234 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 234 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 234 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 59400,
    "revenue_kind": "new",
@@ -3058,6 +3150,7 @@
    "last_visit_at": "2026-01-15T15:00:00+00:00",
    "likelihood_score": 59,
    "matched_types": [
+    "lapsed_regular",
     "unused_balance"
    ],
    "overdue_ratio": "1.14",
@@ -3084,13 +3177,14 @@
      "sms": true
     }
    },
-   "primary_type": "unused_balance",
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 137 days ago, usual Botox every 120 days",
+    "Repeat patient with 4 visits, 137 days since the last visit against a 120 day interval.",
     "Has $50.00 of prepaid balance unused."
    ],
-   "revenue_basis_cents": 5000,
-   "revenue_kind": "retention",
+   "revenue_basis_cents": 4827,
+   "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 19307,
    "usual_provider_id": "00000000-0000-0000-0000-000000002001",
@@ -3102,7 +3196,9 @@
    "days_since_last_visit": 183,
    "last_visit_at": "2025-11-30T15:00:00+00:00",
    "likelihood_score": 59,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.53",
    "patient_id": "00000000-0000-0000-0000-0000000000be",
    "points": {
@@ -3127,12 +3223,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 183 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 183 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 2413,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 9653,
@@ -3146,7 +3242,8 @@
    "last_visit_at": "2025-12-03T15:00:00+00:00",
    "likelihood_score": 58,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.50",
    "patient_id": "00000000-0000-0000-0000-000000000051",
@@ -3175,7 +3272,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 180 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 180 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 180 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 180 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 27720,
    "revenue_kind": "new",
@@ -3191,6 +3289,7 @@
    "last_visit_at": "2025-05-30T15:00:00+00:00",
    "likelihood_score": 58,
    "matched_types": [
+    "lapsed_regular",
     "unused_balance"
    ],
    "overdue_ratio": "3.06",
@@ -3217,13 +3316,14 @@
      "sms": false
     }
    },
-   "primary_type": "unused_balance",
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 367 days ago, usual Consult every 120 days",
+    "Repeat patient with 6 visits, 367 days since the last visit against a 120 day interval.",
     "Has $50.00 of prepaid balance unused."
    ],
-   "revenue_basis_cents": 5000,
-   "revenue_kind": "retention",
+   "revenue_basis_cents": 12050,
+   "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 72297,
    "usual_provider_id": null,
@@ -3236,7 +3336,8 @@
    "last_visit_at": "2025-12-05T15:00:00+00:00",
    "likelihood_score": 58,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.48",
    "patient_id": "00000000-0000-0000-0000-000000000087",
@@ -3265,7 +3366,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 178 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 178 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 178 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 178 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 7653,
    "revenue_kind": "new",
@@ -3281,7 +3383,8 @@
    "last_visit_at": "2026-01-02T15:00:00+00:00",
    "likelihood_score": 58,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.25",
    "patient_id": "00000000-0000-0000-0000-000000000083",
@@ -3310,7 +3413,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 150 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 150 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 150 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 150 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 10503,
    "revenue_kind": "new",
@@ -3326,7 +3430,8 @@
    "last_visit_at": "2025-11-27T15:00:00+00:00",
    "likelihood_score": 58,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.55",
    "patient_id": "00000000-0000-0000-0000-00000000012b",
@@ -3355,7 +3460,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 186 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 186 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 186 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 186 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 6537,
    "revenue_kind": "new",
@@ -3416,7 +3522,8 @@
    "last_visit_at": "2025-10-12T15:00:00+00:00",
    "likelihood_score": 58,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.93",
    "patient_id": "00000000-0000-0000-0000-0000000000c5",
@@ -3445,7 +3552,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 232 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 232 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 232 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 232 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 3298,
    "revenue_kind": "new",
@@ -3461,7 +3569,8 @@
    "last_visit_at": "2025-07-15T15:00:00+00:00",
    "likelihood_score": 57,
    "matched_types": [
-    "lapsed_high_value"
+    "lapsed_high_value",
+    "lapsed_regular"
    ],
    "overdue_ratio": "2.68",
    "patient_id": "00000000-0000-0000-0000-000000000108",
@@ -3490,7 +3599,8 @@
    "primary_type": "lapsed_high_value",
    "reasons": [
     "Last visit 321 days ago, usual Consult every 120 days",
-    "In the top 20% of patients by spend and 321 days since the last visit, 2.7 times the usual 120 day interval."
+    "In the top 20% of patients by spend and 321 days since the last visit, 2.7 times the usual 120 day interval.",
+    "Repeat patient with 6 visits, 321 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 13659,
    "revenue_kind": "new",
@@ -3506,7 +3616,8 @@
    "last_visit_at": "2025-08-12T15:00:00+00:00",
    "likelihood_score": 57,
    "matched_types": [
-    "lapsed_high_value"
+    "lapsed_high_value",
+    "lapsed_regular"
    ],
    "overdue_ratio": "2.44",
    "patient_id": "00000000-0000-0000-0000-000000000104",
@@ -3535,7 +3646,8 @@
    "primary_type": "lapsed_high_value",
    "reasons": [
     "Last visit 293 days ago, usual Facial every 120 days",
-    "In the top 20% of patients by spend and 293 days since the last visit, 2.4 times the usual 120 day interval."
+    "In the top 20% of patients by spend and 293 days since the last visit, 2.4 times the usual 120 day interval.",
+    "Repeat patient with 2 visits, 293 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 39022,
    "revenue_kind": "new",
@@ -3550,7 +3662,9 @@
    "days_since_last_visit": 283,
    "last_visit_at": "2025-08-22T15:00:00+00:00",
    "likelihood_score": 57,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.36",
    "patient_id": "00000000-0000-0000-0000-000000000096",
    "points": {
@@ -3575,12 +3689,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 283 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 283 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 10096,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 60573,
@@ -3593,7 +3707,9 @@
    "days_since_last_visit": 227,
    "last_visit_at": "2025-10-17T15:00:00+00:00",
    "likelihood_score": 57,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.89",
    "patient_id": "00000000-0000-0000-0000-00000000008e",
    "points": {
@@ -3618,12 +3734,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 227 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 227 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 13189,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 52757,
@@ -3636,7 +3752,9 @@
    "days_since_last_visit": 189,
    "last_visit_at": "2025-11-24T15:00:00+00:00",
    "likelihood_score": 57,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.58",
    "patient_id": "00000000-0000-0000-0000-00000000001c",
    "points": {
@@ -3661,12 +3779,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 189 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 189 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 7845,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 31379,
@@ -3679,7 +3797,9 @@
    "days_since_last_visit": 281,
    "last_visit_at": "2025-08-24T15:00:00+00:00",
    "likelihood_score": 57,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.34",
    "patient_id": "00000000-0000-0000-0000-0000000000cc",
    "points": {
@@ -3704,12 +3824,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 281 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 281 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 3889,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 23331,
@@ -3722,7 +3842,9 @@
    "days_since_last_visit": 179,
    "last_visit_at": "2025-12-04T15:00:00+00:00",
    "likelihood_score": 56,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.49",
    "patient_id": "00000000-0000-0000-0000-00000000012a",
    "points": {
@@ -3747,12 +3869,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 179 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 179 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 6292,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 25169,
@@ -3766,7 +3888,8 @@
    "last_visit_at": "2026-01-19T15:00:00+00:00",
    "likelihood_score": 56,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.11",
    "patient_id": "00000000-0000-0000-0000-000000000014",
@@ -3795,7 +3918,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 133 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 133 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 133 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 133 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 5891,
    "revenue_kind": "new",
@@ -3810,7 +3934,9 @@
    "days_since_last_visit": 258,
    "last_visit_at": "2025-09-16T15:00:00+00:00",
    "likelihood_score": 55,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.15",
    "patient_id": "00000000-0000-0000-0000-0000000000ff",
    "points": {
@@ -3835,12 +3961,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 258 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 3 visits, 258 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 24386,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 73158,
@@ -3854,6 +3980,7 @@
    "last_visit_at": "2025-08-29T15:00:00+00:00",
    "likelihood_score": 55,
    "matched_types": [
+    "lapsed_regular",
     "unused_balance"
    ],
    "overdue_ratio": "2.30",
@@ -3880,13 +4007,14 @@
      "sms": false
     }
    },
-   "primary_type": "unused_balance",
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 276 days ago, usual Facial every 120 days",
+    "Repeat patient with 5 visits, 276 days since the last visit against a 120 day interval.",
     "Has $70.00 of prepaid balance unused."
    ],
-   "revenue_basis_cents": 7000,
-   "revenue_kind": "retention",
+   "revenue_basis_cents": 11919,
+   "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 59596,
    "usual_provider_id": "00000000-0000-0000-0000-000000002000",
@@ -3944,7 +4072,8 @@
    "last_visit_at": "2025-10-06T15:00:00+00:00",
    "likelihood_score": 55,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.98",
    "patient_id": "00000000-0000-0000-0000-000000000023",
@@ -3973,7 +4102,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 238 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 238 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 238 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 238 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 9555,
    "revenue_kind": "new",
@@ -3989,7 +4119,8 @@
    "last_visit_at": "2025-06-03T15:00:00+00:00",
    "likelihood_score": 54,
    "matched_types": [
-    "lapsed_high_value"
+    "lapsed_high_value",
+    "lapsed_regular"
    ],
    "overdue_ratio": "3.03",
    "patient_id": "00000000-0000-0000-0000-00000000010e",
@@ -4018,7 +4149,8 @@
    "primary_type": "lapsed_high_value",
    "reasons": [
     "Last visit 363 days ago, usual Consult every 120 days",
-    "In the top 20% of patients by spend and 363 days since the last visit, 3.0 times the usual 120 day interval."
+    "In the top 20% of patients by spend and 363 days since the last visit, 3.0 times the usual 120 day interval.",
+    "Repeat patient with 6 visits, 363 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 14636,
    "revenue_kind": "new",
@@ -4035,7 +4167,8 @@
    "likelihood_score": 54,
    "matched_types": [
     "lapsed_high_value",
-    "churned_member"
+    "churned_member",
+    "lapsed_regular"
    ],
    "overdue_ratio": "2.56",
    "patient_id": "00000000-0000-0000-0000-000000000106",
@@ -4065,7 +4198,8 @@
    "reasons": [
     "Last visit 307 days ago, usual Botox every 120 days",
     "In the top 20% of patients by spend and 307 days since the last visit, 2.6 times the usual 120 day interval.",
-    "Membership expired on 2025-12-25, no active membership and they have not visited since."
+    "Membership expired on 2025-12-25, no active membership and they have not visited since.",
+    "Repeat patient with 4 visits, 307 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 19999,
    "revenue_kind": "new",
@@ -4080,7 +4214,9 @@
    "days_since_last_visit": 287,
    "last_visit_at": "2025-08-18T15:00:00+00:00",
    "likelihood_score": 54,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.39",
    "patient_id": "00000000-0000-0000-0000-00000000002a",
    "points": {
@@ -4105,12 +4241,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 287 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 287 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 7510,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 45057,
@@ -4124,7 +4260,8 @@
    "last_visit_at": "2025-12-11T15:00:00+00:00",
    "likelihood_score": 54,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.43",
    "patient_id": "00000000-0000-0000-0000-000000000129",
@@ -4153,7 +4290,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 172 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 172 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 172 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 172 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 8064,
    "revenue_kind": "new",
@@ -4216,7 +4354,8 @@
    "last_visit_at": "2025-10-29T15:00:00+00:00",
    "likelihood_score": 53,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.79",
    "patient_id": "00000000-0000-0000-0000-000000000056",
@@ -4245,7 +4384,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 215 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 215 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 215 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 215 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 22011,
    "revenue_kind": "new",
@@ -4260,7 +4400,9 @@
    "days_since_last_visit": 251,
    "last_visit_at": "2025-09-23T15:00:00+00:00",
    "likelihood_score": 53,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.09",
    "patient_id": "00000000-0000-0000-0000-0000000000fe",
    "points": {
@@ -4285,12 +4427,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 251 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 2 visits, 251 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 36091,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 72181,
@@ -4304,7 +4446,8 @@
    "last_visit_at": "2025-10-31T15:00:00+00:00",
    "likelihood_score": 53,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.78",
    "patient_id": "00000000-0000-0000-0000-00000000008c",
@@ -4333,7 +4476,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 213 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 213 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 213 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 213 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 12701,
    "revenue_kind": "new",
@@ -4349,6 +4493,7 @@
    "last_visit_at": "2025-11-28T15:00:00+00:00",
    "likelihood_score": 53,
    "matched_types": [
+    "lapsed_regular",
     "unused_balance"
    ],
    "overdue_ratio": "1.54",
@@ -4375,13 +4520,14 @@
      "sms": false
     }
    },
-   "primary_type": "unused_balance",
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 185 days ago, usual Botox every 120 days",
+    "Repeat patient with 4 visits, 185 days since the last visit against a 120 day interval.",
     "Has $40.00 of prepaid balance unused."
    ],
-   "revenue_basis_cents": 4000,
-   "revenue_kind": "retention",
+   "revenue_basis_cents": 11724,
+   "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 46895,
    "usual_provider_id": "00000000-0000-0000-0000-000000002001",
@@ -4393,7 +4539,9 @@
    "days_since_last_visit": 231,
    "last_visit_at": "2025-10-13T15:00:00+00:00",
    "likelihood_score": 53,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.93",
    "patient_id": "00000000-0000-0000-0000-000000000022",
    "points": {
@@ -4418,12 +4566,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 231 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 231 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 9310,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 37241,
@@ -4481,7 +4629,9 @@
    "days_since_last_visit": 262,
    "last_visit_at": "2025-09-12T15:00:00+00:00",
    "likelihood_score": 52,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.18",
    "patient_id": "00000000-0000-0000-0000-000000000093",
    "points": {
@@ -4506,12 +4656,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 262 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 3 visits, 262 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 19214,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 57642,
@@ -4526,7 +4676,8 @@
    "likelihood_score": 52,
    "matched_types": [
     "consult_not_converted",
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.99",
    "patient_id": "00000000-0000-0000-0000-0000000000c6",
@@ -4556,7 +4707,8 @@
    "reasons": [
     "Last visit 239 days ago, usual Consult every 120 days",
     "Had a consult 121 days ago and no treatment visit in the 60 days after it.",
-    "Has come 3 times for their usual service and is overdue: 239 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 239 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 239 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 20627,
    "revenue_kind": "new",
@@ -4662,7 +4814,8 @@
    "last_visit_at": "2025-10-20T15:00:00+00:00",
    "likelihood_score": 51,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.87",
    "patient_id": "00000000-0000-0000-0000-000000000021",
@@ -4691,7 +4844,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 224 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 224 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 224 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 224 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 12088,
    "revenue_kind": "new",
@@ -4752,7 +4906,8 @@
    "last_visit_at": "2026-01-12T15:00:00+00:00",
    "likelihood_score": 51,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.17",
    "patient_id": "00000000-0000-0000-0000-000000000015",
@@ -4781,7 +4936,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 140 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 140 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 140 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 140 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 8180,
    "revenue_kind": "new",
@@ -4797,7 +4953,8 @@
    "last_visit_at": "2025-12-28T15:00:00+00:00",
    "likelihood_score": 51,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.29",
    "patient_id": "00000000-0000-0000-0000-0000000000ba",
@@ -4826,7 +4983,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 155 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 155 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 155 days since the last visit against a 120 day interval.",
+    "Repeat patient with 6 visits, 155 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 957,
    "revenue_kind": "new",
@@ -4842,7 +5000,8 @@
    "last_visit_at": "2025-06-17T15:00:00+00:00",
    "likelihood_score": 50,
    "matched_types": [
-    "lapsed_high_value"
+    "lapsed_high_value",
+    "lapsed_regular"
    ],
    "overdue_ratio": "2.91",
    "patient_id": "00000000-0000-0000-0000-00000000010c",
@@ -4871,7 +5030,8 @@
    "primary_type": "lapsed_high_value",
    "reasons": [
     "Last visit 349 days ago, usual Botox every 120 days",
-    "In the top 20% of patients by spend and 349 days since the last visit, 2.9 times the usual 120 day interval."
+    "In the top 20% of patients by spend and 349 days since the last visit, 2.9 times the usual 120 day interval.",
+    "Repeat patient with 4 visits, 349 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 21465,
    "revenue_kind": "new",
@@ -4886,7 +5046,9 @@
    "days_since_last_visit": 311,
    "last_visit_at": "2025-07-25T15:00:00+00:00",
    "likelihood_score": 50,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.59",
    "patient_id": "00000000-0000-0000-0000-00000000009a",
    "points": {
@@ -4911,12 +5073,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 311 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 311 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 16120,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 64481,
@@ -4929,7 +5091,9 @@
    "days_since_last_visit": 329,
    "last_visit_at": "2025-07-07T15:00:00+00:00",
    "likelihood_score": 50,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.74",
    "patient_id": "00000000-0000-0000-0000-000000000030",
    "points": {
@@ -4954,12 +5118,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 329 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 329 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 8487,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 50919,
@@ -4972,7 +5136,9 @@
    "days_since_last_visit": 273,
    "last_visit_at": "2025-09-01T15:00:00+00:00",
    "likelihood_score": 50,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.28",
    "patient_id": "00000000-0000-0000-0000-000000000028",
    "points": {
@@ -4997,12 +5163,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 273 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 273 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 10776,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 43103,
@@ -5015,7 +5181,9 @@
    "days_since_last_visit": 265,
    "last_visit_at": "2025-09-09T15:00:00+00:00",
    "likelihood_score": 49,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.21",
    "patient_id": "00000000-0000-0000-0000-000000000100",
    "points": {
@@ -5040,12 +5208,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 265 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 265 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 18534,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 74135,
@@ -5060,6 +5228,7 @@
    "likelihood_score": 49,
    "matched_types": [
     "overdue_maintenance",
+    "lapsed_regular",
     "unused_balance"
    ],
    "overdue_ratio": "1.81",
@@ -5090,6 +5259,7 @@
    "reasons": [
     "Last visit 217 days ago, usual Facial every 120 days",
     "Has come 2 times for their usual service and is overdue: 217 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 217 days since the last visit against a 120 day interval.",
     "Has $50.00 of prepaid balance unused."
    ],
    "revenue_basis_cents": 8822,
@@ -5199,7 +5369,9 @@
    "days_since_last_visit": 304,
    "last_visit_at": "2025-08-01T15:00:00+00:00",
    "likelihood_score": 48,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.53",
    "patient_id": "00000000-0000-0000-0000-000000000099",
    "points": {
@@ -5224,12 +5396,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 304 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 3 visits, 304 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 21168,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 63504,
@@ -5287,7 +5459,9 @@
    "days_since_last_visit": 322,
    "last_visit_at": "2025-07-14T15:00:00+00:00",
    "likelihood_score": 48,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.68",
    "patient_id": "00000000-0000-0000-0000-00000000002f",
    "points": {
@@ -5312,12 +5486,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 322 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 5 visits, 322 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 9988,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 49942,
@@ -5375,7 +5549,9 @@
    "days_since_last_visit": 266,
    "last_visit_at": "2025-09-08T15:00:00+00:00",
    "likelihood_score": 48,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.22",
    "patient_id": "00000000-0000-0000-0000-000000000027",
    "points": {
@@ -5400,12 +5576,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 266 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 3 visits, 266 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 14042,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 42126,
@@ -5420,6 +5596,7 @@
    "likelihood_score": 48,
    "matched_types": [
     "overdue_maintenance",
+    "lapsed_regular",
     "unused_balance"
    ],
    "overdue_ratio": "1.41",
@@ -5450,6 +5627,7 @@
    "reasons": [
     "Last visit 169 days ago, usual Facial every 120 days",
     "Has come 2 times for their usual service and is overdue: 169 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 169 days since the last visit against a 120 day interval.",
     "Has $60.00 of prepaid balance unused."
    ],
    "revenue_basis_cents": 1925,
@@ -5465,7 +5643,9 @@
    "days_since_last_visit": 371,
    "last_visit_at": "2025-05-26T15:00:00+00:00",
    "likelihood_score": 47,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "3.09",
    "patient_id": "00000000-0000-0000-0000-000000000036",
    "points": {
@@ -5490,12 +5670,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 371 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 371 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 9464,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 56781,
@@ -5508,7 +5688,9 @@
    "days_since_last_visit": 343,
    "last_visit_at": "2025-06-23T15:00:00+00:00",
    "likelihood_score": 47,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.86",
    "patient_id": "00000000-0000-0000-0000-000000000032",
    "points": {
@@ -5533,12 +5715,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 343 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 2 visits, 343 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 26437,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 52873,
@@ -5553,7 +5735,8 @@
    "likelihood_score": 46,
    "matched_types": [
     "churned_member",
-    "consult_not_converted"
+    "consult_not_converted",
+    "lapsed_regular"
    ],
    "overdue_ratio": "2.94",
    "patient_id": "00000000-0000-0000-0000-0000000000a0",
@@ -5583,7 +5766,8 @@
    "reasons": [
     "Last visit 353 days ago, usual Botox every 120 days",
     "Membership expired on 2025-12-07, no active membership and they have not visited since.",
-    "Had a consult 107 days ago and no treatment visit in the 60 days after it."
+    "Had a consult 107 days ago and no treatment visit in the 60 days after it.",
+    "Repeat patient with 4 visits, 353 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 59400,
    "revenue_kind": "new",
@@ -5598,7 +5782,9 @@
    "days_since_last_visit": 325,
    "last_visit_at": "2025-07-11T15:00:00+00:00",
    "likelihood_score": 46,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.71",
    "patient_id": "00000000-0000-0000-0000-00000000009c",
    "points": {
@@ -5623,12 +5809,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 325 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 325 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 11073,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 66435,
@@ -5641,7 +5827,9 @@
    "days_since_last_visit": 323,
    "last_visit_at": "2025-07-13T15:00:00+00:00",
    "likelihood_score": 46,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.69",
    "patient_id": "00000000-0000-0000-0000-0000000000d2",
    "points": {
@@ -5666,12 +5854,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 323 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 323 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 4866,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 29193,
@@ -5685,7 +5873,8 @@
    "last_visit_at": "2025-10-26T15:00:00+00:00",
    "likelihood_score": 46,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.82",
    "patient_id": "00000000-0000-0000-0000-0000000000c3",
@@ -5714,7 +5903,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 218 days ago, usual Consult every 120 days",
-    "Has come 3 times for their usual service and is overdue: 218 days since the last visit against a 120 day interval."
+    "Has come 3 times for their usual service and is overdue: 218 days since the last visit against a 120 day interval.",
+    "Repeat patient with 3 visits, 218 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 2423,
    "revenue_kind": "new",
@@ -5730,7 +5920,8 @@
    "last_visit_at": "2025-11-23T15:00:00+00:00",
    "likelihood_score": 46,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.58",
    "patient_id": "00000000-0000-0000-0000-0000000000bf",
@@ -5759,7 +5950,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 190 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 190 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 190 days since the last visit against a 120 day interval.",
+    "Repeat patient with 5 visits, 190 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 2658,
    "revenue_kind": "new",
@@ -5774,7 +5966,9 @@
    "days_since_last_visit": 364,
    "last_visit_at": "2025-06-02T15:00:00+00:00",
    "likelihood_score": 45,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "3.03",
    "patient_id": "00000000-0000-0000-0000-000000000035",
    "points": {
@@ -5799,12 +5993,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 364 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 5 visits, 364 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 11161,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 55804,
@@ -5818,7 +6012,8 @@
    "last_visit_at": "2025-12-08T15:00:00+00:00",
    "likelihood_score": 45,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.46",
    "patient_id": "00000000-0000-0000-0000-00000000001a",
@@ -5847,7 +6042,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 175 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 175 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 175 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 175 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 7356,
    "revenue_kind": "new",
@@ -5864,7 +6060,8 @@
    "likelihood_score": 45,
    "matched_types": [
     "churned_member",
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.38",
    "patient_id": "00000000-0000-0000-0000-000000000128",
@@ -5894,7 +6091,8 @@
    "reasons": [
     "Last visit 165 days ago, usual Facial every 120 days",
     "Membership expired on 2025-12-31, no active membership and they have not visited since.",
-    "Has come 2 times for their usual service and is overdue: 165 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 165 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 165 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 59400,
    "revenue_kind": "new",
@@ -5909,7 +6107,9 @@
    "days_since_last_visit": 267,
    "last_visit_at": "2025-09-07T15:00:00+00:00",
    "likelihood_score": 45,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.23",
    "patient_id": "00000000-0000-0000-0000-0000000000ca",
    "points": {
@@ -5934,12 +6134,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 267 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 267 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 5344,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 21377,
@@ -6000,7 +6200,8 @@
    "last_visit_at": "2025-08-05T15:00:00+00:00",
    "likelihood_score": 44,
    "matched_types": [
-    "lapsed_high_value"
+    "lapsed_high_value",
+    "lapsed_regular"
    ],
    "overdue_ratio": "2.50",
    "patient_id": "00000000-0000-0000-0000-000000000105",
@@ -6029,7 +6230,8 @@
    "primary_type": "lapsed_high_value",
    "reasons": [
     "Last visit 300 days ago, usual Consult every 120 days",
-    "In the top 20% of patients by spend and 300 days since the last visit, 2.5 times the usual 120 day interval."
+    "In the top 20% of patients by spend and 300 days since the last visit, 2.5 times the usual 120 day interval.",
+    "Repeat patient with 3 visits, 300 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 26340,
    "revenue_kind": "new",
@@ -6045,6 +6247,7 @@
    "last_visit_at": "2025-07-28T15:00:00+00:00",
    "likelihood_score": 44,
    "matched_types": [
+    "lapsed_regular",
     "unused_balance"
    ],
    "overdue_ratio": "2.57",
@@ -6071,13 +6274,14 @@
      "sms": false
     }
    },
-   "primary_type": "unused_balance",
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 308 days ago, usual Consult every 120 days",
+    "Repeat patient with 3 visits, 308 days since the last visit against a 120 day interval.",
     "Has $80.00 of prepaid balance unused."
    ],
-   "revenue_basis_cents": 8000,
-   "revenue_kind": "retention",
+   "revenue_basis_cents": 15996,
+   "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 47988,
    "usual_provider_id": "00000000-0000-0000-0000-000000002000",
@@ -6134,7 +6338,9 @@
    "days_since_last_visit": 316,
    "last_visit_at": "2025-07-20T15:00:00+00:00",
    "likelihood_score": 44,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.63",
    "patient_id": "00000000-0000-0000-0000-0000000000d1",
    "points": {
@@ -6159,12 +6365,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 316 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 5 visits, 316 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 5643,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 28216,
@@ -6178,7 +6384,8 @@
    "last_visit_at": "2025-11-02T15:00:00+00:00",
    "likelihood_score": 44,
    "matched_types": [
-    "overdue_maintenance"
+    "overdue_maintenance",
+    "lapsed_regular"
    ],
    "overdue_ratio": "1.76",
    "patient_id": "00000000-0000-0000-0000-0000000000c2",
@@ -6207,7 +6414,8 @@
    "primary_type": "overdue_maintenance",
    "reasons": [
     "Last visit 211 days ago, usual Facial every 120 days",
-    "Has come 2 times for their usual service and is overdue: 211 days since the last visit against a 120 day interval."
+    "Has come 2 times for their usual service and is overdue: 211 days since the last visit against a 120 day interval.",
+    "Repeat patient with 2 visits, 211 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 3390,
    "revenue_kind": "new",
@@ -6223,7 +6431,8 @@
    "last_visit_at": "2025-05-20T15:00:00+00:00",
    "likelihood_score": 43,
    "matched_types": [
-    "lapsed_high_value"
+    "lapsed_high_value",
+    "lapsed_regular"
    ],
    "overdue_ratio": "3.14",
    "patient_id": "00000000-0000-0000-0000-000000000110",
@@ -6252,7 +6461,8 @@
    "primary_type": "lapsed_high_value",
    "reasons": [
     "Last visit 377 days ago, usual Facial every 120 days",
-    "In the top 20% of patients by spend and 377 days since the last visit, 3.1 times the usual 120 day interval."
+    "In the top 20% of patients by spend and 377 days since the last visit, 3.1 times the usual 120 day interval.",
+    "Repeat patient with 2 visits, 377 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 44884,
    "revenue_kind": "new",
@@ -6267,7 +6477,9 @@
    "days_since_last_visit": 339,
    "last_visit_at": "2025-06-27T15:00:00+00:00",
    "likelihood_score": 43,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.83",
    "patient_id": "00000000-0000-0000-0000-00000000009e",
    "points": {
@@ -6292,12 +6504,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 339 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 2 visits, 339 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 34195,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 68389,
@@ -6310,7 +6522,9 @@
    "days_since_last_visit": 357,
    "last_visit_at": "2025-06-09T15:00:00+00:00",
    "likelihood_score": 43,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.98",
    "patient_id": "00000000-0000-0000-0000-000000000034",
    "points": {
@@ -6335,12 +6549,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 357 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 357 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 13707,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 54827,
@@ -6353,7 +6567,9 @@
    "days_since_last_visit": 306,
    "last_visit_at": "2025-07-30T15:00:00+00:00",
    "likelihood_score": 43,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.55",
    "patient_id": "00000000-0000-0000-0000-000000000063",
    "points": {
@@ -6378,12 +6594,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 306 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 3 visits, 306 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 3582,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 10746,
@@ -6396,7 +6612,9 @@
    "days_since_last_visit": 278,
    "last_visit_at": "2025-08-27T15:00:00+00:00",
    "likelihood_score": 43,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.32",
    "patient_id": "00000000-0000-0000-0000-00000000005f",
    "points": {
@@ -6421,12 +6639,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 278 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 5 visits, 278 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 1368,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 6838,
@@ -6439,7 +6657,9 @@
    "days_since_last_visit": 255,
    "last_visit_at": "2025-09-19T15:00:00+00:00",
    "likelihood_score": 42,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.13",
    "patient_id": "00000000-0000-0000-0000-000000000092",
    "points": {
@@ -6464,12 +6684,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 255 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 2 visits, 255 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 28333,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 56665,
@@ -6482,7 +6702,9 @@
    "days_since_last_visit": 355,
    "last_visit_at": "2025-06-11T15:00:00+00:00",
    "likelihood_score": 42,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.96",
    "patient_id": "00000000-0000-0000-0000-00000000006a",
    "points": {
@@ -6507,12 +6729,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 355 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 355 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 4396,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 17585,
@@ -6525,7 +6747,9 @@
    "days_since_last_visit": 327,
    "last_visit_at": "2025-07-09T15:00:00+00:00",
    "likelihood_score": 42,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.73",
    "patient_id": "00000000-0000-0000-0000-000000000066",
    "points": {
@@ -6550,12 +6774,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 327 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 327 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 2280,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 13677,
@@ -6658,7 +6882,9 @@
    "days_since_last_visit": 358,
    "last_visit_at": "2025-06-08T15:00:00+00:00",
    "likelihood_score": 41,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.98",
    "patient_id": "00000000-0000-0000-0000-0000000000d7",
    "points": {
@@ -6683,12 +6909,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 358 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 5 visits, 358 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 6816,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 34078,
@@ -6748,7 +6974,9 @@
    "days_since_last_visit": 253,
    "last_visit_at": "2025-09-21T15:00:00+00:00",
    "likelihood_score": 41,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.11",
    "patient_id": "00000000-0000-0000-0000-0000000000c8",
    "points": {
@@ -6773,12 +7001,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 253 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 2 visits, 253 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 9712,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 19423,
@@ -6791,7 +7019,9 @@
    "days_since_last_visit": 225,
    "last_visit_at": "2025-10-19T15:00:00+00:00",
    "likelihood_score": 41,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "1.88",
    "patient_id": "00000000-0000-0000-0000-0000000000c4",
    "points": {
@@ -6816,12 +7046,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 225 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 225 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 3879,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 15515,
@@ -6834,7 +7064,9 @@
    "days_since_last_visit": 271,
    "last_visit_at": "2025-09-03T15:00:00+00:00",
    "likelihood_score": 41,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.26",
    "patient_id": "00000000-0000-0000-0000-00000000005e",
    "points": {
@@ -6859,12 +7091,12 @@
      "sms": true
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 271 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 271 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 1465,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 5861,
@@ -6922,7 +7154,9 @@
    "days_since_last_visit": 302,
    "last_visit_at": "2025-08-03T15:00:00+00:00",
    "likelihood_score": 40,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.52",
    "patient_id": "00000000-0000-0000-0000-0000000000cf",
    "points": {
@@ -6947,12 +7181,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 302 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 3 visits, 302 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 8754,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 26262,
@@ -6967,6 +7201,7 @@
    "likelihood_score": 39,
    "matched_types": [
     "lapsed_high_value",
+    "lapsed_regular",
     "unused_balance"
    ],
    "overdue_ratio": "2.79",
@@ -6997,6 +7232,7 @@
    "reasons": [
     "Last visit 335 days ago, usual Facial every 120 days",
     "In the top 20% of patients by spend and 335 days since the last visit, 2.8 times the usual 120 day interval.",
+    "Repeat patient with 2 visits, 335 days since the last visit against a 120 day interval.",
     "Has $40.00 of prepaid balance unused."
    ],
    "revenue_basis_cents": 41953,
@@ -7013,7 +7249,8 @@
    "last_visit_at": "2025-07-21T15:00:00+00:00",
    "likelihood_score": 39,
    "matched_types": [
-    "consult_not_converted"
+    "consult_not_converted",
+    "lapsed_regular"
    ],
    "overdue_ratio": "2.63",
    "patient_id": "00000000-0000-0000-0000-00000000002e",
@@ -7042,7 +7279,8 @@
    "primary_type": "consult_not_converted",
    "reasons": [
     "Last visit 315 days ago, usual Botox every 120 days",
-    "Had a consult 65 days ago and no treatment visit in the 60 days after it."
+    "Had a consult 65 days ago and no treatment visit in the 60 days after it.",
+    "Repeat patient with 4 visits, 315 days since the last visit against a 120 day interval."
    ],
    "revenue_basis_cents": 120000,
    "revenue_kind": "new",
@@ -7057,7 +7295,9 @@
    "days_since_last_visit": 379,
    "last_visit_at": "2025-05-18T15:00:00+00:00",
    "likelihood_score": 39,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "3.16",
    "patient_id": "00000000-0000-0000-0000-0000000000da",
    "points": {
@@ -7082,12 +7322,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 379 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 2 visits, 379 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 18505,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 37009,
@@ -7145,7 +7385,9 @@
    "days_since_last_visit": 313,
    "last_visit_at": "2025-07-23T15:00:00+00:00",
    "likelihood_score": 38,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.61",
    "patient_id": "00000000-0000-0000-0000-000000000064",
    "points": {
@@ -7170,12 +7412,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 313 days ago, usual Botox every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 4 visits, 313 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 2931,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 11723,
@@ -7233,7 +7475,9 @@
    "days_since_last_visit": 344,
    "last_visit_at": "2025-06-22T15:00:00+00:00",
    "likelihood_score": 37,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.87",
    "patient_id": "00000000-0000-0000-0000-0000000000d5",
    "points": {
@@ -7258,12 +7502,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 344 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 3 visits, 344 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 10708,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 32124,
@@ -7276,7 +7520,9 @@
    "days_since_last_visit": 362,
    "last_visit_at": "2025-06-04T15:00:00+00:00",
    "likelihood_score": 37,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "3.02",
    "patient_id": "00000000-0000-0000-0000-00000000006b",
    "points": {
@@ -7301,12 +7547,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 362 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 5 visits, 362 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 3712,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 18562,
@@ -7319,7 +7565,9 @@
    "days_since_last_visit": 285,
    "last_visit_at": "2025-08-20T15:00:00+00:00",
    "likelihood_score": 37,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.38",
    "patient_id": "00000000-0000-0000-0000-000000000060",
    "points": {
@@ -7344,12 +7592,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 285 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 285 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 1303,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 7815,
@@ -7407,7 +7655,9 @@
    "days_since_last_visit": 365,
    "last_visit_at": "2025-06-01T15:00:00+00:00",
    "likelihood_score": 35,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "3.04",
    "patient_id": "00000000-0000-0000-0000-0000000000d8",
    "points": {
@@ -7432,12 +7682,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 365 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 6 visits, 365 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 5843,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 35055,
@@ -7450,7 +7700,9 @@
    "days_since_last_visit": 337,
    "last_visit_at": "2025-06-29T15:00:00+00:00",
    "likelihood_score": 35,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.81",
    "patient_id": "00000000-0000-0000-0000-0000000000d4",
    "points": {
@@ -7475,12 +7727,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 337 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 2 visits, 337 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 15574,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 31147,
@@ -7493,7 +7745,9 @@
    "days_since_last_visit": 299,
    "last_visit_at": "2025-08-06T15:00:00+00:00",
    "likelihood_score": 34,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.49",
    "patient_id": "00000000-0000-0000-0000-000000000062",
    "points": {
@@ -7518,12 +7772,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 299 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 2 visits, 299 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 4885,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 9769,
@@ -7583,7 +7837,9 @@
    "days_since_last_visit": 348,
    "last_visit_at": "2025-06-18T15:00:00+00:00",
    "likelihood_score": 33,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.90",
    "patient_id": "00000000-0000-0000-0000-000000000069",
    "points": {
@@ -7608,12 +7864,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 348 days ago, usual Consult every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 3 visits, 348 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 5536,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 16608,
@@ -7673,7 +7929,9 @@
    "days_since_last_visit": 295,
    "last_visit_at": "2025-08-10T15:00:00+00:00",
    "likelihood_score": 31,
-   "matched_types": [],
+   "matched_types": [
+    "lapsed_regular"
+   ],
    "overdue_ratio": "2.46",
    "patient_id": "00000000-0000-0000-0000-0000000000ce",
    "points": {
@@ -7698,12 +7956,12 @@
      "sms": false
     }
    },
-   "primary_type": null,
+   "primary_type": "lapsed_regular",
    "reasons": [
     "Last visit 295 days ago, usual Facial every 120 days",
-    "Dormant, but matches none of the enabled patient types"
+    "Repeat patient with 2 visits, 295 days since the last visit against a 120 day interval."
    ],
-   "revenue_basis_cents": 0,
+   "revenue_basis_cents": 12643,
    "revenue_kind": "new",
    "status": "dormant",
    "total_spend_cents": 25285,
@@ -8027,30 +8285,9 @@
    ]
   },
   "unclassified_dormant": {
-   "count": 59,
-   "patients": 59,
-   "sample_ids": [
-    "00000000-0000-0000-0000-000000000016",
-    "00000000-0000-0000-0000-00000000001c",
-    "00000000-0000-0000-0000-000000000022",
-    "00000000-0000-0000-0000-000000000024",
-    "00000000-0000-0000-0000-000000000027",
-    "00000000-0000-0000-0000-000000000028",
-    "00000000-0000-0000-0000-00000000002a",
-    "00000000-0000-0000-0000-00000000002f",
-    "00000000-0000-0000-0000-000000000030",
-    "00000000-0000-0000-0000-000000000032",
-    "00000000-0000-0000-0000-000000000034",
-    "00000000-0000-0000-0000-000000000035",
-    "00000000-0000-0000-0000-000000000036",
-    "00000000-0000-0000-0000-00000000004c",
-    "00000000-0000-0000-0000-000000000058",
-    "00000000-0000-0000-0000-00000000005e",
-    "00000000-0000-0000-0000-00000000005f",
-    "00000000-0000-0000-0000-000000000060",
-    "00000000-0000-0000-0000-000000000062",
-    "00000000-0000-0000-0000-000000000063"
-   ]
+   "count": 0,
+   "patients": 0,
+   "sample_ids": []
   },
   "unknown_appointment_status": {
    "weird": {
@@ -8118,8 +8355,8 @@
   },
   "dormant_count": 160,
   "first_run": false,
-  "new_revenue_high_cents": 454599,
-  "new_revenue_low_cents": 206814,
+  "new_revenue_high_cents": 566005,
+  "new_revenue_low_cents": 266231,
   "newly_dormant": 122,
   "patients_errored": 0,
   "patients_excluded": 32,
@@ -8131,12 +8368,13 @@
    "churned_member": true,
    "consult_not_converted": true,
    "lapsed_high_value": true,
+   "lapsed_regular": true,
    "one_and_done": true,
    "overdue_maintenance": true,
    "unused_balance": true
   },
   "unchanged_dormant": 38,
-  "unclassified_dormant": 59
+  "unclassified_dormant": 0
  },
  "types": [
   {
@@ -8188,6 +8426,18 @@
    "type_key": "overdue_maintenance"
   },
   {
+   "basis_total_cents": 742709,
+   "patient_count": 64,
+   "rate_high": "0.1500",
+   "rate_low": "0.0800",
+   "rate_source": "assumed",
+   "revenue_high_cents": 111406,
+   "revenue_kind": "new",
+   "revenue_low_cents": 59417,
+   "top_service_id": "00000000-0000-0000-0000-000000001000",
+   "type_key": "lapsed_regular"
+  },
+  {
    "basis_total_cents": 401514,
    "patient_count": 24,
    "rate_high": "0.4788",
@@ -8200,15 +8450,15 @@
    "type_key": "one_and_done"
   },
   {
-   "basis_total_cents": 29000,
-   "patient_count": 5,
+   "basis_total_cents": 0,
+   "patient_count": 0,
    "rate_high": "1",
    "rate_low": "1",
    "rate_source": "assumed",
-   "revenue_high_cents": 29000,
+   "revenue_high_cents": 0,
    "revenue_kind": "retention",
-   "revenue_low_cents": 29000,
-   "top_service_id": "00000000-0000-0000-0000-000000001000",
+   "revenue_low_cents": 0,
+   "top_service_id": null,
    "type_key": "unused_balance"
   }
  ]

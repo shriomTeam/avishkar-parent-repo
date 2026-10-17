@@ -267,6 +267,7 @@ def test_summary_rows_totals_and_separate_figures():
         "churned_member",
         "consult_not_converted",
         "overdue_maintenance",
+        "lapsed_regular",
         "one_and_done",
         "unused_balance",
     ]

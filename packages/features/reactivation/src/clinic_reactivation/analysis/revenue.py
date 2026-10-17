@@ -25,6 +25,7 @@ TYPE_KINDS: dict[str, str] = {
     "consult_not_converted": NEW,
     "overdue_maintenance": NEW,
     "one_and_done": NEW,
+    "lapsed_regular": NEW,
     "unused_balance": RETENTION,
 }
 
@@ -135,6 +136,9 @@ def revenue_basis(type_key: str, facts: PatientFacts, context: RevenueContext, s
         if visit is not None and visit > 0:
             return Basis(visit, kind)
         return _spend_basis(facts.spend_cents, kind, fallback=FLAG_SPEND_FALLBACK)
+
+    if type_key == "lapsed_regular":
+        return _spend_basis(average, kind)  # spec 4.7: the patient's average ticket
 
     if type_key == "unused_balance":
         return Basis(max(0, facts.prepaid_balance_cents), kind)

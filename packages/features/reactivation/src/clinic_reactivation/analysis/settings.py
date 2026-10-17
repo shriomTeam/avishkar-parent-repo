@@ -87,6 +87,13 @@ class OneAndDone(_Strict):
     min_days_since_visit: int = Field(default=90, ge=1, le=3650)
 
 
+class LapsedRegular(_Strict):
+    """Repeat patients (at least 2 visits) who are dormant by the general rule (spec 4.7, D13). No thresholds."""
+
+    enabled: bool = True
+    priority: int = Field(default=5, ge=1, le=99)
+
+
 class UnusedBalance(_Strict):
     enabled: bool = True
     priority: int = Field(default=6, ge=1, le=99)
@@ -98,14 +105,11 @@ class TypeRules(_Strict):
     consult_not_converted: ConsultNotConverted = Field(default_factory=ConsultNotConverted)
     overdue_maintenance: OverdueMaintenance = Field(default_factory=OverdueMaintenance)
     one_and_done: OneAndDone = Field(default_factory=OneAndDone)
+    lapsed_regular: LapsedRegular = Field(default_factory=LapsedRegular)
     unused_balance: UnusedBalance = Field(default_factory=UnusedBalance)
 
-    @model_validator(mode="after")
-    def _unique_priorities(self) -> "TypeRules":
-        priorities = [getattr(self, name).priority for name in type(self).model_fields]
-        if len(set(priorities)) != len(priorities):
-            raise ValueError("type priorities must be unique")
-        return self
+    # Priorities may tie (lapsed_regular and one_and_done are both 5 by default, D13). A tie is resolved by
+    # the type key, in the engine, the revenue rows and the types endpoint alike.
 
     @model_validator(mode="after")
     def _types_cannot_overlap(self) -> "TypeRules":
