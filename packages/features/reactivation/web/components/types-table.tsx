@@ -12,7 +12,7 @@ import {
 import { unavailableReason } from "../lib/messages";
 import { RangeBar } from "./kit";
 
-export function TypesTable({ types }: { types: TypeEntry[] }) {
+export function TypesTable({ types, source = "saved" }: { types: TypeEntry[]; source?: "saved" | "file" }) {
   const router = useRouter();
   const scale = Math.max(
     0,
@@ -65,7 +65,7 @@ export function TypesTable({ types }: { types: TypeEntry[] }) {
                   )}
                 </td>
                 <td>
-                  <Revenue entry={t} scale={scale} />
+                  <Revenue entry={t} scale={scale} source={source} />
                 </td>
                 <td>
                   {t.available && t.type_key !== "unclassified"
@@ -84,12 +84,22 @@ export function TypesTable({ types }: { types: TypeEntry[] }) {
   );
 }
 
-function Revenue({ entry: t, scale }: { entry: TypeEntry; scale: number }) {
+function Revenue({
+  entry: t,
+  scale,
+  source,
+}: {
+  entry: TypeEntry;
+  scale: number;
+  source: "saved" | "file";
+}) {
   if (!t.available)
     return (
       <>
-        <span className="dp-unavailable">Not available for this clinic</span>
-        <p className="dp-small">{unavailableReason(t.type_key)}</p>
+        <span className="dp-unavailable">
+          {source === "file" ? "Not available from this file" : "Not available for this clinic"}
+        </span>
+        <p className="dp-small">{unavailableReason(t.type_key, source)}</p>
       </>
     );
   if (t.type_key === "unclassified")

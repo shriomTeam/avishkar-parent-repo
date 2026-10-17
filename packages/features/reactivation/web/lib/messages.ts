@@ -42,7 +42,16 @@ const UNAVAILABLE_REASONS: Record<string, string> = {
     "There aren't enough paying patients yet to tell who your top spenders are.",
 };
 
-export function unavailableReason(typeKey: string) {
+const FILE_UNAVAILABLE_REASONS: Record<string, string> = {
+  churned_member: "The file has no membership information.",
+  unused_balance: "The file has no prepaid balances or memberships.",
+  consult_not_converted: "The file has no consult visits (see visit_type).",
+  lapsed_high_value: "There aren't enough paying patients in the file to tell who your top spenders are.",
+};
+
+export function unavailableReason(typeKey: string, source: "saved" | "file" = "saved") {
+  if (source === "file")
+    return FILE_UNAVAILABLE_REASONS[typeKey] ?? "The file doesn't have the columns needed to measure this type.";
   return (
     UNAVAILABLE_REASONS[typeKey] ??
     "The records needed to measure this type haven't been imported."
@@ -67,13 +76,21 @@ const plural = (n: number, one: string, many: string) =>
   `${formatCount(n)} ${n === 1 ? one : many}`;
 
 /** Quality notes in plain words: data gaps, flags that cannot be imported, incomplete data. */
-export function qualityNotes(quality: Record<string, unknown> | null): Note[] {
+export function qualityNotes(
+  quality: Record<string, unknown> | null,
+  source: "saved" | "file" = "saved",
+): Note[] {
   if (!quality) return [];
   const notes: Note[] = [];
   const available = obj(quality, "data_available");
   const gaps: [string, string][] = [
     ["memberships", "No membership or package records were found, so Churned member and Unused balance can't be measured."],
-    ["staff", "Staff records haven't been imported, so we can't tell whether a patient's usual provider still works here."],
+    [
+      "staff",
+      source === "file"
+        ? "Files don't include staff records, so we can't tell whether a patient's usual provider still works here."
+        : "Staff records haven't been imported, so we can't tell whether a patient's usual provider still works here.",
+    ],
     ["consents", "No messaging-consent records were found, so we can't tell who has opted out of texts or emails."],
     ["services", "Visits aren't linked to services, so usual services and offers can't be worked out."],
   ];
@@ -83,7 +100,10 @@ export function qualityNotes(quality: Record<string, unknown> | null): Note[] {
   if (flag(quality, "exclusion_flags_not_importable"))
     notes.push({
       tone: "warn",
-      text: "\"Do not contact\" and \"deceased\" flags can't be imported yet, so patients who asked not to be contacted may still appear in these results. Check with your team before contacting anyone.",
+      text:
+        source === "file"
+          ? "The file doesn't have both do_not_contact and deceased columns, so patients who asked not to be contacted may still appear in these results. Check with your team before contacting anyone."
+          : "\"Do not contact\" and \"deceased\" flags can't be imported yet, so patients who asked not to be contacted may still appear in these results. Check with your team before contacting anyone.",
     });
 
   for (const code of strings(quality, "warnings"))
@@ -107,4 +127,26 @@ export function qualityNotes(quality: Record<string, unknown> | null): Note[] {
     if (n > 0) notes.push({ tone: "info", text: plural(n, one, many) + "." });
   }
   return notes;
+}
+
+const FILE_NOTES: Record<string, [string, string]> = {
+  email_treated_as_missing: ["patient has an email address that doesn't look valid and was treated as missing", "patients have email addresses that don't look valid and were treated as missing"],
+  phone_treated_as_missing: ["patient has a phone number that doesn't look valid and was treated as missing", "patients have phone numbers that don't look valid and were treated as missing"],
+  membership_details_ignored: ["patient has a membership end date or fee but no membership status, so those were ignored", "patients have a membership end date or fee but no membership status, so those were ignored"],
+  past_next_appointment_ignored: ["patient has a next appointment date in the past, which was ignored", "patients have a next appointment date in the past, which were ignored"],
+};
+
+/** Notes that only apply to a file analysis: what the file can't tell us, and what was set aside. */
+export function fileNotes(notes: { code: string; patients: number }[]): Note[] {
+  const out: Note[] = [
+    {
+      tone: "info",
+      text: "Files don't include visit times, so the best time to contact each patient isn't shown.",
+    },
+  ];
+  for (const n of notes) {
+    const text = FILE_NOTES[n.code];
+    if (text) out.push({ tone: "info", text: plural(n.patients, text[0], text[1]) + "." });
+  }
+  return out;
 }

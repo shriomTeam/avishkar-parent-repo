@@ -222,9 +222,9 @@ test("with no analysis yet, Run now starts one, shows progress and refreshes whe
   await expect(tid(page, "progress-card")).toHaveCount(0);
   await expect(tid(page, "last-analysed")).toContainText("Last analysed just now");
   await expect(tid(page, "run-now")).toBeEnabled();
-  // An empty clinic is explained rather than shown as a bare zero.
+  // Patients with no visits are explained rather than shown as a bare zero.
   await tid(page, "about-data").getByText(/About this data/).click();
-  await expect(tid(page, "about-data")).toContainText("No patients were found");
+  await expect(tid(page, "about-data")).toContainText("have no completed visits");
 });
 
 test("roles that cannot start runs do not see Run now", async ({ page }) => {
@@ -238,4 +238,5 @@ test("roles that cannot start runs do not see Run now", async ({ page }) => {
   await page.goto("/reactivation");
   await expect(tid(page, "tile-dormant")).toBeVisible();
   await expect(tid(page, "run-now")).toHaveCount(0);
+  await expect(tid(page, "import-csv")).toHaveCount(0);
 });

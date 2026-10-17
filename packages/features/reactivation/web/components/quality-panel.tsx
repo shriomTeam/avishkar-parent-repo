@@ -1,12 +1,16 @@
-import { qualityNotes } from "../lib/messages";
+import { qualityNotes, type Note } from "../lib/messages";
 import { CollapsiblePanel } from "./kit";
 
 export function QualityPanel({
   quality,
+  source = "saved",
+  extra = [],
 }: {
   quality: Record<string, unknown> | null;
+  source?: "saved" | "file";
+  extra?: Note[];
 }) {
-  const notes = qualityNotes(quality);
+  const notes = [...qualityNotes(quality, source), ...extra];
   return (
     <CollapsiblePanel
       title={

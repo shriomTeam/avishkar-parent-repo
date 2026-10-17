@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, PageHeader } from "@clinic/ui";
 
+import { CsvModeNote } from "../../../components/csv-results";
 import { EmptyState } from "../../../components/kit";
 
 export default function TypePage() {
@@ -9,6 +10,7 @@ export default function TypePage() {
       <Link href="/reactivation" className="dp-back">
         ← Back to overview
       </Link>
+      <CsvModeNote />
       <PageHeader title="Patients of this type" />
       <Card>
         <EmptyState title="The patient list is coming soon">

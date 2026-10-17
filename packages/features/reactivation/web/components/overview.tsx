@@ -1,22 +1,21 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Card, Stat } from "@clinic/ui";
+import { Button, Card } from "@clinic/ui";
 import { useAuth } from "@clinic/core/web/auth/provider";
 
 import type { LatestRun, TypeEntry } from "../lib/api-types";
 import { browserClient } from "../lib/client";
-import {
-  formatCount,
-  formatDateTime,
-  formatRange,
-  relativeTime,
-} from "../lib/format";
+import { formatDateTime, relativeTime } from "../lib/format";
 import { failureMessage, stageLabel } from "../lib/messages";
-import { num } from "../lib/summary";
+import { CsvImportPanel } from "./csv-import";
+import { useCsvResult } from "./csv-provider";
+import { CsvResults } from "./csv-results";
 import { EmptyState, Notice, ProgressBar } from "./kit";
 import { QualityPanel } from "./quality-panel";
+import { Tiles } from "./tiles";
 import { TypesTable } from "./types-table";
+import { Welcome } from "./welcome";
 
 export type InFlight = { id: string; status: string; progress_pct: number };
 export type OverviewData = {
@@ -25,6 +24,8 @@ export type OverviewData = {
   inFlight: InFlight | null;
   /** The newest run failed and nothing newer is running. */
   failedCode: string | null | undefined;
+  /** No patient data and no completed analysis: show the welcome page instead of an empty Overview. */
+  welcome: boolean;
 };
 
 const POLL_MS = 2000;
@@ -56,6 +57,8 @@ export function Overview({ data }: { data: OverviewData }) {
   const [startError, setStartError] = useState<string | null>(null);
   const [trouble, setTrouble] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
+  const [importing, setImporting] = useState(false);
+  const { result: csv } = useCsvResult();
 
   useEffect(() => {
     setNow(new Date());
@@ -142,12 +145,34 @@ export function Overview({ data }: { data: OverviewData }) {
     }
   }
 
+  // File results replace the page body but not this component, so a run in flight keeps polling underneath.
+  if (csv)
+    return (
+      <CsvResults
+        result={csv}
+        canImport={canRun}
+        timeZone={timeZone}
+        onBack={() => router.refresh()}
+      />
+    );
+  if (data.welcome) return <Welcome canImport={canRun} />;
+
   const { latest, types } = data;
   const busy = starting || run !== null;
   const summary = latest?.summary ?? null;
   const runButton = canRun ? (
     <Button onClick={runNow} disabled={busy} data-testid="run-now">
       {busy ? "Analysing…" : latest ? "Run now" : "Analyse my patients"}
+    </Button>
+  ) : null;
+  const importButton = canRun ? (
+    <Button
+      variant="secondary"
+      onClick={() => setImporting((open) => !open)}
+      aria-expanded={importing}
+      data-testid="import-csv"
+    >
+      Import CSV
     </Button>
   ) : null;
 
@@ -171,8 +196,17 @@ export function Overview({ data }: { data: OverviewData }) {
             )}
           </p>
         </div>
-        {latest && runButton}
+        {(importButton || (latest && runButton)) && (
+          <div className="dp-head-actions">
+            {importButton}
+            {latest && runButton}
+          </div>
+        )}
       </div>
+
+      {importing && canRun && (
+        <CsvImportPanel onDone={() => setImporting(false)} onCancel={() => setImporting(false)} />
+      )}
 
       {startError && <Notice tone="error">{startError}</Notice>}
       {failed && !run && (
@@ -238,60 +272,5 @@ function ProgressCard({ run, trouble }: { run: InFlight; trouble: boolean }) {
         )}
       </div>
     </Card>
-  );
-}
-
-function Tiles({ summary }: { summary: Record<string, unknown> | null }) {
-  const dormant = num(summary, "dormant_count");
-  const total = num(summary, "patients_total");
-  const low = num(summary, "new_revenue_low_cents");
-  const high = num(summary, "new_revenue_high_cents");
-  const firstRun = summary?.first_run === true;
-  const newly = num(summary, "newly_dormant");
-  const back = num(summary, "returned_since_last");
-  return (
-    <div className="dp-tiles" data-testid="tiles">
-      <div data-testid="tile-dormant">
-        <Stat
-          label="Dormant patients"
-          value={dormant === null ? "Not available" : formatCount(dormant)}
-          hint={
-            total === null
-              ? undefined
-              : `of ${formatCount(total)} ${total === 1 ? "patient" : "patients"}`
-          }
-        />
-      </div>
-      <div data-testid="tile-revenue">
-        <Stat
-          label="Recoverable revenue"
-          value={
-            low === null || high === null
-              ? "Not available"
-              : formatRange(low, high)
-          }
-          hint="New revenue if some of them come back. Prepaid balances aren't included."
-        />
-      </div>
-      <div data-testid="tile-change">
-        <Stat
-          label="Since last run"
-          value={
-            firstRun
-              ? "First analysis"
-              : newly === null
-                ? "Not available"
-                : `${formatCount(newly)} newly dormant`
-          }
-          hint={
-            firstRun
-              ? "There's no earlier analysis to compare with yet."
-              : back === null
-                ? undefined
-                : `${formatCount(back)} came back`
-          }
-        />
-      </div>
-    </div>
   );
 }

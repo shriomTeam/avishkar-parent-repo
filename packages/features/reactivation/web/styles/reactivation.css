@@ -410,3 +410,217 @@
     white-space: normal;
   }
 }
+
+/* Import CSV: welcome page, import panel, file results */
+.dp-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dp-link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--dp-accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.dp-link-button:hover {
+  color: var(--dp-accent);
+}
+.dp-welcome {
+  padding: 28px 24px;
+  border: 1px solid var(--dp-line);
+  border-radius: 8px;
+  background: var(--dp-surface);
+}
+.dp-welcome-title {
+  font-size: 24px;
+  line-height: 1.25;
+}
+.dp-welcome-text {
+  max-width: 620px;
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--dp-muted);
+}
+.dp-welcome .dp-small {
+  margin-top: 8px;
+}
+.dp-welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin-top: 20px;
+}
+.dp-import > * + * {
+  margin-top: 14px;
+}
+.dp-import-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dp-import-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+.dp-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-height: 168px; /* the same height idle and busy, so nothing shifts when a file is chosen */
+  justify-content: center;
+  padding: 20px 16px;
+  text-align: center;
+  border: 2px dashed var(--dp-line-strong);
+  border-radius: 8px;
+  background: var(--dp-subtle);
+}
+.dp-drop[data-dragging] {
+  border-color: var(--dp-accent);
+  background: var(--dp-accent-soft);
+}
+.dp-drop-text {
+  font-size: 14px;
+  color: var(--dp-muted);
+}
+.dp-drop-file {
+  max-width: 100%;
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.dp-drop-busy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(420px, 100%);
+}
+.dp-drop-busy .dp-bar {
+  width: 100%;
+}
+.dp-bar-indeterminate > span {
+  width: 35%;
+  animation: dp-slide 1.2s ease-in-out infinite;
+}
+@keyframes dp-slide {
+  from {
+    margin-left: -35%;
+  }
+  to {
+    margin-left: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dp-bar-indeterminate > span {
+    width: 100%;
+    animation: none;
+    opacity: 0.5;
+  }
+}
+.dp-import-error:focus {
+  outline: none;
+}
+.dp-import-error > * + * {
+  margin-top: 10px;
+}
+.dp-errors {
+  min-width: 0;
+}
+.dp-errors-caption {
+  padding: 8px 0;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dp-bad-ink);
+}
+.dp-errors td code,
+.dp-guide code {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.dp-guide {
+  min-width: 0;
+}
+.dp-guide th[scope="row"] {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--dp-ink);
+  white-space: nowrap;
+  vertical-align: top;
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--dp-line);
+}
+.dp-guide-notes {
+  margin-bottom: 14px;
+  font-size: 14px;
+  color: var(--dp-muted);
+}
+.dp-guide-notes li {
+  padding: 3px 0 3px 14px;
+  position: relative;
+}
+.dp-guide-notes li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--dp-faint);
+}
+.dp-from-file {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  vertical-align: 2px;
+  background: var(--dp-info-soft);
+  color: var(--dp-info-ink);
+  border: 1px solid var(--dp-info-line);
+}
+.dp-title:focus {
+  outline: none;
+}
+.dp-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dp-notice[data-tone="info"] .dp-notice-actions {
+  max-width: 100%;
+}
+[data-testid="csv-banner"] .dp-notice {
+  flex-wrap: wrap;
+  border-left-width: 4px;
+}
+[data-testid="csv-banner"] .dp-notice > div:nth-child(2) {
+  flex: 1 1 280px;
+  overflow-wrap: anywhere;
+}
+.dp-file-frame {
+  padding: 16px;
+  border: 1px dashed var(--dp-info-line);
+  border-radius: 10px;
+  background: var(--dp-info-soft);
+}
+.dp-file-frame > * + * {
+  margin-top: 16px;
+}
+.dp-mode-note {
+  margin-bottom: 16px;
+}

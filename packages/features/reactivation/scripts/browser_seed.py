@@ -5,7 +5,8 @@
     uv run python packages/features/reactivation/scripts/browser_seed.py cleanup --tenant-name NAME
 
 Scenarios for `seed`: full (a previous run plus this one, one type unavailable, one retention type), first (a
-first analysis with nothing to compare with), failed (a completed run followed by a failed one), none (no runs).
+first analysis with nothing to compare with), failed (a completed run followed by a failed one), none (patients
+but no runs), empty (no patients and no runs: the welcome page).
 `work` plays the worker for the queued run the browser asked for. `cleanup` removes every run for the tenant and
 every patient and service this script created. The workspace itself is created by the browser sign-in and is left
 alone, like the other browser journeys.
@@ -190,7 +191,12 @@ async def seed(args) -> dict:
     tenant = await _tenant(args.tenant_name)
     await _wipe(tenant.id)
     facts: dict = {"tenant_id": str(tenant.id), "scenario": args.scenario}
-    if args.scenario == "none":
+    if args.scenario == "empty":
+        return facts
+    if args.scenario == "none":  # patients with no visits: there is data to analyse, but no analysis yet
+        async with tenant_session(tenant.id) as s:
+            for name in ("Ada", "Ben", "Cy"):
+                s.add(Patient(tenant_id=tenant.id, first_name=name, attributes=dict(MARK)))
         return facts
     async with tenant_session(tenant.id) as s:
         services = {}
@@ -246,7 +252,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("command", choices=["seed", "work", "cleanup"])
     parser.add_argument("--tenant-name", required=True)
-    parser.add_argument("--scenario", choices=["full", "first", "failed", "none"], default="full")
+    parser.add_argument("--scenario", choices=["full", "first", "failed", "none", "empty"], default="full")
     parser.add_argument("--delay", type=float, default=0.0)
     args = parser.parse_args()
 

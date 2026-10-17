@@ -2,6 +2,7 @@ import "../styles/reactivation.css";
 import type { ReactNode } from "react";
 import { requireFeature } from "@clinic/core/web/api";
 
+import { CsvResultProvider } from "../components/csv-provider";
 import { SectionTabs } from "../components/section-tabs";
 
 export default async function ReactivationLayout({
@@ -12,9 +13,11 @@ export default async function ReactivationLayout({
   await requireFeature("reactivation");
   return (
     <div className="dp-scope">
-      <p className="dp-eyebrow">Dormant patients</p>
-      <SectionTabs />
-      {children}
+      <CsvResultProvider>
+        <p className="dp-eyebrow">Dormant patients</p>
+        <SectionTabs />
+        {children}
+      </CsvResultProvider>
     </div>
   );
 }
