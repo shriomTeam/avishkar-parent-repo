@@ -403,6 +403,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/reactivation/runs/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Latest Run */
+        get: operations["latest_run_features_reactivation_runs_latest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/runs/{run_id}/types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Run Types */
+        get: operations["run_types_features_reactivation_runs__run_id__types_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/runs/{run_id}/patients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Run Patients */
+        get: operations["run_patients_features_reactivation_runs__run_id__patients_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/reactivation/runs": {
         parameters: {
             query?: never;
@@ -551,6 +602,18 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActiveRun */
+        ActiveRun: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Progress Pct */
+            progress_pct: number;
+        };
         /** AnalysisPoints */
         AnalysisPoints: {
             /**
@@ -958,6 +1021,22 @@ export interface components {
             /** Lifetime Value Cents */
             lifetime_value_cents: number;
         };
+        /**
+         * LapsedRegular
+         * @description Repeat patients (at least 2 visits) who are dormant by the general rule (spec 4.7, D13). No thresholds.
+         */
+        LapsedRegular: {
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
+             * Priority
+             * @default 5
+             */
+            priority: number;
+        };
         /** LastRunOut */
         LastRunOut: {
             /**
@@ -980,6 +1059,44 @@ export interface components {
             finished_at: string | null;
             /** Progress Pct */
             progress_pct: number;
+        };
+        /** LatestRun */
+        LatestRun: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Trigger */
+            trigger: string;
+            /** Status */
+            status: string;
+            /**
+             * Queued At
+             * Format: date-time
+             */
+            queued_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            /** Progress Pct */
+            progress_pct: number;
+            /** Error Code */
+            error_code: string | null;
+            /** Settings Version */
+            settings_version: number;
+            /** Settings Source */
+            settings_source: string;
+            /** Summary */
+            summary: {
+                [key: string]: unknown;
+            } | null;
+            /** Quality */
+            quality: {
+                [key: string]: unknown;
+            } | null;
+            active_run: components["schemas"]["ActiveRun"] | null;
         };
         /** MappingConfig */
         MappingConfig: {
@@ -1104,6 +1221,49 @@ export interface components {
              * @default 2
              */
             overdue_ratio_max: number;
+        };
+        /** PatientOut */
+        PatientOut: {
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+            /** Display Name */
+            display_name: string | null;
+            /** Status */
+            status: string;
+            /** Primary Type */
+            primary_type: string | null;
+            /** Matched Types */
+            matched_types: string[];
+            /** Reasons */
+            reasons: string[];
+            /** Usual Service Name */
+            usual_service_name: string | null;
+            /** Last Visit At */
+            last_visit_at: string | null;
+            /** Days Since Last Visit */
+            days_since_last_visit: number | null;
+            /** Likelihood Score */
+            likelihood_score: number | null;
+            /** Revenue Basis Cents */
+            revenue_basis_cents: number;
+            /** Points */
+            points: {
+                [key: string]: unknown;
+            };
+        };
+        /** PatientPage */
+        PatientPage: {
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Items */
+            items: components["schemas"]["PatientOut"][];
         };
         /** PreviewOut */
         PreviewOut: {
@@ -1402,6 +1562,33 @@ export interface components {
             /** Features */
             features: string[];
         };
+        /** TypeOut */
+        TypeOut: {
+            /** Type Key */
+            type_key: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description: string;
+            /** Kind */
+            kind: string | null;
+            /** Available */
+            available: boolean;
+            /** Patient Count */
+            patient_count: number | null;
+            /** Revenue Low Cents */
+            revenue_low_cents: number | null;
+            /** Revenue High Cents */
+            revenue_high_cents: number | null;
+            /** Rate Low */
+            rate_low: number | null;
+            /** Rate High */
+            rate_high: number | null;
+            /** Rate Source */
+            rate_source: string | null;
+            /** Top Service Name */
+            top_service_name: string | null;
+        };
         /** TypeRules */
         TypeRules: {
             lapsed_high_value?: components["schemas"]["LapsedHighValue"];
@@ -1409,6 +1596,7 @@ export interface components {
             consult_not_converted?: components["schemas"]["ConsultNotConverted"];
             overdue_maintenance?: components["schemas"]["OverdueMaintenance"];
             one_and_done?: components["schemas"]["OneAndDone"];
+            lapsed_regular?: components["schemas"]["LapsedRegular"];
             unused_balance?: components["schemas"]["UnusedBalance"];
         };
         /** UnusedBalance */
@@ -2245,6 +2433,114 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScheduleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    latest_run_features_reactivation_runs_latest_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LatestRun"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_types_features_reactivation_runs__run_id__types_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_patients_features_reactivation_runs__run_id__patients_get: {
+        parameters: {
+            query?: {
+                type?: string | null;
+                status?: ("dormant" | "at_risk") | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientPage"];
                 };
             };
             /** @description Validation Error */
