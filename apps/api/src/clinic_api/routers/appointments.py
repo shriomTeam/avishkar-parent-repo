@@ -51,9 +51,7 @@ async def book(
 
 
 @router.post("/{appointment_id}/complete", response_model=BookOut)
-async def complete(
-    appointment_id: uuid.UUID, session: AsyncSession = Depends(get_session)
-) -> BookOut:
+async def complete(appointment_id: uuid.UUID, session: AsyncSession = Depends(get_session)) -> BookOut:
     """Mark a visit completed and emit ``appointment.completed`` for review automation."""
     appt = await session.get(Appointment, appointment_id)
     if appt is None:

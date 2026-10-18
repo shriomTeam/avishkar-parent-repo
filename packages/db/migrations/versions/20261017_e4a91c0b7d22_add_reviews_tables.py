@@ -33,12 +33,8 @@ def upgrade() -> None:
         sa.Column("delay_minutes", sa.Integer(), nullable=False),
         sa.Column("channels", postgresql.JSONB(astext_type=sa.Text()), nullable=False, comment="ordered: sms, email"),
         sa.Column("fallback_enabled", sa.Boolean(), server_default=sa.text("true"), nullable=False),
-        sa.Column(
-            "included_service_ids", postgresql.JSONB(astext_type=sa.Text()), server_default="[]", nullable=False
-        ),
-        sa.Column(
-            "excluded_service_ids", postgresql.JSONB(astext_type=sa.Text()), server_default="[]", nullable=False
-        ),
+        sa.Column("included_service_ids", postgresql.JSONB(astext_type=sa.Text()), server_default="[]", nullable=False),
+        sa.Column("excluded_service_ids", postgresql.JSONB(astext_type=sa.Text()), server_default="[]", nullable=False),
         sa.Column("frequency_days", sa.Integer(), nullable=False),
         sa.Column("activated_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False),
@@ -116,7 +112,10 @@ def upgrade() -> None:
             ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["campaign_id"], ["reviews.campaigns.id"], name=op.f("fk_requests_campaign_id_campaigns"), ondelete="CASCADE"
+            ["campaign_id"],
+            ["reviews.campaigns.id"],
+            name=op.f("fk_requests_campaign_id_campaigns"),
+            ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["patient_id"], ["core.patients.id"], name=op.f("fk_requests_patient_id_patients"), ondelete="CASCADE"
@@ -135,12 +134,16 @@ def upgrade() -> None:
         schema="reviews",
     )
     op.create_index(op.f("ix_reviews_requests_tenant_id"), "requests", ["tenant_id"], unique=False, schema="reviews")
-    op.create_index(op.f("ix_reviews_requests_campaign_id"), "requests", ["campaign_id"], unique=False, schema="reviews")
+    op.create_index(
+        op.f("ix_reviews_requests_campaign_id"), "requests", ["campaign_id"], unique=False, schema="reviews"
+    )
     op.create_index(
         op.f("ix_reviews_requests_appointment_id"), "requests", ["appointment_id"], unique=False, schema="reviews"
     )
     op.create_index(op.f("ix_reviews_requests_patient_id"), "requests", ["patient_id"], unique=False, schema="reviews")
-    op.create_index(op.f("ix_reviews_requests_scheduled_at"), "requests", ["scheduled_at"], unique=False, schema="reviews")
+    op.create_index(
+        op.f("ix_reviews_requests_scheduled_at"), "requests", ["scheduled_at"], unique=False, schema="reviews"
+    )
     op.create_index(
         "ix_reviews_requests_due",
         "requests",

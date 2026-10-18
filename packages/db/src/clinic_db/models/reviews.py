@@ -51,9 +51,7 @@ class ReviewRequest(IdMixin, TenantMixin, TimestampMixin, Base):
         SCHEMA,
     )
 
-    campaign_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("reviews.campaigns.id", ondelete="CASCADE"), index=True
-    )
+    campaign_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("reviews.campaigns.id", ondelete="CASCADE"), index=True)
     appointment_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("core.appointments.id", ondelete="CASCADE"), index=True
     )

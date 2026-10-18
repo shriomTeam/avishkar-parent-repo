@@ -79,9 +79,7 @@ async def google_click(token: str) -> PublicFeedbackOut:
     async with tenant_session(tenant_id) as session:
         request = await session.get(ReviewRequest, request_id)
         tenant = await session.get(Tenant, tenant_id)
-        feedback = (
-            await session.scalar(select(Feedback).where(Feedback.request_id == request_id)) if request else None
-        )
+        feedback = await session.scalar(select(Feedback).where(Feedback.request_id == request_id)) if request else None
         if request is None or tenant is None or feedback is None or not feedback.google_review_offered:
             raise HTTPException(404, "request not found")
         await service.mark_google_clicked(session, request)

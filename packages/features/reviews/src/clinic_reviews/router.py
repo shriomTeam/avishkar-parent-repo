@@ -109,9 +109,7 @@ async def overview(session: AsyncSession = Depends(get_session)) -> OverviewOut:
             last_validated_at=integration.last_validated_at,
         ),
         campaigns=[await _campaign_out(session, c) for c in campaigns],
-        pending_follow_ups=[
-            FollowUpItem(id=t.id, rating=t.rating, reason=t.reason, status=t.status) for t in tasks
-        ],
+        pending_follow_ups=[FollowUpItem(id=t.id, rating=t.rating, reason=t.reason, status=t.status) for t in tasks],
     )
 
 
