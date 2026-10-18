@@ -83,7 +83,7 @@ Feature backend code belongs in its package's `src/`. New features must start in
 
 Shared browser/server auth helpers and API access live in `packages/core/web`, exported through `@clinic/core/web/*`. Feature code must never import `apps/web` or its `@/` alias. Python and frontend boundaries are checked by `pnpm boundaries`. Browser tests are discovered from installed feature workspace manifests (`clinic.webTests`), so deleting a feature removes its tests automatically.
 
-To verify voice removal, run `python scripts/check_voice_removal.py` with all DATABASE_* and TEST_* URLs pointing to a disposable migrated database. It creates an isolated copy, removes the voice package/routes and explicit npm/Python/import-linter registrations, refreshes lockfiles and runs build, tests, boundaries, typechecks and platform auth browser tests. Shared migrations and database data remain intact.
+To verify voice removal, run `python scripts/check_voice_removal.py` with all DATABASE_* and TEST_* URLs pointing to a disposable migrated database. It creates an isolated copy, removes the voice package/routes and explicit npm/Python/import-linter registrations, refreshes lockfiles and runs build, tests, boundaries, typechecks and platform auth browser tests. The same applies to any feature: platform code and the platform's test servers must never import a feature. Where a feature's test helper is useful (`apps/api/tests/browser_server.py` uses voice's scripted model), import it only if the feature is installed, and re-raise any other import error. Shared migrations and database data remain intact.
 
 ## Voice AI migration
 
