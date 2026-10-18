@@ -7,7 +7,7 @@ output "private_ip" {
 }
 
 output "secret_ids" {
-  description = "Secret Manager secrets: owner-url, app-password, system-password, auth-password, auth-url."
+  description = "Secret Manager secrets: owner-url, app-url, system-url, auth-url and the role passwords."
   value       = { for k, v in google_secret_manager_secret.db : k => v.secret_id }
 
   # Consumers reference "latest", which only resolves once a version exists.

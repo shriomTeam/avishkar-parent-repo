@@ -182,6 +182,9 @@ importers:
 
   packages/features/voice-receptionist:
     dependencies:
+      '@clinic/api-client':
+        specifier: workspace:*
+        version: link:../../api-client
       '@clinic/core':
         specifier: workspace:*
         version: link:../../core

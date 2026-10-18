@@ -8,8 +8,13 @@ SMS/email through clinic_engagement. See docs/ADDING_A_FEATURE.md.
 from fastapi import APIRouter
 
 from clinic_core.features import Feature, NavItem
+from clinic_voice_receptionist.inbound.live.ws import ws_router
+from clinic_voice_receptionist.inbound.router import router as inbound_router
+from clinic_voice_receptionist.tools.router import router as tools_router
 
 router = APIRouter(tags=["voice_receptionist"])
+router.include_router(inbound_router)
+router.include_router(tools_router)
 
 
 @router.get("/status")
@@ -22,6 +27,7 @@ feature = Feature(
     name="The Front Desk That Never Sleeps",
     description="AI voice agent that answers, books, reschedules and escalates around the clock.",
     router=router,
+    websocket_router=ws_router,
     nav=[NavItem(label="Voice Receptionist", path="/voice-receptionist")],
     trial_eligible=True,
     phi_sensitive=True,

@@ -1,16 +1,14 @@
 name: Migrate database
 
 on:
+  # Releases migrate as part of deploy.yml. This is for running a migration on its own, by hand.
   pull_request:
-    paths: ["packages/db/**", ".github/workflows/migrate.yml"]
-  push:
-    branches: [main]
     paths: ["packages/db/**", ".github/workflows/migrate.yml"]
   workflow_dispatch:
 
 # One migration at a time.
 concurrency:
-  group: migrate
+  group: release
   cancel-in-progress: false
 
 permissions:
@@ -51,6 +49,7 @@ jobs:
     if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - uses: google-github-actions/auth@v2
         with:

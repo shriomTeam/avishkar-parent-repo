@@ -22,3 +22,4 @@ packages/api-client
 packages/integrations/samples
 docs
 infra
+**/tests

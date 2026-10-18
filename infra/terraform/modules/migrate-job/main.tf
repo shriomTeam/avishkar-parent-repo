@@ -4,7 +4,7 @@ resource "google_service_account" "migrate" {
 }
 
 resource "google_secret_manager_secret_iam_member" "migrate" {
-  for_each = { for key, value in var.secret_ids : key => value if key != "auth-url" }
+  for_each = { for key, value in var.secret_ids : key => value if !contains(["auth-url", "app-url", "system-url"], key) }
 
   secret_id = each.value
   role      = "roles/secretmanager.secretAccessor"
@@ -86,7 +86,7 @@ resource "google_cloud_run_v2_job" "migrate" {
   }
 
   lifecycle {
-    ignore_changes = [template[0].template[0].containers[0].image]
+    ignore_changes = [template[0].template[0].containers[0].image, client, client_version]
   }
 
   depends_on = [google_secret_manager_secret_iam_member.migrate]

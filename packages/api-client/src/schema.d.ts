@@ -655,6 +655,214 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/voice_receptionist/inbound/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Agents */
+        get: operations["list_agents_features_voice_receptionist_inbound_agents_get"];
+        put?: never;
+        /** Create Agent */
+        post: operations["create_agent_features_voice_receptionist_inbound_agents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/agents/{agent_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Agent */
+        get: operations["get_agent_features_voice_receptionist_inbound_agents__agent_id__get"];
+        /** Update Agent */
+        put: operations["update_agent_features_voice_receptionist_inbound_agents__agent_id__put"];
+        post?: never;
+        /**
+         * Delete Agent
+         * @description Calls stay (they keep a snapshot of the agent); only the agent and its field list go.
+         */
+        delete: operations["delete_agent_features_voice_receptionist_inbound_agents__agent_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/calls": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Calls */
+        get: operations["list_calls_features_voice_receptionist_inbound_calls_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/calls/{call_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Call */
+        get: operations["get_call_features_voice_receptionist_inbound_calls__call_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/agents/{agent_id}/test-call": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Test Call
+         * @description Create the call record and a one-time ticket the browser uses to open the call WebSocket.
+         */
+        post: operations["start_test_call_features_voice_receptionist_inbound_agents__agent_id__test_call_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Tools */
+        get: operations["list_tools_features_voice_receptionist_inbound_tools_get"];
+        put?: never;
+        /** Create Tool */
+        post: operations["create_tool_features_voice_receptionist_inbound_tools_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tools/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Tool Catalog
+         * @description The internal tools a clinic can add, and which it already has.
+         */
+        get: operations["tool_catalog_features_voice_receptionist_inbound_tools_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tools/internal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Internal Tool */
+        post: operations["add_internal_tool_features_voice_receptionist_inbound_tools_internal_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tools/{tool_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Tool */
+        get: operations["get_tool_features_voice_receptionist_inbound_tools__tool_id__get"];
+        /** Update Tool */
+        put: operations["update_tool_features_voice_receptionist_inbound_tools__tool_id__put"];
+        post?: never;
+        /**
+         * Delete Tool
+         * @description Agents stop using it; past executions keep the tool's name. An internal tool can be added again later.
+         */
+        delete: operations["delete_tool_features_voice_receptionist_inbound_tools__tool_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tools/{tool_id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Tool
+         * @description Really call the endpoint with sample input, through the same safeguards a live call uses.
+         */
+        post: operations["test_tool_features_voice_receptionist_inbound_tools__tool_id__test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tool-executions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recent Executions */
+        get: operations["recent_executions_features_voice_receptionist_inbound_tool_executions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/voice_receptionist/status": {
         parameters: {
             query?: never;
@@ -687,6 +895,90 @@ export interface components {
             status: string;
             /** Progress Pct */
             progress_pct: number;
+        };
+        /** AgentIn */
+        AgentIn: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Prompt */
+            prompt: string;
+            /** Greeting */
+            greeting?: string | null;
+            /**
+             * Voice
+             * @default Puck
+             */
+            voice: string;
+            /**
+             * Language
+             * @default en-US
+             */
+            language: string;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+            /**
+             * Save Transcript
+             * @default true
+             */
+            save_transcript: boolean;
+            /**
+             * Save Raw Events
+             * @default true
+             */
+            save_raw_events: boolean;
+            /** Fields */
+            fields?: components["schemas"]["FieldIn"][];
+            /** Tool Ids */
+            tool_ids?: string[];
+        };
+        /** AgentOut */
+        AgentOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Prompt */
+            prompt: string;
+            /** Greeting */
+            greeting: string | null;
+            /** Voice */
+            voice: string;
+            /** Language */
+            language: string;
+            /** Model */
+            model: string;
+            /** Direction */
+            direction: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Save Transcript */
+            save_transcript: boolean;
+            /** Save Raw Events */
+            save_raw_events: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Fields */
+            fields?: components["schemas"]["FieldOut"][];
+            /** Tool Ids */
+            tool_ids?: string[];
         };
         /** AnalysisPoints */
         AnalysisPoints: {
@@ -833,6 +1125,94 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** CallDetailOut */
+        CallDetailOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Agent Id */
+            agent_id: string | null;
+            /**
+             * Agent Name
+             * @default
+             */
+            agent_name: string;
+            /** Channel */
+            channel: string;
+            /** Is Test */
+            is_test: boolean;
+            /** Status */
+            status: string;
+            /** End Reason */
+            end_reason: string | null;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Duration Seconds */
+            duration_seconds: number | null;
+            /** Summary */
+            summary: string | null;
+            /**
+             * Captured Count
+             * @default 0
+             */
+            captured_count: number;
+            /** Model */
+            model: string;
+            /** Usage */
+            usage: {
+                [key: string]: unknown;
+            };
+            /** Turns */
+            turns: components["schemas"]["TurnOut"][];
+            /** Values */
+            values: components["schemas"]["CapturedValueOut"][];
+            /** Events */
+            events: components["schemas"]["EventOut"][];
+            /** Tool Executions */
+            tool_executions?: components["schemas"]["ToolExecutionOut"][];
+        };
+        /** CallSummaryOut */
+        CallSummaryOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Agent Id */
+            agent_id: string | null;
+            /**
+             * Agent Name
+             * @default
+             */
+            agent_name: string;
+            /** Channel */
+            channel: string;
+            /** Is Test */
+            is_test: boolean;
+            /** Status */
+            status: string;
+            /** End Reason */
+            end_reason: string | null;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Duration Seconds */
+            duration_seconds: number | null;
+            /** Summary */
+            summary: string | null;
+            /**
+             * Captured Count
+             * @default 0
+             */
+            captured_count: number;
+        };
         /** CampaignIn */
         CampaignIn: {
             /**
@@ -876,6 +1256,26 @@ export interface components {
             booked_revenue_cents: number;
             /** Dormant Lifetime Value Cents */
             dormant_lifetime_value_cents: number;
+        };
+        /** CapturedValueOut */
+        CapturedValueOut: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string | null;
+            /** Value */
+            value: unknown;
+        };
+        /** CatalogItemOut */
+        CatalogItemOut: {
+            /** Key */
+            key: string;
+            /** Title */
+            title: string;
+            /** Description */
+            description: string;
+            /** Added */
+            added: boolean;
         };
         /** ChurnedMember */
         ChurnedMember: {
@@ -1096,6 +1496,24 @@ export interface components {
              */
             seasonality_window_days: number;
         };
+        /** EventOut */
+        EventOut: {
+            /** Seq */
+            seq: number;
+            /** Source */
+            source: string;
+            /** Type */
+            type: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** FeatureOut */
         FeatureOut: {
             /** Key */
@@ -1120,6 +1538,57 @@ export interface components {
             enabled: boolean;
             /** Expires At */
             expires_at?: string | null;
+        };
+        /** FieldIn */
+        FieldIn: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Data Type
+             * @default text
+             * @enum {string}
+             */
+            data_type: "text" | "phone" | "email" | "date" | "number" | "boolean" | "enum";
+            /** Enum Values */
+            enum_values?: string[] | null;
+            /**
+             * Required
+             * @default false
+             */
+            required: boolean;
+        };
+        /** FieldOut */
+        FieldOut: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Data Type
+             * @default text
+             * @enum {string}
+             */
+            data_type: "text" | "phone" | "email" | "date" | "number" | "boolean" | "enum";
+            /** Enum Values */
+            enum_values?: string[] | null;
+            /**
+             * Required
+             * @default false
+             */
+            required: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Position */
+            position: number;
         };
         /** FieldSpec */
         FieldSpec: {
@@ -1177,6 +1646,11 @@ export interface components {
              * @default sms
              */
             channel: string;
+        };
+        /** InternalToolIn */
+        InternalToolIn: {
+            /** Builtin Key */
+            builtin_key: string;
         };
         /** LapsedHighValue */
         LapsedHighValue: {
@@ -1774,6 +2248,181 @@ export interface components {
             status: string;
             /** Features */
             features: string[];
+        };
+        /** TestCallOut */
+        TestCallOut: {
+            /**
+             * Call Id
+             * Format: uuid
+             */
+            call_id: string;
+            /** Ticket */
+            ticket: string;
+            /** Ws Path */
+            ws_path: string;
+            /** Input Rate */
+            input_rate: number;
+            /** Output Rate */
+            output_rate: number;
+            /** Max Seconds */
+            max_seconds: number;
+        };
+        /** ToolExecutionOut */
+        ToolExecutionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Call Id
+             * Format: uuid
+             */
+            call_id: string;
+            /** Tool Name */
+            tool_name: string;
+            /** Success */
+            success: boolean;
+            /** Error */
+            error: string | null;
+            /** Duration Ms */
+            duration_ms: number;
+            /** Input */
+            input: {
+                [key: string]: unknown;
+            };
+            /** Output */
+            output: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** ToolIn */
+        ToolIn: {
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Endpoint */
+            endpoint?: string | null;
+            /**
+             * Method
+             * @default POST
+             * @enum {string}
+             */
+            method: "GET" | "POST";
+            /**
+             * Timeout Seconds
+             * @default 5
+             */
+            timeout_seconds: number;
+            /** Input Schema */
+            input_schema?: {
+                [key: string]: unknown;
+            };
+            /** Auth Header Name */
+            auth_header_name?: string | null;
+            /** Auth Header Value */
+            auth_header_value?: string | null;
+            /**
+             * Clear Auth
+             * @default false
+             */
+            clear_auth: boolean;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+        };
+        /** ToolOut */
+        ToolOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Kind */
+            kind: string;
+            /** Builtin Key */
+            builtin_key: string | null;
+            /** Endpoint */
+            endpoint: string | null;
+            /** Method */
+            method: string;
+            /** Timeout Seconds */
+            timeout_seconds: number;
+            /** Input Schema */
+            input_schema: {
+                [key: string]: unknown;
+            };
+            /** Auth Header Name */
+            auth_header_name: string | null;
+            /**
+             * Has Auth
+             * @default false
+             */
+            has_auth: boolean;
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Description Customized
+             * @default false
+             */
+            description_customized: boolean;
+            /** Default Description */
+            default_description?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ToolTestIn */
+        ToolTestIn: {
+            /** Input */
+            input?: {
+                [key: string]: unknown;
+            };
+        };
+        /** ToolTestOut */
+        ToolTestOut: {
+            /** Ok */
+            ok: boolean;
+            /** Status */
+            status: number | null;
+            /** Duration Ms */
+            duration_ms: number;
+            /** Response */
+            response?: unknown;
+            /** Error */
+            error?: string | null;
+        };
+        /** TurnOut */
+        TurnOut: {
+            /** Seq */
+            seq: number;
+            /** Speaker */
+            speaker: string;
+            /** Text */
+            text: string;
+            /** Offset Ms */
+            offset_ms: number;
+            /** Interrupted */
+            interrupted: boolean;
         };
         /** TypeOut */
         TypeOut: {
@@ -3202,6 +3851,613 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_agents_features_voice_receptionist_inbound_agents_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_agent_features_voice_receptionist_inbound_agents_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_agent_features_voice_receptionist_inbound_agents__agent_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_agent_features_voice_receptionist_inbound_agents__agent_id__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_agent_features_voice_receptionist_inbound_agents__agent_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_calls_features_voice_receptionist_inbound_calls_get: {
+        parameters: {
+            query?: {
+                agent_id?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CallSummaryOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_call_features_voice_receptionist_inbound_calls__call_id__get: {
+        parameters: {
+            query?: {
+                include_events?: boolean;
+            };
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                call_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CallDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_test_call_features_voice_receptionist_inbound_agents__agent_id__test_call_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TestCallOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_tools_features_voice_receptionist_inbound_tools_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_tool_features_voice_receptionist_inbound_tools_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ToolIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tool_catalog_features_voice_receptionist_inbound_tools_catalog_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_internal_tool_features_voice_receptionist_inbound_tools_internal_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InternalToolIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_tool_features_voice_receptionist_inbound_tools__tool_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                tool_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_tool_features_voice_receptionist_inbound_tools__tool_id__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                tool_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ToolIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_tool_features_voice_receptionist_inbound_tools__tool_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                tool_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_tool_features_voice_receptionist_inbound_tools__tool_id__test_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                tool_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ToolTestIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolTestOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recent_executions_features_voice_receptionist_inbound_tool_executions_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolExecutionOut"][];
                 };
             };
             /** @description Validation Error */
