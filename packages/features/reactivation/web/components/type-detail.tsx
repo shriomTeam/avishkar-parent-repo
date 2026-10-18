@@ -151,6 +151,14 @@ function SavedType({ typeKey }: { typeKey: string }) {
     </Notice>
   ) : null;
 
+  // One object for as long as the run, clinic and client are the same. A new object on every render would make
+  // the list think its source changed and fetch the same page again each time the URL updated.
+  const runId = pre.kind === "ready" ? pre.run.id : null;
+  const source = useMemo<ListSource | null>(
+    () => (runId ? { kind: "saved", runId, timeZone, client } : null),
+    [runId, timeZone, client],
+  );
+
   if (pre.kind === "loading") return <TypeSkeleton />;
   if (pre.kind === "error")
     return (
@@ -201,11 +209,7 @@ function SavedType({ typeKey }: { typeKey: string }) {
           </EmptyState>
         </Card>
       ) : (
-        <PatientList
-          typeKey={typeKey}
-          entry={entry}
-          source={{ kind: "saved", runId: pre.run.id, timeZone, client }}
-        />
+        <PatientList typeKey={typeKey} entry={entry} source={source!} />
       )}
     </TypeFrame>
   );
@@ -402,6 +406,7 @@ function PatientList({ typeKey, entry, source }: { typeKey: string; entry: TypeE
   const [loaded, setLoaded] = useState<Loaded>({ kind: "loading", items: [], total: 0, first: true });
   const [retry, setRetry] = useState(0);
   const queryKey = JSON.stringify(apiParams(typeKey, state));
+  const savedRunId = source.kind === "saved" ? source.runId : null;
   useEffect(() => {
     if (source.kind !== "saved") return;
     const controller = new AbortController();
@@ -420,7 +425,8 @@ function PatientList({ typeKey, entry, source }: { typeKey: string; entry: TypeE
       }
     })();
     return () => controller.abort();
-  }, [source, queryKey, retry]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only a change of run, client or query refetches
+  }, [savedRunId, source.kind === "saved" ? source.client : null, queryKey, retry]);
 
   const items = fileResult ? fileResult.items : loaded.items;
   const total = fileResult ? fileResult.total : loaded.total;

@@ -259,15 +259,50 @@ test("the table works from the keyboard", async ({ page }) => {
   helper("seed", workspace, ["--scenario", "full"]);
   await page.goto("/reactivation/types/overdue_maintenance");
   await expect(rowsOf(page)).toHaveCount(25);
+
+  // Sorting from the header refetches the list. Wait until that has finished and the rows are the new ones,
+  // so the next keystrokes land on rows that will not be swapped out underneath them.
+  const sorted = page.waitForResponse((r) => r.url().includes("/patients") && r.url().includes("sort=overdue"));
   await tid(page, "sort-overdue").focus();
   await page.keyboard.press("Enter");
+  await sorted;
   await expect(tid(page, "sort-overdue").locator("..")).toHaveAttribute("aria-sort", "descending");
-  const toggle = rowsOf(page).first().getByTestId("expand-row");
+  await expect(tid(page, "patients-table")).toHaveAttribute("aria-busy", "false");
+  await expect(rowsOf(page)).toHaveCount(25);
+
+  // Then follow one patient, by name, so nothing but their own row matters.
+  const name = (await rowsOf(page).first().getByTestId("expand-row").innerText()).trim();
+  const toggle = rowsOf(page).filter({ hasText: name }).getByTestId("expand-row");
   await toggle.focus();
   await page.keyboard.press("Enter");
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
   await page.keyboard.press("Enter");
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
+});
+
+test("one change to the list makes one request, and an open row stays open while the data refreshes", async ({ page }) => {
+  helper("seed", workspace, ["--scenario", "full"]);
+  await page.goto("/reactivation/types/overdue_maintenance");
+  await expect(rowsOf(page)).toHaveCount(25);
+  await expect(tid(page, "patients-table")).toHaveAttribute("aria-busy", "false");
+
+  const name = (await rowsOf(page).first().getByTestId("expand-row").innerText()).trim();
+  await rowsOf(page).first().getByTestId("expand-row").click();
+  await expect(rowsOf(page).first().getByTestId("expand-row")).toHaveAttribute("aria-expanded", "true");
+
+  const requests: string[] = [];
+  page.on("request", (r) => r.url().includes("/patients") && requests.push(r.url()));
+  await page.getByTestId("reachable-only").check();
+  await expect(page).toHaveURL(/reachable=1/);
+  await expect(tid(page, "patients-table")).toHaveAttribute("aria-busy", "false");
+  await page.waitForTimeout(500); // long enough for any duplicate request to show up
+  expect(requests, "one filter change, one request").toHaveLength(1);
+  expect(requests[0]).toContain("reachable=true");
+
+  // The patient who was open is still open if they are still in the list.
+  const same = rowsOf(page).filter({ hasText: name });
+  if ((await same.count()) > 0)
+    await expect(same.getByTestId("expand-row")).toHaveAttribute("aria-expanded", "true");
 });
 
 test("narrow screens turn rows into cards with no sideways scroll", async ({ page }, info) => {
