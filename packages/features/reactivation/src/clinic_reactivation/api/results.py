@@ -9,17 +9,16 @@ from pydantic import BaseModel
 from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from clinic_core.api import RequestContext, get_request_context, get_session, require_role
+from clinic_core.api import RequestContext, get_request_context, get_session
 from clinic_core.audit import audit
-from clinic_db.models.core import Patient, Service, StaffRole
+from clinic_db.models.core import Patient, Service
 from clinic_db.models.reactivation import Run, RunPatient, RunType
-from clinic_reactivation.api.runs import RunDetail, _base
+from clinic_reactivation.api.roles import MANAGERS, VIEWERS
+from clinic_reactivation.api.runs import RunDetail, run_fields
 from clinic_reactivation.labels import TYPE_INFO, UNCLASSIFIED
 
 router = APIRouter()
 
-MANAGERS = [Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER))]
-VIEWERS = [Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER, StaffRole.FRONT_DESK))]
 TYPE_KEYS = tuple(k for k in TYPE_INFO if k != UNCLASSIFIED)
 
 
@@ -122,7 +121,7 @@ async def latest_run(session: AsyncSession = Depends(get_session)) -> LatestRun:
         select(Run).where(Run.status.in_(("queued", "running"))).order_by(Run.queued_at.desc(), Run.id.desc()).limit(1)
     )
     return LatestRun(
-        **_base(run),
+        **run_fields(run),
         summary=run.summary,
         quality=run.quality,
         active_run=ActiveRun(id=active.id, status=active.status, progress_pct=active.progress_pct) if active else None,

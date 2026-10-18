@@ -7,14 +7,16 @@ from sqlalchemy import select
 
 from clinic_core.auth.database import create_database
 from clinic_core.database import tenant_session
+from clinic_core.features import JobContext
 from clinic_core.settings import Settings
 from clinic_core.testing import create_test_tenant
 from clinic_db.models.ops import AuditLog, OutboxEvent
 from clinic_db.models.reactivation import Run
 from clinic_db.models.reactivation import Settings as SettingsRow
 from clinic_reactivation.analysis.settings import ReactivationSettings
+from clinic_reactivation.feature import feature
 from clinic_reactivation.router import router
-from clinic_reactivation.runs import RUN_REQUESTED
+from clinic_reactivation.runs import REAP_EVERY_SECONDS, REAP_JOB, RUN_REQUESTED, reap_stuck_runs
 
 app = FastAPI()
 # This isolated router test intentionally exercises the explicit dev-header adapter.
@@ -196,3 +198,43 @@ async def test_get_run_returns_summary_quality_and_error_code(client):
     d = (await client.get(f"/runs/{ok}", headers=_h(t))).json()
     assert (d["summary"], d["quality"], d["error_code"]) == ({"dormant_count": 1}, {"warnings": []}, None)
     assert (await client.get(f"/runs/{bad}", headers=_h(t))).json()["error_code"] == "facts_query_failed"
+
+
+# --- the scheduled reaper ------------------------------------------------------------------------------------
+
+
+async def _reap(tenant):
+    async with tenant_session(tenant) as s:
+        await reap_stuck_runs(JobContext(tenant_id=tenant, session=s), {})
+
+
+def test_the_reaper_is_scheduled():
+    assert feature.jobs[REAP_JOB] is reap_stuck_runs
+    assert [(s.job, s.every_seconds) for s in feature.schedules] == [(REAP_JOB, REAP_EVERY_SECONDS)]
+
+
+async def test_reaper_fails_a_stuck_run_and_requests_the_queued_run_behind_it():
+    t = await create_test_tenant()
+    stuck = await _add_run(t, "running", started_at=_ago(31))
+    queued = await _add_run(t, "queued")
+    await _reap(t)
+    old = await _run(t, stuck)
+    assert (old.status, old.error_code) == ("failed", "timed_out")
+    assert await _events(t) == [queued]
+
+
+async def test_reaper_re_requests_an_orphaned_queued_run():
+    # Nothing is running, so a queued run's event was lost; ask again.
+    t = await create_test_tenant()
+    queued = await _add_run(t, "queued")
+    await _reap(t)
+    assert await _events(t) == [queued]
+
+
+async def test_reaper_leaves_a_live_run_and_its_queue_alone():
+    t = await create_test_tenant()
+    running = await _add_run(t, "running", started_at=_ago(5))
+    await _add_run(t, "queued")
+    await _reap(t)
+    assert (await _run(t, running)).status == "running"
+    assert await _events(t) == []

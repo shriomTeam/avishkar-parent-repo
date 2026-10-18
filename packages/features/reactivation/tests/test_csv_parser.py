@@ -113,6 +113,25 @@ def test_header_is_trimmed_case_insensitive_and_strict():
     assert "Missing required columns: line_kind, amount" in e.message
 
 
+def test_an_unnamed_empty_column_is_ignored_but_must_stay_empty():
+    # Spreadsheet exports often end every line with a comma: an extra column with no name and no values.
+    parsed = parse_csv(b"patient_id,visit_date,line_kind,amount,\nP1,2026-01-01,product,1.00,\n", today=TODAY)
+    assert parsed.patients == 1 and parsed.columns == {"patient_id", "visit_date", "line_kind", "amount"}
+    e = reject(b"patient_id,,visit_date,line_kind,amount\nP1,,2026-01-01,product,1.00\nP2,x,2026-01-01,product,1.00\n")
+    assert e.code == "csv_invalid"
+    assert [(x.row, x.column) for x in e.errors] == [(3, "(column 2)")]
+    assert "x" not in e.errors[0].reason.split()
+
+
+def test_a_row_with_a_bad_cell_is_not_compared_with_other_rows():
+    # Row 3's visit date can't be read, so the visit_id check must not report it as a different date.
+    errors = only_error([
+        row(visit_id="V1", visit_date="2026-03-14"),
+        row(visit_id="V1", visit_date="14/03/2026", service_name="Filler"),
+    ])  # fmt: skip
+    assert [(e.row, e.column) for e in errors] == [(3, "visit_date")]
+
+
 # --- cell errors ----------------------------------------------------------------------------------------------
 
 

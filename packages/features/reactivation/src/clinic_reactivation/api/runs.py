@@ -7,15 +7,12 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from clinic_core.api import RequestContext, get_request_context, get_session, require_role
-from clinic_db.models.core import StaffRole
+from clinic_core.api import RequestContext, get_request_context, get_session
 from clinic_db.models.reactivation import Run
 from clinic_reactivation import runs as run_service
+from clinic_reactivation.api.roles import MANAGERS, VIEWERS
 
 router = APIRouter()
-
-MANAGERS = [Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER))]
-VIEWERS = [Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER, StaffRole.FRONT_DESK))]
 
 HEADLINE_KEYS = (
     "patients_total",
@@ -55,7 +52,7 @@ class RunRequested(RunOut):
     deduplicated: str | None
 
 
-def _base(run: Run) -> dict[str, Any]:
+def run_fields(run: Run) -> dict[str, Any]:
     return {
         "id": run.id,
         "trigger": run.trigger,
@@ -83,7 +80,7 @@ async def request_run(
     )
     if not request.created:
         response.status_code = 200
-    return RunRequested(**_base(request.run), deduplicated=request.deduplicated)
+    return RunRequested(**run_fields(request.run), deduplicated=request.deduplicated)
 
 
 @router.get("/runs", response_model=list[RunListItem], dependencies=VIEWERS)
@@ -91,7 +88,7 @@ async def list_runs(session: AsyncSession = Depends(get_session)) -> list[RunLis
     runs = (await session.scalars(select(Run).order_by(Run.queued_at.desc(), Run.id.desc()).limit(20))).all()
     return [
         RunListItem(
-            **_base(r),
+            **run_fields(r),
             headline={k: r.summary[k] for k in HEADLINE_KEYS if k in r.summary} if r.summary else None,
         )
         for r in runs
@@ -103,4 +100,4 @@ async def get_run(run_id: uuid.UUID, session: AsyncSession = Depends(get_session
     run = await session.get(Run, run_id)
     if run is None:
         raise HTTPException(404, "run not found")
-    return RunDetail(**_base(run), summary=run.summary, quality=run.quality)
+    return RunDetail(**run_fields(run), summary=run.summary, quality=run.quality)

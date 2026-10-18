@@ -20,13 +20,14 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from clinic_core.api import RequestContext, get_request_context, get_session, require_role
+from clinic_core.api import RequestContext, get_request_context, get_session
 from clinic_core.audit import audit
-from clinic_db.models.core import Patient, StaffRole, Tenant
+from clinic_db.models.core import Patient, Tenant
 from clinic_db.models.reactivation import Run, Settings
 from clinic_reactivation.analysis.engine import RunFailed, RunResult, analyse
 from clinic_reactivation.analysis.settings import ReactivationSettings
 from clinic_reactivation.api.results import TypeOut, offer_service_id, patient_value_range, type_entries
+from clinic_reactivation.api.roles import MANAGERS, VIEWERS
 from clinic_reactivation.csv_import import columns as cols
 from clinic_reactivation.csv_import import parser
 from clinic_reactivation.csv_import.build import Built, build_facts
@@ -34,9 +35,6 @@ from clinic_reactivation.csv_import.parser import CsvRejected
 
 log = logging.getLogger(__name__)
 router = APIRouter()
-
-MANAGERS = [Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER))]
-VIEWERS = [Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER, StaffRole.FRONT_DESK))]
 
 TIMEOUT_SECONDS = 60
 MAX_CONCURRENT = 2  # analyses at once per API process; each holds up to ~25 MB of the file plus its facts
@@ -222,9 +220,9 @@ def analyse_file(
 
 
 async def _run_in_slot(data: bytes, **kwargs: Any) -> tuple[RunResult, Built, parser.ParsedFile]:
-    """Analyse in a worker thread under the time limit. A thread can't be stopped, so after a timeout the slot
-    stays taken until the thread really finishes; timeouts therefore can't pile up threads."""
-    await _slots.acquire()
+    """Analyse in a worker thread under the time limit. The caller already holds a slot and hands it to the
+    thread. A thread can't be stopped, so after a timeout the slot stays taken until the thread really
+    finishes; timeouts therefore can't pile up threads."""
     work = asyncio.ensure_future(asyncio.to_thread(analyse_file, data, **kwargs))
     work.add_done_callback(lambda _: _slots.release())
     return await asyncio.wait_for(asyncio.shield(work), TIMEOUT_SECONDS)
@@ -241,18 +239,25 @@ async def csv_analysis(
         raise _fail(415, "csv_wrong_type", "Send the file as text/csv.")
     if _slots.locked():
         raise _fail(429, "csv_busy", "Another file is being analysed. Try again in a moment.")
+    # Taken before the body is read, so at most MAX_CONCURRENT files are ever held in memory. The slot is free,
+    # so this does not wait, and no other request can run between the check and the acquire.
+    await _slots.acquire()
     began = time.monotonic()
-    data = await _read_body(request)
-    tenant = await session.get(Tenant, ctx.tenant_id)
     try:
-        ZoneInfo(tenant.timezone)
-    except (ZoneInfoNotFoundError, ValueError, OSError):
-        raise _fail(422, "bad_timezone", "The practice's time zone is not recognised.") from None
-    saved = await session.scalar(select(Settings))
-    try:
-        settings = ReactivationSettings.model_validate(saved.config if saved else {})
-    except ValueError:
-        raise _fail(422, "bad_settings", "The saved settings no longer pass validation.") from None
+        data = await _read_body(request)
+        tenant = await session.get(Tenant, ctx.tenant_id)
+        try:
+            ZoneInfo(tenant.timezone)
+        except (ZoneInfoNotFoundError, ValueError, OSError):
+            raise _fail(422, "bad_timezone", "The practice's time zone is not recognised.") from None
+        saved = await session.scalar(select(Settings))
+        try:
+            settings = ReactivationSettings.model_validate(saved.config if saved else {})
+        except ValueError:
+            raise _fail(422, "bad_settings", "The saved settings no longer pass validation.") from None
+    except BaseException:
+        _slots.release()  # the analysis never started, so no thread will release it
+        raise
     now = datetime.now(UTC)
     try:
         result, built, parsed = await _run_in_slot(

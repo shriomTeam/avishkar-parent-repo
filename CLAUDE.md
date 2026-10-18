@@ -18,7 +18,7 @@ apps/
         import/                patient data import
         (features)/
           blueprints/          existing patient blueprint pages
-          reactivation/        existing reactivation pages
+          reactivation/        thin routes to the feature's pages; campaigns/ still lives here
     components/
       auth/                    onboarding and sign-out controls
       platform-frame.tsx       generic platform shell (no feature path checks)
@@ -50,7 +50,9 @@ packages/
   integrations/                client data import
   engagement/                  shared SMS and email engine
   features/
-    reactivation/src/          reactivation backend
+    reactivation/
+      src/                     reactivation backend (analysis engine, runs, CSV import)
+      web/                     Dormant patients pages, components, unit and browser tests
     blueprints/src/            blueprint backend
     voice-receptionist/
       src/                     voice backend entry point (control-plane stub)
@@ -79,7 +81,7 @@ infra/
 
 This tree describes the implemented `migration/voice-ai` layout. There is no standalone `apps/voice-receptionist`, `backend/` or `frontend/` app. Voice UI is served at `/voice-receptionist` by `apps/web`; route groups `(fullscreen)`, `(platform)` and `(features)` do not appear in URLs. Its original branded sidebar and header replace the platform shell on voice routes; “All clinic products” returns to the platform.
 
-Feature backend code belongs in its package's `src/`. New features must start in `packages/features/<name>/web/`, with thin one-line route files in `apps/web` importing their pages. Voice follows this convention now. Existing reactivation and blueprints pages remain in `apps/web/app/(platform)/(features)/` until their teams move them.
+Feature backend code belongs in its package's `src/`. New features must start in `packages/features/<name>/web/`, with thin one-line route files in `apps/web` importing their pages. Voice and reactivation follow this convention now (reactivation's campaigns page and its server actions still live in `apps/web`). Existing blueprints pages remain in `apps/web/app/(platform)/(features)/` until their team moves them.
 
 Shared browser/server auth helpers and API access live in `packages/core/web`, exported through `@clinic/core/web/*`. Feature code must never import `apps/web` or its `@/` alias. Python and frontend boundaries are checked by `pnpm boundaries`. Browser tests are discovered from installed feature workspace manifests (`clinic.webTests`), so deleting a feature removes its tests automatically.
 

@@ -246,6 +246,21 @@ async def _request_queued(session: AsyncSession) -> None:
         await emit(session, RUN_REQUESTED, {"run_id": str(queued)})
 
 
+REAP_JOB = "reap_stuck_runs"
+REAP_EVERY_SECONDS = 300
+
+
+async def reap_stuck_runs(ctx: JobContext, data: dict) -> None:
+    """Scheduled job. A worker that dies mid-run leaves the run "running", which blocks the queue, and an event
+    can be lost (a worker without this handler drops it). So: fail runs stuck past STUCK_AFTER, then, if nothing
+    is running, ask again for the queued run. Asking twice is harmless: the handler skips a run already claimed."""
+    reaped = await fail_stuck_runs(ctx.session, datetime.now(UTC))
+    if reaped:
+        log.warning("failed %d stuck run(s) for tenant %s", reaped, ctx.tenant_id)
+    if not await ctx.session.scalar(select(Run.id).where(Run.status == "running").limit(1)):
+        await _request_queued(ctx.session)
+
+
 async def _claim(tenant_id: uuid.UUID, run_id: uuid.UUID) -> tuple[str, dict | None]:
     """queued to running under a row lock. Not queued: skipped. Another run running: busy (it will request us)."""
     try:

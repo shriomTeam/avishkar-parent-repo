@@ -515,18 +515,15 @@ async def load_facts(
     facts: list[PatientFacts] = []
     # Fresh imports have no planner statistics, so every CTE is estimated at one row and Postgres picks
     # nested loops that re-run each aggregate once per patient (quadratic). Equi-joins on patient_id
-    # are always hashable, so forbid nested loops for this one statement and restore afterwards.
+    # are always hashable, so forbid nested loops for this transaction (SET LOCAL ends with it; a RESET
+    # here would fail in a transaction the query had aborted and hide the real error).
     # That setting inflates plan cost past the JIT threshold, and compiling this query costs seconds
     # for no gain, so JIT is switched off for the statement too.
     await session.execute(text("SET LOCAL enable_nestloop = off"))
     await session.execute(text("SET LOCAL jit = off"))
-    try:
-        result = await session.stream(_FACTS_SQL, params, execution_options={"yield_per": STREAM_BATCH})
-        async for row in result:
-            facts.append(_to_facts(row, today))
-    finally:
-        await session.execute(text("RESET enable_nestloop"))
-        await session.execute(text("RESET jit"))
+    result = await session.stream(_FACTS_SQL, params, execution_options={"yield_per": STREAM_BATCH})
+    async for row in result:
+        facts.append(_to_facts(row, today))
     return assign_spend_percentiles(facts, cohort_min=cohort_min)
 
 

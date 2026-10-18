@@ -192,11 +192,13 @@ def _decode(data: bytes) -> str:
 
 
 def _header(record: list[str]) -> list[str]:
+    """The column names in file order. A blank name is kept as "" so cell positions still line up; spreadsheet
+    exports often add an empty column at the end, and it is accepted as long as it stays empty."""
     names = [cell.strip().lower() for cell in record]
     problems: list[str] = []
-    unknown = [n for n in names if n not in BY_NAME]
+    unknown = [n for n in names if n and n not in BY_NAME]
     if unknown:
-        shown = ", ".join(f'"{n[:40]}"' if n else "(blank)" for n in unknown[:10])
+        shown = ", ".join(f'"{n[:40]}"' for n in unknown[:10])
         more = f" and {len(unknown) - 10} more" if len(unknown) > 10 else ""
         problems.append(f"Unknown columns: {shown}{more}.")
     seen: set[str] = set()
@@ -228,6 +230,7 @@ def parse_csv(data: bytes, *, today: date) -> ParsedFile:
     start_row = 1
     plan: list[tuple[int, str, Callable, bool]] = []  # (cell index, column, reader, required)
     index_of: dict[str, int] = {}
+    unnamed: list[int] = []  # cell indexes of blank header names; their cells must be empty
     data_rows = 0
     try:
         for record in reader:
@@ -237,7 +240,8 @@ def parse_csv(data: bytes, *, today: date) -> ParsedFile:
                 continue
             if names is None:
                 names = _header(record)
-                index_of = {n: i for i, n in enumerate(names)}
+                index_of = {n: i for i, n in enumerate(names) if n}
+                unnamed = [i for i, n in enumerate(names) if not n]
                 plan = [(i, n, _READERS[n], BY_NAME[n].required) for n, i in index_of.items()]
                 continue
             data_rows += 1
@@ -246,6 +250,10 @@ def parse_csv(data: bytes, *, today: date) -> ParsedFile:
             if len(record) != len(names):
                 errors.add(row, "(row)", f"has {len(record)} cells but the header has {len(names)}")
                 continue
+            errors_before = errors.total
+            for i in unnamed:
+                if record[i].strip():
+                    errors.add(row, f"(column {i + 1})", "has a value but the header has no name for this column")
             values: dict[str, object] = {}
             for i, col, read, required in plan:
                 raw = record[i].strip()
@@ -259,6 +267,8 @@ def parse_csv(data: bytes, *, today: date) -> ParsedFile:
                     errors.add(row, col, str(e))
             if values.get("line_kind") == "service" and "service_name" in index_of and "service_name" not in values:
                 errors.add(row, "service_name", "is required on service lines")
+            if errors.total > errors_before:
+                continue  # the file is rejected anyway; a half-read row would only add misleading row-to-row errors
             lines.append(Line(row, *(values.get(n) for n in COLUMN_NAMES)))
     except csv.Error:
         errors.add(max(reader.line_num, 1), "(row)", "isn't valid CSV (check for a stray quote mark)")
@@ -267,7 +277,7 @@ def parse_csv(data: bytes, *, today: date) -> ParsedFile:
         raise CsvRejected("csv_empty", "The file is empty.")
     if data_rows == 0:
         raise CsvRejected("csv_header_only", "The file has column names but no data rows.")
-    columns = frozenset(names)
+    columns = frozenset(index_of)
     if "service_name" not in columns and any(ln.line_kind == "service" for ln in lines):
         errors.add(1, "service_name", "is required because the file has service lines")
     _check_consistency(lines, errors)

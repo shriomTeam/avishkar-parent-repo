@@ -254,6 +254,23 @@ async def test_a_busy_server_says_so(client):
             csv_analysis._slots.release()
 
 
+async def test_the_slot_is_taken_before_the_body_is_read_and_freed_when_the_file_is_refused(client, monkeypatch):
+    tenant = await create_test_tenant()
+    free_while_reading = []
+    real = csv_analysis._read_body
+
+    async def reading(request):
+        free_while_reading.append(csv_analysis._slots._value)
+        return await real(request)
+
+    monkeypatch.setattr(csv_analysis, "_read_body", reading)
+    monkeypatch.setattr(parser, "MAX_BYTES", 10)
+    r = await post(client, tenant, make_file(5))
+    assert (r.status_code, r.json()["detail"]["code"]) == (413, "csv_too_large")
+    assert free_while_reading == [csv_analysis.MAX_CONCURRENT - 1]
+    assert csv_analysis._slots._value == csv_analysis.MAX_CONCURRENT
+
+
 async def test_a_timeout_returns_504_and_keeps_the_slot_until_the_thread_ends(client, monkeypatch):
     tenant = await create_test_tenant()
     real = csv_analysis.analyse_file
