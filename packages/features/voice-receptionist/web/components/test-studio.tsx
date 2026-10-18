@@ -3,103 +3,42 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Mic } from "lucide-react";
-import { useDemo } from "../lib/demo/provider";
-import { makeTranscript } from "../lib/demo/seed";
-import { resolvePrompt } from "../lib/format";
-import type { AgentConfig, Call } from "../lib/types";
-import { Heading, Select, Badge, Empty } from "./ui";
-import { Transcript } from "./calls-table";
+import { useVoice } from "../lib/voice/provider";
+import { useTestCall } from "../lib/voice/use-test-call";
+import { Heading, Select, Badge, Empty, FormError } from "./ui";
+import { VoiceBoundary } from "./voice-boundary";
+
+const clock = (s: number) =>
+  `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+
 export function TestStudio() {
-  const { state, run, busy } = useDemo();
-  const params = useSearchParams();
-  const [selected, setSelected] = useState(
-    params.get("agent") || "agent-sophie",
+  return (
+    <VoiceBoundary>
+      <Studio />
+    </VoiceBoundary>
   );
-  const [session, setSession] = useState<{
-    call: Call;
-    config: AgentConfig;
-  } | null>(null);
-  const [active, setActive] = useState(false);
-  const [saved, setSaved] = useState(false);
-  if (!state) return null;
-  const agent = state.agents.find((a) => a.id === selected);
-  const config = agent?.draft;
-  const start = () => {
-    if (!agent || !config) return;
-    const id = `TEST_${crypto.randomUUID().slice(0, 8)}`;
-    const enabledTools = state.tools.filter(
-      (t) => t.enabled && config.toolIds.includes(t.id),
-    );
-    const lead = enabledTools.find((t) => t.name === "create_lead");
-    const greeting = resolvePrompt(config.greeting, state.variables, {
-      current_date: new Date().toISOString().slice(0, 10),
-      caller_number: "+14155550101",
-      customer_name: "Morgan Lee",
-    });
-    const turns = makeTranscript("Morgan Lee", state.workspace.name, greeting);
-    if (!lead)
-      turns[turns.length - 1] = {
-        speaker: "Agent",
-        time: "00:45",
-        text: "Thank you. Please contact our front desk to arrange your callback.",
-      };
-    const call: Call = {
-      id,
-      caller: "Morgan Lee",
-      phone: "Browser test",
-      agentId: agent.id,
-      agentName: config.name,
-      version: 0,
-      startedAt: new Date().toISOString(),
-      durationSeconds: 45,
-      status: "Completed",
-      outcome: lead ? "Lead created" : "Test completed",
-      latencyMs: 490,
-      cost: 0,
-      transcript: turns,
-      toolExecutions: lead
-        ? [
-            {
-              toolName: lead.name,
-              durationMs: 312,
-              success: true,
-              input: {
-                name: "Morgan Lee",
-                phone: "+14155550101",
-                service: "Consultation",
-                consent: true,
-              },
-              output: { success: true, lead_id: `L-${id}` },
-              idempotencyKey: `${id}_lead`,
-            },
-          ]
-        : [],
-      recording: false,
-      summary: lead
-        ? "Simulated enquiry captured using the saved agent draft. A sample lead action succeeded."
-        : "Simulated conversation completed using the saved agent draft. No lead action was enabled.",
-    };
-    setSession({ call, config: structuredClone(config) });
-    setSaved(false);
-    setActive(true);
-  };
-  const end = async () => {
-    if (!session) return;
-    if (
-      await run(
-        { type: "add-call", call: session.call },
-        "Simulated call saved to call history",
-      )
-    ) {
-      setActive(false);
-      setSaved(true);
-    }
-  };
+}
+
+function Studio() {
+  const { agents, api, reloadCalls } = useVoice();
+  const params = useSearchParams();
+  const requested = params.get("agent");
+  const [selected, setSelected] = useState(
+    agents.find((a) => a.id === requested)?.id ??
+      agents.find((a) => a.is_active)?.id ??
+      agents[0]?.id ??
+      "",
+  );
+  const call = useTestCall(api, reloadCalls);
+  const agent = agents.find((a) => a.id === selected);
+  const fields = agent?.fields ?? [];
+  const finished = call.state === "ended" && call.callId;
+
   return (
     <>
       <Heading
         title="Test studio"
-        description="Try your agent before callers do. All conversations here are simulated."
+        description="Try your agent before callers do. You speak, the agent answers out loud."
         actions={
           agent && (
             <Link
@@ -111,99 +50,191 @@ export function TestStudio() {
           )
         }
       />
-      <div className="two">
+      {agents.length === 0 ? (
         <section className="panel">
-          <div className="panelHead">
-            <h2>Browser call</h2>
-            <Badge>Simulated</Badge>
-          </div>
-          <Select
-            label="Agent"
-            value={selected}
-            disabled={active}
-            onChange={(e) => {
-              setSelected(e.target.value);
-              setSession(null);
-              setSaved(false);
-            }}
-          >
-            <option value="" disabled>
-              Select an agent
-            </option>
-            {state.agents.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.draft.name}
-              </option>
-            ))}
-          </Select>
-          {!agent && (
-            <p role="alert">
-              Selected agent is unavailable. Choose an agent to continue.
-            </p>
-          )}
-          <div className="testcenter">
-            <div className={`orb ${active ? "live" : ""}`}>
-              <Mic size={32} />
+          <Empty
+            title="Create an agent first"
+            description="You need at least one agent to take a test call."
+          />
+          <Link className="button" href="/voice-receptionist/agents">
+            Go to agents
+          </Link>
+        </section>
+      ) : (
+        <div className="two">
+          <section className="panel">
+            <div className="panelHead">
+              <h2>Browser call</h2>
+              <Badge>
+                {call.state === "live"
+                  ? "Live"
+                  : call.state === "connecting"
+                    ? "Connecting"
+                    : "Ready"}
+              </Badge>
             </div>
-            <h2>
-              {active
-                ? `${config?.voice || "Agent"} is listening`
-                : saved
-                  ? "Test call completed"
-                  : "Ready when you are"}
-            </h2>
-            <p>No microphone, carrier or AI provider is used.</p>
-            <button
-              className={`${active ? "danger" : "primary"} spaced`}
-              disabled={!agent || busy}
-              onClick={active ? end : start}
+            <Select
+              label="Agent"
+              value={selected}
+              disabled={call.busy}
+              onChange={(e) => setSelected(e.target.value)}
             >
-              {active ? "End simulated call" : "Start simulated call"}
-            </button>
-          </div>
-          {saved && session && (
-            <div className="note">
-              <strong>Test complete</strong>
-              <p>Greeting delivered · sample conversation saved</p>
-              <Link
-                className="button spaced"
-                href={`/voice-receptionist/calls/${session.call.id}`}
+              {agents.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </Select>
+            <div className="testcenter">
+              <div
+                className={`orb ${call.state === "live" ? "live" : ""}`}
+                style={{
+                  transform:
+                    call.state === "live"
+                      ? `scale(${1 + call.level * 0.18})`
+                      : undefined,
+                }}
               >
-                View saved call
-              </Link>
-            </div>
-          )}
-          <small>
-            Uses the saved draft. Test calls are labeled v0 to distinguish
-            unpublished draft tests from published versions.
-          </small>
-        </section>
-        <section className="panel">
-          <div className="panelHead">
-            <h2>Conversation</h2>
-            <span className="pill">Sample transcript</span>
-          </div>
-          {session ? (
-            <>
-              <Transcript
-                turns={session.call.transcript}
-                agentName={session.config.name}
-              />
-              {session.call.toolExecutions.length > 0 && (
-                <div className="note">
-                  00:44 · {session.call.toolExecutions[0]?.toolName} · Simulated
-                  success · 312 ms
-                </div>
+                <Mic size={32} />
+              </div>
+              <h2>
+                {call.state === "live"
+                  ? `${agent?.voice ?? "The agent"} is listening · ${clock(call.seconds)}`
+                  : call.state === "connecting"
+                    ? "Connecting…"
+                    : finished
+                      ? "Test call completed"
+                      : "Ready when you are"}
+              </h2>
+              <p>Use headphones so the agent does not hear itself.</p>
+              <button
+                className={`${call.busy ? "danger" : "primary"} spaced`}
+                disabled={
+                  !agent ||
+                  (!call.busy && !agent.is_active) ||
+                  call.state === "connecting"
+                }
+                onClick={() =>
+                  call.busy ? call.hangup() : agent && call.start(agent)
+                }
+              >
+                {call.busy
+                  ? "End call"
+                  : finished || call.state === "error"
+                    ? "Call again"
+                    : "Start test call"}
+              </button>
+              {agent && !agent.is_active && (
+                <small>
+                  This agent is disabled. Turn it on in its settings to call it.
+                </small>
               )}
-            </>
-          ) : (
-            <Empty
-              title="Your conversation appears here"
-              description="Start a simulated call to review the dialogue and tool execution."
-            />
-          )}
-        </section>
-      </div>
+            </div>
+            <FormError message={call.error} />
+            {finished && (
+              <div className="note">
+                <strong>Test complete</strong>
+                <p>
+                  {call.reason} The call was saved with its transcript and
+                  captured details.
+                </p>
+                <Link
+                  className="button spaced"
+                  href={`/voice-receptionist/calls/${call.callId}`}
+                >
+                  View saved call
+                </Link>
+              </div>
+            )}
+            <small>
+              Test calls use the saved agent and appear in call history.
+            </small>
+          </section>
+          <section className="panel">
+            <div className="panelHead">
+              <h2>Conversation</h2>
+              <span className="pill">
+                {call.state === "live" ? "Live transcript" : "Transcript"}
+              </span>
+            </div>
+            {call.lines.length === 0 ? (
+              <Empty
+                title="Your conversation appears here"
+                description="Start a test call to see the dialogue as it happens."
+              />
+            ) : (
+              <div aria-live="polite" data-testid="live-transcript">
+                {call.lines.map((line, i) => (
+                  <div
+                    key={i}
+                    className={`chat ${line.speaker === "agent" ? "agent" : ""}`}
+                  >
+                    <div
+                      className={`avatar ${line.speaker === "caller" ? "dark" : ""}`}
+                    >
+                      {line.speaker === "agent" ? (agent?.name[0] ?? "A") : "Y"}
+                    </div>
+                    <div className="bubble">
+                      <strong>
+                        {line.speaker === "agent" ? agent?.name : "You"}
+                      </strong>
+                      {line.text}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {call.toolRuns.length > 0 && (
+              <>
+                <h3>Tool activity</h3>
+                <div data-testid="tool-activity">
+                  {call.toolRuns.map((run, i) => (
+                    <div className="rowline" key={i}>
+                      <span>
+                        {run.name}
+                        {run.durationMs !== undefined
+                          ? ` · ${run.durationMs} ms`
+                          : ""}
+                      </span>
+                      <Badge>
+                        {run.status === "running"
+                          ? "Running"
+                          : run.status === "ok"
+                            ? "Success"
+                            : "Failed"}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            {fields.length > 0 &&
+              (call.state !== "idle" ||
+                Object.keys(call.values).length > 0) && (
+                <>
+                  <h3>Captured details</h3>
+                  <dl className="captured" data-testid="captured-fields">
+                    {fields.map((f) => (
+                      <div key={f.key}>
+                        <dt>
+                          {f.label}
+                          {f.required ? " *" : ""}
+                        </dt>
+                        <dd>
+                          {call.values[f.key] === undefined ? (
+                            <span className="muted">not yet</span>
+                          ) : (
+                            String(call.values[f.key])
+                          )}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </>
+              )}
+          </section>
+        </div>
+      )}
     </>
   );
 }

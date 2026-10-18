@@ -2,26 +2,40 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Badge, Empty } from "./ui";
-import type { Call, TranscriptTurn } from "../lib/types";
-import { dateLabel, duration } from "../lib/format";
+import type { CallSummary } from "../lib/inbound/api";
+import type { TranscriptTurn } from "../lib/types";
+import {
+  callDuration,
+  channelLabel,
+  dateLabel,
+  reasonLabel,
+  statusLabel,
+} from "../lib/format";
+
 export function CallsTable({
   calls,
   timezone,
+  empty = {
+    title: "No calls match your filters",
+    description: "Try another agent, status or call ID.",
+  },
 }: {
-  calls: Call[];
+  calls: CallSummary[];
   timezone: string;
+  empty?: { title: string; description: string };
 }) {
   return (
     <div className="tablewrap">
       <table>
         <thead>
           <tr>
-            <th scope="col">Caller</th>
+            <th scope="col">Call</th>
             <th scope="col">Agent</th>
             <th scope="col">Time</th>
             <th scope="col">Duration</th>
             <th scope="col">Status</th>
-            <th scope="col">Outcome</th>
+            <th scope="col">Details captured</th>
+            <th scope="col">How it ended</th>
           </tr>
         </thead>
         <tbody>
@@ -37,27 +51,25 @@ export function CallsTable({
                       <ArrowUpRight size={16} />
                     </span>
                     <div>
-                      <strong>{call.caller}</strong>
-                      <small>{call.phone}</small>
+                      <strong>{channelLabel(call.channel)}</strong>
+                      <small>{call.id.slice(0, 8)}</small>
                     </div>
                   </Link>
                 </td>
-                <td>{call.agentName}</td>
-                <td>{dateLabel(call.startedAt, timezone)}</td>
-                <td>{duration(call.durationSeconds)}</td>
+                <td>{call.agent_name || "Deleted agent"}</td>
+                <td>{dateLabel(call.started_at, timezone)}</td>
+                <td>{callDuration(call.duration_seconds)}</td>
                 <td>
-                  <Badge>{call.status}</Badge>
+                  <Badge>{statusLabel(call.status)}</Badge>
                 </td>
-                <td>{call.outcome}</td>
+                <td>{call.captured_count || "—"}</td>
+                <td>{reasonLabel(call.end_reason)}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={6}>
-                <Empty
-                  title="No calls match your filters"
-                  description="Try another caller, agent or status."
-                />
+              <td colSpan={7}>
+                <Empty title={empty.title} description={empty.description} />
               </td>
             </tr>
           )}

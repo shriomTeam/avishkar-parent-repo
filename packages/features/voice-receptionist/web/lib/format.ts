@@ -1,4 +1,5 @@
-import type { Call, Variable } from "./types";
+import type { CallSummary } from "./inbound/api";
+import type { Variable } from "./types";
 export const duration = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 export const dateLabel = (date: string, timezone: string) =>
@@ -30,7 +31,39 @@ export function resolvePrompt(
       match,
   );
 }
-export function exportCalls(calls: Call[]) {
+export const plural = (n: number, word: string) =>
+  `${n} ${word}${n === 1 ? "" : "s"}`;
+
+export const channelLabel = (channel: string) =>
+  channel === "browser_test"
+    ? "Browser test"
+    : channel === "twilio"
+      ? "Phone call"
+      : channel;
+
+export const statusLabel = (status: string) =>
+  status === "completed"
+    ? "Completed"
+    : status === "failed"
+      ? "Failed"
+      : "In progress";
+
+const REASONS: Record<string, string> = {
+  caller_hangup: "Caller ended the call",
+  agent_ended: "Agent ended the call",
+  caller_disconnected: "Caller disconnected",
+  max_duration: "Reached the time limit",
+  model_disconnected: "Voice service disconnected",
+  expired: "Never connected",
+  error: "Error",
+};
+export const reasonLabel = (reason: string | null | undefined) =>
+  reason ? (REASONS[reason] ?? reason.replaceAll("_", " ")) : "—";
+
+export const callDuration = (seconds: number | null | undefined) =>
+  seconds == null ? "—" : duration(seconds);
+
+export function exportCalls(calls: CallSummary[]) {
   const safeCell = (value: string) => {
     const safe = /^[\s]*[=+@\-]/.test(value) ? `'${value}` : value;
     return `"${safe.replaceAll('"', '""')}"`;
@@ -38,25 +71,23 @@ export function exportCalls(calls: Call[]) {
   const rows = [
     [
       "Call ID",
-      "Caller",
-      "Phone",
       "Agent",
-      "Version",
+      "Channel",
       "Started at (UTC)",
       "Duration",
       "Status",
-      "Outcome",
+      "How it ended",
+      "Details captured",
     ],
     ...calls.map((c) => [
       c.id,
-      c.caller,
-      c.phone,
-      c.agentName,
-      String(c.version),
-      c.startedAt,
-      duration(c.durationSeconds),
-      c.status,
-      c.outcome,
+      c.agent_name ?? "",
+      channelLabel(c.channel),
+      c.started_at,
+      callDuration(c.duration_seconds),
+      statusLabel(c.status),
+      reasonLabel(c.end_reason),
+      String(c.captured_count ?? 0),
     ]),
   ];
   const url = URL.createObjectURL(
@@ -69,7 +100,7 @@ export function exportCalls(calls: Call[]) {
   );
   const link = document.createElement("a");
   link.href = url;
-  link.download = "avishkar-sample-calls.csv";
+  link.download = "avishkar-calls.csv";
   document.body.appendChild(link);
   link.click();
   link.remove();

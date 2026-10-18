@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     session_ttl_seconds: int = 86400
     oauth_transaction_ttl_seconds: int = 600
     trusted_hosts: list[str] = ["localhost", "127.0.0.1", "testserver", "test", "backend"]
+    # How many proxies in front of the API we trust to append to X-Forwarded-For (Cloud Run: 1). With 0 the header is
+    # ignored, because anyone can send it. Login rate limits count by the address this yields.
+    trusted_proxy_hops: int = 0
 
     @property
     def binding_cookie_name(self) -> str:
@@ -60,6 +63,8 @@ class Settings(BaseSettings):
                 raise ValueError("Database URLs must use Postgres with psycopg")
         if self.allow_dev_auth and self.app_env != "dev":
             raise ValueError("Dev header authentication is restricted to APP_ENV=dev")
+        if not 0 <= self.trusted_proxy_hops <= 3:
+            raise ValueError("TRUSTED_PROXY_HOPS must be between 0 and 3")
         if not 300 <= self.session_ttl_seconds <= 604800:
             raise ValueError("SESSION_TTL_SECONDS must be between 300 and 604800")
         if not 60 <= self.oauth_transaction_ttl_seconds <= 900:
