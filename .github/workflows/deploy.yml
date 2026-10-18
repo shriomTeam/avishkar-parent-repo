@@ -1,0 +1,168 @@
+name: Deploy
+
+# On a merge to main: build the images, migrate the database, then deploy the API and the web app (in that order,
+# so the web app never calls an API that is older than it expects). Pull requests only check that the images build.
+# Infrastructure (the Cloud Run services themselves) is created by terraform.yml; apply that first on a new project.
+
+on:
+  pull_request:
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".dockerignore"
+      - ".github/workflows/deploy.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".dockerignore"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+# One release at a time; also serialises with a manual migration.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write # Workload Identity Federation
+
+env:
+  PROJECT_ID: ${{ vars.PROJECT_ID }}
+  REGION: ${{ vars.REGION }}
+  REGISTRY: ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/prod-avishkar-docker
+  API_SERVICE: prod-avishkar-api
+  WEB_SERVICE: prod-avishkar-web
+  MIGRATE_JOB: prod-avishkar-migrate
+  SQL_INSTANCE: prod-avishkar-postgres
+
+jobs:
+  images:
+    name: Build ${{ matrix.image }} image
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        image: [api, web, migrate]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sign in to Google Cloud
+        if: github.event_name != 'pull_request'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.CICD_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+        if: github.event_name != 'pull_request'
+      - name: Work out the service addresses
+        # The same fixed pattern Terraform uses for TRUSTED_HOSTS and the sign-in origin: the project number is in
+        # WIF_PROVIDER. Asking Cloud Run for the address could return a different form that the API would reject.
+        run: |
+          PROJECT_NUMBER="$(echo "${{ vars.WIF_PROVIDER }}" | cut -d/ -f2)"
+          echo "API_URL=https://${API_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app" >> "$GITHUB_ENV"
+          echo "WEB_URL=https://${WEB_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app" >> "$GITHUB_ENV"
+      - name: Build and push
+        run: |
+          set -euo pipefail
+          IMAGE="${REGISTRY}/${{ matrix.image }}:${GITHUB_SHA}"
+          case "${{ matrix.image }}" in
+            api)     DOCKERFILE=apps/api/Dockerfile;      ARGS=() ;;
+            migrate) DOCKERFILE=packages/db/Dockerfile;   ARGS=() ;;
+            web)
+              DOCKERFILE=apps/web/Dockerfile
+              # Next.js bakes the API address into the build. Pull requests only check that the build works,
+              # so they use a stand-in.
+              BAKED_URL="${API_URL}"
+              if [ "${{ github.event_name }}" = "pull_request" ]; then
+                BAKED_URL="https://api.example.invalid"
+              fi
+              ARGS=(--build-arg "BACKEND_INTERNAL_URL=${BAKED_URL}" --build-arg "NEXT_PUBLIC_API_URL=${BAKED_URL}")
+              ;;
+          esac
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            docker build -f "${DOCKERFILE}" "${ARGS[@]}" .
+          else
+            gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+            docker build -f "${DOCKERFILE}" "${ARGS[@]}" -t "${IMAGE}" .
+            docker push "${IMAGE}"
+          fi
+
+  migrate:
+    name: Migrate the database
+    if: github.event_name != 'pull_request'
+    needs: images
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.CICD_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Back up the database first
+        run: gcloud sql backups create --instance="${SQL_INSTANCE}" --description="pre-release ${GITHUB_SHA}"
+      - name: Point the job at this release
+        run: gcloud run jobs update "${MIGRATE_JOB}" --region="${REGION}" --image="${REGISTRY}/migrate:${GITHUB_SHA}"
+      - name: Run migrations
+        run: gcloud run jobs execute "${MIGRATE_JOB}" --region="${REGION}" --wait
+
+  deploy-api:
+    name: Deploy the API
+    needs: migrate
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.CICD_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy
+        run: gcloud run services update "${API_SERVICE}" --region="${REGION}" --image="${REGISTRY}/api:${GITHUB_SHA}"
+      - name: Work out the service addresses
+        run: |
+          PROJECT_NUMBER="$(echo "${{ vars.WIF_PROVIDER }}" | cut -d/ -f2)"
+          echo "API_URL=https://${API_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app" >> "$GITHUB_ENV"
+      - name: Smoke test (reaches the database)
+        run: |
+          curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors "${API_URL}/api/v1/health/ready"
+          echo "API is ready at ${API_URL}" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-web:
+    name: Deploy the web app
+    needs: deploy-api
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.CICD_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy
+        run: gcloud run services update "${WEB_SERVICE}" --region="${REGION}" --image="${REGISTRY}/web:${GITHUB_SHA}"
+      - name: Work out the service addresses
+        run: |
+          PROJECT_NUMBER="$(echo "${{ vars.WIF_PROVIDER }}" | cut -d/ -f2)"
+          echo "WEB_URL=https://${WEB_SERVICE}-${PROJECT_NUMBER}.${REGION}.run.app" >> "$GITHUB_ENV"
+      - name: Smoke test (the page, and its route through to the API)
+        run: |
+          curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors --output /dev/null "${WEB_URL}/login"
+          curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors "${WEB_URL}/api/v1/health/live"
+          {
+            echo "### Released ${GITHUB_SHA}"
+            echo "Open: ${WEB_URL}"
+            echo "To roll back, send traffic to the previous revision: \`gcloud run services update-traffic <service> --region ${REGION} --to-revisions <previous>=100\`"
+          } >> "$GITHUB_STEP_SUMMARY"

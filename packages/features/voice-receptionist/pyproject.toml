@@ -3,7 +3,13 @@ name = "clinic-feature-voice-receptionist"
 version = "0.1.0"
 description = "The Front Desk That Never Sleeps: AI voice agent that answers, books, reschedules and escalates around the clock."
 requires-python = ">=3.12"
-dependencies = ["clinic-core", "clinic-db"]
+dependencies = [
+    "clinic-core",
+    "clinic-db",
+    "google-genai>=1.0",
+    "httpx>=0.28",
+    "cryptography>=43",
+]
 
 [project.entry-points."clinic.features"]
 voice_receptionist = "clinic_voice_receptionist.feature:feature"

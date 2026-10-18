@@ -4,8 +4,14 @@ import os
 import uuid
 from urllib.parse import urlencode
 
+from fastapi import Request
+
 from clinic_api.main import create_app
 from clinic_core.settings import Settings
+from clinic_voice_receptionist.testing import ScriptedConnector
+
+# Browser tests point custom tools at this server's own /_test/echo, so private addresses must be allowed.
+os.environ.setdefault("VOICE_TOOL_ALLOW_PRIVATE_HOSTS", "true")
 
 if not os.environ.get("TEST_DATABASE_URL"):
     raise RuntimeError("Browser tests require a disposable TEST_DATABASE_URL")
@@ -36,3 +42,14 @@ class BrowserGoogle:
 
 
 app = create_app(settings, google=BrowserGoogle())
+# Voice calls use a scripted model so browser tests never reach Vertex.
+app.state.voice_connector = ScriptedConnector()
+
+
+@app.api_route("/_test/echo", methods=["GET", "POST"], include_in_schema=False)
+async def echo(request: Request):
+    """A stand-in for a clinic's own API, for the custom-tool test."""
+    return {
+        "echo": dict(request.query_params) or (await request.json() if await request.body() else {}),
+        "open": "9 to 5",
+    }

@@ -30,3 +30,19 @@ variable "db_name" {
   description = "Application database. The app and Alembic migrations expect \"clinic\"."
   default     = "clinic"
 }
+
+variable "google_client_id" {
+  type        = string
+  description = "Google OAuth client ID for sign-in. Not secret (it is in the sign-in URL); set from the GOOGLE_CLIENT_ID repo variable."
+}
+
+variable "google_client_secret" {
+  type        = string
+  sensitive   = true
+  description = "Google OAuth client secret. Set from the GOOGLE_CLIENT_SECRET GitHub secret; Terraform stores it in Secret Manager."
+
+  validation {
+    condition     = length(var.google_client_secret) > 0
+    error_message = "google_client_secret is empty. Add the GOOGLE_CLIENT_SECRET GitHub secret."
+  }
+}

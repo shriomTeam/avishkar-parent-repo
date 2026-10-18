@@ -2,29 +2,40 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useDemo } from "../lib/demo/provider";
-import { Heading, Metric, Badge } from "./ui";
+import { useVoice } from "../lib/voice/provider";
+import { callDuration, plural } from "../lib/format";
+import { Heading, Metric, Badge, Empty } from "./ui";
 import { CallsTable } from "./calls-table";
-import { median } from "../lib/format";
+import { VoiceBoundary } from "./voice-boundary";
+
+const DAY = 86_400_000;
+
 export function Overview() {
+  return (
+    <VoiceBoundary>
+      <Summary />
+    </VoiceBoundary>
+  );
+}
+
+function Summary() {
+  const { agents, calls: all } = useVoice();
   const { state } = useDemo();
   const [period, setPeriod] = useState(7);
-  if (!state) return null;
-  // Demo time is anchored to the most recent fixture/session call, not wall-clock expiry.
-  const latest = Math.max(
-    ...state.calls.map((c) => new Date(c.startedAt).getTime()),
-  );
-  const end = new Date(latest);
+  const end = new Date();
   end.setUTCHours(23, 59, 59, 999);
-  const start = end.getTime() - period * 86400000;
-  const calls = state.calls.filter(
-    (c) => new Date(c.startedAt).getTime() > start,
+  const start = end.getTime() - period * DAY;
+  const calls = all.filter((c) => new Date(c.started_at).getTime() > start);
+  const completed = calls.filter((c) => c.status === "completed");
+  const captured = calls.reduce((sum, c) => sum + (c.captured_count ?? 0), 0);
+  const lengths = completed.flatMap((c) =>
+    c.duration_seconds == null ? [] : [c.duration_seconds],
   );
-  const completed = calls.filter((c) => c.status === "Completed").length;
-  const latencies = calls
-    .flatMap((c) => (c.latencyMs === null ? [] : [c.latencyMs]))
-    .sort((a, b) => a - b);
+  const average = lengths.length
+    ? Math.round(lengths.reduce((a, b) => a + b, 0) / lengths.length)
+    : null;
   const buckets = Array.from({ length: period }, (_, index) => {
-    const date = new Date(end.getTime() - (period - 1 - index) * 86400000);
+    const date = new Date(end.getTime() - (period - 1 - index) * DAY);
     const key = date.toISOString().slice(0, 10);
     return {
       key,
@@ -32,7 +43,7 @@ export function Overview() {
         weekday: "short",
         timeZone: "UTC",
       }).format(date),
-      count: calls.filter((c) => c.startedAt.slice(0, 10) === key).length,
+      count: calls.filter((c) => c.started_at.slice(0, 10) === key).length,
     };
   });
   const max = Math.max(1, ...buckets.map((b) => b.count));
@@ -62,32 +73,32 @@ export function Overview() {
         <Metric
           label="Total calls"
           value={String(calls.length)}
-          sub={`Sample calls · last ${period} days`}
+          sub={`Last ${period} days`}
           feature
         />
         <Metric
           label="Completed calls"
-          value={`${calls.length ? ((completed / calls.length) * 100).toFixed(1) : "0"}%`}
-          sub={`${completed} of ${calls.length} calls completed`}
+          value={`${calls.length ? ((completed.length / calls.length) * 100).toFixed(1) : "0"}%`}
+          sub={`${completed.length} of ${plural(calls.length, "call")} completed`}
         />
         <Metric
-          label="Leads captured"
-          value={String(
-            calls.filter((c) => c.outcome === "Lead created").length,
-          )}
-          sub="Confirmed sample enquiries"
+          label="Details captured"
+          value={String(captured)}
+          sub="Caller details saved from calls"
         />
         <Metric
-          label="Response latency"
-          value={`${median(latencies)} ms`}
-          sub={`Median · P95 ${latencies[Math.max(0, Math.ceil(latencies.length * 0.95) - 1)] || 0} ms`}
+          label="Average call length"
+          value={average === null ? "—" : callDuration(average)}
+          sub="Completed calls"
         />
       </div>
       <div className="two">
         <section className="panel">
           <div className="panelHead">
             <h2>Call activity</h2>
-            <span className="pill">{calls.length} calls in this period</span>
+            <span className="pill">
+              {plural(calls.length, "call")} in this period
+            </span>
           </div>
           <div
             className={`chart ${period === 30 ? "chart-month" : ""}`}
@@ -109,51 +120,42 @@ export function Overview() {
               </div>
             ))}
           </div>
-          <div className="legend">
-            Inbound phone & browser calls · Sample metrics · dates in UTC
-          </div>
+          <div className="legend">Browser test calls · dates in UTC</div>
         </section>
         <section className="panel">
           <div className="panelHead">
             <h2>Your agents</h2>
             <Link href="/voice-receptionist/agents">View all</Link>
           </div>
-          {state.agents.slice(0, 2).map((agent) => {
-            const agentCalls = state.calls.filter(
-              (c) => c.agentId === agent.id,
-            );
-            return (
-              <Link
-                className="agentmini"
-                key={agent.id}
-                href={`/voice-receptionist/agents/${agent.id}`}
-              >
-                <div className="avatar">{agent.draft.name[0]}</div>
-                <div className="grow">
-                  <strong>{agent.draft.name}</strong>
-                  <small>
-                    {agentCalls.length} calls ·{" "}
-                    {median(
-                      agentCalls.flatMap((c) =>
-                        c.latencyMs === null ? [] : [c.latencyMs],
-                      ),
-                    )}{" "}
-                    ms median
-                  </small>
-                </div>
-                <Badge>{agent.versions.length ? "Published" : "Draft"}</Badge>
-              </Link>
-            );
-          })}
+          {agents.length === 0 && (
+            <Empty
+              title="No agents yet"
+              description="Create one to start taking calls."
+            />
+          )}
+          {agents.slice(0, 2).map((agent) => (
+            <Link
+              className="agentmini"
+              key={agent.id}
+              href={`/voice-receptionist/agents/${agent.id}`}
+            >
+              <div className="avatar">{agent.name[0]}</div>
+              <div className="grow">
+                <strong>{agent.name}</strong>
+                <small>
+                  {plural(
+                    all.filter((c) => c.agent_id === agent.id).length,
+                    "call",
+                  )}{" "}
+                  · {plural(agent.fields?.length ?? 0, "detail")} to capture
+                </small>
+              </div>
+              <Badge>{agent.is_active ? "Active" : "Disabled"}</Badge>
+            </Link>
+          ))}
           <div className="rowline">
-            <span>Connected numbers</span>
-            <strong>{state.numbers.filter((n) => n.agentId).length}</strong>
-          </div>
-          <div className="rowline">
-            <span>Sample call cost</span>
-            <strong>
-              ${calls.reduce((total, c) => total + c.cost, 0).toFixed(2)}
-            </strong>
+            <span>Active agents</span>
+            <strong>{agents.filter((a) => a.is_active).length}</strong>
           </div>
         </section>
       </div>
@@ -163,8 +165,12 @@ export function Overview() {
           <Link href="/voice-receptionist/calls">View call history</Link>
         </div>
         <CallsTable
-          calls={calls.slice(0, 4)}
-          timezone={state.workspace.timezone}
+          calls={all.slice(0, 4)}
+          timezone={state?.workspace.timezone || "UTC"}
+          empty={{
+            title: "No calls yet",
+            description: "Take a test call in Test studio to see it here.",
+          }}
         />
       </section>
     </>

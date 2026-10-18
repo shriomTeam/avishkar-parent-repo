@@ -77,6 +77,7 @@ export function Settings() {
   return (
     <>
       <Heading
+        demo
         title="Settings"
         description="Your workspace, team and call data preferences."
         actions={

@@ -8,6 +8,7 @@ resource "google_project_service" "apis" {
     "secretmanager.googleapis.com",
     "run.googleapis.com",
     "artifactregistry.googleapis.com",
+    "aiplatform.googleapis.com", # Vertex AI: the Gemini Live model behind voice agents
   ])
 
   service            = each.key

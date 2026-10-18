@@ -3,6 +3,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -24,7 +25,10 @@ export function AuthProvider({
   const [error, setError] = useState(false);
   const [expired, setExpired] = useState(false);
   const path = usePathname();
+  // Only the newest session check may change what the user sees; an older, slower answer must not undo it.
+  const latest = useRef(0);
   async function refresh() {
+    const id = ++latest.current;
     const response = await fetch("/api/v1/auth/me", {
       cache: "no-store",
       credentials: "same-origin",
@@ -42,19 +46,22 @@ export function AuthProvider({
       window.location.replace(next.needs_onboarding ? "/onboarding" : "/");
       throw new Error("Your signed-in account changed.");
     }
-    setAuth(next);
-    setError(false);
+    if (id === latest.current) {
+      setAuth(next);
+      setError(false);
+    }
     return next;
   }
   useEffect(() => {
     let live = true;
     const check = () => {
+      const id = ++latest.current;
       fetch("/api/v1/auth/me", {
         cache: "no-store",
         credentials: "same-origin",
       })
         .then(async (response) => {
-          if (!live) return;
+          if (!live || id !== latest.current) return;
           if (response.status === 401) {
             setExpired(true);
             window.location.replace("/login");
@@ -62,7 +69,7 @@ export function AuthProvider({
           }
           if (!response.ok) throw new Error();
           const next: AuthState = await response.json();
-          if (live) {
+          if (live && id === latest.current) {
             if (next.user.id !== initial.user.id) {
               setExpired(true);
               window.location.replace(
@@ -75,7 +82,7 @@ export function AuthProvider({
           }
         })
         .catch(() => {
-          if (live) setError(true);
+          if (live && id === latest.current) setError(true);
         });
     };
     check();
