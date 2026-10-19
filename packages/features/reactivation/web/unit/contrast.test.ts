@@ -65,6 +65,14 @@ check("saved mode: text is 4.5:1 or better", saved, [
   ["muted text on a table header", "--dp-muted", "--dp-subtle", TEXT],
   ["muted text on a hovered row", "--dp-muted", "--dp-accent-tint", TEXT],
   ["muted text on soft lime", "--dp-muted", "--dp-accent-soft", TEXT],
+  ["status card: body text on its soft tint", "--dp-ink", "--dp-accent-tint", TEXT],
+  ["status card: muted text on its soft tint", "--dp-muted", "--dp-accent-tint", TEXT],
+  ["status card (nothing yet): muted text on the subtle fill", "--dp-muted", "--dp-subtle", TEXT],
+  ["mode badge (saved): dark green on soft lime", "--dp-accent-ink", "--dp-accent-soft", TEXT],
+  ["mode badge (no saved data): muted on the neutral fill", "--dp-muted", "--dp-sunk", TEXT],
+  ["mode badge and status card (file): blue ink on soft blue", "--dp-info-ink", "--dp-info-soft", TEXT],
+  ["white initials on the dark avatar", "--dp-surface", "--dp-ink", TEXT],
+  ["sign-out error text on the sidebar", "--dp-bad-ink", "--dp-surface", TEXT],
   ["muted text on a sunk fill (neutral badge)", "--dp-muted", "--dp-sunk", TEXT],
   ["faint text on a card", "--dp-faint", "--dp-surface", TEXT],
   ["faint text on the page", "--dp-faint", PAGE, TEXT],
@@ -88,6 +96,8 @@ check("saved mode: text is 4.5:1 or better", saved, [
 ]);
 
 check("saved mode: control edges, focus rings and graphics are 3:1 or better", saved, [
+  ["file badge and card edge on soft blue", "--dp-info-edge", "--dp-info-soft", UI],
+  ["sign-out button edge on the sidebar", "--dp-control", "--dp-surface", UI],
   ["input, select, checkbox and secondary button edge on a card", "--dp-control", "--dp-surface", UI],
   ["control edge on the page", "--dp-control", PAGE, UI],
   ["control edge on a table header", "--dp-control", "--dp-subtle", UI],

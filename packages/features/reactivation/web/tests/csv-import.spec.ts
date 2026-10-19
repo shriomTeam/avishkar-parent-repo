@@ -244,6 +244,8 @@ test("a file can be dropped, and progress is shown while it is analysed", async 
   helper("seed", workspace, ["--scenario", "empty"]);
   await page.goto("/reactivation");
   await tid(page, "import-csv").click();
+  // The picker takes focus once the Import data page is ready; a file dropped before that can be lost to React's dev double effect.
+  await expect(page.getByTestId("csv-choose")).toBeFocused();
 
   await page.route("**/csv-analysis", async (route) => {
     await new Promise((r) => setTimeout(r, 1500));

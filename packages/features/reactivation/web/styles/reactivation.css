@@ -228,6 +228,90 @@
   color: var(--dp-accent-ink);
   font-weight: 600;
 }
+.dp-sidebottom {
+  margin-top: auto;
+  padding-top: 20px;
+}
+.dp-status {
+  margin-bottom: 12px;
+  padding: 14px;
+  border: 1px solid var(--dp-line);
+  border-radius: 10px;
+  background: var(--dp-accent-tint);
+  color: var(--dp-ink);
+  font-size: 12px;
+}
+.dp-status strong {
+  display: block;
+}
+.dp-status p {
+  margin-top: 4px;
+  color: var(--dp-muted);
+  line-height: 1.45;
+}
+.dp-status[data-mode="none"],
+.dp-status[data-mode="unknown"] {
+  background: var(--dp-subtle);
+}
+/* file results: the card turns blue and its words say they are not saved */
+.dp-status[data-mode="file"] {
+  background: var(--dp-info-soft);
+  border-color: var(--dp-info-edge);
+  color: var(--dp-info-ink);
+}
+.dp-status[data-mode="file"] p {
+  color: var(--dp-info-ink);
+}
+.dp-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 4px;
+  font-size: 14px;
+  min-width: 0;
+}
+.dp-profile strong {
+  display: block;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+.dp-profile small {
+  display: block;
+  color: var(--dp-muted);
+  font-size: 12px;
+}
+.dp-avatar-dark {
+  background: var(--dp-ink);
+  color: var(--dp-surface);
+}
+.dp-signout button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--dp-control-height);
+  border: 1px solid var(--dp-control);
+  border-radius: var(--dp-radius-control);
+  background: var(--dp-surface);
+  color: var(--dp-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dp-signout button:hover {
+  background: var(--dp-accent-tint);
+  border-color: var(--dp-accent-ink);
+}
+.dp-signout button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.dp-signout .form-error {
+  margin-top: 6px;
+  color: var(--dp-bad-ink);
+  font-size: 12px;
+}
 .dp-frame {
   display: flex;
   flex-direction: column;
@@ -260,6 +344,26 @@
 .dp-crumbs strong {
   color: var(--dp-ink);
   font-weight: 600;
+}
+/* The mode badge says it in words; the colour only backs the words up. */
+.dp-mode {
+  flex: none;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--dp-radius-badge);
+  background: var(--dp-sunk);
+  color: var(--dp-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.dp-mode[data-mode="saved"] {
+  background: var(--dp-accent-soft);
+  color: var(--dp-accent-ink);
+}
+.dp-mode[data-mode="file"] {
+  background: var(--dp-info-soft);
+  border-color: var(--dp-info-edge);
+  color: var(--dp-info-ink);
 }
 .dp-main {
   flex: 1;

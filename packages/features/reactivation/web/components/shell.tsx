@@ -2,24 +2,45 @@
 /**
  * The Dormant patients frame: its own sidebar, header bar and footer around the page, in the same layout as the
  * Voice receptionist but written here (nothing is imported from another feature). It is a client component only
- * to know the current path; the clinic name and role are read on the server and passed in.
+ * to know the current path and whether file results are open; the clinic name, the role and whether a saved analysis
+ * exists are read on the server and passed in.
  */
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { useAuth } from "@clinic/core/web/auth/provider";
+import { SignOut } from "@clinic/core/web/auth/sign-out";
 import { Brand } from "@clinic/ui";
 
-import { Icon, type IconName } from "./kit";
+import { clinicOf, personOf, roleLabel } from "../lib/profile";
 import { canRunRole } from "../lib/roles";
+import { useCsvResult } from "./csv-provider";
+import { Icon, type IconName } from "./kit";
 import { DATA_NAV, NAV, ROOT, activeHref, breadcrumb } from "./shell-nav";
+import { showingFile, statusOf, type Saved } from "./shell-status";
 
-export function Shell({ clinicName, children }: { clinicName: string; children: ReactNode }) {
+export function Shell({
+  clinicName,
+  role: serverRole,
+  saved,
+  children,
+}: {
+  clinicName: string | null;
+  role: string | null;
+  saved: Saved;
+  children: ReactNode;
+}) {
   const path = usePathname();
+  const params = useSearchParams();
   const { auth } = useAuth();
+  const { result } = useCsvResult();
   const role = auth.memberships.find((m) => m.workspace_id === auth.workspace?.id)?.role;
   const active = activeHref(path);
   const trail = breadcrumb(path);
+  const clinic = clinicOf(clinicName);
+  const person = personOf(auth.user);
+  const roleText = roleLabel(serverRole);
+  const status = statusOf(saved, showingFile(path, params.get("view"), params.get("source"), !!result));
   return (
     <div className="dp-app">
       <a className="dp-skip" href="#main-content">
@@ -31,10 +52,10 @@ export function Shell({ clinicName, children }: { clinicName: string; children: 
         </div>
         <div className="dp-workspace">
           <div className="dp-avatar" aria-hidden>
-            {clinicName.trim()[0]?.toUpperCase() ?? "D"}
+            {clinic.letter}
           </div>
           <div>
-            <strong data-testid="clinic-name">{clinicName}</strong>
+            <strong data-testid="clinic-name">{clinic.name}</strong>
             <small>Dormant patients workspace</small>
           </div>
         </div>
@@ -49,6 +70,24 @@ export function Shell({ clinicName, children }: { clinicName: string; children: 
             <NavList label="Dormant patients data" items={DATA_NAV} active={active} />
           </>
         )}
+        <div className="dp-sidebottom">
+          <div className="dp-status" data-mode={status.tone} data-testid="status-card">
+            <strong>{status.title}</strong>
+            <p>{status.text}</p>
+          </div>
+          <div className="dp-profile" data-testid="profile">
+            <div className="dp-avatar dp-avatar-dark" aria-hidden>
+              {person.initials}
+            </div>
+            <div>
+              <strong data-testid="profile-name">{person.name}</strong>
+              {roleText && <small data-testid="profile-role">{roleText}</small>}
+            </div>
+          </div>
+          <div className="dp-signout">
+            <SignOut />
+          </div>
+        </div>
       </aside>
       <div className="dp-frame">
         <header className="dp-header">
@@ -60,11 +99,16 @@ export function Shell({ clinicName, children }: { clinicName: string; children: 
               </span>
             ))}
           </nav>
+          <span className="dp-mode" data-mode={status.tone} data-testid="mode-badge">
+            {status.badge}
+          </span>
         </header>
         <main id="main-content" tabIndex={-1} className="dp-main">
           <div className="dp-page">{children}</div>
         </main>
-        <footer className="dp-footer">Avishkar Dormant patients</footer>
+        <footer className="dp-footer" data-testid="shell-footer">
+          Avishkar Dormant patients · {status.footer}
+        </footer>
       </div>
     </div>
   );
