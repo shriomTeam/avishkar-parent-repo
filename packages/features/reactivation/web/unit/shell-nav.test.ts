@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { NAV, activeHref, breadcrumb } from "../components/shell-nav.ts";
+import { DATA_NAV, NAV, activeHref, breadcrumb } from "../components/shell-nav.ts";
 
 test("the sidebar has the three sections, in order", () => {
   assert.deepEqual(
@@ -23,4 +23,13 @@ test("the breadcrumb names the section, and the patient group on a type page", (
   assert.deepEqual(breadcrumb("/reactivation"), ["Workspace", "Overview"]);
   assert.deepEqual(breadcrumb("/reactivation/runs"), ["Workspace", "Runs"]);
   assert.deepEqual(breadcrumb("/reactivation/types/unclassified"), ["Workspace", "Overview", "Patient group"]);
+});
+
+test("Import data is its own group and its page is active and named in the breadcrumb", () => {
+  assert.deepEqual(
+    DATA_NAV.map((n) => n.label),
+    ["Import data"],
+  );
+  assert.equal(activeHref("/reactivation/import"), "/reactivation/import");
+  assert.deepEqual(breadcrumb("/reactivation/import"), ["Workspace", "Import data"]);
 });

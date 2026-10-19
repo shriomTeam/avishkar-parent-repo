@@ -7,13 +7,14 @@ import type { LatestRun, TypeEntry } from "../lib/api-types";
 import { browserClient } from "../lib/client";
 import { formatDateTime, relativeTime } from "../lib/format";
 import { failureMessage, stageLabel } from "../lib/messages";
-import { CsvImportPanel } from "./csv-import";
+import { canRunRole } from "../lib/roles";
 import { useCsvResult } from "./csv-provider";
 import { CsvResults } from "./csv-results";
-import { Button, Card, EmptyState, Icon, Notice, ProgressBar } from "./kit";
+import { Button, ButtonLink, Card, EmptyState, Icon, Notice, ProgressBar } from "./kit";
 import { QualityPanel } from "./quality-panel";
 import { Tiles } from "./tiles";
 import { TypesTable } from "./types-table";
+import { IMPORT_PATH } from "./shell-nav";
 import { Welcome } from "./welcome";
 
 export type InFlight = { id: string; status: string; progress_pct: number };
@@ -28,7 +29,6 @@ export type OverviewData = {
 };
 
 const POLL_MS = 2000;
-const CAN_RUN = new Set(["owner", "office_manager"]);
 
 function idempotencyKey() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -42,7 +42,7 @@ export function Overview({ data }: { data: OverviewData }) {
   const tenantId = auth.workspace?.id;
   const timeZone = auth.workspace?.timezone ?? "America/New_York";
   const role = auth.memberships.find((m) => m.workspace_id === tenantId)?.role;
-  const canRun = !!role && CAN_RUN.has(role);
+  const canRun = canRunRole(role);
   const client = useMemo(
     () => browserClient(auth.csrf_token, tenantId),
     [auth.csrf_token, tenantId],
@@ -56,7 +56,6 @@ export function Overview({ data }: { data: OverviewData }) {
   const [startError, setStartError] = useState<string | null>(null);
   const [trouble, setTrouble] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
-  const [importing, setImporting] = useState(false);
   const { result: csv } = useCsvResult();
   const params = useSearchParams();
   const forceSaved = params.get("view") === "saved";
@@ -183,15 +182,10 @@ export function Overview({ data }: { data: OverviewData }) {
     </Button>
   ) : null;
   const importButton = canRun ? (
-    <Button
-      variant="secondary"
-      onClick={() => setImporting((open) => !open)}
-      aria-expanded={importing}
-      data-testid="import-csv"
-    >
+    <ButtonLink variant="secondary" href={IMPORT_PATH} data-testid="import-csv">
       <Icon name="upload" size={16} />
       Import CSV
-    </Button>
+    </ButtonLink>
   ) : null;
 
   return (
@@ -235,10 +229,6 @@ export function Overview({ data }: { data: OverviewData }) {
           </div>
         )}
       </div>
-
-      {importing && canRun && (
-        <CsvImportPanel onDone={() => setImporting(false)} onCancel={() => setImporting(false)} />
-      )}
 
       {startError && <Notice tone="error">{startError}</Notice>}
       {failed && !run && (

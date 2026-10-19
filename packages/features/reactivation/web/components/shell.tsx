@@ -7,13 +7,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { useAuth } from "@clinic/core/web/auth/provider";
 import { Brand } from "@clinic/ui";
 
-import { Icon } from "./kit";
-import { NAV, ROOT, activeHref, breadcrumb } from "./shell-nav";
+import { Icon, type IconName } from "./kit";
+import { canRunRole } from "../lib/roles";
+import { DATA_NAV, NAV, ROOT, activeHref, breadcrumb } from "./shell-nav";
 
 export function Shell({ clinicName, children }: { clinicName: string; children: ReactNode }) {
   const path = usePathname();
+  const { auth } = useAuth();
+  const role = auth.memberships.find((m) => m.workspace_id === auth.workspace?.id)?.role;
   const active = activeHref(path);
   const trail = breadcrumb(path);
   return (
@@ -38,18 +42,13 @@ export function Shell({ clinicName, children }: { clinicName: string; children: 
           ← All clinic products
         </Link>
         <div className="dp-navlabel">WORKSPACE</div>
-        <nav aria-label="Dormant patients sections" className="dp-nav">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={active === item.href ? "page" : undefined}
-            >
-              <Icon name={item.icon} size={19} />
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <NavList label="Dormant patients sections" items={NAV} active={active} />
+        {canRunRole(role) && (
+          <>
+            <div className="dp-navlabel">DATA</div>
+            <NavList label="Dormant patients data" items={DATA_NAV} active={active} />
+          </>
+        )}
       </aside>
       <div className="dp-frame">
         <header className="dp-header">
@@ -68,5 +67,26 @@ export function Shell({ clinicName, children }: { clinicName: string; children: 
         <footer className="dp-footer">Avishkar Dormant patients</footer>
       </div>
     </div>
+  );
+}
+
+function NavList({
+  label,
+  items,
+  active,
+}: {
+  label: string;
+  items: { href: string; label: string; icon: IconName }[];
+  active: string | null;
+}) {
+  return (
+    <nav aria-label={label} className="dp-nav">
+      {items.map((item) => (
+        <Link key={item.href} href={item.href} aria-current={active === item.href ? "page" : undefined}>
+          <Icon name={item.icon} size={19} />
+          {item.label}
+        </Link>
+      ))}
+    </nav>
   );
 }

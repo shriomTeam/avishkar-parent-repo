@@ -4,7 +4,8 @@
  * Candidates to promote into packages/ui later: Button, Card, Stat, Skeleton, Notice, ProgressBar, RangeBar,
  * CollapsiblePanel, EmptyState, PageHead, Icon, the app shell.
  */
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import Link from "next/link";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 
 // --- icons: inline SVG, 24 px grid, 1.7 stroke, always decorative (the words next to them carry the meaning) ------
 
@@ -57,6 +58,23 @@ export function Button({
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" }) {
   return <button className={["dp-btn", className].filter(Boolean).join(" ")} data-variant={variant} {...props} />;
+}
+
+/** A link that looks like a Button, for actions that go to another page. */
+export function ButtonLink({
+  variant = "primary",
+  className,
+  href,
+  ...props
+}: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & { href: string; variant?: "primary" | "secondary" }) {
+  return (
+    <Link
+      href={href}
+      className={["dp-btn", className].filter(Boolean).join(" ")}
+      data-variant={variant}
+      {...props}
+    />
+  );
 }
 
 export function Card({

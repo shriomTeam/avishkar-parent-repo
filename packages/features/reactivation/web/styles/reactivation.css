@@ -378,6 +378,13 @@
   background: var(--dp-accent);
   border-color: var(--dp-accent-edge);
 }
+.dp-scope a.dp-btn {
+  color: var(--dp-ink);
+  text-decoration: none;
+}
+.dp-scope a.dp-btn[data-variant="primary"] {
+  color: var(--dp-on-accent);
+}
 .dp-icon {
   flex: none;
 }

@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { fileNotes } from "../lib/messages";
 import { formatDateTime } from "../lib/format";
-import { CsvImportPanel } from "./csv-import";
+import { IMPORT_PATH } from "./shell-nav";
 import { useCsvResult, type CsvResult } from "./csv-provider";
-import { Button, Card, EmptyState, Icon, Notice } from "./kit";
+import { Button, ButtonLink, Card, EmptyState, Icon, Notice } from "./kit";
 import { QualityPanel } from "./quality-panel";
 import { Tiles } from "./tiles";
 import { TypesTable } from "./types-table";
@@ -44,7 +44,6 @@ export function CsvResults({
 }) {
   const { data, fileName } = result;
   const heading = useRef<HTMLHeadingElement>(null);
-  const [importing, setImporting] = useState(false);
   const { clear } = useCsvResult();
 
   // Move focus to the new results when they appear, so keyboard and screen-reader users land on them.
@@ -74,10 +73,10 @@ export function CsvResults({
         actions={
           <span className="dp-banner-actions">
             {canImport && (
-              <Button variant="secondary" onClick={() => setImporting(true)} data-testid="csv-another">
+              <ButtonLink variant="secondary" href={IMPORT_PATH} data-testid="csv-another">
                 <Icon name="upload" size={16} />
                 Import another file
-              </Button>
+              </ButtonLink>
             )}
             <Button variant="secondary" onClick={back} data-testid="csv-back">
               Back to saved data
@@ -85,10 +84,6 @@ export function CsvResults({
           </span>
         }
       />
-
-      {importing && canImport && (
-        <CsvImportPanel onDone={() => setImporting(false)} onCancel={() => setImporting(false)} />
-      )}
 
       <Notice tone="info" title="Return rates are assumed.">
         Measured rates come from past campaigns, which exist only in your saved data, so a file analysis always uses

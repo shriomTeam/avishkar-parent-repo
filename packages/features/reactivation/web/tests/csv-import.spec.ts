@@ -81,7 +81,8 @@ test("a clinic with no data lands on the welcome page and can read the guide and
   ).toBeVisible();
   await expect(tid(page, "import-csv")).toBeVisible();
   await expect(tid(page, "tile-dormant")).toHaveCount(0);
-  // The importer lives on this page only: not in the sidebar, and the platform's own import page is untouched.
+  // The importer has its own page, linked as "Import data" in the sidebar, and the platform's own import page is untouched.
+  // There is no "Import CSV" link in any navigation.
   await expect(page.getByRole("navigation").getByRole("link", { name: "Import CSV" })).toHaveCount(0);
 
   const download = page.waitForEvent("download");
