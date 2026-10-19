@@ -967,6 +967,69 @@
 .dp-file-frame > * + * {
   margin-top: 16px;
 }
+/* The same blue tokens without the dashed frame, for the rows of the file on the Imported file page. */
+.dp-file-frame[data-plain] {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* --- the Imported file page: a table that scrolls inside its own region ----------------------------------------- */
+.dp-grid-scroll {
+  max-height: min(68vh, 640px);
+  overflow: auto;
+  border: 1px solid var(--dp-line);
+  border-radius: 10px;
+  background: var(--dp-surface);
+}
+.dp-grid {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+.dp-grid th,
+.dp-grid td {
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--dp-line);
+  min-width: 8ch;
+  max-width: 28ch;
+  overflow-wrap: anywhere;
+}
+.dp-grid thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--dp-subtle);
+  color: var(--dp-ink);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.dp-grid tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 0;
+  background: var(--dp-subtle);
+  color: var(--dp-muted);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.dp-grid thead th:first-child {
+  left: 0;
+  z-index: 3;
+  min-width: 0;
+}
+.dp-field-inline {
+  flex-direction: row;
+  align-items: center;
+}
+.dp-btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* --- type page: hints, controls, patient list ---------------------------------------------------------------------- */
 .dp-hint-wrap {

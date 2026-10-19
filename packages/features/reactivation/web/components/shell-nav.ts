@@ -14,7 +14,11 @@ export const NAV: Item[] = [
 ];
 
 /** The file items. Only roles that can import a file see them. */
-export const DATA_NAV: Item[] = [{ href: IMPORT_PATH, label: "Import data", icon: "upload" }];
+export const FILE_PATH = `${ROOT}/file`;
+export const DATA_NAV: Item[] = [
+  { href: IMPORT_PATH, label: "Import data", icon: "upload" },
+  { href: FILE_PATH, label: "Imported file", icon: "table" },
+];
 
 const ALL = [...NAV, ...DATA_NAV];
 

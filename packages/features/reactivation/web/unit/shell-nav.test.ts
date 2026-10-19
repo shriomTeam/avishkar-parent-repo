@@ -28,8 +28,10 @@ test("the breadcrumb names the section, and the patient group on a type page", (
 test("Import data is its own group and its page is active and named in the breadcrumb", () => {
   assert.deepEqual(
     DATA_NAV.map((n) => n.label),
-    ["Import data"],
+    ["Import data", "Imported file"],
   );
   assert.equal(activeHref("/reactivation/import"), "/reactivation/import");
   assert.deepEqual(breadcrumb("/reactivation/import"), ["Workspace", "Import data"]);
+  assert.equal(activeHref("/reactivation/file"), "/reactivation/file");
+  assert.deepEqual(breadcrumb("/reactivation/file"), ["Workspace", "Imported file"]);
 });

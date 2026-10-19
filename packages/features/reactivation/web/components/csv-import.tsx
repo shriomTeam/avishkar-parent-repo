@@ -69,7 +69,10 @@ export function CsvImportPanel({ onDone, onCancel }: { onDone: () => void; onCan
     });
     if (controller.signal.aborted) return;
     if (outcome.ok) {
-      setResult({ data: outcome.data, fileName: file.name });
+      // Keep the file in memory (this tab only) so its rows can be shown on the Imported file page.
+      const bytes = await file.arrayBuffer().catch(() => null);
+      if (controller.signal.aborted) return;
+      setResult({ data: outcome.data, fileName: file.name, bytes, importedAt: new Date() });
       setPhase({ kind: "idle" });
       onDone();
     } else if (!outcome.cancelled) {
