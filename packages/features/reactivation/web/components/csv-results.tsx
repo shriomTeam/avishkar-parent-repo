@@ -1,12 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Button, Card } from "@clinic/ui";
 
 import { fileNotes } from "../lib/messages";
 import { formatDateTime } from "../lib/format";
 import { CsvImportPanel } from "./csv-import";
 import { useCsvResult, type CsvResult } from "./csv-provider";
-import { EmptyState, Notice } from "./kit";
+import { Button, Card, EmptyState, Icon, Notice } from "./kit";
 import { QualityPanel } from "./quality-panel";
 import { Tiles } from "./tiles";
 import { TypesTable } from "./types-table";
@@ -76,6 +75,7 @@ export function CsvResults({
           <span className="dp-banner-actions">
             {canImport && (
               <Button variant="secondary" onClick={() => setImporting(true)} data-testid="csv-another">
+                <Icon name="upload" size={16} />
                 Import another file
               </Button>
             )}

@@ -1,11 +1,9 @@
-import { Card, PageHeader } from "@clinic/ui";
-
-import { EmptyState } from "../../components/kit";
+import { Card, EmptyState, PageHead } from "../../components/kit";
 
 export default function SettingsPage() {
   return (
     <>
-      <PageHeader
+      <PageHead
         title="Settings"
         description="How patients are judged dormant and when the analysis runs."
       />

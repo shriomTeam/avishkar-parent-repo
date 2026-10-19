@@ -1,8 +1,8 @@
 "use client";
 import { useRef, useState, type ReactNode } from "react";
-import { Button } from "@clinic/ui";
 
 import { CsvHelp, TemplateButton } from "./csv-help";
+import { Button, Icon } from "./kit";
 import { CsvImportPanel } from "./csv-import";
 
 /** The first visit to Dormant patients for a clinic with no patient data and no analysis. */
@@ -13,6 +13,9 @@ export function Welcome({ canImport, notice }: { canImport: boolean; notice?: Re
     <div className="dp-stack" data-testid="welcome">
       {notice}
       <section className="dp-welcome" aria-labelledby="dp-welcome-title">
+        <span className="dp-welcome-icon">
+          <Icon name="users" size={26} />
+        </span>
         <h1 className="dp-title dp-welcome-title" id="dp-welcome-title">
           Upload your data to find your dormant patients
         </h1>
@@ -24,6 +27,7 @@ export function Welcome({ canImport, notice }: { canImport: boolean; notice?: Re
         {canImport ? (
           <div className="dp-welcome-actions">
             <Button onClick={() => setOpen(true)} aria-expanded={open} data-testid="import-csv">
+              <Icon name="upload" size={16} />
               Import CSV
             </Button>
             <TemplateButton />

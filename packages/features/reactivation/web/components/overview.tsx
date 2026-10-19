@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Card } from "@clinic/ui";
 import { useAuth } from "@clinic/core/web/auth/provider";
 
 import type { LatestRun, TypeEntry } from "../lib/api-types";
@@ -11,7 +10,7 @@ import { failureMessage, stageLabel } from "../lib/messages";
 import { CsvImportPanel } from "./csv-import";
 import { useCsvResult } from "./csv-provider";
 import { CsvResults } from "./csv-results";
-import { EmptyState, Notice, ProgressBar } from "./kit";
+import { Button, Card, EmptyState, Icon, Notice, ProgressBar } from "./kit";
 import { QualityPanel } from "./quality-panel";
 import { Tiles } from "./tiles";
 import { TypesTable } from "./types-table";
@@ -179,6 +178,7 @@ export function Overview({ data }: { data: OverviewData }) {
   const summary = latest?.summary ?? null;
   const runButton = canRun ? (
     <Button onClick={runNow} disabled={busy} data-testid="run-now">
+      {!busy && <Icon name="play" size={16} />}
       {busy ? "Analysing…" : latest ? "Run now" : "Analyse my patients"}
     </Button>
   ) : null;
@@ -189,6 +189,7 @@ export function Overview({ data }: { data: OverviewData }) {
       aria-expanded={importing}
       data-testid="import-csv"
     >
+      <Icon name="upload" size={16} />
       Import CSV
     </Button>
   ) : null;

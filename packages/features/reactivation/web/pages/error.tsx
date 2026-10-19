@@ -1,7 +1,5 @@
 "use client";
-import { Button, Card } from "@clinic/ui";
-
-import { EmptyState } from "../components/kit";
+import { Button, Card, EmptyState } from "../components/kit";
 
 export default function ErrorPage({ reset }: { reset: () => void }) {
   return (
