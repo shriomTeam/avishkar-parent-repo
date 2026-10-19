@@ -3,20 +3,18 @@ import type { ReactNode } from "react";
 import { requireFeature } from "@clinic/core/web/api";
 
 import { CsvResultProvider } from "../components/csv-provider";
-import { SectionTabs } from "../components/section-tabs";
+import { Shell } from "../components/shell";
 
 export default async function ReactivationLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  await requireFeature("reactivation");
+  const me = await requireFeature("reactivation");
   return (
     <div className="dp-scope">
       <CsvResultProvider>
-        <p className="dp-eyebrow">Dormant patients</p>
-        <SectionTabs />
-        {children}
+        <Shell clinicName={me.tenant_name || "Your clinic"}>{children}</Shell>
       </CsvResultProvider>
     </div>
   );

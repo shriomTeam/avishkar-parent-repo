@@ -2,7 +2,7 @@
  * This feature's own building blocks: the same visual language as the Voice receptionist, written here so the
  * feature does not depend on (or fight) the Tailwind classes in @clinic/ui.
  * Candidates to promote into packages/ui later: Button, Card, Stat, Skeleton, Notice, ProgressBar, RangeBar,
- * CollapsiblePanel, EmptyState, PageHead, Icon, SectionTabs.
+ * CollapsiblePanel, EmptyState, PageHead, Icon, the app shell.
  */
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
@@ -22,6 +22,8 @@ const ICON_PATHS = {
   file: "M14 3H7a1 1 0 00-1 1v16a1 1 0 001 1h10a1 1 0 001-1V7l-4-4zm0 0v4h4M9 13h6M9 17h6",
   users: "M16 19v-1.5a3.5 3.5 0 00-3.5-3.5h-5A3.5 3.5 0 004 17.5V19M10 4.5a3.25 3.25 0 100 6.5 3.25 3.25 0 000-6.5zM20 19v-1.5a3.5 3.5 0 00-2.6-3.4M15.5 4.7a3.25 3.25 0 010 6.1",
   clock: "M12 3a9 9 0 100 18 9 9 0 000-18zm0 4.5V12l3 2",
+  overview: "M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z",
+  chevron: "M9 6l6 6-6 6",
   settings: "M12 9a3 3 0 100 6 3 3 0 000-6zm7.4 3a7.4 7.4 0 00-.1-1.3l2-1.5-2-3.4-2.3.9a7.5 7.5 0 00-2.2-1.3L14.4 3h-4l-.4 2.4a7.5 7.5 0 00-2.2 1.3l-2.3-.9-2 3.4 2 1.5a7.4 7.4 0 000 2.6l-2 1.5 2 3.4 2.3-.9a7.5 7.5 0 002.2 1.3l.4 2.4h4l.4-2.4a7.5 7.5 0 002.2-1.3l2.3.9 2-3.4-2-1.5c.1-.4.1-.9.1-1.3z",
 } as const;
 export type IconName = keyof typeof ICON_PATHS;
