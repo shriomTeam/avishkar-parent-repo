@@ -55,16 +55,17 @@ module "api" {
   memory          = "1Gi"
 
   env = {
-    APP_ENV             = "production"
-    PUBLIC_APP_ORIGIN   = local.web_url
-    GOOGLE_CLIENT_ID    = var.google_client_id
-    GOOGLE_REDIRECT_URI = "${local.web_url}/api/v1/auth/google/callback"
-    COOKIE_SECURE       = "true"
-    SESSION_COOKIE_NAME = "__Host-avishkar_session"
-    CORS_ORIGINS        = jsonencode([local.web_url])
-    TRUSTED_HOSTS       = jsonencode([local.api_host])
-    TRUSTED_PROXY_HOPS  = "1" # Cloud Run's front end is the one proxy; see clinic_api.forwarded
-    VOICE_GCP_PROJECT   = var.project_id
+    APP_ENV                 = "production"
+    PUBLIC_APP_ORIGIN       = local.web_url
+    GOOGLE_CLIENT_ID        = var.google_client_id
+    GOOGLE_REDIRECT_URI     = "${local.web_url}/api/v1/auth/google/callback"
+    COOKIE_SECURE           = "true"
+    SESSION_COOKIE_NAME     = "__Host-avishkar_session"
+    CORS_ORIGINS            = jsonencode([local.web_url])
+    TRUSTED_HOSTS           = jsonencode([local.api_host])
+    TRUSTED_PROXY_HOPS      = "1" # Cloud Run's front end is the one proxy; see clinic_api.forwarded
+    VOICE_GCP_PROJECT       = var.project_id
+    VOICE_RECORDINGS_BUCKET = module.storage.name # recordings go under recordings/
   }
   secret_env = local.api_secrets
 

@@ -28,7 +28,10 @@ async function createAgent(page: Page, name: string) {
   await dialog
     .getByRole("button", { name: "Create agent", exact: true })
     .click();
-  await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
+  // Creating adds the tool, saves the agent and opens its page, which a cold dev server compiles on first visit.
+  await expect(page.getByRole("heading", { name, exact: true })).toBeVisible(
+    CALL,
+  );
 }
 
 /** Opens Test studio, calls the agent, lets the scripted caller give details, and hangs up. */
