@@ -528,6 +528,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/reactivation/runs/{run_id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Run Report
+         * @description Every dormant patient of a completed run, for the Export report button, in one call.
+         *
+         *     The patient list pages 100 at a time and writes an audit row per page; a report of up to 25,000 patients would
+         *     write hundreds. This is one read and one audit entry holding counts only. Names are patient data, so the response
+         *     is never cached.
+         */
+        get: operations["run_report_features_reactivation_runs__run_id__report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/reactivation/runs": {
         parameters: {
             query?: never;
@@ -2007,6 +2031,55 @@ export interface components {
             total_revenue_cents: number;
             /** Profiles */
             profiles: components["schemas"]["Profile"][];
+        };
+        /** ReportOut */
+        ReportOut: {
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /** Total */
+            total: number;
+            /** Patients */
+            patients: components["schemas"]["ReportPatient"][];
+        };
+        /**
+         * ReportPatient
+         * @description One row of the Dormant patients report. No contact details and none of the scoring internals.
+         */
+        ReportPatient: {
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+            /** Display Name */
+            display_name: string | null;
+            /** Status */
+            status: string;
+            /** Primary Type */
+            primary_type: string | null;
+            /** Reasons */
+            reasons: string[];
+            /** Usual Service Name */
+            usual_service_name: string | null;
+            /** Last Visit At */
+            last_visit_at: string | null;
+            /** Days Since Last Visit */
+            days_since_last_visit: number | null;
+            /** Likelihood Score */
+            likelihood_score: number | null;
+            /** Revenue Basis Cents */
+            revenue_basis_cents: number;
+            /** Revenue Kind */
+            revenue_kind: string | null;
+            /** Revenue Low Cents */
+            revenue_low_cents: number | null;
+            /** Revenue High Cents */
+            revenue_high_cents: number | null;
+            /** Offer Service Name */
+            offer_service_name: string | null;
         };
         /** RevenueRules */
         RevenueRules: {
@@ -3539,6 +3612,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PatientPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_report_features_reactivation_runs__run_id__report_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportOut"];
                 };
             };
             /** @description Validation Error */

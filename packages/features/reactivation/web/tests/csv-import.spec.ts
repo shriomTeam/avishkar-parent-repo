@@ -81,7 +81,8 @@ test("a clinic with no data lands on the welcome page and can read the guide and
   ).toBeVisible();
   await expect(tid(page, "import-csv")).toBeVisible();
   await expect(tid(page, "tile-dormant")).toHaveCount(0);
-  // The importer lives on this page only: not in the sidebar, and the platform's own import page is untouched.
+  // The importer has its own page, linked as "Import data" in the sidebar, and the platform's own import page is untouched.
+  // There is no "Import CSV" link in any navigation.
   await expect(page.getByRole("navigation").getByRole("link", { name: "Import CSV" })).toHaveCount(0);
 
   const download = page.waitForEvent("download");
@@ -141,6 +142,7 @@ test("importing a file shows its results with a banner, keeps them across pages,
     await noHorizontalScroll(page);
     await page.screenshot({ path: info.outputPath(`file-results-${width}.png`), fullPage: true });
   }
+  await page.setViewportSize({ width: 1440, height: 1000 }); // the loop leaves 768 px, where the sidebar is a menu
 
   // The results survive moving around the section, and say so on every page.
   await tid(page, "type-row-unclassified").getByRole("link").click();
@@ -243,6 +245,8 @@ test("a file can be dropped, and progress is shown while it is analysed", async 
   helper("seed", workspace, ["--scenario", "empty"]);
   await page.goto("/reactivation");
   await tid(page, "import-csv").click();
+  // The picker takes focus once the Import data page is ready; a file dropped before that can be lost to React's dev double effect.
+  await expect(page.getByTestId("csv-choose")).toBeFocused();
 
   await page.route("**/csv-analysis", async (route) => {
     await new Promise((r) => setTimeout(r, 1500));

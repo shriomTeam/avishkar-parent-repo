@@ -1,0 +1,10 @@
+patient_id,visit_date,line_kind,amount,patient_name,service_name
+P1,2026-01-10,service,150.00,"Rao, Maya",Botox
+P2,2026-01-11,service,90.50,"Dr ""Sam"" Lee","Line one
+line two"
+P3,2026-01-12,product,12.00,Zoë ☃,"Windows
+break"
+P4,2026-01-13,service,10.00,"",Facial
+P5,2026-01-14,service,20.00,,"a,b,c"
+P6,2026-01-15,service,30.00,"  padded  ",Peel
+P7,2026-01-16,service,40.00,"""",Peel

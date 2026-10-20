@@ -1,13 +1,12 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
-import { Button, Card } from "@clinic/ui";
 import { useAuth } from "@clinic/core/web/auth/provider";
 
 import { formatCount } from "../lib/format";
 import { uploadCsv, type CsvFailure } from "../lib/csv-upload";
 import { TemplateButton, useCsvColumns } from "./csv-help";
 import { useCsvResult } from "./csv-provider";
-import { Notice, ProgressBar } from "./kit";
+import { Button, Card, Icon, Notice, ProgressBar } from "./kit";
 
 type Phase =
   | { kind: "idle" }
@@ -70,7 +69,10 @@ export function CsvImportPanel({ onDone, onCancel }: { onDone: () => void; onCan
     });
     if (controller.signal.aborted) return;
     if (outcome.ok) {
-      setResult({ data: outcome.data, fileName: file.name });
+      // Keep the file in memory (this tab only) so its rows can be shown on the Imported file page.
+      const bytes = await file.arrayBuffer().catch(() => null);
+      if (controller.signal.aborted) return;
+      setResult({ data: outcome.data, fileName: file.name, bytes, importedAt: new Date() });
       setPhase({ kind: "idle" });
       onDone();
     } else if (!outcome.cancelled) {
@@ -173,8 +175,12 @@ export function CsvImportPanel({ onDone, onCancel }: { onDone: () => void; onCan
             </div>
           ) : (
             <>
+              <span className="dp-drop-icon">
+                <Icon name="file" size={22} />
+              </span>
               <p className="dp-drop-text">Drag a .csv file here, or</p>
               <Button onClick={() => input.current?.click()} data-testid="csv-choose">
+                <Icon name="upload" size={16} />
                 Choose a file
               </Button>
               <p className="dp-small">

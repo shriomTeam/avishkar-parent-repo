@@ -81,8 +81,8 @@ test("the overview shows tiles, the types table and the unavailable state", asyn
   const f = helper("seed", workspace, ["--scenario", "full"]);
   await page.goto("/reactivation");
 
-  // Navigation: the section, its tabs and the platform sidebar entry.
-  await expect(page.getByRole("link", { name: "Dormant patients" })).toBeVisible();
+  // Navigation: the section's own sidebar, and the way back to the platform.
+  await expect(page.getByRole("link", { name: "← All clinic products" })).toBeVisible();
   const tabs = page.getByRole("navigation", { name: "Dormant patients sections" });
   await expect(tabs.getByRole("link")).toHaveText(["Overview", "Runs", "Settings"]);
   await expect(tabs.getByRole("link", { name: "Overview" })).toHaveAttribute(

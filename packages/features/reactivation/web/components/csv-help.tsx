@@ -5,7 +5,7 @@ import { useAuth } from "@clinic/core/web/auth/provider";
 import { browserClient } from "../lib/client";
 import { formatCount } from "../lib/format";
 import { useCsvResult } from "./csv-provider";
-import { CollapsiblePanel, Notice, Skeleton } from "./kit";
+import { CollapsiblePanel, Icon, Notice, Skeleton } from "./kit";
 
 /** The column definition lives in the API; this loads it once per visit and shares it. */
 export function useCsvColumns() {
@@ -60,6 +60,7 @@ export function TemplateButton() {
   return (
     <>
       <button type="button" className="dp-link-button" onClick={download} data-testid="download-template">
+        <Icon name="download" size={15} />
         Download template
       </button>
       {error && (
