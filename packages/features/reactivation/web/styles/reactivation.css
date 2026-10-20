@@ -134,6 +134,39 @@
   background: var(--dp-surface);
   border-right: 1px solid var(--dp-line);
 }
+.dp-sidehead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dp-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: var(--dp-hit);
+  min-height: var(--dp-hit);
+  padding: 0 14px;
+  border: 1px solid var(--dp-control);
+  border-radius: var(--dp-radius-control);
+  background: var(--dp-surface);
+  color: var(--dp-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dp-menu-btn:hover {
+  background: var(--dp-accent-tint);
+  border-color: var(--dp-accent-ink);
+}
+.dp-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
 .dp-brand {
   padding: 0 8px;
 }
@@ -608,7 +641,9 @@
 }
 .dp-notice-actions {
   margin-left: auto;
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
 }
 .dp-progress-row {
   display: flex;
@@ -880,6 +915,7 @@
 }
 .dp-skeleton {
   display: block;
+  max-width: 100%;
   border-radius: 6px;
   background: linear-gradient(90deg, var(--dp-sunk), #e6e4ea, var(--dp-sunk));
   background-size: 200% 100%;
@@ -1353,8 +1389,9 @@
 }
 .dp-pager-buttons {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 8px 12px;
 }
 .dp-pager-page {
   font-size: 14px;
@@ -1446,15 +1483,35 @@
   .dp-scope {
     --dp-pad-card: 18px;
   }
-  /* stand-in until the menu button arrives: the sidebar stacks above the page */
+  /* the sidebar becomes a top bar; its content opens as a panel from the Menu button */
   .dp-app {
     grid-template-columns: minmax(0, 1fr);
   }
   .dp-side {
     position: static;
     height: auto;
+    overflow: visible;
+    padding: 8px 20px;
     border-right: 0;
     border-bottom: 1px solid var(--dp-line);
+  }
+  .dp-menu-btn {
+    display: inline-flex;
+  }
+  .dp-panel {
+    display: none;
+  }
+  .dp-panel[data-open="true"] {
+    display: flex;
+    padding: 8px 0 12px;
+  }
+  .dp-sidebottom {
+    margin-top: 16px;
+    padding-top: 0;
+  }
+  .dp-header {
+    flex-wrap: wrap;
+    padding-block: 12px;
   }
   .dp-header,
   .dp-main,

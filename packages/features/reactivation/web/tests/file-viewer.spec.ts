@@ -178,7 +178,8 @@ test("front desk has no Imported file item, and the page refuses them by URL", a
 test("on a narrow screen the table scrolls inside its own region, not the page", async ({ page }) => {
   await importFile(page, csvFile(40));
   await page.setViewportSize({ width: 768, height: 1000 });
-  await viewerLink(page).click(); // at this width the sidebar is stacked above the page, still reachable
+  await page.getByRole("button", { name: "Menu" }).click(); // at this width the sidebar is a menu
+  await viewerLink(page).click();
   await expect(tid(page, "file-table")).toBeVisible();
   const { page: pageOver, region } = await page.evaluate(() => {
     const r = document.querySelector('[data-testid="file-region"]') as HTMLElement;

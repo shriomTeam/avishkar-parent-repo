@@ -142,6 +142,7 @@ test("importing a file shows its results with a banner, keeps them across pages,
     await noHorizontalScroll(page);
     await page.screenshot({ path: info.outputPath(`file-results-${width}.png`), fullPage: true });
   }
+  await page.setViewportSize({ width: 1440, height: 1000 }); // the loop leaves 768 px, where the sidebar is a menu
 
   // The results survive moving around the section, and say so on every page.
   await tid(page, "type-row-unclassified").getByRole("link").click();
