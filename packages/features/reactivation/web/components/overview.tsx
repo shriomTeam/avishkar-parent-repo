@@ -8,8 +8,10 @@ import { browserClient } from "../lib/client";
 import { formatDateTime, relativeTime } from "../lib/format";
 import { failureMessage, stageLabel } from "../lib/messages";
 import { canRunRole } from "../lib/roles";
+import { num } from "../lib/summary";
 import { useCsvResult } from "./csv-provider";
 import { CsvResults } from "./csv-results";
+import { ExportReportButton } from "./export-button";
 import { Button, ButtonLink, Card, EmptyState, Icon, Notice, ProgressBar } from "./kit";
 import { QualityPanel } from "./quality-panel";
 import { Tiles } from "./tiles";
@@ -188,6 +190,11 @@ export function Overview({ data }: { data: OverviewData }) {
     </ButtonLink>
   ) : null;
 
+  const exportButton =
+    canRun && latest ? (
+      <ExportReportButton source={{ kind: "saved", latest, types, dormant: num(summary, "dormant_count") }} />
+    ) : null;
+
   return (
     <div className="dp-stack">
       {clearedNotice}
@@ -222,9 +229,10 @@ export function Overview({ data }: { data: OverviewData }) {
             )}
           </p>
         </div>
-        {(importButton || (latest && runButton)) && (
+        {(importButton || exportButton || (latest && runButton)) && (
           <div className="dp-head-actions">
             {importButton}
+            {exportButton}
             {latest && runButton}
           </div>
         )}

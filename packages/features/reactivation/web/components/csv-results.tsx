@@ -3,6 +3,8 @@ import { useEffect, useRef } from "react";
 
 import { fileNotes } from "../lib/messages";
 import { formatDateTime } from "../lib/format";
+import { num } from "../lib/summary";
+import { ExportReportButton } from "./export-button";
 import { IMPORT_PATH } from "./shell-nav";
 import { useCsvResult, type CsvResult } from "./csv-provider";
 import { Button, ButtonLink, Card, EmptyState, Icon, Notice } from "./kit";
@@ -66,6 +68,11 @@ export function CsvResults({
             Analysed {formatDateTime(data.as_of, timeZone)} from {fileName}
           </p>
         </div>
+        {canImport && (
+          <div className="dp-head-actions">
+            <ExportReportButton source={{ kind: "file", fileName, data, dormant: num(data.summary, "dormant_count") }} />
+          </div>
+        )}
       </div>
 
       <CsvBanner

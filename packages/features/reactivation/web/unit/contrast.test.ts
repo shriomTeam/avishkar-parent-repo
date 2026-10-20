@@ -75,6 +75,7 @@ check("saved mode: text is 4.5:1 or better", saved, [
   ["Menu button text on its fill", "--dp-ink", "--dp-surface", TEXT],
   ["Menu button text on hover", "--dp-ink", "--dp-accent-tint", TEXT],
   ["sign-out error text on the sidebar", "--dp-bad-ink", "--dp-surface", TEXT],
+  ["export error text on the page", "--dp-bad-ink", PAGE, TEXT],
   ["muted text on a sunk fill (neutral badge)", "--dp-muted", "--dp-sunk", TEXT],
   ["faint text on a card", "--dp-faint", "--dp-surface", TEXT],
   ["faint text on the page", "--dp-faint", PAGE, TEXT],
