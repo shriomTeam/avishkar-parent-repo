@@ -9,6 +9,7 @@ resource "google_project_service" "apis" {
     "run.googleapis.com",
     "artifactregistry.googleapis.com",
     "aiplatform.googleapis.com", # Vertex AI: the Gemini Live model behind voice agents
+    "storage.googleapis.com",
   ])
 
   service            = each.key
@@ -60,6 +61,18 @@ module "migrate_job" {
   network_id = module.network.vpc_id
   subnet_id  = module.network.subnet_id
   secret_ids = module.cloudsql.secret_ids
+
+  depends_on = [google_project_service.apis]
+}
+
+module "storage" {
+  source = "./modules/storage"
+
+  name                         = local.name
+  project_id                   = var.project_id
+  region                       = var.region
+  labels                       = local.labels
+  writer_service_account_email = google_service_account.api.email
 
   depends_on = [google_project_service.apis]
 }
