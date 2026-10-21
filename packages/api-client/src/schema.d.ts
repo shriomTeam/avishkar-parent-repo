@@ -1375,6 +1375,9 @@ export interface components {
             source: string;
             /** Settings Source */
             settings_source: string;
+            /** Settings Version */
+            settings_version: number;
+            settings: components["schemas"]["ReactivationSettings"];
             /** Rate Basis */
             rate_basis: string;
             /**
@@ -1693,6 +1696,11 @@ export interface components {
              * @default 80
              */
             spend_percentile_min: number;
+            /**
+             * Spend Cents Min
+             * @description also a top spender above this lifetime spend, in cents; empty adds no rule
+             */
+            spend_cents_min?: number | null;
             /**
              * Overdue Ratio Min
              * @default 2
@@ -2245,6 +2253,8 @@ export interface components {
         ScheduleOut: {
             /** Next Run At */
             next_run_at: string | null;
+            /** Settings Version */
+            settings_version: number;
             last_run: components["schemas"]["LastRunOut"] | null;
         };
         /** SettingsOut */
@@ -2252,6 +2262,88 @@ export interface components {
             /** Version */
             version: number;
             config: components["schemas"]["ReactivationSettings"];
+            /**
+             * @default {
+             *       "dormant": {
+             *         "at_risk_ratio_min": 0.8,
+             *         "default_rebooking_days": 120,
+             *         "min_days_since_visit": 180,
+             *         "rebooking_days_by_category": {},
+             *         "rebooking_days_by_service": {}
+             *       },
+             *       "types": {
+             *         "churned_member": {
+             *           "enabled": true,
+             *           "membership_months": 6,
+             *           "priority": 2
+             *         },
+             *         "consult_not_converted": {
+             *           "conversion_window_days": 60,
+             *           "enabled": true,
+             *           "priority": 3
+             *         },
+             *         "lapsed_high_value": {
+             *           "enabled": true,
+             *           "overdue_ratio_min": 2,
+             *           "priority": 1,
+             *           "spend_percentile_min": 80
+             *         },
+             *         "lapsed_regular": {
+             *           "enabled": true,
+             *           "priority": 5
+             *         },
+             *         "one_and_done": {
+             *           "enabled": true,
+             *           "min_days_since_visit": 90,
+             *           "priority": 5
+             *         },
+             *         "overdue_maintenance": {
+             *           "enabled": true,
+             *           "min_visits": 2,
+             *           "overdue_ratio_max": 2,
+             *           "overdue_ratio_min": 1,
+             *           "priority": 4
+             *         },
+             *         "unused_balance": {
+             *           "enabled": true,
+             *           "priority": 6
+             *         }
+             *       },
+             *       "revenue": {
+             *         "attribution_window_days": 30,
+             *         "min_sample": 30,
+             *         "rate_high": 0.15,
+             *         "rate_low": 0.08
+             *       },
+             *       "points": {
+             *         "best_offer": true,
+             *         "best_time": true,
+             *         "change_since_last": true,
+             *         "provider_continuity": true,
+             *         "reachable": true,
+             *         "revenue_at_risk": true,
+             *         "seasonality": false
+             *       },
+             *       "schedule": {
+             *         "day_of_month": 1,
+             *         "day_of_week": 0,
+             *         "frequency": "weekly",
+             *         "local_time": "06:00"
+             *       },
+             *       "modules": {
+             *         "ai_summary_enabled": false,
+             *         "analysis_enabled": true,
+             *         "campaign_handoff_enabled": false,
+             *         "export_enabled": true
+             *       },
+             *       "limits": {
+             *         "patient_error_tolerance": 0.02,
+             *         "seasonality_window_days": 45,
+             *         "spend_cohort_minimum": 20
+             *       }
+             *     }
+             */
+            defaults: components["schemas"]["ReactivationSettings"];
             /** Next Run At */
             next_run_at: string | null;
             /** Timezone */
