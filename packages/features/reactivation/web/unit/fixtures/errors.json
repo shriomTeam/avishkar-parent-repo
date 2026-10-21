@@ -1,0 +1,316 @@
+{
+ "rows": [
+  [
+   "patient_id",
+   "patient_name",
+   "email",
+   "visit_date",
+   "line_kind",
+   "service_name",
+   "amount"
+  ],
+  [
+   "P0",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P1",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P2",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P3",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P4",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P5",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P6",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P7",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P8",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P9",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P10",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P11",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P12",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P13",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P14",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P15",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P16",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P17",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P18",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P19",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P20",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P21",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P22",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P23",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P24",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P25",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P26",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P27",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P28",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ],
+  [
+   "P29",
+   "Zelda Canary",
+   "canary.person@canary-example.test",
+   "2026-13-01",
+   "service",
+   "Botox",
+   "oops"
+  ]
+ ],
+ "lines": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30,
+  31
+ ]
+}

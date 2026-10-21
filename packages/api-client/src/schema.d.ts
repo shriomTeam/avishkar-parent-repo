@@ -423,6 +423,193 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/reactivation/csv-analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Csv Analysis
+         * @description Body: the CSV file as raw bytes with ``Content-Type: text/csv``.
+         */
+        post: operations["csv_analysis_features_reactivation_csv_analysis_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/csv-columns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Csv Columns */
+        get: operations["csv_columns_features_reactivation_csv_columns_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/csv-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Csv Template */
+        get: operations["csv_template_features_reactivation_csv_template_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/data-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Data Status
+         * @description No data means no patients and no completed run; the Overview shows the welcome page then.
+         */
+        get: operations["data_status_features_reactivation_data_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/runs/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Latest Run */
+        get: operations["latest_run_features_reactivation_runs_latest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/runs/{run_id}/types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Run Types */
+        get: operations["run_types_features_reactivation_runs__run_id__types_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/runs/{run_id}/patients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Run Patients */
+        get: operations["run_patients_features_reactivation_runs__run_id__patients_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/runs/{run_id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Run Report
+         * @description Every dormant patient of a completed run, for the Export report button, in one call.
+         *
+         *     The patient list pages 100 at a time and writes an audit row per page; a report of up to 25,000 patients would
+         *     write hundreds. This is one read and one audit entry holding counts only. Names are patient data, so the response
+         *     is never cached.
+         */
+        get: operations["run_report_features_reactivation_runs__run_id__report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Runs */
+        get: operations["list_runs_features_reactivation_runs_get"];
+        put?: never;
+        /**
+         * Request Run
+         * @description Run now. 202 for a new run; 200 when this repeats an earlier request or a run is already queued.
+         */
+        post: operations["request_run_features_reactivation_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reactivation/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Run */
+        get: operations["get_run_features_reactivation_runs__run_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/reactivation/preview": {
         parameters: {
             query?: never;
@@ -632,6 +819,214 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/voice_receptionist/inbound/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Agents */
+        get: operations["list_agents_features_voice_receptionist_inbound_agents_get"];
+        put?: never;
+        /** Create Agent */
+        post: operations["create_agent_features_voice_receptionist_inbound_agents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/agents/{agent_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Agent */
+        get: operations["get_agent_features_voice_receptionist_inbound_agents__agent_id__get"];
+        /** Update Agent */
+        put: operations["update_agent_features_voice_receptionist_inbound_agents__agent_id__put"];
+        post?: never;
+        /**
+         * Delete Agent
+         * @description Calls stay (they keep a snapshot of the agent); only the agent and its field list go.
+         */
+        delete: operations["delete_agent_features_voice_receptionist_inbound_agents__agent_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/calls": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Calls */
+        get: operations["list_calls_features_voice_receptionist_inbound_calls_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/calls/{call_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Call */
+        get: operations["get_call_features_voice_receptionist_inbound_calls__call_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/agents/{agent_id}/test-call": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Test Call
+         * @description Create the call record and a one-time ticket the browser uses to open the call WebSocket.
+         */
+        post: operations["start_test_call_features_voice_receptionist_inbound_agents__agent_id__test_call_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Tools */
+        get: operations["list_tools_features_voice_receptionist_inbound_tools_get"];
+        put?: never;
+        /** Create Tool */
+        post: operations["create_tool_features_voice_receptionist_inbound_tools_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tools/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Tool Catalog
+         * @description The internal tools a clinic can add, and which it already has.
+         */
+        get: operations["tool_catalog_features_voice_receptionist_inbound_tools_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tools/internal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Internal Tool */
+        post: operations["add_internal_tool_features_voice_receptionist_inbound_tools_internal_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tools/{tool_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Tool */
+        get: operations["get_tool_features_voice_receptionist_inbound_tools__tool_id__get"];
+        /** Update Tool */
+        put: operations["update_tool_features_voice_receptionist_inbound_tools__tool_id__put"];
+        post?: never;
+        /**
+         * Delete Tool
+         * @description Agents stop using it; past executions keep the tool's name. An internal tool can be added again later.
+         */
+        delete: operations["delete_tool_features_voice_receptionist_inbound_tools__tool_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tools/{tool_id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Tool
+         * @description Really call the endpoint with sample input, through the same safeguards a live call uses.
+         */
+        post: operations["test_tool_features_voice_receptionist_inbound_tools__tool_id__test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/tool-executions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recent Executions */
+        get: operations["recent_executions_features_voice_receptionist_inbound_tool_executions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/voice_receptionist/status": {
         parameters: {
             query?: never;
@@ -653,6 +1048,102 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActiveRun */
+        ActiveRun: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Progress Pct */
+            progress_pct: number;
+        };
+        /** AgentIn */
+        AgentIn: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Prompt */
+            prompt: string;
+            /** Greeting */
+            greeting?: string | null;
+            /**
+             * Voice
+             * @default Puck
+             */
+            voice: string;
+            /**
+             * Language
+             * @default en-US
+             */
+            language: string;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+            /**
+             * Save Transcript
+             * @default true
+             */
+            save_transcript: boolean;
+            /**
+             * Save Raw Events
+             * @default true
+             */
+            save_raw_events: boolean;
+            /** Fields */
+            fields?: components["schemas"]["FieldIn"][];
+            /** Tool Ids */
+            tool_ids?: string[];
+        };
+        /** AgentOut */
+        AgentOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Prompt */
+            prompt: string;
+            /** Greeting */
+            greeting: string | null;
+            /** Voice */
+            voice: string;
+            /** Language */
+            language: string;
+            /** Model */
+            model: string;
+            /** Direction */
+            direction: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Save Transcript */
+            save_transcript: boolean;
+            /** Save Raw Events */
+            save_raw_events: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Fields */
+            fields?: components["schemas"]["FieldOut"][];
+            /** Tool Ids */
+            tool_ids?: string[];
+        };
         /** AnalysisPoints */
         AnalysisPoints: {
             /**
@@ -685,6 +1176,11 @@ export interface components {
              * @default true
              */
             change_since_last: boolean;
+            /**
+             * Revenue At Risk
+             * @default true
+             */
+            revenue_at_risk: boolean;
         };
         /** AuthMeOut */
         AuthMeOut: {
@@ -793,8 +1289,121 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** CallDetailOut */
+        CallDetailOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Agent Id */
+            agent_id: string | null;
+            /**
+             * Agent Name
+             * @default
+             */
+            agent_name: string;
+            /** Channel */
+            channel: string;
+            /** Is Test */
+            is_test: boolean;
+            /** Status */
+            status: string;
+            /** End Reason */
+            end_reason: string | null;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Duration Seconds */
+            duration_seconds: number | null;
+            /** Summary */
+            summary: string | null;
+            /**
+             * Captured Count
+             * @default 0
+             */
+            captured_count: number;
+            /** Model */
+            model: string;
+            /** Usage */
+            usage: {
+                [key: string]: unknown;
+            };
+            /** Turns */
+            turns: components["schemas"]["TurnOut"][];
+            /** Values */
+            values: components["schemas"]["CapturedValueOut"][];
+            /** Events */
+            events: components["schemas"]["EventOut"][];
+            /** Tool Executions */
+            tool_executions?: components["schemas"]["ToolExecutionOut"][];
+        };
+        /** CallSummaryOut */
+        CallSummaryOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Agent Id */
+            agent_id: string | null;
+            /**
+             * Agent Name
+             * @default
+             */
+            agent_name: string;
+            /** Channel */
+            channel: string;
+            /** Is Test */
+            is_test: boolean;
+            /** Status */
+            status: string;
+            /** End Reason */
+            end_reason: string | null;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Duration Seconds */
+            duration_seconds: number | null;
+            /** Summary */
+            summary: string | null;
+            /**
+             * Captured Count
+             * @default 0
+             */
+            captured_count: number;
+        };
+        /** CapturedValueOut */
+        CapturedValueOut: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string | null;
+            /** Value */
+            value: unknown;
+        };
+        /** CatalogItemOut */
+        CatalogItemOut: {
+            /** Key */
+            key: string;
+            /** Title */
+            title: string;
+            /** Description */
+            description: string;
+            /** Added */
+            added: boolean;
+        };
         /** ChurnedMember */
         ChurnedMember: {
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
             /**
              * Priority
              * @default 2
@@ -811,6 +1420,33 @@ export interface components {
          * @enum {string}
          */
         ClinicType: "medspa" | "wellness" | "hrt";
+        /** ColumnOut */
+        ColumnOut: {
+            /** Name */
+            name: string;
+            /** Kind */
+            kind: string;
+            /** Required */
+            required: boolean;
+            /** Description */
+            description: string;
+            /** If Missing */
+            if_missing: string;
+            /** Example */
+            example: string;
+            /** Values */
+            values: string[];
+            /** Max Length */
+            max_length: number;
+        };
+        /** ColumnsOut */
+        ColumnsOut: {
+            /** Columns */
+            columns: components["schemas"]["ColumnOut"][];
+            /** Notes */
+            notes: string[];
+            limits: components["schemas"]["CsvLimits"];
+        };
         /** ConnectGoogleIn */
         ConnectGoogleIn: {
             /** Listing Name */
@@ -821,6 +1457,11 @@ export interface components {
         /** ConsultNotConverted */
         ConsultNotConverted: {
             /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
              * Priority
              * @default 3
              */
@@ -830,6 +1471,108 @@ export interface components {
              * @default 60
              */
             conversion_window_days: number;
+        };
+        /** CsvAnalysis */
+        CsvAnalysis: {
+            /** Source */
+            source: string;
+            /** Settings Source */
+            settings_source: string;
+            /** Rate Basis */
+            rate_basis: string;
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            counts: components["schemas"]["CsvCounts"];
+            /** Notes */
+            notes: components["schemas"]["CsvNote"][];
+            /** Summary */
+            summary: {
+                [key: string]: unknown;
+            };
+            /** Quality */
+            quality: {
+                [key: string]: unknown;
+            };
+            /** Types */
+            types: components["schemas"]["TypeOut"][];
+            /** Patients */
+            patients: components["schemas"]["CsvPatientOut"][];
+        };
+        /** CsvCounts */
+        CsvCounts: {
+            /** Rows */
+            rows: number;
+            /** Patients */
+            patients: number;
+            /** Visit Days */
+            visit_days: number;
+        };
+        /** CsvLimits */
+        CsvLimits: {
+            /** Max Bytes */
+            max_bytes: number;
+            /** Max Rows */
+            max_rows: number;
+            /** Max Patients */
+            max_patients: number;
+        };
+        /** CsvNote */
+        CsvNote: {
+            /** Code */
+            code: string;
+            /** Patients */
+            patients: number;
+        };
+        /** CsvPatientOut */
+        CsvPatientOut: {
+            /** Patient Id */
+            patient_id: string;
+            /** External Id */
+            external_id: string;
+            /** Display Name */
+            display_name: string | null;
+            /** Status */
+            status: string;
+            /** Primary Type */
+            primary_type: string | null;
+            /** Matched Types */
+            matched_types: string[];
+            /** Reasons */
+            reasons: string[];
+            /** Usual Service Name */
+            usual_service_name: string | null;
+            /** Last Visit Day */
+            last_visit_day: string | null;
+            /** Days Since Last Visit */
+            days_since_last_visit: number;
+            /** Likelihood Score */
+            likelihood_score: number;
+            /** Revenue Basis Cents */
+            revenue_basis_cents: number;
+            /** Overdue Ratio */
+            overdue_ratio: number;
+            /** Revenue Kind */
+            revenue_kind: string | null;
+            /** Revenue Low Cents */
+            revenue_low_cents: number | null;
+            /** Revenue High Cents */
+            revenue_high_cents: number | null;
+            /** Offer Service Name */
+            offer_service_name: string | null;
+            /** Points */
+            points: {
+                [key: string]: unknown;
+            };
+        };
+        /** DataStatus */
+        DataStatus: {
+            /** Has Patients */
+            has_patients: boolean;
+            /** Has Completed Run */
+            has_completed_run: boolean;
         };
         /** DormantRule */
         DormantRule: {
@@ -848,10 +1591,55 @@ export interface components {
                 [key: string]: number;
             };
             /**
+             * Rebooking Days By Service
+             * @description service id -> days; checked before the category map
+             */
+            rebooking_days_by_service?: {
+                [key: string]: number;
+            };
+            /**
              * At Risk Ratio Min
              * @default 0.8
              */
             at_risk_ratio_min: number;
+        };
+        /** EngineLimits */
+        EngineLimits: {
+            /**
+             * Spend Cohort Minimum
+             * @description D10: smaller cohorts get no percentile
+             * @default 20
+             */
+            spend_cohort_minimum: number;
+            /**
+             * Patient Error Tolerance
+             * @description D9: share of patients that may error before the run fails
+             * @default 0.02
+             */
+            patient_error_tolerance: number;
+            /**
+             * Seasonality Window Days
+             * @default 45
+             */
+            seasonality_window_days: number;
+        };
+        /** EventOut */
+        EventOut: {
+            /** Seq */
+            seq: number;
+            /** Source */
+            source: string;
+            /** Type */
+            type: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** FeatureOut */
         FeatureOut: {
@@ -877,6 +1665,57 @@ export interface components {
             enabled: boolean;
             /** Expires At */
             expires_at?: string | null;
+        };
+        /** FieldIn */
+        FieldIn: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Data Type
+             * @default text
+             * @enum {string}
+             */
+            data_type: "text" | "phone" | "email" | "date" | "number" | "boolean" | "enum";
+            /** Enum Values */
+            enum_values?: string[] | null;
+            /**
+             * Required
+             * @default false
+             */
+            required: boolean;
+        };
+        /** FieldOut */
+        FieldOut: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Data Type
+             * @default text
+             * @enum {string}
+             */
+            data_type: "text" | "phone" | "email" | "date" | "number" | "boolean" | "enum";
+            /** Enum Values */
+            enum_values?: string[] | null;
+            /**
+             * Required
+             * @default false
+             */
+            required: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Position */
+            position: number;
         };
         /** FieldSpec */
         FieldSpec: {
@@ -970,8 +1809,18 @@ export interface components {
             /** Last Validated At */
             last_validated_at: string | null;
         };
+        /** InternalToolIn */
+        InternalToolIn: {
+            /** Builtin Key */
+            builtin_key: string;
+        };
         /** LapsedHighValue */
         LapsedHighValue: {
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
             /**
              * Priority
              * @default 1
@@ -1011,6 +1860,22 @@ export interface components {
             /** Lifetime Value Cents */
             lifetime_value_cents: number;
         };
+        /**
+         * LapsedRegular
+         * @description Repeat patients (at least 2 visits) who are dormant by the general rule (spec 4.7, D13). No thresholds.
+         */
+        LapsedRegular: {
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
+             * Priority
+             * @default 5
+             */
+            priority: number;
+        };
         /** LastRunOut */
         LastRunOut: {
             /**
@@ -1033,6 +1898,44 @@ export interface components {
             finished_at: string | null;
             /** Progress Pct */
             progress_pct: number;
+        };
+        /** LatestRun */
+        LatestRun: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Trigger */
+            trigger: string;
+            /** Status */
+            status: string;
+            /**
+             * Queued At
+             * Format: date-time
+             */
+            queued_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            /** Progress Pct */
+            progress_pct: number;
+            /** Error Code */
+            error_code: string | null;
+            /** Settings Version */
+            settings_version: number;
+            /** Settings Source */
+            settings_source: string;
+            /** Summary */
+            summary: {
+                [key: string]: unknown;
+            } | null;
+            /** Quality */
+            quality: {
+                [key: string]: unknown;
+            } | null;
+            active_run: components["schemas"]["ActiveRun"] | null;
         };
         /** MappingConfig */
         MappingConfig: {
@@ -1115,6 +2018,11 @@ export interface components {
         /** OneAndDone */
         OneAndDone: {
             /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
              * Priority
              * @default 5
              */
@@ -1127,6 +2035,11 @@ export interface components {
         };
         /** OverdueMaintenance */
         OverdueMaintenance: {
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
             /**
              * Priority
              * @default 4
@@ -1155,6 +2068,59 @@ export interface components {
             campaigns: components["schemas"]["clinic_reviews__router__CampaignOut"][];
             /** Pending Follow Ups */
             pending_follow_ups: components["schemas"]["FollowUpItem"][];
+        };
+        /** PatientOut */
+        PatientOut: {
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+            /** Display Name */
+            display_name: string | null;
+            /** Status */
+            status: string;
+            /** Primary Type */
+            primary_type: string | null;
+            /** Matched Types */
+            matched_types: string[];
+            /** Reasons */
+            reasons: string[];
+            /** Usual Service Name */
+            usual_service_name: string | null;
+            /** Last Visit At */
+            last_visit_at: string | null;
+            /** Days Since Last Visit */
+            days_since_last_visit: number | null;
+            /** Likelihood Score */
+            likelihood_score: number | null;
+            /** Revenue Basis Cents */
+            revenue_basis_cents: number;
+            /** Overdue Ratio */
+            overdue_ratio: number | null;
+            /** Revenue Kind */
+            revenue_kind: string | null;
+            /** Revenue Low Cents */
+            revenue_low_cents: number | null;
+            /** Revenue High Cents */
+            revenue_high_cents: number | null;
+            /** Offer Service Name */
+            offer_service_name: string | null;
+            /** Points */
+            points: {
+                [key: string]: unknown;
+            };
+        };
+        /** PatientPage */
+        PatientPage: {
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Items */
+            items: components["schemas"]["PatientOut"][];
         };
         /** PreviewOut */
         PreviewOut: {
@@ -1218,6 +2184,7 @@ export interface components {
             points?: components["schemas"]["AnalysisPoints"];
             schedule?: components["schemas"]["RunSchedule"];
             modules?: components["schemas"]["ModuleSwitches"];
+            limits?: components["schemas"]["EngineLimits"];
         };
         /** Report */
         Report: {
@@ -1232,6 +2199,55 @@ export interface components {
             total_revenue_cents: number;
             /** Profiles */
             profiles: components["schemas"]["Profile"][];
+        };
+        /** ReportOut */
+        ReportOut: {
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /** Total */
+            total: number;
+            /** Patients */
+            patients: components["schemas"]["ReportPatient"][];
+        };
+        /**
+         * ReportPatient
+         * @description One row of the Dormant patients report. No contact details and none of the scoring internals.
+         */
+        ReportPatient: {
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+            /** Display Name */
+            display_name: string | null;
+            /** Status */
+            status: string;
+            /** Primary Type */
+            primary_type: string | null;
+            /** Reasons */
+            reasons: string[];
+            /** Usual Service Name */
+            usual_service_name: string | null;
+            /** Last Visit At */
+            last_visit_at: string | null;
+            /** Days Since Last Visit */
+            days_since_last_visit: number | null;
+            /** Likelihood Score */
+            likelihood_score: number | null;
+            /** Revenue Basis Cents */
+            revenue_basis_cents: number;
+            /** Revenue Kind */
+            revenue_kind: string | null;
+            /** Revenue Low Cents */
+            revenue_low_cents: number | null;
+            /** Revenue High Cents */
+            revenue_high_cents: number | null;
+            /** Offer Service Name */
+            offer_service_name: string | null;
         };
         /** RevenueRules */
         RevenueRules: {
@@ -1262,6 +2278,107 @@ export interface components {
             row: number;
             /** Error */
             error: string;
+        };
+        /** RunDetail */
+        RunDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Trigger */
+            trigger: string;
+            /** Status */
+            status: string;
+            /**
+             * Queued At
+             * Format: date-time
+             */
+            queued_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            /** Progress Pct */
+            progress_pct: number;
+            /** Error Code */
+            error_code: string | null;
+            /** Settings Version */
+            settings_version: number;
+            /** Settings Source */
+            settings_source: string;
+            /** Summary */
+            summary: {
+                [key: string]: unknown;
+            } | null;
+            /** Quality */
+            quality: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** RunListItem */
+        RunListItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Trigger */
+            trigger: string;
+            /** Status */
+            status: string;
+            /**
+             * Queued At
+             * Format: date-time
+             */
+            queued_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            /** Progress Pct */
+            progress_pct: number;
+            /** Error Code */
+            error_code: string | null;
+            /** Settings Version */
+            settings_version: number;
+            /** Settings Source */
+            settings_source: string;
+            /** Headline */
+            headline: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** RunRequested */
+        RunRequested: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Trigger */
+            trigger: string;
+            /** Status */
+            status: string;
+            /**
+             * Queued At
+             * Format: date-time
+             */
+            queued_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            /** Progress Pct */
+            progress_pct: number;
+            /** Error Code */
+            error_code: string | null;
+            /** Settings Version */
+            settings_version: number;
+            /** Settings Source */
+            settings_source: string;
+            /** Deduplicated */
+            deduplicated: string | null;
         };
         /**
          * RunSchedule
@@ -1373,6 +2490,208 @@ export interface components {
             /** Features */
             features: string[];
         };
+        /** TestCallOut */
+        TestCallOut: {
+            /**
+             * Call Id
+             * Format: uuid
+             */
+            call_id: string;
+            /** Ticket */
+            ticket: string;
+            /** Ws Path */
+            ws_path: string;
+            /** Input Rate */
+            input_rate: number;
+            /** Output Rate */
+            output_rate: number;
+            /** Max Seconds */
+            max_seconds: number;
+        };
+        /** ToolExecutionOut */
+        ToolExecutionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Call Id
+             * Format: uuid
+             */
+            call_id: string;
+            /** Tool Name */
+            tool_name: string;
+            /** Success */
+            success: boolean;
+            /** Error */
+            error: string | null;
+            /** Duration Ms */
+            duration_ms: number;
+            /** Input */
+            input: {
+                [key: string]: unknown;
+            };
+            /** Output */
+            output: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** ToolIn */
+        ToolIn: {
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Endpoint */
+            endpoint?: string | null;
+            /**
+             * Method
+             * @default POST
+             * @enum {string}
+             */
+            method: "GET" | "POST";
+            /**
+             * Timeout Seconds
+             * @default 5
+             */
+            timeout_seconds: number;
+            /** Input Schema */
+            input_schema?: {
+                [key: string]: unknown;
+            };
+            /** Auth Header Name */
+            auth_header_name?: string | null;
+            /** Auth Header Value */
+            auth_header_value?: string | null;
+            /**
+             * Clear Auth
+             * @default false
+             */
+            clear_auth: boolean;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+        };
+        /** ToolOut */
+        ToolOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Kind */
+            kind: string;
+            /** Builtin Key */
+            builtin_key: string | null;
+            /** Endpoint */
+            endpoint: string | null;
+            /** Method */
+            method: string;
+            /** Timeout Seconds */
+            timeout_seconds: number;
+            /** Input Schema */
+            input_schema: {
+                [key: string]: unknown;
+            };
+            /** Auth Header Name */
+            auth_header_name: string | null;
+            /**
+             * Has Auth
+             * @default false
+             */
+            has_auth: boolean;
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Description Customized
+             * @default false
+             */
+            description_customized: boolean;
+            /** Default Description */
+            default_description?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ToolTestIn */
+        ToolTestIn: {
+            /** Input */
+            input?: {
+                [key: string]: unknown;
+            };
+        };
+        /** ToolTestOut */
+        ToolTestOut: {
+            /** Ok */
+            ok: boolean;
+            /** Status */
+            status: number | null;
+            /** Duration Ms */
+            duration_ms: number;
+            /** Response */
+            response?: unknown;
+            /** Error */
+            error?: string | null;
+        };
+        /** TurnOut */
+        TurnOut: {
+            /** Seq */
+            seq: number;
+            /** Speaker */
+            speaker: string;
+            /** Text */
+            text: string;
+            /** Offset Ms */
+            offset_ms: number;
+            /** Interrupted */
+            interrupted: boolean;
+        };
+        /** TypeOut */
+        TypeOut: {
+            /** Type Key */
+            type_key: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description: string;
+            /** Kind */
+            kind: string | null;
+            /** Available */
+            available: boolean;
+            /** Patient Count */
+            patient_count: number | null;
+            /** Revenue Low Cents */
+            revenue_low_cents: number | null;
+            /** Revenue High Cents */
+            revenue_high_cents: number | null;
+            /** Rate Low */
+            rate_low: number | null;
+            /** Rate High */
+            rate_high: number | null;
+            /** Rate Source */
+            rate_source: string | null;
+            /** Top Service Name */
+            top_service_name: string | null;
+        };
         /** TypeRules */
         TypeRules: {
             lapsed_high_value?: components["schemas"]["LapsedHighValue"];
@@ -1380,10 +2699,16 @@ export interface components {
             consult_not_converted?: components["schemas"]["ConsultNotConverted"];
             overdue_maintenance?: components["schemas"]["OverdueMaintenance"];
             one_and_done?: components["schemas"]["OneAndDone"];
+            lapsed_regular?: components["schemas"]["LapsedRegular"];
             unused_balance?: components["schemas"]["UnusedBalance"];
         };
         /** UnusedBalance */
         UnusedBalance: {
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
             /**
              * Priority
              * @default 6
@@ -2366,6 +3691,387 @@ export interface operations {
             };
         };
     };
+    csv_analysis_features_reactivation_csv_analysis_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CsvAnalysis"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    csv_columns_features_reactivation_csv_columns_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ColumnsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    csv_template_features_reactivation_csv_template_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    data_status_features_reactivation_data_status_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    latest_run_features_reactivation_runs_latest_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LatestRun"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_types_features_reactivation_runs__run_id__types_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_patients_features_reactivation_runs__run_id__patients_get: {
+        parameters: {
+            query?: {
+                type?: string | null;
+                status?: ("dormant" | "at_risk") | null;
+                q?: string | null;
+                reachable?: boolean | null;
+                sort?: "likelihood" | "value" | "overdue";
+                dir?: "asc" | "desc";
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_report_features_reactivation_runs__run_id__report_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_runs_features_reactivation_runs_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunListItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    request_run_features_reactivation_runs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunRequested"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_run_features_reactivation_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     preview_features_reactivation_preview_get: {
         parameters: {
             query?: {
@@ -2837,6 +4543,613 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_agents_features_voice_receptionist_inbound_agents_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_agent_features_voice_receptionist_inbound_agents_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_agent_features_voice_receptionist_inbound_agents__agent_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_agent_features_voice_receptionist_inbound_agents__agent_id__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_agent_features_voice_receptionist_inbound_agents__agent_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_calls_features_voice_receptionist_inbound_calls_get: {
+        parameters: {
+            query?: {
+                agent_id?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CallSummaryOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_call_features_voice_receptionist_inbound_calls__call_id__get: {
+        parameters: {
+            query?: {
+                include_events?: boolean;
+            };
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                call_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CallDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_test_call_features_voice_receptionist_inbound_agents__agent_id__test_call_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TestCallOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_tools_features_voice_receptionist_inbound_tools_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_tool_features_voice_receptionist_inbound_tools_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ToolIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tool_catalog_features_voice_receptionist_inbound_tools_catalog_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_internal_tool_features_voice_receptionist_inbound_tools_internal_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InternalToolIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_tool_features_voice_receptionist_inbound_tools__tool_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                tool_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_tool_features_voice_receptionist_inbound_tools__tool_id__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                tool_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ToolIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_tool_features_voice_receptionist_inbound_tools__tool_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                tool_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_tool_features_voice_receptionist_inbound_tools__tool_id__test_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                tool_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ToolTestIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolTestOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recent_executions_features_voice_receptionist_inbound_tool_executions_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolExecutionOut"][];
                 };
             };
             /** @description Validation Error */

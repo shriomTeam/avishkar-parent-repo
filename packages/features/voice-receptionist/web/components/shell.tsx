@@ -71,7 +71,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="sidebottom">
           <div className="pilot">
             <strong>Authenticated workspace</strong>
-            <p>Sample data · simulated actions</p>
+            <p>Agents, calls and tools are live · other sections are demo</p>
           </div>
           <Link className="profile" href="/voice-receptionist/settings">
             <div className="avatar dark">
@@ -91,7 +91,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <strong>{active?.name || "Page guide"}</strong>
           </span>
           <div className="headerRight">
-            <span className="badge pale">Sample voice data</span>
+            <span className="badge pale">Live agents &amp; calls</span>
             <Link className="button" href="/voice-receptionist/test">
               <Mic size={15} />
               Test agent
@@ -103,7 +103,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </main>
         <footer>
           Avishkar Voice{" "}
-          <span>Demo workspace · No real calls or patient data</span>
+          <span>
+            Agents, calls and transcripts are real and stored · phone numbers,
+            tools and variables are demo
+          </span>
           <Link href="/voice-receptionist/guide">Page guide</Link>
         </footer>
       </div>

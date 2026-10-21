@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import JSONResponse
 
+from clinic_api.forwarded import ForwardedClient
 from clinic_api.routers import admin, appointments, auth, dev, imports, me, onboarding
 from clinic_core.api import require_feature
 from clinic_core.auth.database import create_database
@@ -100,6 +101,10 @@ def create_app(settings: Settings | None = None, google=None) -> FastAPI:
             )
         if feature.public_router is not None:
             app.include_router(feature.public_router, prefix=f"/public/{key}")
+        if feature.websocket_router is not None:
+            app.include_router(feature.websocket_router, prefix=f"/features/{key}")
+    if settings.trusted_proxy_hops:
+        app.add_middleware(ForwardedClient, hops=settings.trusted_proxy_hops)  # outermost: runs before the rest
     return app
 
 

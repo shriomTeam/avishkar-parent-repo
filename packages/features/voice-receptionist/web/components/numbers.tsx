@@ -4,18 +4,21 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import type { PhoneNumber } from "../lib/types";
 import { useDemo } from "../lib/demo/provider";
+import { useVoiceStatus } from "../lib/voice/provider";
 import { Heading, Badge, Dialog, Field, Select, FormError } from "./ui";
 export function Numbers() {
   const { state, run, busy } = useDemo();
+  const { agents } = useVoiceStatus();
   const [editing, setEditing] = useState<PhoneNumber | "new" | null>(null);
   const [error, setError] = useState("");
   if (!state) return null;
-  const published = state.agents.filter((a) => a.versions.length);
+  const published = (agents ?? []).filter((a) => a.is_active);
   return (
     <>
       <Heading
+        demo
         title="Phone numbers"
-        description="Connect an inbound number and route it to a published agent."
+        description="Connect an inbound number and route it to an agent."
         actions={
           <button
             className="primary"
@@ -50,7 +53,7 @@ export function Numbers() {
                   </td>
                   <td>{n.provider}</td>
                   <td>
-                    {state.agents.find((a) => a.id === n.agentId)?.draft.name ||
+                    {(agents ?? []).find((a) => a.id === n.agentId)?.name ||
                       "Not assigned"}
                   </td>
                   <td>
@@ -166,12 +169,12 @@ export function Numbers() {
               <option value="">Unassigned</option>
               {published.map((a) => (
                 <option key={a.id} value={a.id}>
-                  {a.draft.name}
+                  {a.name}
                 </option>
               ))}
             </Select>
             {!published.length && (
-              <p>Publish an agent before assigning a number.</p>
+              <p>Create an active agent before assigning a number.</p>
             )}
             <FormError message={error} />
             <div className="actions dialog-actions">

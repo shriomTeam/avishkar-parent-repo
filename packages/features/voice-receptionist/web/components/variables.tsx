@@ -43,6 +43,7 @@ export function Variables() {
   return (
     <>
       <Heading
+        demo
         title="Variables"
         description="Personalise agent context without rewriting the prompt."
         actions={

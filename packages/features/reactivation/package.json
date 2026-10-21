@@ -1,8 +1,33 @@
 {
   "name": "@clinic/feature-reactivation",
   "private": true,
+  "type": "module",
   "scripts": {
     "lint": "uv run ruff check src tests",
-    "test": "uv run pytest tests -q"
+    "typecheck": "tsc --noEmit",
+    "test": "uv run pytest tests -q && node --test web/unit/*.test.ts",
+    "test:web": "node --test web/unit/*.test.ts"
+  },
+  "exports": {
+    "./web/*": "./web/pages/*.tsx"
+  },
+  "dependencies": {
+    "@clinic/api-client": "workspace:*",
+    "@clinic/core": "workspace:*",
+    "@clinic/ui": "workspace:*"
+  },
+  "peerDependencies": {
+    "next": "^16.4.0",
+    "react": "^19.3.0"
+  },
+  "devDependencies": {
+    "@clinic/tsconfig": "workspace:*",
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "typescript": "^5.9.3"
+  },
+  "clinic": {
+    "webTests": "web/tests"
   }
 }

@@ -59,11 +59,13 @@ locals {
     "system-password" = random_password.db["system"].result
     "auth-password"   = random_password.db["auth"].result
     "auth-url"        = "postgresql+psycopg://clinic_auth:${random_password.db["auth"].result}@${google_sql_database_instance.postgres.private_ip_address}:5432/${var.db_name}"
+    "app-url"         = "postgresql+psycopg://clinic_app:${random_password.db["app"].result}@${google_sql_database_instance.postgres.private_ip_address}:5432/${var.db_name}"
+    "system-url"      = "postgresql+psycopg://clinic_system:${random_password.db["system"].result}@${google_sql_database_instance.postgres.private_ip_address}:5432/${var.db_name}"
   }
 }
 
 resource "google_secret_manager_secret" "db" {
-  for_each = toset(["owner-url", "app-password", "system-password", "auth-password", "auth-url"])
+  for_each = toset(["owner-url", "app-password", "system-password", "auth-password", "auth-url", "app-url", "system-url"])
 
   secret_id = "${var.name}-db-${each.key}"
   labels    = var.labels

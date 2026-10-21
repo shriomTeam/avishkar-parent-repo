@@ -18,19 +18,29 @@ export function Heading({
   title,
   description,
   actions,
+  demo = false,
 }: {
   title: string;
   description: string;
   actions?: ReactNode;
+  demo?: boolean;
 }) {
   return (
-    <div className="heading">
-      <div>
-        <h1>{title}</h1>
-        <p>{description}</p>
+    <>
+      <div className="heading">
+        <div>
+          <h1>{title}</h1>
+          <p>{description}</p>
+        </div>
+        {actions && <div className="actions">{actions}</div>}
       </div>
-      {actions && <div className="actions">{actions}</div>}
-    </div>
+      {demo && (
+        <div className="note demo-notice" role="note">
+          <strong>Demo section.</strong> This page shows sample data and is not
+          connected to real calls yet.
+        </div>
+      )}
+    </>
   );
 }
 export function Badge({ children }: { children: string }) {

@@ -11,7 +11,7 @@ export async function createCampaign() {
     body: { name },
   });
   if (error) throw new Error("Could not create campaign");
-  revalidatePath("/reactivation");
+  revalidatePath("/reactivation/campaigns");
 }
 
 export async function launchCampaign(campaignId: string) {
@@ -23,5 +23,5 @@ export async function launchCampaign(campaignId: string) {
     },
   );
   if (error) throw new Error("Could not launch campaign");
-  revalidatePath("/reactivation");
+  revalidatePath("/reactivation/campaigns");
 }

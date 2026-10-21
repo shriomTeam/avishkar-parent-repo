@@ -546,6 +546,7 @@
 }
 .voice-scope .summarylist {
   display: grid;
+  align-content: start;
   gap: 15px;
   font-size: 14px;
 }
@@ -692,6 +693,8 @@
   font-size: 14px;
 }
 .voice-scope dialog {
+  /* Tailwind's reset zeroes margins, which removes the browser's default centering of modal dialogs. */
+  margin: auto;
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 28px;
@@ -1499,4 +1502,264 @@
   .voice-scope .platform-return {
     margin: 12px 12px 18px;
   }
+}
+
+/* Inbound call agents: capture-field editor, live call controls, captured details */
+.voice-scope .section-title {
+  margin: 34px 0 6px;
+  font-size: 16px;
+  font-weight: 650;
+}
+.voice-scope .muted {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.voice-scope .agent-picker {
+  margin-bottom: 18px;
+}
+.voice-scope .agent-picker .field {
+  margin: 0;
+  max-width: 380px;
+}
+.voice-scope .editor-main {
+  display: grid;
+  gap: 22px;
+  align-content: start;
+  min-width: 0;
+}
+.voice-scope .editor > div {
+  min-width: 0;
+}
+.voice-scope .editor-side {
+  display: grid;
+  gap: 22px;
+  align-content: start;
+}
+.voice-scope .capture-field {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px 14px;
+  margin: 14px 0;
+  background: #fcfcfd;
+}
+.voice-scope .capture-field .field {
+  margin-bottom: 0;
+}
+.voice-scope .capture-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) 42px;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 14px;
+}
+.voice-scope .capture-field input:not([type="checkbox"]),
+.voice-scope .capture-field select {
+  height: 42px;
+}
+.voice-scope .capture-field > .field {
+  margin-bottom: 14px;
+}
+.voice-scope .icon-button {
+  height: 42px;
+  width: 42px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+.voice-scope .inline-check {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+.voice-scope .inline-check input {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  accent-color: var(--purple);
+  flex-shrink: 0;
+}
+.voice-scope .form-actions {
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  justify-content: flex-end;
+}
+.voice-scope .call-controls {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.voice-scope .call-timer {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.voice-scope .level {
+  display: block;
+  width: 90px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--line);
+  overflow: hidden;
+}
+.voice-scope .level span {
+  display: block;
+  height: 100%;
+  background: var(--purple);
+  transition: width 80ms linear;
+}
+.voice-scope .primary.danger {
+  background: #b3261e;
+  border-color: #b3261e;
+  color: #fff;
+}
+.voice-scope .live-transcript {
+  max-height: 340px;
+  overflow-y: auto;
+  border-top: 1px solid var(--line);
+  margin-top: 8px;
+}
+.voice-scope .captured {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+}
+.voice-scope .captured div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+.voice-scope .captured dt {
+  color: var(--muted);
+}
+.voice-scope .captured dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.voice-scope .calls-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.voice-scope .calls-table th,
+.voice-scope .calls-table td {
+  text-align: left;
+  padding: 9px 6px;
+  border-bottom: 1px solid var(--line);
+}
+.voice-scope .raw-events {
+  max-height: 260px;
+  overflow: auto;
+  background: #f6f5f8;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 900px) {
+  .voice-scope .capture-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .voice-scope .capture-row .icon-button {
+    justify-self: end;
+  }
+}
+
+.voice-scope .demo-notice {
+  margin-bottom: 18px;
+}
+
+.voice-scope .plain-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.voice-scope .schema-view {
+  max-height: 55vh;
+  overflow: auto;
+}
+
+/* Dropdown: the app's own select */
+.voice-scope .dropdown {
+  position: relative;
+}
+.voice-scope .dropdown-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid #dedce5;
+  border-radius: 8px;
+  background: white;
+  color: var(--ink);
+  font-size: 14px;
+  text-align: left;
+  font-weight: 400;
+}
+.voice-scope .dropdown-button:hover {
+  border-color: #c9c6d2;
+}
+.voice-scope .dropdown-button[aria-expanded="true"] {
+  border-color: #80cc4e;
+}
+.voice-scope .dropdown-button svg {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.voice-scope .dropdown-list {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  margin: 6px 0 0;
+  padding: 6px;
+  list-style: none;
+  max-height: 240px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px #201d1d1f;
+}
+.voice-scope .dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.voice-scope .dropdown-option.active {
+  background: var(--lilac);
+}
+.voice-scope .dropdown-option[aria-selected="true"] {
+  font-weight: 600;
+  color: #315218;
+}
+.voice-scope .dropdown-option.disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.voice-scope .dropdown-option small {
+  margin-left: 8px;
+  color: var(--muted);
+  font-weight: 400;
 }
