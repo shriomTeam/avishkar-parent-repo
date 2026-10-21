@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 
 import { fileNotes } from "../lib/messages";
 import { formatDateTime } from "../lib/format";
+import { settingsInUse } from "../lib/settings";
 import { num } from "../lib/summary";
 import { ExportReportButton } from "./export-button";
 import { IMPORT_PATH } from "./shell-nav";
@@ -96,6 +97,10 @@ export function CsvResults({
         Measured rates come from past campaigns, which exist only in your saved data, so a file analysis always uses
         the assumed range.
       </Notice>
+
+      <p className="dp-small" data-testid="csv-settings">
+        Analysed with {settingsInUse(data.settings_version)}. Nothing about the file was saved.
+      </p>
 
       <div className="dp-file-frame" data-testid="csv-frame">
         <Tiles
