@@ -37,11 +37,6 @@ export function DemoProvider({
         phone: identity.workspace?.phone || "",
         address: "",
       },
-      variables: sample.variables.map((v) =>
-        v.name === "company_name"
-          ? { ...v, value: identity.workspace?.name || "" }
-          : v,
-      ),
       audit: sample.audit.map((event) => ({ ...event, actor: "Sample actor" })),
     }),
     [identity],

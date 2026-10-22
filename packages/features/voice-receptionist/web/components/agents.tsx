@@ -238,7 +238,8 @@ function EditorLoader({ id }: { id: string }) {
 }
 
 function Editor({ agent }: { agent: Agent }) {
-  const { api, calls, tools, upsertAgent, removeAgent } = useVoice();
+  const { api, calls, tools, upsertAgent, removeAgent, reloadVariables } =
+    useVoice();
   const { state, notify } = useDemo();
   const router = useRouter();
   const [draft, setDraft] = useState<Draft>(() => toDraft(agent));
@@ -267,6 +268,7 @@ function Editor({ agent }: { agent: Agent }) {
     try {
       const saved = await api.updateAgent(agent.id, toInput(draft));
       upsertAgent(saved);
+      void reloadVariables(); // which agents use which variable may have changed
       setDraft(toDraft(saved));
       notify("Agent saved");
     } catch (e) {
@@ -281,6 +283,7 @@ function Editor({ agent }: { agent: Agent }) {
     try {
       await api.deleteAgent(agent.id);
       removeAgent(agent.id);
+      void reloadVariables();
       notify("Agent deleted. Its past calls are kept.");
       router.push("/voice-receptionist/agents");
     } catch (e) {

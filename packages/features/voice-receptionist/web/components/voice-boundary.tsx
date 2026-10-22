@@ -4,8 +4,8 @@ import { Alert, Button, Muted, Panel } from "@clinic/ui";
 import { useVoiceStatus } from "../lib/voice/provider";
 
 export function VoiceBoundary({ children }: { children: ReactNode }) {
-  const { agents, calls, tools, error, retry } = useVoiceStatus();
-  if (agents && calls && tools) return <>{children}</>;
+  const { agents, calls, tools, variables, error, retry } = useVoiceStatus();
+  if (agents && calls && tools && variables) return <>{children}</>;
   return (
     <Panel>
       {error ? (

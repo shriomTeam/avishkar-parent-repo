@@ -298,41 +298,79 @@ test("selects are the app's own dropdown: styled list, keyboard and form use", a
   ).toBeVisible(CALL);
 });
 
-test("variables persist and reset preserves authenticated workspace", async ({
+test("variables: add, edit, use in a prompt, refuse unknown names, block deleting one in use", async ({
   page,
 }) => {
   await page.goto("/voice-receptionist/variables");
+  await expect(
+    page.getByRole("heading", { name: "No variables yet" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: "{{clinic_name}}" }),
+  ).toBeVisible(); // built in, listed for reference
+
   await page.getByRole("button", { name: "Add variable" }).click();
-  await page
-    .getByRole("dialog")
-    .getByLabel("Name", { exact: true })
-    .fill("company_name");
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Name", { exact: true }).fill("clinic_name");
+  await dialog.getByLabel("Value", { exact: true }).fill("Duplicate");
+  await dialog.getByRole("button", { name: "Save variable" }).click();
+  await expect(dialog.getByRole("alert")).toContainText("built in");
+  await dialog.getByLabel("Name", { exact: true }).fill("hours");
+  await dialog
+    .getByLabel("Value", { exact: true })
+    .fill("Monday to Friday, 9 to 5");
+  await dialog.getByRole("button", { name: "Save variable" }).click();
+  const row = page.getByRole("row", { name: /\{\{hours\}\}/ });
+  await expect(row).toContainText("Monday to Friday, 9 to 5");
+  await expect(row).toContainText("No agent");
+
+  await page.getByRole("button", { name: "Edit hours" }).click();
+  await expect(page.getByRole("dialog")).toContainText("cannot be changed");
   await page
     .getByRole("dialog")
     .getByLabel("Value", { exact: true })
-    .fill("Duplicate");
+    .fill("Daily, 8 to 6");
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Save variable" })
     .click();
-  await expect(page.getByRole("dialog").getByRole("alert")).toHaveText(
-    "A variable with this name already exists.",
-  );
+  await expect(row).toContainText("Daily, 8 to 6");
+
+  await createAgent(page, "Hours agent");
+  await expect(page.getByTestId("variable-hint")).toContainText("{{hours}}");
+  await page.getByLabel("System prompt").fill("We are open {{hourz}}.");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Unknown variables: {{hourz}}" }),
+  ).toBeVisible();
   await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Cancel" })
-    .click();
-  await page.getByRole("button", { name: "Edit company_name" }).click();
-  await page
-    .getByRole("dialog")
-    .getByLabel("Value", { exact: true })
-    .fill("Demo Clinic");
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Save variable" })
-    .click();
-  await expect(page.locator("pre").last()).toContainText("Demo Clinic");
-  await page.getByRole("link", { name: "Settings", exact: true }).click();
+    .getByLabel("System prompt")
+    .fill("We are open {{hours}} at {{clinic_name}}.");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Agent saved");
+
+  await page.getByRole("link", { name: "Variables", exact: true }).click();
+  await expect(row).toContainText("Hours agent");
+  await page.getByRole("button", { name: "Delete hours" }).click();
+  await page.getByRole("button", { name: "Delete variable" }).click();
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Used by Hours agent" }),
+  ).toBeVisible();
+  await expect(row).toBeVisible();
+
+  await page.getByRole("link", { name: "Voice agents", exact: true }).click();
+  await page.getByRole("link", { name: "Open agent" }).click();
+  await page.getByLabel("System prompt").fill("No variables here.");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Agent saved");
+  await page.getByRole("link", { name: "Variables", exact: true }).click();
+  await page.getByRole("button", { name: "Delete hours" }).click();
+  await page.getByRole("button", { name: "Delete variable" }).click();
+  await expect(row).toHaveCount(0);
+});
+
+test("reset demo keeps the signed-in workspace", async ({ page }) => {
+  await page.goto("/voice-receptionist/settings");
   await expect(page.getByTestId("clinic-name")).toContainText(
     "Browser Practice",
   );

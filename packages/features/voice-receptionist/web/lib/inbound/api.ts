@@ -11,6 +11,9 @@ export type ToolInput = Schemas["ToolIn"];
 export type ToolTestResult = Schemas["ToolTestOut"];
 export type ToolExecution = Schemas["ToolExecutionOut"];
 export type CatalogItem = Schemas["CatalogItemOut"];
+export type Variable = Schemas["VariableOut"];
+export type BuiltinVariable = Schemas["BuiltinOut"];
+export type Variables = Schemas["VariablesOut"];
 
 // Same-origin: Next rewrites /api/platform/* to the FastAPI backend, so the session cookie is sent.
 const BASE = "/api/platform/features/voice_receptionist/inbound";
@@ -122,6 +125,12 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
       request<ToolTestResult>("POST", `/tools/${id}/test`, { input }),
     listExecutions: (limit = 25) =>
       request<ToolExecution[]>("GET", `/tool-executions?limit=${limit}`),
+    listVariables: () => request<Variables>("GET", "/variables"),
+    createVariable: (name: string, value: string) =>
+      request<Variable>("POST", "/variables", { name, value }),
+    updateVariable: (id: string, value: string) =>
+      request<Variable>("PUT", `/variables/${id}`, { value }),
+    deleteVariable: (id: string) => request<void>("DELETE", `/variables/${id}`),
     startTestCall: (agentId: string) =>
       request<TestCall>("POST", `/agents/${agentId}/test-call`),
   };

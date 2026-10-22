@@ -21,6 +21,7 @@ import {
   TwoColumns,
   CheckboxField,
 } from "@clinic/ui";
+import { useVoice } from "../lib/voice/provider";
 import { Dropdown, Field, Switch, Textarea } from "./ui";
 
 type Props = { draft: Draft; onChange: (draft: Draft) => void };
@@ -43,6 +44,8 @@ function setter({ draft, onChange }: Props) {
 export function ConfigurationFields(props: Props) {
   const { draft } = props;
   const set = setter(props);
+  const { variables, builtinVariables } = useVoice();
+  const names = [...builtinVariables, ...variables].map((v) => `{{${v.name}}}`);
   return (
     <>
       <TwoColumns>
@@ -77,6 +80,18 @@ export function ConfigurationFields(props: Props) {
       <small className="block text-[12px] text-muted">
         Tell the agent who it is, what the clinic offers and how to help
         callers. It speaks briefly and does not give medical advice.
+      </small>
+      <small
+        className="mb-[18px] mt-1 block text-[12px] text-muted"
+        data-testid="variable-hint"
+      >
+        Variables you can use here and in the first message: {names.join(", ")}.{" "}
+        <Link
+          className="text-[#38691d] underline"
+          href="/voice-receptionist/variables"
+        >
+          Manage variables
+        </Link>
       </small>
       <Textarea
         label="First message"

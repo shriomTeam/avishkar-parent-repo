@@ -99,7 +99,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="rounded-[10px] bg-[#f7faf5] p-3.5 text-[12px]">
             <strong>Authenticated workspace</strong>
             <p className="my-1 text-[14px] text-muted">
-              Agents, calls and tools are live · other sections are demo
+              Agents, calls, tools and variables are live · other sections are
+              demo
             </p>
           </div>
           <Link
@@ -150,8 +151,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <footer className="flex gap-6 border-t border-line px-[38px] py-[18px] text-[12px] text-muted max-app:flex-wrap max-app:gap-2 max-app:p-4">
           Avishkar Voice{" "}
           <span>
-            Agents, calls and transcripts are real and stored · phone numbers,
-            tools and variables are demo
+            Agents, calls, transcripts, tools and variables are real and stored
+            · phone numbers are demo
           </span>
           <Link
             className="focus-ring ml-auto text-[#38691d]"

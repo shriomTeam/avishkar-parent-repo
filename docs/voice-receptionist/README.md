@@ -1,6 +1,6 @@
 # Voice receptionist in Always-On Clinic
 
-The implemented Avishkar Voice AI authentication, onboarding and dashboard now live in this monorepo. The original checkout remains intact. Google login and clinic onboarding use PostgreSQL; agents, calls, numbers, tools, variables, recording previews and test calls remain explicitly simulated.
+The implemented Avishkar Voice AI authentication, onboarding and dashboard now live in this monorepo. The original checkout remains intact. Google login and clinic onboarding use PostgreSQL; agents, calls, tools, variables and test calls are real; phone numbers and settings remain explicitly simulated.
 
 ## Code locations
 

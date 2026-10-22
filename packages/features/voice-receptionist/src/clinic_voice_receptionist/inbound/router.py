@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from clinic_core.api import RequestContext, get_request_context, get_session, require_role
 from clinic_core.audit import audit
-from clinic_db.models.core import StaffRole
+from clinic_db.models.core import StaffRole, Tenant
 from clinic_db.models.voice import Agent, Call
 from clinic_voice_receptionist.config import get_voice_settings
 from clinic_voice_receptionist.inbound import service
@@ -27,6 +27,7 @@ from clinic_voice_receptionist.inbound.schemas import (
     TurnOut,
 )
 from clinic_voice_receptionist.tools.service import refresh_builtins
+from clinic_voice_receptionist.variables import service as variables
 
 router = APIRouter(prefix="/inbound", tags=["voice_receptionist"])
 
@@ -37,6 +38,11 @@ async def _audit(session: AsyncSession, ctx: RequestContext, action: str, entity
     await audit(
         session, action, actor_type="staff", actor_id=ctx.actor_id, entity_type=entity_type, entity_id=entity_id
     )
+
+
+def _unknown_variables_message(names: list[str]) -> str:
+    listed = ", ".join("{{" + n + "}}" for n in names)
+    return f"Unknown variables: {listed}. Add them on the Variables page, or remove them from the text."
 
 
 async def _agents_out(session: AsyncSession, agents: list[Agent]) -> list[AgentOut]:
@@ -77,6 +83,8 @@ async def create_agent(
         raise HTTPException(409, "An agent with this name already exists.") from None
     except service.UnknownTool:
         raise HTTPException(422, "One of the selected tools no longer exists.") from None
+    except service.UnknownVariables as exc:
+        raise HTTPException(422, _unknown_variables_message(exc.names)) from None
     await audit(
         session,
         "voice.agent.created",
@@ -107,6 +115,8 @@ async def update_agent(
         raise HTTPException(409, "An agent with this name already exists.") from None
     except service.UnknownTool:
         raise HTTPException(422, "One of the selected tools no longer exists.") from None
+    except service.UnknownVariables as exc:
+        raise HTTPException(422, _unknown_variables_message(exc.names)) from None
     await audit(
         session,
         "voice.agent.updated",
@@ -244,11 +254,20 @@ async def start_test_call(
     fields = await service.agent_fields(session, agent.id)
     await refresh_builtins(session)  # a call always gets the current wording of built-in tools
     tools = await service.attached_tools(session, agent.id)
+    # Variables are filled in once, when the call starts, so the call keeps exactly what the agent was told.
+    tenant = await session.get(Tenant, ctx.tenant_id)
+    values = (await variables.custom_values(session)) | variables.builtin_values(
+        agent_name=agent.name,
+        clinic_name=tenant.name if tenant else "",
+        timezone=tenant.timezone if tenant else "UTC",
+        caller_number=None,  # a browser test has no caller number
+        now=now,
+    )
     snapshot = {
         "id": str(agent.id),
         "name": agent.name,
-        "prompt": agent.prompt,
-        "greeting": agent.greeting,
+        "prompt": variables.resolve(agent.prompt, values),
+        "greeting": variables.resolve(agent.greeting, values),
         "voice": agent.voice,
         "language": agent.language,
         "model": agent.model,
