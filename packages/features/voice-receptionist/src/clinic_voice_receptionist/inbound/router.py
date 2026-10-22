@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from clinic_core.api import RequestContext, get_request_context, get_session, require_role
 from clinic_core.audit import audit
+from clinic_core.database import tenant_session
 from clinic_db.models.core import StaffRole, Tenant
 from clinic_db.models.voice import Agent, Call
 from clinic_voice_receptionist.config import get_voice_settings
@@ -310,9 +311,13 @@ async def start_test_call(
         status="connecting",
         model=agent.model,
     )
-    session.add(call)
-    await session.flush()
-    ticket = tickets.mint(call)
+    # The browser opens the call WebSocket the moment it has the ticket. The request's own transaction only commits
+    # after the response has gone out, so the call and its ticket are saved in a transaction of their own that is
+    # finished before we answer. Otherwise the WebSocket can arrive first and be refused as an unknown ticket.
+    async with tenant_session(ctx.tenant_id, database_url=ctx.database_url) as own:
+        own.add(call)
+        await own.flush()
+        ticket = tickets.mint(call)
     await _audit(session, ctx, "voice.test_call.started", "voice.call", call.id)
     return TestCallOut(
         call_id=call.id,
