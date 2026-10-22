@@ -52,6 +52,12 @@ class LapsedHighValue(_Strict):
     enabled: bool = True
     priority: int = Field(default=1, ge=1, le=99)
     spend_percentile_min: int = Field(default=80, ge=0, le=100)
+    spend_cents_min: int | None = Field(
+        default=None,
+        ge=1,
+        le=100_000_000,
+        description="also a top spender above this lifetime spend, in cents; empty adds no rule",
+    )
     overdue_ratio_min: float = Field(default=2.0, gt=0, le=20)
 
 

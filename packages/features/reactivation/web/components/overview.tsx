@@ -12,6 +12,7 @@ import { num } from "../lib/summary";
 import { useCsvResult } from "./csv-provider";
 import { CsvResults } from "./csv-results";
 import { ExportReportButton } from "./export-button";
+import { SummaryReportButton } from "./summary-button";
 import { Button, ButtonLink, Card, EmptyState, Icon, Notice, ProgressBar } from "./kit";
 import { QualityPanel } from "./quality-panel";
 import { Tiles } from "./tiles";
@@ -22,6 +23,8 @@ import { Welcome } from "./welcome";
 export type InFlight = { id: string; status: string; progress_pct: number };
 export type OverviewData = {
   latest: LatestRun | null;
+  /** The version of the settings saved now, or null when it could not be read. */
+  currentSettingsVersion: number | null;
   types: TypeEntry[];
   inFlight: InFlight | null;
   /** The newest run failed and nothing newer is running. */
@@ -195,6 +198,11 @@ export function Overview({ data }: { data: OverviewData }) {
       <ExportReportButton source={{ kind: "saved", latest, types, dormant: num(summary, "dormant_count") }} />
     ) : null;
 
+  const summaryButton =
+    canRun && latest ? (
+      <SummaryReportButton source={{ kind: "saved", runId: latest.id, dormant: num(summary, "dormant_count") }} />
+    ) : null;
+
   return (
     <div className="dp-stack">
       {clearedNotice}
@@ -229,10 +237,11 @@ export function Overview({ data }: { data: OverviewData }) {
             )}
           </p>
         </div>
-        {(importButton || exportButton || (latest && runButton)) && (
+        {(importButton || exportButton || summaryButton || (latest && runButton)) && (
           <div className="dp-head-actions">
             {importButton}
             {exportButton}
+            {summaryButton}
             {latest && runButton}
           </div>
         )}
@@ -245,6 +254,13 @@ export function Overview({ data }: { data: OverviewData }) {
         </Notice>
       )}
       {run && <ProgressCard run={run} trouble={trouble} />}
+      {latest && !run && data.currentSettingsVersion !== null && latest.settings_version !== data.currentSettingsVersion && (
+        <Notice tone="info" title="Your settings changed after this analysis." >
+          {canRun
+            ? "The figures below still use the earlier settings. Run the analysis again to use the new ones."
+            : "The figures below still use the earlier settings. The clinic owner or office manager can run the analysis again."}
+        </Notice>
+      )}
 
       {!latest ? (
         run ? null : (

@@ -1,5 +1,6 @@
 import uuid
 from datetime import UTC, datetime
+from typing import Any
 from zoneinfo import ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, Header, HTTPException
@@ -24,6 +25,7 @@ SUMMARY_VIEWERS = [Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGE
 class SettingsOut(BaseModel):
     version: int
     config: ReactivationSettings
+    defaults: ReactivationSettings = ReactivationSettings()  # what "reset to defaults" means
     next_run_at: datetime | None
     timezone: str
     updated_by: str | None
@@ -41,6 +43,7 @@ class LastRunOut(BaseModel):
 
 class ScheduleOut(BaseModel):
     next_run_at: datetime | None
+    settings_version: int
     last_run: LastRunOut | None
 
 
@@ -50,6 +53,28 @@ async def _timezone(session: AsyncSession) -> str:
 
 async def _current(session: AsyncSession) -> Settings | None:
     return await session.scalar(select(Settings).where(Settings.tenant_id == current_tenant(session)))
+
+
+def config_changes(old: dict[str, Any], new: dict[str, Any]) -> list[dict[str, Any]]:
+    """Which settings differ, as ``{setting, from, to}`` with dotted names, in name order.
+
+    Numbers, switches and fixed words only. A setting that holds a map (rebooking days by category or service) is
+    named without its keys or values, because the keys are the clinic's own words.
+    """
+    changes: list[dict[str, Any]] = []
+
+    def walk(path: str, a: Any, b: Any) -> None:
+        if isinstance(a, dict) and isinstance(b, dict) and not path.startswith("dormant.rebooking_days_by_"):
+            for key in sorted(a.keys() | b.keys()):
+                walk(f"{path}.{key}" if path else key, a.get(key), b.get(key))
+        elif a != b:
+            if isinstance(a, dict) or isinstance(b, dict):
+                changes.append({"setting": path})
+            else:
+                changes.append({"setting": path, "from": a, "to": b})
+
+    walk("", old, new)
+    return changes
 
 
 def _parse_if_match(value: str | None) -> int | None:
@@ -93,6 +118,11 @@ async def put_settings(
         raise HTTPException(409, f"the practice's time zone {tz!r} is not recognised") from None
     config = body.model_dump(mode="json")
     new_version = current_version + 1
+    try:
+        before = ReactivationSettings.model_validate(row.config).model_dump(mode="json") if row else None
+    except ValueError:
+        before = None  # a stored config that no longer validates: every setting counts as changed
+    changes = config_changes(before if before is not None else ReactivationSettings().model_dump(mode="json"), config)
 
     if row is None:
         row = Settings(
@@ -130,7 +160,7 @@ async def put_settings(
         actor_id=ctx.actor_id,
         entity_type="reactivation_settings",
         entity_id=row.id,
-        details={"from_version": current_version, "to_version": new_version},
+        details={"from_version": current_version, "to_version": new_version, "changes": changes},
     )
     return SettingsOut(version=new_version, config=body, next_run_at=next_run_at, timezone=tz, updated_by=ctx.actor_id)
 
@@ -141,6 +171,7 @@ async def get_schedule(session: AsyncSession = Depends(get_session)) -> Schedule
     last = await session.scalar(select(Run).order_by(Run.queued_at.desc()).limit(1))
     return ScheduleOut(
         next_run_at=row.next_run_at if row else None,
+        settings_version=row.version if row else 0,
         last_run=LastRunOut(
             id=last.id,
             trigger=last.trigger,

@@ -197,13 +197,13 @@ async def test_save_is_audited_without_settings_content(client):
         rows = (await s.scalars(select(AuditLog).where(AuditLog.action == "reactivation.settings.saved"))).all()
     assert len(rows) == 1
     assert rows[0].actor_type == "staff" and rows[0].actor_id == "alice"
-    assert rows[0].details == {"from_version": 0, "to_version": 1}
+    assert rows[0].details == {"from_version": 0, "to_version": 1, "changes": []}
 
 
 async def test_schedule_shows_next_run_and_last_run(client):
     t = await create_test_tenant()
     empty = (await client.get("/schedule", headers=_h(t))).json()
-    assert empty == {"next_run_at": None, "last_run": None}
+    assert empty == {"next_run_at": None, "settings_version": 0, "last_run": None}
 
     await client.put("/settings", headers=_h(t, **{"If-Match": "0"}), json=_config())
     async with tenant_session(t) as s:
