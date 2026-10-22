@@ -511,6 +511,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/reactivation/runs/{run_id}/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Run Summary
+         * @description Everything the summary report (PDF) needs, with no patient rows: group totals, the headline figures and the
+         *     settings the run used. One audit entry holding counts only.
+         */
+        get: operations["run_summary_features_reactivation_runs__run_id__summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/reactivation/runs/{run_id}/patients": {
         parameters: {
             query?: never;
@@ -2370,6 +2391,30 @@ export interface components {
                 [key: string]: unknown;
             }[];
         };
+        /**
+         * SummaryOut
+         * @description What the summary report prints: totals and groups, the settings the run used, and no patient rows.
+         */
+        SummaryOut: {
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /** Finished At */
+            finished_at: string | null;
+            /** Settings Version */
+            settings_version: number;
+            /** Settings Source */
+            settings_source: string;
+            settings: components["schemas"]["ReactivationSettings"];
+            /** Summary */
+            summary: {
+                [key: string]: unknown;
+            };
+            /** Types */
+            types: components["schemas"]["TypeOut"][];
+        };
         /** TenantIn */
         TenantIn: {
             /** Name */
@@ -3660,6 +3705,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TypeOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_summary_features_reactivation_runs__run_id__summary_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SummaryOut"];
                 };
             };
             /** @description Validation Error */
