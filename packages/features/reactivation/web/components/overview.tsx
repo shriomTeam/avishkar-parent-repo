@@ -12,6 +12,7 @@ import { num } from "../lib/summary";
 import { useCsvResult } from "./csv-provider";
 import { CsvResults } from "./csv-results";
 import { ExportReportButton } from "./export-button";
+import { SummaryReportButton } from "./summary-button";
 import { Button, ButtonLink, Card, EmptyState, Icon, Notice, ProgressBar } from "./kit";
 import { QualityPanel } from "./quality-panel";
 import { Tiles } from "./tiles";
@@ -197,6 +198,11 @@ export function Overview({ data }: { data: OverviewData }) {
       <ExportReportButton source={{ kind: "saved", latest, types, dormant: num(summary, "dormant_count") }} />
     ) : null;
 
+  const summaryButton =
+    canRun && latest ? (
+      <SummaryReportButton source={{ kind: "saved", runId: latest.id, dormant: num(summary, "dormant_count") }} />
+    ) : null;
+
   return (
     <div className="dp-stack">
       {clearedNotice}
@@ -231,10 +237,11 @@ export function Overview({ data }: { data: OverviewData }) {
             )}
           </p>
         </div>
-        {(importButton || exportButton || (latest && runButton)) && (
+        {(importButton || exportButton || summaryButton || (latest && runButton)) && (
           <div className="dp-head-actions">
             {importButton}
             {exportButton}
+            {summaryButton}
             {latest && runButton}
           </div>
         )}

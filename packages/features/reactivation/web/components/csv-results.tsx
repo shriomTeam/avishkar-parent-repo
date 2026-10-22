@@ -6,6 +6,7 @@ import { formatDateTime } from "../lib/format";
 import { settingsInUse } from "../lib/settings";
 import { num } from "../lib/summary";
 import { ExportReportButton } from "./export-button";
+import { SummaryReportButton } from "./summary-button";
 import { IMPORT_PATH } from "./shell-nav";
 import { useCsvResult, type CsvResult } from "./csv-provider";
 import { Button, ButtonLink, Card, EmptyState, Icon, Notice } from "./kit";
@@ -72,6 +73,7 @@ export function CsvResults({
         {canImport && (
           <div className="dp-head-actions">
             <ExportReportButton source={{ kind: "file", fileName, data, dormant: num(data.summary, "dormant_count") }} />
+            <SummaryReportButton source={{ kind: "file", data, dormant: num(data.summary, "dormant_count") }} />
           </div>
         )}
       </div>
