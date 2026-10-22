@@ -209,6 +209,62 @@ test("the agent editor checks values before saving and keeps unsaved edits from 
   await expect(page.getByLabel("Save the transcript")).toBeChecked();
 });
 
+test("a recording agent keeps the call audio, which plays back in call history beside the transcript", async ({
+  page,
+}) => {
+  await createAgent(page, "Recorded line");
+  await page.getByRole("tab", { name: "Data & privacy" }).click();
+  const record = page.getByLabel("Record the call");
+  await expect(record).not.toBeChecked(); // off unless chosen
+  await record.check();
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Agent saved");
+
+  await takeTestCall(page, "Recorded line");
+  await page.getByRole("link", { name: "View saved call" }).click();
+  await expect(
+    page.getByText("Thanks Sam, I have your details."),
+  ).toBeVisible();
+  await expect(page.locator("audio")).toHaveCount(0); // nothing is downloaded until someone presses Play
+  await page.getByRole("button", { name: "Play recording" }).click();
+  const audio = page.locator("audio");
+  await expect(audio).toHaveCount(1, CALL);
+  await expect(
+    page.getByRole("button", { name: "Pause recording" }),
+  ).toBeVisible(CALL); // it started playing
+  await expect(page.getByLabel("Seek")).toBeEnabled();
+  await expect(page.locator("a[download], [download]")).toHaveCount(0); // no way to download it from the page
+  await page.getByRole("button", { name: /Playback speed 1×/ }).click();
+  await expect(
+    page.getByRole("button", { name: /Playback speed 1.25×/ }),
+  ).toBeVisible();
+  expect(await audio.evaluate((el: HTMLAudioElement) => el.playbackRate)).toBe(
+    1.25,
+  );
+  expect(await audio.evaluate((el: HTMLAudioElement) => el.controls)).toBe(
+    false,
+  );
+  const bytes = await audio.evaluate(async (el: HTMLAudioElement) => {
+    const blob = await (await fetch(el.src)).blob();
+    return new Uint8Array(await blob.arrayBuffer()).slice(0, 4);
+  });
+  expect(String.fromCharCode(...bytes)).toBe("RIFF");
+});
+
+test("an agent that does not record leaves no player in call history", async ({
+  page,
+}) => {
+  await createAgent(page, "Unrecorded line");
+  await takeTestCall(page, "Unrecorded line");
+  await page.getByRole("link", { name: "View saved call" }).click();
+  await expect(
+    page.getByText("Thanks Sam, I have your details."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Play recording" }),
+  ).toHaveCount(0);
+});
+
 test("variables persist and reset preserves authenticated workspace", async ({
   page,
 }) => {

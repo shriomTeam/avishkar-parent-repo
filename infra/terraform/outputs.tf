@@ -35,6 +35,6 @@ output "google_oauth_redirect_uri" {
 }
 
 output "files_bucket" {
-  description = "Private bucket for feature files; voice recordings go under recordings/."
+  description = "Private bucket for feature files; voice recordings go under voice-recordings/."
   value       = module.storage.name
 }

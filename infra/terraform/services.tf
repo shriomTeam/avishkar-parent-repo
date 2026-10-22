@@ -65,7 +65,7 @@ module "api" {
     TRUSTED_HOSTS           = jsonencode([local.api_host])
     TRUSTED_PROXY_HOPS      = "1" # Cloud Run's front end is the one proxy; see clinic_api.forwarded
     VOICE_GCP_PROJECT       = var.project_id
-    VOICE_RECORDINGS_BUCKET = module.storage.name # recordings go under recordings/
+    VOICE_RECORDINGS_BUCKET = module.storage.name # recordings go under voice-recordings/
   }
   secret_env = local.api_secrets
 

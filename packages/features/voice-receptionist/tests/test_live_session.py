@@ -12,6 +12,7 @@ from clinic_core.testing import create_test_tenant
 from clinic_db.models.voice import Agent, Call, CallEvent, CallFieldValue, CallTurn
 from clinic_voice_receptionist.inbound.live import session as session_module
 from clinic_voice_receptionist.inbound.live import tickets
+from clinic_voice_receptionist.inbound.live.audio import CallAudio
 from clinic_voice_receptionist.inbound.live.events import (
     AudioOut,
     Interrupted,
@@ -101,7 +102,7 @@ class FakeTransport:
         self.events.append(event)
 
 
-async def _start(*models, snapshot_extra=None, max_seconds=60, tool_runner=None):
+async def _start(*models, snapshot_extra=None, max_seconds=60, tool_runner=None, audio=None, store=None):
     tenant = await create_test_tenant()
     snapshot = {
         "name": "Front desk",
@@ -136,6 +137,8 @@ async def _start(*models, snapshot_extra=None, max_seconds=60, tool_runner=None)
         recorder=CallRecorder(tenant, call_id, snapshot),
         max_seconds=max_seconds,
         tool_runner=tool_runner(tenant, call_id) if tool_runner else None,
+        audio=audio,
+        store=store,
     )
     return tenant, call_id, session, connector, transport, asyncio.create_task(session.run())
 
@@ -273,6 +276,79 @@ async def test_a_full_audio_queue_drops_the_oldest_chunks_instead_of_growing():
     assert [session._out.get_nowait() for _ in range(3)] == [b"\x02", b"\x03", b"\x04"]
     transport.inbox.put_nowait(None)
     await asyncio.wait_for(task, 5)
+
+
+class FakeStore:
+    def __init__(self, fail_times=0):
+        self.objects, self.attempts, self._fail = {}, 0, fail_times
+
+    async def put(self, name, data):
+        self.attempts += 1
+        if self.attempts <= self._fail:
+            raise OSError("storage unavailable")
+        self.objects[name] = data
+
+    async def get(self, name):
+        return self.objects.get(name)
+
+
+async def _recorded_call(store, *, audio=True, seconds=1):
+    model = FakeModel()
+    tenant, call_id, session, _, transport, task = await _start(
+        model, audio=CallAudio(60) if audio else None, store=store
+    )
+    await asyncio.sleep(0.05)
+    transport.inbox.put_nowait(b"\x01\x00" * 16_000 * seconds)
+    model.push(AudioOut(b"\x02\x00" * 24_000 * seconds))
+    await asyncio.sleep(0.05)
+    transport.inbox.put_nowait(None)
+    await asyncio.wait_for(task, 5)
+    return tenant, call_id
+
+
+async def test_a_recorded_call_is_uploaded_under_its_clinic_and_marked_saved():
+    store = FakeStore()
+    tenant, call_id = await _recorded_call(store)
+    name = f"voice-recordings/{tenant}/{call_id}.wav"
+    assert list(store.objects) == [name]
+    assert store.objects[name][:4] == b"RIFF"
+    call, *_ = await _saved(tenant, call_id)
+    assert (call.recording_object, call.recording_status) == (name, "saved")
+
+
+async def test_a_failed_upload_is_retried_once_then_reported_without_losing_the_call():
+    store = FakeStore(fail_times=1)
+    tenant, call_id = await _recorded_call(store)
+    call, *_ = await _saved(tenant, call_id)
+    assert store.attempts == 2 and call.recording_status == "saved"
+
+    store = FakeStore(fail_times=5)
+    tenant, call_id = await _recorded_call(store)
+    call, *_ = await _saved(tenant, call_id)
+    assert store.attempts == 2 and store.objects == {}
+    assert (call.status, call.recording_object, call.recording_status) == ("completed", None, "failed")
+
+
+async def test_a_call_that_should_be_recorded_but_has_no_storage_is_marked_failed():
+    tenant, call_id = await _recorded_call(None)
+    call, *_ = await _saved(tenant, call_id)
+    assert (call.status, call.recording_object, call.recording_status) == ("completed", None, "failed")
+
+
+async def test_calls_are_not_recorded_unless_the_agent_asks_for_it():
+    store = FakeStore()
+    tenant, call_id = await _recorded_call(store, audio=False)
+    call, *_ = await _saved(tenant, call_id)
+    assert store.objects == {} and (call.recording_object, call.recording_status) == (None, None)
+
+
+async def test_a_call_with_no_audio_leaves_no_recording():
+    store = FakeStore()
+    tenant, call_id, session, _, transport, task = await _start(FakeModel(), audio=CallAudio(60), store=store)
+    transport.inbox.put_nowait(None)
+    await asyncio.wait_for(task, 5)
+    call, *_ = await _saved(tenant, call_id)
+    assert store.objects == {} and call.recording_status is None
 
 
 def test_field_values_are_validated_and_normalised():

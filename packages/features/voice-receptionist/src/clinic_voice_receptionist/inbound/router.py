@@ -1,7 +1,7 @@
 import uuid
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +13,7 @@ from clinic_voice_receptionist.config import get_voice_settings
 from clinic_voice_receptionist.inbound import service
 from clinic_voice_receptionist.inbound.live import tickets
 from clinic_voice_receptionist.inbound.live.events import INPUT_RATE, OUTPUT_RATE
+from clinic_voice_receptionist.inbound.live.storage import CONTENT_TYPE, belongs_to, store_for
 from clinic_voice_receptionist.inbound.schemas import (
     AgentIn,
     AgentOut,
@@ -187,12 +188,33 @@ async def get_call(
     )
 
 
+@router.get("/calls/{call_id}/recording")
+async def get_recording(
+    call_id: uuid.UUID,
+    request: Request,
+    ctx: RequestContext = Depends(get_request_context),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    """The call's audio. The file is found from the call row, never from anything in the request."""
+    call = await session.get(Call, call_id)  # row-level security limits this to the clinic's own calls
+    name = call.recording_object if call and call.recording_status == "saved" else None
+    if call is None or name is None or call.tenant_id != ctx.tenant_id or not belongs_to(name, ctx.tenant_id):
+        raise HTTPException(404, "recording not found")
+    store = store_for(request.app, get_voice_settings())
+    data = await store.get(name) if store else None
+    if data is None:
+        raise HTTPException(404, "recording not found")
+    await _audit(session, ctx, "voice.recording.played", "voice.call", call_id)  # recordings are PHI: who listened
+    return Response(data, media_type=CONTENT_TYPE, headers={"Cache-Control": "private, no-store"})
+
+
 MAX_OPEN_TEST_CALLS = 3
 
 
 @router.post("/agents/{agent_id}/test-call", response_model=TestCallOut, status_code=201, dependencies=MANAGERS)
 async def start_test_call(
     agent_id: uuid.UUID,
+    request: Request,
     ctx: RequestContext = Depends(get_request_context),
     session: AsyncSession = Depends(get_session),
 ) -> TestCallOut:
@@ -201,6 +223,8 @@ async def start_test_call(
     if not agent.is_active:
         raise HTTPException(409, "agent is not active")
     voice = get_voice_settings()
+    if agent.save_recording and store_for(request.app, voice) is None:
+        raise HTTPException(409, "This agent records calls, but recording storage is not set up on this server.")
     now = datetime.now(UTC)
     # Calls that were never opened, or outlived the call limit (for example after a restart), are over.
     await session.execute(
@@ -230,6 +254,7 @@ async def start_test_call(
         "model": agent.model,
         "save_transcript": agent.save_transcript,
         "save_raw_events": agent.save_raw_events,
+        "save_recording": agent.save_recording,
         # Only what the model needs. Endpoints and auth headers stay out of the call record; the runner reads them
         # fresh when a tool runs, so disabling or deleting a tool takes effect even mid-call.
         "tools": [
