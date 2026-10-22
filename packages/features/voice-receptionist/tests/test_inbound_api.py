@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import httpx
@@ -13,6 +14,7 @@ from clinic_db.models.ops import AuditLog
 from clinic_db.models.voice import Call, CallEvent, CallFieldValue, CallTurn
 from clinic_voice_receptionist.config import VoiceSettings
 from clinic_voice_receptionist.inbound import router as router_module
+from clinic_voice_receptionist.inbound.live import tickets
 from clinic_voice_receptionist.inbound.router import router
 
 app = FastAPI()
@@ -288,3 +290,29 @@ async def test_a_test_call_of_a_recording_agent_carries_the_setting_when_storage
     async with tenant_session(t) as s:
         call = await s.get(Call, uuid.UUID(started.json()["call_id"]))
         assert call.agent_snapshot["save_recording"] is True
+
+
+async def test_the_ticket_works_the_moment_the_browser_receives_it(client):
+    """The WebSocket opens as soon as the browser has the ticket, so the call must already be saved by then."""
+    t = await create_test_tenant()
+    agent = await _create(client, t)
+    opened = {}
+
+    async def browser_watching(scope, receive, send):
+        body = bytearray()
+
+        async def watch(message):
+            await send(message)
+            if message["type"] == "http.response.body":
+                body.extend(message.get("body", b""))
+                if not message.get("more_body") and scope["path"].endswith("/test-call"):
+                    # Exactly when the browser would act on the response: the server has not finished the request yet.
+                    opened["call"] = await tickets.redeem(json.loads(body)["ticket"])
+
+        await app(scope, receive, watch)
+
+    transport = httpx.ASGITransport(app=browser_watching)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as watching:
+        started = await watching.post(f"/inbound/agents/{agent['id']}/test-call", headers=_h(t))
+    assert started.status_code == 201
+    assert opened["call"] == (t, uuid.UUID(started.json()["call_id"]))

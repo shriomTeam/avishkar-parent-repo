@@ -222,6 +222,10 @@ importers:
   packages/tsconfig: {}
 
   packages/ui:
+    dependencies:
+      lucide-react:
+        specifier: ^0.468.0
+        version: 0.468.0(react@19.3.0)
     devDependencies:
       '@clinic/tsconfig':
         specifier: workspace:*

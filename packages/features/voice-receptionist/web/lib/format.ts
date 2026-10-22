@@ -1,5 +1,4 @@
 import type { CallSummary } from "./inbound/api";
-import type { Variable } from "./types";
 export const duration = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 export const dateLabel = (date: string, timezone: string) =>
@@ -16,19 +15,6 @@ export function median(values: number[]) {
   const mid = Math.floor(sorted.length / 2);
   return Math.round(
     sorted.length % 2 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2,
-  );
-}
-export function resolvePrompt(
-  text: string,
-  vars: Variable[],
-  runtime: Record<string, string> = {},
-) {
-  return text.replace(
-    /\{\{([a-z][a-z0-9_]*)\}\}/g,
-    (match, name) =>
-      runtime[name] ??
-      vars.find((v) => v.name === name && v.type === "Static")?.value ??
-      match,
   );
 }
 export const plural = (n: number, word: string) =>

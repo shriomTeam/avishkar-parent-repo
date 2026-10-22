@@ -928,6 +928,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/voice_receptionist/inbound/variables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Variables */
+        get: operations["list_variables_features_voice_receptionist_inbound_variables_get"];
+        put?: never;
+        /** Create Variable */
+        post: operations["create_variable_features_voice_receptionist_inbound_variables_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/variables/{variable_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update Variable
+         * @description Only the value can change: the name is what prompts refer to, so renaming would break them.
+         */
+        put: operations["update_variable_features_voice_receptionist_inbound_variables__variable_id__put"];
+        post?: never;
+        /** Delete Variable */
+        delete: operations["delete_variable_features_voice_receptionist_inbound_variables__variable_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/voice_receptionist/status": {
         parameters: {
             query?: never;
@@ -1196,6 +1235,15 @@ export interface components {
             id: string;
             /** Status */
             status: string;
+        };
+        /** BuiltinOut */
+        BuiltinOut: {
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Example */
+            example: string;
         };
         /** CallDetailOut */
         CallDetailOut: {
@@ -2739,6 +2787,44 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VariableIn */
+        VariableIn: {
+            /** Name */
+            name: string;
+            /** Value */
+            value: string;
+        };
+        /** VariableOut */
+        VariableOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Value */
+            value: string;
+            /** Used By */
+            used_by?: string[];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** VariableUpdate */
+        VariableUpdate: {
+            /** Value */
+            value: string;
+        };
+        /** VariablesOut */
+        VariablesOut: {
+            /** Custom */
+            custom: components["schemas"]["VariableOut"][];
+            /** Builtin */
+            builtin: components["schemas"]["BuiltinOut"][];
         };
         /** WorkspaceCreate */
         WorkspaceCreate: {
@@ -4805,6 +4891,148 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ToolExecutionOut"][];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_variables_features_voice_receptionist_inbound_variables_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VariablesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_variable_features_voice_receptionist_inbound_variables_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VariableIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VariableOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_variable_features_voice_receptionist_inbound_variables__variable_id__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                variable_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VariableUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VariableOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_variable_features_voice_receptionist_inbound_variables__variable_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                variable_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

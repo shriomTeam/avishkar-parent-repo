@@ -15,6 +15,7 @@ from clinic_db.models.voice import (
     ToolExecution,
 )
 from clinic_voice_receptionist.inbound.schemas import AgentIn, FieldIn
+from clinic_voice_receptionist.variables import service as variables
 
 MAX_EVENTS_RETURNED = 5000  # a 10-minute call is well under this; the cap only guards the response size
 
@@ -25,6 +26,12 @@ class NameTaken(Exception):
 
 class UnknownTool(Exception):
     pass
+
+
+class UnknownVariables(Exception):
+    def __init__(self, names: list[str]):
+        super().__init__(", ".join(names))
+        self.names = names
 
 
 async def get_agent(session: AsyncSession, agent_id: uuid.UUID) -> Agent | None:
@@ -117,6 +124,8 @@ async def save_agent(
 ) -> Agent:
     if await _name_taken(session, body.name, except_id=agent.id if agent else None):
         raise NameTaken(body.name)
+    if missing := await variables.unknown_names(session, body.prompt, body.greeting):
+        raise UnknownVariables(missing)
     values = body.model_dump(exclude={"fields", "tool_ids"})
     if agent is None:
         agent = Agent(tenant_id=tenant_id, model=model, created_by_staff_id=staff_id, **values)

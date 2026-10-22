@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
+import { Alert, Button, H3, Muted } from "@clinic/ui";
 import { ApiError, type InboundApi } from "../lib/inbound/api";
 
 const SPEEDS = [0.75, 1, 1.25, 1.5, 2];
@@ -47,11 +48,11 @@ export function RecordingPlayer({
   if (!status) return null;
   if (status !== "saved")
     return (
-      <div className="recording" role="status">
-        <p className="muted">
+      <div className="mb-2 border-b border-line pb-4" role="status">
+        <Muted>
           This call was set to be recorded, but the recording could not be
           saved.
-        </p>
+        </Muted>
       </div>
     );
 
@@ -86,16 +87,18 @@ export function RecordingPlayer({
 
   const progress = length ? (position / length) * 100 : 0;
   return (
-    <div className="recording">
-      <h3>Recording</h3>
+    <div className="mb-2 grid gap-2 border-b border-line pb-4">
+      <H3 flush>Recording</H3>
       <div
-        className="player"
+        className="flex max-w-[560px] items-center gap-3 rounded-xl border border-line bg-white px-3.5 py-2.5"
         onContextMenu={(e) => e.preventDefault()}
         role="group"
         aria-label="Call recording"
       >
-        <button
-          className="primary player-play"
+        <Button
+          variant="brand"
+          size="icon"
+          className="shrink-0"
           onClick={toggle}
           disabled={loading}
           aria-label={
@@ -107,10 +110,12 @@ export function RecordingPlayer({
           }
         >
           {playing ? <Pause size={16} /> : <Play size={16} />}
-        </button>
-        <span className="player-time">{clock(position)}</span>
+        </Button>
+        <span className="min-w-9 shrink-0 text-[13px] tabular-nums text-muted">
+          {clock(position)}
+        </span>
         <input
-          className="player-seek"
+          className="focus-ring m-0 h-1.5 min-w-20 flex-1 cursor-pointer appearance-none rounded-full bg-[linear-gradient(to_right,var(--color-brand)_var(--progress,0%),var(--color-line)_var(--progress,0%))] disabled:cursor-default [&::-moz-range-thumb]:size-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-ink [&::-moz-range-thumb]:bg-white [&::-webkit-slider-thumb]:size-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-ink [&::-webkit-slider-thumb]:bg-white disabled:[&::-webkit-slider-thumb]:invisible"
           type="range"
           aria-label="Seek"
           min={0}
@@ -125,14 +130,17 @@ export function RecordingPlayer({
             if (audio.current) audio.current.currentTime = at;
           }}
         />
-        <span className="player-time">{length ? clock(length) : "–:––"}</span>
-        <button
-          className="player-speed"
+        <span className="min-w-9 shrink-0 text-[13px] tabular-nums text-muted">
+          {length ? clock(length) : "–:––"}
+        </span>
+        <Button
+          variant="brand"
+          size="pill"
           onClick={cycleSpeed}
           aria-label={`Playback speed ${speed}×, change`}
         >
           {speed}×
-        </button>
+        </Button>
         {url && (
           <audio
             ref={audio}
@@ -150,14 +158,10 @@ export function RecordingPlayer({
           />
         )}
       </div>
-      {error && (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
-      )}
-      <p className="muted">
+      {error && <Alert>{error}</Alert>}
+      <Muted>
         Caller on the left, agent on the right. Each listen is recorded.
-      </p>
+      </Muted>
     </div>
   );
 }

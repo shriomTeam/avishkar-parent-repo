@@ -120,13 +120,16 @@ export function AuthProvider({
   if (expired) return <p role="status">Returning to sign-in…</p>;
   if (error)
     return (
-      <main className="standalone">
-        <h1>Unable to check your session</h1>
-        <p>
+      <main className="mx-auto max-w-[700px] px-[30px] py-[70px]">
+        <h1 className="mb-[5px] text-[30px] font-[650] tracking-[-1px]">
+          Unable to check your session
+        </h1>
+        <p className="my-[7px] text-[14px] text-muted">
           The authentication service is unavailable. Your dashboard is hidden
           until it can be verified.
         </p>
         <button
+          className="cursor-pointer rounded-[9px] border border-line bg-white px-4 py-2.5 text-[14px] font-semibold text-ink hover:border-brand"
           onClick={() => {
             void refresh().catch(() => setError(true));
           }}

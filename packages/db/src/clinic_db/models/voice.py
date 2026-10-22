@@ -210,3 +210,13 @@ class ToolExecution(IdMixin, TenantMixin, Base):
     duration_ms: Mapped[int] = mapped_column(Integer)
     idempotency_key: Mapped[str] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Variable(IdMixin, TenantMixin, TimestampMixin, Base):
+    """A fixed value a clinic writes into agent prompts as {{name}}, shared by all its agents."""
+
+    __tablename__ = "variables"
+    __table_args__ = (UniqueConstraint("tenant_id", "name"), SCHEMA)
+
+    name: Mapped[str] = mapped_column(String(64), comment="snake_case, used as {{name}}; never changes after creation")
+    value: Mapped[str] = mapped_column(Text)

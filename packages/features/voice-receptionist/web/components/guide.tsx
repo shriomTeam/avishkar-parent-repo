@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { buttonStyles, H2, Muted, Note } from "@clinic/ui";
 import { Heading } from "./ui";
 export const guide: [string, string, string][] = [
   [
@@ -66,23 +67,29 @@ export function Guide() {
         title="Page-by-page design"
         description="The complete V1 frontend journey, ready to explore."
         actions={
-          <Link className="button primary" href="/voice-receptionist">
+          <Link className={buttonStyles("brand")} href="/voice-receptionist">
             Open dashboard
           </Link>
         }
       />
-      <div className="note guide-note">
+      <Note className="mb-[22px]">
         Avishkar lime #A1FF62 · charcoal #201D1D · grey #F4F4F4 · soft green
         #EDFFE1. Changes last until refresh. Sample records and actions are for
         design review.
-      </div>
-      <div className="guidegrid">
+      </Note>
+      <div className="grid grid-cols-2 gap-[18px] max-app:grid-cols-1">
         {guide.map(([path, title, description], index) => (
-          <Link className="card" key={path} href={path}>
-            <span className="number">{String(index + 1).padStart(2, "0")}</span>
+          <Link
+            className="focus-ring flex gap-[18px] rounded-[13px] border border-line bg-white p-[23px] max-app:p-[18px]"
+            key={path}
+            href={path}
+          >
+            <span className="text-[25px] font-[650] text-brand-ink">
+              {String(index + 1).padStart(2, "0")}
+            </span>
             <div>
-              <h2>{title}</h2>
-              <p>{description}</p>
+              <H2>{title}</H2>
+              <Muted>{description}</Muted>
             </div>
           </Link>
         ))}
