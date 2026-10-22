@@ -20,10 +20,12 @@ from clinic_core.entitlements import enabled_feature_keys
 from clinic_db.models.voice import Call
 from clinic_voice_receptionist.config import get_voice_settings
 from clinic_voice_receptionist.inbound.live import tickets
+from clinic_voice_receptionist.inbound.live.audio import CallAudio
 from clinic_voice_receptionist.inbound.live.events import INPUT_RATE, OUTPUT_RATE
 from clinic_voice_receptionist.inbound.live.gemini import GeminiConnector
 from clinic_voice_receptionist.inbound.live.recorder import CallRecorder
 from clinic_voice_receptionist.inbound.live.session import CallSession
+from clinic_voice_receptionist.inbound.live.storage import store_for
 from clinic_voice_receptionist.tools.runner import ToolRunner
 
 log = logging.getLogger("voice.ws")
@@ -125,6 +127,8 @@ async def live_call(ws: WebSocket, ticket: str = Query(min_length=1, max_length=
             recorder=recorder,
             max_seconds=voice.max_call_seconds,
             tool_runner=ToolRunner(tenant_id=tenant_id, call_id=call_id, database_url=settings.database_url),
+            audio=CallAudio(voice.max_call_seconds) if snapshot.get("save_recording") else None,
+            store=store_for(ws.app, voice),
         ).run()
     finally:
         _active_calls -= 1

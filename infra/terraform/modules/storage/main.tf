@@ -1,5 +1,5 @@
 # Private file storage for the platform. Features keep their files under their own folder (prefix),
-# e.g. voice recordings go in "recordings/". The bucket holds patient audio, so nothing here is public.
+# e.g. voice recordings go in "voice-recordings/". The bucket holds patient audio, so nothing here is public.
 resource "google_storage_bucket" "files" {
   # Bucket names are global, so the project id keeps this one unique.
   name     = "${var.name}-${var.project_id}-files"

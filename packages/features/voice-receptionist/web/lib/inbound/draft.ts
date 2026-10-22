@@ -52,6 +52,7 @@ export type Draft = {
   is_active: boolean;
   save_transcript: boolean;
   save_raw_events: boolean;
+  save_recording: boolean;
   fields: DraftField[];
   tool_ids: string[];
 };
@@ -88,6 +89,7 @@ export function toDraft(agent?: Agent): Draft {
     is_active: agent?.is_active ?? true,
     save_transcript: agent?.save_transcript ?? true,
     save_raw_events: agent?.save_raw_events ?? true,
+    save_recording: agent?.save_recording ?? false,
     tool_ids: [...(agent?.tool_ids ?? [])].sort(),
     fields: (agent?.fields ?? []).map((f) => ({
       uid: f.id,
@@ -119,6 +121,7 @@ export function toInput(d: Draft): AgentInput {
     is_active: d.is_active,
     save_transcript: d.save_transcript,
     save_raw_events: d.save_raw_events,
+    save_recording: d.save_recording,
     tool_ids: d.tool_ids,
     fields: d.fields.map((f): FieldInput => ({
       key: f.key,

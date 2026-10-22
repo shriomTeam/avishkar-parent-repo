@@ -51,11 +51,11 @@ async function detailOf(response: Response): Promise<string | null> {
 }
 
 export function createInboundApi(session: { csrf: string; tenantId?: string }) {
-  async function request<T>(
+  async function send(
     method: string,
     path: string,
     body?: unknown,
-  ): Promise<T> {
+  ): Promise<Response> {
     const headers: Record<string, string> = { "X-CSRF-Token": session.csrf };
     if (session.tenantId) headers["X-Tenant-Id"] = session.tenantId;
     if (body !== undefined) headers["Content-Type"] = "application/json";
@@ -79,6 +79,14 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
         response.status,
         (await detailOf(response)) ?? messageFor(response.status),
       );
+    return response;
+  }
+  async function request<T>(
+    method: string,
+    path: string,
+    body?: unknown,
+  ): Promise<T> {
+    const response = await send(method, path, body);
     return response.status === 204
       ? (undefined as T)
       : ((await response.json()) as T);
@@ -99,6 +107,9 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
         "GET",
         `/calls/${id}?include_events=${includeEvents}`,
       ),
+    /** The call's audio. Fetched with the session headers, so it cannot be a plain <audio src>. */
+    getRecording: async (id: string) =>
+      (await send("GET", `/calls/${id}/recording`)).blob(),
     listTools: () => request<Tool[]>("GET", "/tools"),
     toolCatalog: () => request<CatalogItem[]>("GET", "/tools/catalog"),
     addInternalTool: (key: string) =>

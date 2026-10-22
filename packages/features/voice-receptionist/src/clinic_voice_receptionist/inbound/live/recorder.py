@@ -113,9 +113,19 @@ class CallRecorder:
             self._pending_values = values | self._pending_values
             raise
 
-    async def finish(self, *, status: str, end_reason: str, started_at: datetime, usage: dict) -> None:
+    async def finish(
+        self,
+        *,
+        status: str,
+        end_reason: str,
+        started_at: datetime,
+        usage: dict,
+        recording: tuple[str | None, str] | None = None,
+    ) -> None:
+        """``recording`` is (object name, "saved" or "failed") when the call was recorded, else None."""
         await self.flush()
         ended = datetime.now(UTC)
+        recording_values = {"recording_object": recording[0], "recording_status": recording[1]} if recording else {}
         async with tenant_session(self.tenant_id, database_url=self._url) as session:
             await session.execute(
                 update(Call)
@@ -126,5 +136,6 @@ class CallRecorder:
                     ended_at=ended,
                     usage=usage,
                     duration_seconds=max(0, int((ended - started_at).total_seconds())),
+                    **recording_values,
                 )
             )

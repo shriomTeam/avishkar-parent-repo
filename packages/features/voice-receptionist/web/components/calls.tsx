@@ -20,6 +20,7 @@ import {
 } from "../lib/format";
 import { Heading, Badge, Tabs, Empty, Metric } from "./ui";
 import { CallsTable, Transcript } from "./calls-table";
+import { RecordingPlayer } from "./recording-player";
 import { VoiceBoundary } from "./voice-boundary";
 
 export function CallHistory() {
@@ -236,6 +237,11 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
       </div>
       <div className="editor">
         <section className="panel">
+          <RecordingPlayer
+            callId={call.id}
+            status={call.recording_status}
+            api={api}
+          />
           <Tabs
             tabs={[
               "Transcript",
@@ -346,8 +352,11 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
           <section className="panel spaced">
             <h2>Audio</h2>
             <p>
-              Audio is not recorded. Only the transcript and captured details
-              are saved, and only if the agent is set to keep them.
+              {call.recording_status === "saved"
+                ? "This call was recorded. Press Play recording above the transcript to listen."
+                : call.recording_status === "failed"
+                  ? "This call was set to be recorded, but the audio could not be saved."
+                  : "This call was not recorded. Turn on Record the call in the agent’s Data & privacy settings to keep the audio of future calls."}
             </p>
           </section>
         </div>

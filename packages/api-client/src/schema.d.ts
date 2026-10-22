@@ -729,6 +729,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/voice_receptionist/inbound/calls/{call_id}/recording": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Recording
+         * @description The call's audio. The file is found from the call row, never from anything in the request.
+         */
+        get: operations["get_recording_features_voice_receptionist_inbound_calls__call_id__recording_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/voice_receptionist/inbound/agents/{agent_id}/test-call": {
         parameters: {
             query?: never;
@@ -931,6 +951,11 @@ export interface components {
              * @default true
              */
             save_raw_events: boolean;
+            /**
+             * Save Recording
+             * @default false
+             */
+            save_recording: boolean;
             /** Fields */
             fields?: components["schemas"]["FieldIn"][];
             /** Tool Ids */
@@ -965,6 +990,8 @@ export interface components {
             save_transcript: boolean;
             /** Save Raw Events */
             save_raw_events: boolean;
+            /** Save Recording */
+            save_recording: boolean;
             /**
              * Created At
              * Format: date-time
@@ -1156,6 +1183,8 @@ export interface components {
             duration_seconds: number | null;
             /** Summary */
             summary: string | null;
+            /** Recording Status */
+            recording_status?: string | null;
             /**
              * Captured Count
              * @default 0
@@ -1207,6 +1236,8 @@ export interface components {
             duration_seconds: number | null;
             /** Summary */
             summary: string | null;
+            /** Recording Status */
+            recording_status?: string | null;
             /**
              * Captured Count
              * @default 0
@@ -4102,6 +4133,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CallDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_recording_features_voice_receptionist_inbound_calls__call_id__recording_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                call_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

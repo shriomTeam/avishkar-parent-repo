@@ -11,6 +11,8 @@ from clinic_core.settings import Settings
 from clinic_core.testing import create_test_tenant
 from clinic_db.models.ops import AuditLog
 from clinic_db.models.voice import Call, CallEvent, CallFieldValue, CallTurn
+from clinic_voice_receptionist.config import VoiceSettings
+from clinic_voice_receptionist.inbound import router as router_module
 from clinic_voice_receptionist.inbound.router import router
 
 app = FastAPI()
@@ -205,3 +207,84 @@ async def test_call_list_pages_and_filters(client):
     assert len((await client.get(f"/inbound/calls?agent_id={a['id']}", headers=_h(t))).json()) == 2
     assert len((await client.get("/inbound/calls?limit=1&offset=2", headers=_h(t))).json()) == 1
     assert (await client.get("/inbound/calls?limit=0", headers=_h(t))).status_code == 422
+
+
+class MemoryStore:
+    def __init__(self):
+        self.objects = {}
+
+    async def put(self, name, data):
+        self.objects[name] = data
+
+    async def get(self, name):
+        return self.objects.get(name)
+
+
+@pytest.fixture
+def store():
+    app.state.recording_store = MemoryStore()
+    yield app.state.recording_store
+    del app.state.recording_store
+
+
+async def _recorded_call(client, tenant, store, *, status="saved", folder=None):
+    call_id = await _seed_call(tenant, (await _create(client, tenant))["id"])
+    name = f"voice-recordings/{folder or tenant}/{call_id}.wav"
+    store.objects[name] = b"RIFFdata"
+    async with tenant_session(tenant) as s:
+        call = await s.get(Call, uuid.UUID(call_id))
+        call.recording_object, call.recording_status = name, status
+    return call_id
+
+
+async def test_a_recording_is_played_back_audited_and_listed_as_saved(client, store):
+    t = await create_test_tenant()
+    call_id = await _recorded_call(client, t, store)
+    played = await client.get(f"/inbound/calls/{call_id}/recording", headers=_h(t))
+    assert played.status_code == 200 and played.content == b"RIFFdata"
+    assert played.headers["content-type"] == "audio/wav" and "no-store" in played.headers["cache-control"]
+    assert (await client.get(f"/inbound/calls/{call_id}", headers=_h(t))).json()["recording_status"] == "saved"
+    async with tenant_session(t) as s:
+        assert "voice.recording.played" in (await s.scalars(select(AuditLog.action))).all()
+
+
+async def test_another_clinic_cannot_play_a_recording(client, store):
+    t, other = await create_test_tenant(), await create_test_tenant()
+    call_id = await _recorded_call(client, t, store)
+    assert (await client.get(f"/inbound/calls/{call_id}/recording", headers=_h(other))).status_code == 404
+
+
+async def test_a_recording_outside_the_clinics_folder_is_never_served(client, store):
+    t, other = await create_test_tenant(), await create_test_tenant()
+    call_id = await _recorded_call(client, t, store, folder=other)  # a row pointing at someone else's folder
+    assert (await client.get(f"/inbound/calls/{call_id}/recording", headers=_h(t))).status_code == 404
+
+
+async def test_calls_without_a_saved_recording_return_404(client, store):
+    t = await create_test_tenant()
+    failed = await _recorded_call(client, t, store, status="failed")
+    plain = await _seed_call(t, (await _create(client, t, name="Other"))["id"])
+    for call_id in (failed, plain, str(uuid.uuid4())):
+        assert (await client.get(f"/inbound/calls/{call_id}/recording", headers=_h(t))).status_code == 404
+
+
+async def test_recording_is_off_by_default_and_a_test_call_needs_storage_to_record(client, monkeypatch):
+    monkeypatch.setattr(router_module, "get_voice_settings", lambda: VoiceSettings(recordings_bucket=""))
+    t = await create_test_tenant()
+    plain = await _create(client, t)
+    assert plain["save_recording"] is False
+    recording = await _create(client, t, name="Recorded", save_recording=True)
+    assert recording["save_recording"] is True
+    refused = await client.post(f"/inbound/agents/{recording['id']}/test-call", headers=_h(t))
+    assert refused.status_code == 409 and "storage" in refused.json()["detail"]
+    assert (await client.post(f"/inbound/agents/{plain['id']}/test-call", headers=_h(t))).status_code == 201
+
+
+async def test_a_test_call_of_a_recording_agent_carries_the_setting_when_storage_exists(client, store):
+    t = await create_test_tenant()
+    agent = await _create(client, t, save_recording=True)
+    started = await client.post(f"/inbound/agents/{agent['id']}/test-call", headers=_h(t))
+    assert started.status_code == 201
+    async with tenant_session(t) as s:
+        call = await s.get(Call, uuid.UUID(started.json()["call_id"]))
+        assert call.agent_snapshot["save_recording"] is True

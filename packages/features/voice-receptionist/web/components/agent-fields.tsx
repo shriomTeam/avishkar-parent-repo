@@ -216,7 +216,7 @@ export function PrivacyFields(props: Props) {
       <p className="muted">
         Captured details are always saved. Transcripts and raw model messages
         can contain patient information, so turn them off if you do not need
-        them. Audio is never stored.
+        them. Call audio is only kept if you turn on recording below.
       </p>
       <Switch
         label="Save the transcript"
@@ -229,6 +229,12 @@ export function PrivacyFields(props: Props) {
         description="Keep the unprocessed messages from the AI model (no audio) for each call."
         checked={draft.save_raw_events}
         onChange={(v) => set("save_raw_events", v)}
+      />
+      <Switch
+        label="Record the call"
+        description="Keep the audio of each call (caller and agent) so staff can play it back in Call history. Recordings contain patient information. Tell callers they are being recorded; many places require it."
+        checked={draft.save_recording}
+        onChange={(v) => set("save_recording", v)}
       />
     </>
   );
