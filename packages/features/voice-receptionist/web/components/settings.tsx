@@ -5,7 +5,23 @@ import { useAuth } from "@clinic/core/web/auth/provider";
 import { initials } from "@clinic/core/web/auth/types";
 import { SignOut } from "@clinic/core/web/auth/sign-out";
 import { dateLabel } from "../lib/format";
-import { Heading, Tabs, Select, Switch, Badge, ResetDemo } from "./ui";
+import {
+  Avatar,
+  Button,
+  buttonStyles,
+  DataTable,
+  H2,
+  Muted,
+  Note,
+  Panel,
+  PanelHead,
+  SummaryList,
+  Td,
+  Th,
+  Tr,
+  TwoColumns,
+} from "@clinic/ui";
+import { Heading, Tabs, Dropdown, Switch, Badge, ResetDemo } from "./ui";
 import type { Workspace } from "../lib/types";
 function PrivacyForm({ workspace }: { workspace: Workspace }) {
   const { run, busy } = useDemo();
@@ -28,44 +44,44 @@ function PrivacyForm({ workspace }: { workspace: Workspace }) {
         );
       }}
     >
-      <h2>Call data settings</h2>
+      <H2>Call data settings</H2>
       <Switch
         label="Store call recordings"
         description="Only enable after reviewing consent and provider agreements."
         checked={privacy.recordCalls}
         onChange={(recordCalls) => setPrivacy({ ...privacy, recordCalls })}
       />
-      <div className="formtwo spaced">
-        <Select
+      <TwoColumns className="mt-5">
+        <Dropdown
           label="Transcript retention"
           value={privacy.transcriptRetention}
-          onChange={(e) =>
-            setPrivacy({ ...privacy, transcriptRetention: e.target.value })
+          onChange={(transcriptRetention) =>
+            setPrivacy({ ...privacy, transcriptRetention })
           }
-        >
-          {["30 days", "90 days", "180 days"].map((x) => (
-            <option key={x}>{x}</option>
-          ))}
-        </Select>
-        <Select
+          options={["30 days", "90 days", "180 days"].map((x) => ({
+            value: x,
+            label: x,
+          }))}
+        />
+        <Dropdown
           label="Recording retention"
           value={privacy.recordingRetention}
-          onChange={(e) =>
-            setPrivacy({ ...privacy, recordingRetention: e.target.value })
+          onChange={(recordingRetention) =>
+            setPrivacy({ ...privacy, recordingRetention })
           }
-        >
-          {["7 days", "30 days", "90 days"].map((x) => (
-            <option key={x}>{x}</option>
-          ))}
-        </Select>
-      </div>
-      <div className="note">
+          options={["7 days", "30 days", "90 days"].map((x) => ({
+            value: x,
+            label: x,
+          }))}
+        />
+      </TwoColumns>
+      <Note>
         These demo preferences do not configure real recording or retention.
         Existing sample call fixtures remain unchanged.
-      </div>
-      <button className="primary spaced" disabled={busy}>
+      </Note>
+      <Button type="submit" variant="brand" className="mt-5" disabled={busy}>
         Save preferences
-      </button>
+      </Button>
     </form>
   );
 }
@@ -86,89 +102,75 @@ export function Settings() {
           </>
         }
       />
-      <section
-        className="panel settings-panel"
-        aria-label="Your account"
-        style={{ marginBottom: 24 }}
-      >
-        <div className="panelHead" style={{ marginBottom: 0 }}>
-          <div className="inline">
-            <div className="avatar dark">
-              {initials(auth.user.display_name)}
-            </div>
+      <Panel className="mb-6 max-w-[1000px]" aria-label="Your account">
+        <div className="flex items-center justify-between gap-3 max-app:flex-wrap">
+          <div className="flex items-center gap-2.5 max-app:flex-wrap">
+            <Avatar tone="dark">{initials(auth.user.display_name)}</Avatar>
             <div>
-              <h2>{auth.user.display_name}</h2>
-              <small>
+              <H2>{auth.user.display_name}</H2>
+              <small className="block text-[12px] text-muted">
                 {auth.user.email} · {auth.memberships[0]?.role || "Member"}
               </small>
             </div>
           </div>
-          <SignOut />
+          <SignOut
+            className={buttonStyles("outline")}
+            errorClassName="my-3 rounded-lg bg-danger-soft px-3.5 py-2.5 text-danger-ink"
+          />
         </div>
-      </section>
+      </Panel>
       <Tabs
         tabs={["Workspace", "Team", "Privacy & retention", "Audit log"]}
         value={tab}
         onChange={setTab}
       />
-      <section
-        className="panel settings-panel"
-        role="tabpanel"
-        aria-label={tab}
-      >
+      <Panel className="max-w-[1000px]" role="tabpanel" aria-label={tab}>
         {tab === "Workspace" && (
           <>
-            <h2>Workspace details</h2>
-            <p className="form-intro">
+            <H2>Workspace details</H2>
+            <Muted className="mb-[25px]">
               Practice information used across your agents.
-            </p>
-            <div className="summarylist">
-              <div>
-                <span>Name</span>
-                <strong>{auth.workspace?.name}</strong>
-              </div>
-              <div>
-                <span>Timezone</span>
-                <strong>{auth.workspace?.timezone}</strong>
-              </div>
-              <div>
-                <span>Callback number</span>
-                <strong>{auth.workspace?.phone || "Not set"}</strong>
-              </div>
-            </div>
-            <p className="spaced">
+            </Muted>
+            <SummaryList
+              items={[
+                ["Name", auth.workspace?.name],
+                ["Timezone", auth.workspace?.timezone],
+                ["Callback number", auth.workspace?.phone || "Not set"],
+              ]}
+            />
+            <Muted className="mt-5">
               Workspace details are saved in your account. Editing will be added
               with the workspace management API.
-            </p>
+            </Muted>
           </>
         )}
         {tab === "Team" && (
           <>
-            <h2>Workspace team</h2>
-            <p>Your actual workspace membership.</p>
-            <div className="tablewrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Member</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      {auth.user.display_name}
-                      <small>{auth.user.email}</small>
-                    </td>
-                    <td>{auth.memberships[0]?.role || "Member"}</td>
-                    <td>
-                      <Badge>Active</Badge>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <H2>Workspace team</H2>
+            <Muted>Your actual workspace membership.</Muted>
+            <DataTable>
+              <thead>
+                <tr>
+                  <Th>Member</Th>
+                  <Th>Role</Th>
+                  <Th>Status</Th>
+                </tr>
+              </thead>
+              <tbody>
+                <Tr>
+                  <Td>
+                    {auth.user.display_name}
+                    <small className="block text-[12px] text-muted">
+                      {auth.user.email}
+                    </small>
+                  </Td>
+                  <Td>{auth.memberships[0]?.role || "Member"}</Td>
+                  <Td>
+                    <Badge>Active</Badge>
+                  </Td>
+                </Tr>
+              </tbody>
+            </DataTable>
           </>
         )}
         {tab === "Privacy & retention" && (
@@ -179,30 +181,28 @@ export function Settings() {
         )}
         {tab === "Audit log" && (
           <>
-            <h2>Recent workspace activity</h2>
-            <div className="tablewrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Event</th>
-                    <th>Actor</th>
-                    <th>Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {state.audit.map((event) => (
-                    <tr key={event.id}>
-                      <td>{event.event}</td>
-                      <td>{event.actor}</td>
-                      <td>{dateLabel(event.at, state.workspace.timezone)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <H2>Recent workspace activity</H2>
+            <DataTable>
+              <thead>
+                <tr>
+                  <Th>Event</Th>
+                  <Th>Actor</Th>
+                  <Th>Time</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.audit.map((event) => (
+                  <Tr key={event.id}>
+                    <Td>{event.event}</Td>
+                    <Td>{event.actor}</Td>
+                    <Td>{dateLabel(event.at, state.workspace.timezone)}</Td>
+                  </Tr>
+                ))}
+              </tbody>
+            </DataTable>
           </>
         )}
-      </section>
+      </Panel>
     </>
   );
 }

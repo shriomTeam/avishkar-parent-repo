@@ -18,6 +18,25 @@ import {
   reasonLabel,
   statusLabel,
 } from "../lib/format";
+import {
+  Alert,
+  backLinkStyles,
+  Button,
+  buttonStyles,
+  CodeBlock,
+  DetailList,
+  H2,
+  H3,
+  Input,
+  Dropdown,
+  Muted,
+  Panel,
+  PanelHead,
+  SidebarLayout,
+  StatGrid,
+  SummaryList,
+  TwoColumns,
+} from "@clinic/ui";
 import { Heading, Badge, Tabs, Empty, Metric } from "./ui";
 import { CallsTable, Transcript } from "./calls-table";
 import { RecordingPlayer } from "./recording-player";
@@ -52,7 +71,8 @@ function History() {
         title="Call history"
         description="Every conversation, how it ended and the details it captured."
         actions={
-          <button
+          <Button
+            variant="outline"
             onClick={() => {
               exportCalls(calls);
               notify("Call history exported");
@@ -60,39 +80,45 @@ function History() {
           >
             <Download size={16} />
             Export CSV
-          </button>
+          </Button>
         }
       />
-      <section className="panel">
-        <div className="filters">
-          <input
+      <Panel>
+        <div className="mb-5 flex items-center gap-3 max-app:flex-wrap">
+          <Input
+            inline
+            className="flex-1 max-app:basis-full"
             aria-label="Search calls"
             placeholder="Search agent or call ID"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <select
-            aria-label="Filter call status"
+          <Dropdown
+            inline
+            hideLabel
+            className="max-w-[190px] max-app:max-w-full max-app:flex-1"
+            label="Filter call status"
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="all">All statuses</option>
-            <option>Completed</option>
-            <option>Failed</option>
-            <option>In progress</option>
-          </select>
-          <select
-            aria-label="Filter agent"
+            onChange={setStatus}
+            options={[
+              { value: "all", label: "All statuses" },
+              { value: "Completed", label: "Completed" },
+              { value: "Failed", label: "Failed" },
+              { value: "In progress", label: "In progress" },
+            ]}
+          />
+          <Dropdown
+            inline
+            hideLabel
+            className="max-w-[190px] max-app:max-w-full max-app:flex-1"
+            label="Filter agent"
             value={agent}
-            onChange={(e) => setAgent(e.target.value)}
-          >
-            <option value="all">All agents</option>
-            {agents.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-              </option>
-            ))}
-          </select>
+            onChange={setAgent}
+            options={[
+              { value: "all", label: "All agents" },
+              ...agents.map((a) => ({ value: a.id, label: a.name })),
+            ]}
+          />
         </div>
         <CallsTable
           calls={calls}
@@ -107,10 +133,10 @@ function History() {
               : undefined
           }
         />
-      </section>
-      <p>
+      </Panel>
+      <Muted>
         Showing {calls.length} of {all.length} calls · {timezone}
-      </p>
+      </Muted>
     </>
   );
 }
@@ -149,27 +175,30 @@ function DetailLoader({ id }: { id: string }) {
 
   if (missing)
     return (
-      <section className="panel">
+      <Panel>
         <Empty
           title="Call not found"
           description="This call does not exist, or belongs to another workspace."
         />
-        <Link className="button" href="/voice-receptionist/calls">
+        <Link
+          className={buttonStyles("outline")}
+          href="/voice-receptionist/calls"
+        >
           Back to call history
         </Link>
-      </section>
+      </Panel>
     );
   if (error)
     return (
-      <section className="panel">
-        <p role="alert">{error}</p>
-      </section>
+      <Panel>
+        <Alert>{error}</Alert>
+      </Panel>
     );
   if (!call)
     return (
-      <section className="panel">
-        <p role="status">Loading call…</p>
-      </section>
+      <Panel>
+        <Muted role="status">Loading call…</Muted>
+      </Panel>
     );
   return <DetailView call={call} api={api} />;
 }
@@ -204,7 +233,7 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
   }));
   return (
     <>
-      <Link className="backlink" href="/voice-receptionist/calls">
+      <Link className={backLinkStyles} href="/voice-receptionist/calls">
         <ArrowLeft size={15} />
         Call history
       </Link>
@@ -213,7 +242,7 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
         description={`${call.id} · ${dateLabel(call.started_at, timezone)} · ${timezone}`}
         actions={<Badge>{statusLabel(call.status)}</Badge>}
       />
-      <div className="cards">
+      <StatGrid>
         <Metric
           label="Duration"
           value={callDuration(call.duration_seconds)}
@@ -234,9 +263,9 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
           value={tokens === undefined ? "—" : String(tokens)}
           sub="Tokens reported by the model"
         />
-      </div>
-      <div className="editor">
-        <section className="panel">
+      </StatGrid>
+      <SidebarLayout>
+        <Panel>
           <RecordingPlayer
             callId={call.id}
             status={call.recording_status}
@@ -264,14 +293,12 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
               ))}
             {tab === "Captured details" &&
               (call.values.length ? (
-                <dl className="captured">
-                  {call.values.map((v) => (
-                    <div key={v.key}>
-                      <dt>{v.label ?? v.key}</dt>
-                      <dd>{String(v.value)}</dd>
-                    </div>
-                  ))}
-                </dl>
+                <DetailList
+                  items={call.values.map((v) => [
+                    v.label ?? v.key,
+                    String(v.value),
+                  ])}
+                />
               ) : (
                 <Empty title="Nothing was captured in this call" />
               ))}
@@ -279,28 +306,29 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
               (call.tool_executions?.length ? (
                 call.tool_executions.map((e) => (
                   <div key={e.id}>
-                    <div className="panelHead">
-                      <h3>{e.tool_name}</h3>
-                      <Badge>{e.success ? "Success" : "Failed"}</Badge>
-                    </div>
-                    <p>
+                    <PanelHead
+                      title={e.tool_name}
+                      level="h3"
+                      action={<Badge>{e.success ? "Success" : "Failed"}</Badge>}
+                    />
+                    <Muted>
                       Run time {e.duration_ms} ms
                       {e.error ? ` · ${e.error}` : ""}
-                    </p>
-                    <div className="formtwo">
+                    </Muted>
+                    <TwoColumns>
                       <div>
-                        <h3>Input</h3>
-                        <pre className="code">
+                        <H3>Input</H3>
+                        <CodeBlock>
                           {JSON.stringify(e.input, null, 2)}
-                        </pre>
+                        </CodeBlock>
                       </div>
                       <div>
-                        <h3>Result</h3>
-                        <pre className="code">
+                        <H3>Result</H3>
+                        <CodeBlock>
                           {JSON.stringify(e.output, null, 2)}
-                        </pre>
+                        </CodeBlock>
                       </div>
-                    </div>
+                    </TwoColumns>
                   </div>
                 ))
               ) : (
@@ -308,11 +336,15 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
               ))}
             {tab === "Raw responses" &&
               (eventsError ? (
-                <p role="alert">{eventsError}</p>
+                <Alert>{eventsError}</Alert>
               ) : events === null ? (
-                <p role="status">Loading…</p>
+                <Muted role="status">Loading…</Muted>
               ) : events.length ? (
-                <pre className="code raw-events" tabIndex={0}>
+                <CodeBlock
+                  data-testid="raw-events"
+                  className="max-h-[260px] overflow-auto rounded-lg bg-[#f6f5f8] p-3 text-[12px]"
+                  tabIndex={0}
+                >
                   {events
                     .map((e) =>
                       JSON.stringify({
@@ -322,7 +354,7 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
                       }),
                     )
                     .join("\n")}
-                </pre>
+                </CodeBlock>
               ) : (
                 <Empty
                   title="No raw responses saved"
@@ -330,37 +362,31 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
                 />
               ))}
           </div>
-        </section>
+        </Panel>
         <div>
-          <section className="panel">
-            <h2>Call summary</h2>
-            <div className="summarylist spaced">
-              <div>
-                <span>Agent</span>
-                <strong>{agentName}</strong>
-              </div>
-              <div>
-                <span>Source</span>
-                <strong>{channelLabel(call.channel)}</strong>
-              </div>
-              <div>
-                <span>Model</span>
-                <strong>{call.model}</strong>
-              </div>
-            </div>
-          </section>
-          <section className="panel spaced">
-            <h2>Audio</h2>
-            <p>
+          <Panel>
+            <H2>Call summary</H2>
+            <SummaryList
+              className="mt-5"
+              items={[
+                ["Agent", agentName],
+                ["Source", channelLabel(call.channel)],
+                ["Model", call.model],
+              ]}
+            />
+          </Panel>
+          <Panel className="mt-5">
+            <H2>Audio</H2>
+            <Muted>
               {call.recording_status === "saved"
                 ? "This call was recorded. Press Play recording above the transcript to listen."
                 : call.recording_status === "failed"
                   ? "This call was set to be recorded, but the audio could not be saved."
                   : "This call was not recorded. Turn on Record the call in the agent’s Data & privacy settings to keep the audio of future calls."}
-            </p>
-          </section>
+            </Muted>
+          </Panel>
         </div>
-      </div>
+      </SidebarLayout>
     </>
   );
 }

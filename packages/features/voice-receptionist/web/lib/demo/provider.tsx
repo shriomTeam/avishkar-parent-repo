@@ -122,7 +122,10 @@ export function DemoProvider({
     >
       {children}
       {toast && (
-        <div className="toast" role="status">
+        <div
+          className="fixed bottom-7 left-1/2 z-[100] max-w-[calc(100vw-32px)] -translate-x-1/2 rounded-[10px] bg-ink px-[22px] py-[13px] text-[14px] text-white shadow-[0_8px_30px_#201d1d20]"
+          role="status"
+        >
           {toast}
         </div>
       )}

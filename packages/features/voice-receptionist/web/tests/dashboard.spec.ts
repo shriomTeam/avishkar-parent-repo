@@ -37,9 +37,7 @@ async function createAgent(page: Page, name: string) {
 /** Opens Test studio, calls the agent, lets the scripted caller give details, and hangs up. */
 async function takeTestCall(page: Page, agentName: string) {
   await page.getByRole("link", { name: "Test studio", exact: true }).click();
-  await page
-    .getByLabel("Agent", { exact: true })
-    .selectOption({ label: agentName });
+  await choose(page, "Agent", agentName);
   await page.getByRole("button", { name: "Start test call" }).click();
   await expect(page.getByTestId("captured-fields")).toContainText(
     "Sam Lee",
@@ -151,7 +149,7 @@ test("create, edit and save an agent, take a test call, review it and route a nu
   await expect(page.getByRole("tabpanel")).toContainText("create_lead");
   await expect(page.getByRole("tabpanel")).toContainText("+14155550123");
   await page.getByRole("tab", { name: "Raw responses" }).click();
-  await expect(page.locator(".raw-events")).toContainText("turn_complete");
+  await expect(page.getByTestId("raw-events")).toContainText("turn_complete");
 
   await page.getByRole("link", { name: "Phone numbers", exact: true }).click();
   await page
@@ -161,10 +159,11 @@ test("create, edit and save an agent, take a test call, review it and route a nu
     .getByRole("dialog")
     .getByLabel("Phone number (E.164)")
     .fill("+919876543210");
-  await page
-    .getByRole("dialog")
-    .getByLabel("Assigned agent")
-    .selectOption({ label: "Pilot receptionist" });
+  await choose(
+    page.getByRole("dialog"),
+    "Assigned agent",
+    "Pilot receptionist",
+  );
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Save routing" })
@@ -188,16 +187,16 @@ test("the agent editor checks values before saving and keeps unsaved edits from 
   await createAgent(page, "Careful agent");
   await page.getByLabel("Agent name").fill("");
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
-  await expect(page.locator(".form-error")).toContainText(
-    "Give the agent a name.",
-  );
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Give the agent a name." }),
+  ).toBeVisible();
   await page.getByLabel("Agent name").fill("Careful agent");
   await page.getByRole("tab", { name: "What to capture" }).click();
   await page.getByRole("button", { name: "Add field" }).click();
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
-  await expect(page.locator(".form-error")).toContainText(
-    "Every field needs a label.",
-  );
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Every field needs a label." }),
+  ).toBeVisible();
   await page
     .getByTestId("capture-field")
     .last()
@@ -263,6 +262,40 @@ test("an agent that does not record leaves no player in call history", async ({
   await expect(
     page.getByRole("button", { name: "Play recording" }),
   ).toHaveCount(0);
+});
+
+test("selects are the app's own dropdown: styled list, keyboard and form use", async ({
+  page,
+}) => {
+  await createAgent(page, "First agent");
+  await createAgent(page, "Second agent");
+  await page.getByRole("link", { name: "Test studio", exact: true }).click();
+  const agent = page.getByRole("combobox", { name: "Agent" });
+  await expect(page.locator("select")).toHaveCount(0); // no browser-native menus on this screen
+  await agent.click();
+  await expect(page.getByRole("listbox")).toBeVisible();
+  await expect(page.getByRole("option")).toHaveCount(2);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+  await agent.focus();
+  await page.keyboard.press("ArrowDown"); // opens
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+  const chosen = await agent.innerText();
+  expect(["First agent", "Second agent"]).toContain(chosen.trim());
+  // Inside a form (Create agent): the choice is submitted through the hidden input.
+  await page.goto("/voice-receptionist/agents");
+  await page.getByRole("button", { name: "Create agent", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Agent name").fill("From a dropdown");
+  await choose(dialog, "Purpose", "Enquiry assistant");
+  await dialog
+    .getByRole("button", { name: "Create agent", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "From a dropdown", exact: true }),
+  ).toBeVisible(CALL);
 });
 
 test("variables persist and reset preserves authenticated workspace", async ({
@@ -353,7 +386,7 @@ test("tools: add internal and external tools, validation, a real test run, attac
   await expect(picker.getByRole("listbox")).toHaveCount(0);
   await expect(picker).toBeVisible();
   await picker.getByRole("button", { name: "Add tool" }).click();
-  const update = page.locator("section.panel").filter({
+  const update = page.getByTestId("tool-card").filter({
     has: page.getByRole("heading", { name: "update_lead", exact: true }),
   });
   await expect(update).toContainText("never creates a lead");
@@ -366,10 +399,10 @@ test("tools: add internal and external tools, validation, a real test run, attac
   await expect(
     page.getByRole("button", { name: "View input schema" }),
   ).toHaveCount(0);
-  await expect(page.locator("pre.code")).toHaveCount(0);
+  await expect(page.locator("pre")).toHaveCount(0);
 
   // A built-in tool's wording can be changed, and put back.
-  const lead = page.locator("section.panel").filter({
+  const lead = page.getByTestId("tool-card").filter({
     has: page.getByRole("heading", { name: "create_lead", exact: true }),
   });
   await lead.getByRole("button", { name: "Edit description" }).click();
@@ -411,14 +444,14 @@ test("tools: add internal and external tools, validation, a real test run, attac
   await dialog.getByLabel("Auth header value").fill("secret-123");
   await dialog.getByRole("button", { name: "Save tool" }).click();
 
-  const panel = page.locator("section.panel").filter({
+  const panel = page.getByTestId("tool-card").filter({
     has: page.getByRole("heading", { name: "lookup_hours", exact: true }),
   });
   await expect(panel).toBeVisible();
   await expect(panel).toContainText("X-Api-Key (saved)");
   await expect(page.getByText("secret-123")).toHaveCount(0); // the value is never shown again
 
-  await expect(page.locator("pre.code")).toHaveCount(0); // schemas stay tucked away until asked for
+  await expect(page.locator("pre")).toHaveCount(0); // schemas stay tucked away until asked for
   await panel.getByRole("button", { name: "View input schema" }).click();
   await expect(page.getByRole("dialog")).toContainText('"day"');
   await page.keyboard.press("Escape");
@@ -468,11 +501,11 @@ test("call filters, CSV download and missing record states", async ({
     .getByRole("textbox", { name: "Search calls" })
     .fill("Filter agent");
   await expect(page.locator("tbody tr")).toHaveCount(1);
-  await page.getByLabel("Filter call status").selectOption("Failed");
+  await choose(page, "Filter call status", "Failed");
   await expect(
     page.getByRole("heading", { name: "No calls match your filters" }),
   ).toBeVisible();
-  await page.getByLabel("Filter call status").selectOption("all");
+  await choose(page, "Filter call status", "All statuses");
   const downloadEvent = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export CSV" }).click();
   const download = await downloadEvent;
@@ -569,27 +602,26 @@ test("original voice shell and platform return work across screen sizes", async 
   for (const width of [1440, 820, 390]) {
     await page.setViewportSize({ width, height: 950 });
     await page.goto("/voice-receptionist");
-    await expect(page.locator(".sidebar .brand")).toBeVisible();
+    await expect(page.getByTestId("voice-sidebar")).toBeVisible();
     await expect(
       page.getByRole("navigation", { name: "Workspace navigation" }),
     ).toBeVisible();
-    await expect(page.locator(".shell header .breadcrumb")).toContainText(
+    await expect(page.getByTestId("voice-breadcrumb")).toContainText(
       "Overview",
     );
     await expect(
       page.getByRole("link", { name: "Always-On Clinic", exact: true }),
     ).toHaveCount(0);
-    await expect(page.locator(".voice-navigation")).toHaveCount(0);
     if (width > 700) {
       await expect(page.getByTestId("clinic-name")).toHaveText(
         "Browser Practice",
       );
-      const sidebar = await page.locator(".sidebar").boundingBox();
-      const main = await page.locator(".shell main").boundingBox();
+      const sidebar = await page.getByTestId("voice-sidebar").boundingBox();
+      const main = await page.getByTestId("voice-main").boundingBox();
       expect(main!.x).toBeGreaterThanOrEqual(sidebar!.x + sidebar!.width);
       expect(
         await page
-          .locator(".voice-scope")
+          .getByTestId("voice-app")
           .evaluate((el) => getComputedStyle(el).zoom),
       ).toBe("0.9");
     }
@@ -611,5 +643,5 @@ test("original voice shell and platform return work across screen sizes", async 
   await page
     .getByRole("link", { name: "Voice Receptionist", exact: true })
     .click();
-  await expect(page.locator(".sidebar .brand")).toBeVisible();
+  await expect(page.getByTestId("voice-sidebar")).toBeVisible();
 });

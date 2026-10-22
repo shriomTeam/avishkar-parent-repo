@@ -4,33 +4,45 @@ import { Plus } from "lucide-react";
 import { useDemo } from "../lib/demo/provider";
 import { resolvePrompt } from "../lib/format";
 import type { Variable } from "../lib/types";
+import {
+  Button,
+  CodeBlock,
+  DataTable,
+  DialogActions,
+  H2,
+  Muted,
+  Panel,
+  Pill,
+  Td,
+  Th,
+  Tr,
+  WideSplit,
+} from "@clinic/ui";
 import { Heading, Dialog, Field, FormError } from "./ui";
 export function VariableTable({ variables }: { variables: Variable[] }) {
   return (
-    <div className="tablewrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Variable</th>
-            <th>Value / source</th>
-            <th>Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          {variables.map((v) => (
-            <tr key={v.id}>
-              <td>
-                <code>{`{{${v.name}}}`}</code>
-              </td>
-              <td>{v.value}</td>
-              <td>
-                <span className="pill">{v.type}</span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataTable>
+      <thead>
+        <tr>
+          <Th>Variable</Th>
+          <Th>Value / source</Th>
+          <Th>Type</Th>
+        </tr>
+      </thead>
+      <tbody>
+        {variables.map((v) => (
+          <Tr key={v.id}>
+            <Td>
+              <code>{`{{${v.name}}}`}</code>
+            </Td>
+            <Td>{v.value}</Td>
+            <Td>
+              <Pill>{v.type}</Pill>
+            </Td>
+          </Tr>
+        ))}
+      </tbody>
+    </DataTable>
   );
 }
 export function Variables() {
@@ -47,8 +59,8 @@ export function Variables() {
         title="Variables"
         description="Personalise agent context without rewriting the prompt."
         actions={
-          <button
-            className="primary"
+          <Button
+            variant="brand"
             onClick={() => {
               setError("");
               setEditing("new");
@@ -56,45 +68,46 @@ export function Variables() {
           >
             <Plus size={16} />
             Add variable
-          </button>
+          </Button>
         }
       />
-      <section className="panel">
+      <Panel>
         <VariableTable variables={state.variables} />
-        <div className="inline spaced">
+        <div className="mt-5 flex items-center gap-2.5 max-app:flex-wrap">
           {state.variables
             .filter((v) => v.type === "Static")
             .map((v) => (
-              <button
+              <Button
                 key={v.id}
+                variant="outline"
                 onClick={() => {
                   setError("");
                   setEditing(v);
                 }}
               >
                 Edit {v.name}
-              </button>
+              </Button>
             ))}
         </div>
-      </section>
-      <div className="two spaced">
-        <section className="panel">
-          <h2>Prompt template</h2>
-          <pre className="code">{template}</pre>
-        </section>
-        <section className="panel">
-          <h2>Resolved preview</h2>
-          <pre className="code">
+      </Panel>
+      <WideSplit className="mt-5">
+        <Panel>
+          <H2>Prompt template</H2>
+          <CodeBlock>{template}</CodeBlock>
+        </Panel>
+        <Panel>
+          <H2>Resolved preview</H2>
+          <CodeBlock>
             {resolvePrompt(template, state.variables, {
               caller_number: "+1 (415) 555-0101",
             })}
-          </pre>
-          <p>
+          </CodeBlock>
+          <Muted>
             Runtime values are examples. Missing variables stay visible as
             placeholders.
-          </p>
-        </section>
-      </div>
+          </Muted>
+        </Panel>
+      </WideSplit>
       {editing && (
         <Dialog
           title={
@@ -156,14 +169,18 @@ export function Variables() {
               defaultValue={editing === "new" ? "" : editing.value}
             />
             <FormError message={error} />
-            <div className="actions dialog-actions">
-              <button type="button" onClick={() => setEditing(null)}>
+            <DialogActions>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditing(null)}
+              >
                 Cancel
-              </button>
-              <button className="primary" disabled={busy}>
+              </Button>
+              <Button type="submit" variant="brand" disabled={busy}>
                 Save variable
-              </button>
-            </div>
+              </Button>
+            </DialogActions>
           </form>
         </Dialog>
       )}

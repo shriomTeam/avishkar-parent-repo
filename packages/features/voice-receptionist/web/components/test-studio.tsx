@@ -5,7 +5,22 @@ import { useState } from "react";
 import { Mic } from "lucide-react";
 import { useVoice } from "../lib/voice/provider";
 import { useTestCall } from "../lib/voice/use-test-call";
-import { Heading, Select, Badge, Empty, FormError } from "./ui";
+import {
+  Button,
+  buttonStyles,
+  ChatMessage,
+  DetailList,
+  FooterRow,
+  H2,
+  H3,
+  Muted,
+  Note,
+  Panel,
+  PanelHead,
+  Pill,
+  WideSplit,
+} from "@clinic/ui";
+import { Heading, Dropdown, Badge, Empty, FormError } from "./ui";
 import { VoiceBoundary } from "./voice-boundary";
 
 const clock = (s: number) =>
@@ -42,7 +57,7 @@ function Studio() {
         actions={
           agent && (
             <Link
-              className="button"
+              className={buttonStyles("outline")}
               href={`/voice-receptionist/agents/${agent.id}`}
             >
               Edit agent
@@ -51,43 +66,43 @@ function Studio() {
         }
       />
       {agents.length === 0 ? (
-        <section className="panel">
+        <Panel>
           <Empty
             title="Create an agent first"
             description="You need at least one agent to take a test call."
           />
-          <Link className="button" href="/voice-receptionist/agents">
+          <Link
+            className={buttonStyles("outline")}
+            href="/voice-receptionist/agents"
+          >
             Go to agents
           </Link>
-        </section>
+        </Panel>
       ) : (
-        <div className="two">
-          <section className="panel">
-            <div className="panelHead">
-              <h2>Browser call</h2>
-              <Badge>
-                {call.state === "live"
-                  ? "Live"
-                  : call.state === "connecting"
-                    ? "Connecting"
-                    : "Ready"}
-              </Badge>
-            </div>
-            <Select
+        <WideSplit>
+          <Panel>
+            <PanelHead
+              title="Browser call"
+              action={
+                <Badge>
+                  {call.state === "live"
+                    ? "Live"
+                    : call.state === "connecting"
+                      ? "Connecting"
+                      : "Ready"}
+                </Badge>
+              }
+            />
+            <Dropdown
               label="Agent"
               value={selected}
               disabled={call.busy}
-              onChange={(e) => setSelected(e.target.value)}
-            >
-              {agents.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </Select>
-            <div className="testcenter">
+              onChange={setSelected}
+              options={agents.map((a) => ({ value: a.id, label: a.name }))}
+            />
+            <div className="px-[25px] py-[42px] text-center">
               <div
-                className={`orb ${call.state === "live" ? "live" : ""}`}
+                className={`mx-auto my-[25px] grid size-[110px] place-items-center rounded-full border-[13px] border-[#f4ffed] bg-brand-soft text-brand-ink ${call.state === "live" ? "animate-pulse-ring" : ""}`}
                 style={{
                   transform:
                     call.state === "live"
@@ -97,7 +112,7 @@ function Studio() {
               >
                 <Mic size={32} />
               </div>
-              <h2>
+              <H2>
                 {call.state === "live"
                   ? `${agent?.voice ?? "The agent"} is listening · ${clock(call.seconds)}`
                   : call.state === "connecting"
@@ -105,10 +120,11 @@ function Studio() {
                     : finished
                       ? "Test call completed"
                       : "Ready when you are"}
-              </h2>
-              <p>Use headphones so the agent does not hear itself.</p>
-              <button
-                className={`${call.busy ? "danger" : "primary"} spaced`}
+              </H2>
+              <Muted>Use headphones so the agent does not hear itself.</Muted>
+              <Button
+                variant={call.busy ? "dangerOutline" : "brand"}
+                className="mt-5"
                 disabled={
                   !agent ||
                   (!call.busy && !agent.is_active) ||
@@ -123,40 +139,42 @@ function Studio() {
                   : finished || call.state === "error"
                     ? "Call again"
                     : "Start test call"}
-              </button>
+              </Button>
               {agent && !agent.is_active && (
-                <small>
+                <small className="block text-[12px] text-muted">
                   This agent is disabled. Turn it on in its settings to call it.
                 </small>
               )}
             </div>
             <FormError message={call.error} />
             {finished && (
-              <div className="note">
+              <Note>
                 <strong>Test complete</strong>
                 <p>
                   {call.reason} The call was saved with its transcript and
                   captured details.
                 </p>
                 <Link
-                  className="button spaced"
+                  className={buttonStyles("outline", { className: "mt-5" })}
                   href={`/voice-receptionist/calls/${call.callId}`}
                 >
                   View saved call
                 </Link>
-              </div>
+              </Note>
             )}
-            <small>
+            <small className="block text-[12px] text-muted">
               Test calls use the saved agent and appear in call history.
             </small>
-          </section>
-          <section className="panel">
-            <div className="panelHead">
-              <h2>Conversation</h2>
-              <span className="pill">
-                {call.state === "live" ? "Live transcript" : "Transcript"}
-              </span>
-            </div>
+          </Panel>
+          <Panel>
+            <PanelHead
+              title="Conversation"
+              action={
+                <Pill>
+                  {call.state === "live" ? "Live transcript" : "Transcript"}
+                </Pill>
+              }
+            />
             {call.lines.length === 0 ? (
               <Empty
                 title="Your conversation appears here"
@@ -165,31 +183,25 @@ function Studio() {
             ) : (
               <div aria-live="polite" data-testid="live-transcript">
                 {call.lines.map((line, i) => (
-                  <div
+                  <ChatMessage
                     key={i}
-                    className={`chat ${line.speaker === "agent" ? "agent" : ""}`}
+                    from={line.speaker === "agent" ? "agent" : "caller"}
+                    initial={
+                      line.speaker === "agent" ? (agent?.name[0] ?? "A") : "Y"
+                    }
+                    name={line.speaker === "agent" ? agent?.name : "You"}
                   >
-                    <div
-                      className={`avatar ${line.speaker === "caller" ? "dark" : ""}`}
-                    >
-                      {line.speaker === "agent" ? (agent?.name[0] ?? "A") : "Y"}
-                    </div>
-                    <div className="bubble">
-                      <strong>
-                        {line.speaker === "agent" ? agent?.name : "You"}
-                      </strong>
-                      {line.text}
-                    </div>
-                  </div>
+                    {line.text}
+                  </ChatMessage>
                 ))}
               </div>
             )}
             {call.toolRuns.length > 0 && (
               <>
-                <h3>Tool activity</h3>
+                <H3>Tool activity</H3>
                 <div data-testid="tool-activity">
                   {call.toolRuns.map((run, i) => (
-                    <div className="rowline" key={i}>
+                    <FooterRow key={i}>
                       <span>
                         {run.name}
                         {run.durationMs !== undefined
@@ -203,7 +215,7 @@ function Studio() {
                             ? "Success"
                             : "Failed"}
                       </Badge>
-                    </div>
+                    </FooterRow>
                   ))}
                 </div>
               </>
@@ -212,28 +224,22 @@ function Studio() {
               (call.state !== "idle" ||
                 Object.keys(call.values).length > 0) && (
                 <>
-                  <h3>Captured details</h3>
-                  <dl className="captured" data-testid="captured-fields">
-                    {fields.map((f) => (
-                      <div key={f.key}>
-                        <dt>
-                          {f.label}
-                          {f.required ? " *" : ""}
-                        </dt>
-                        <dd>
-                          {call.values[f.key] === undefined ? (
-                            <span className="muted">not yet</span>
-                          ) : (
-                            String(call.values[f.key])
-                          )}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
+                  <H3>Captured details</H3>
+                  <DetailList
+                    data-testid="captured-fields"
+                    items={fields.map((f) => [
+                      `${f.label}${f.required ? " *" : ""}`,
+                      call.values[f.key] === undefined ? (
+                        <span className="text-muted">not yet</span>
+                      ) : (
+                        String(call.values[f.key])
+                      ),
+                    ])}
+                  />
                 </>
               )}
-          </section>
-        </div>
+          </Panel>
+        </WideSplit>
       )}
     </>
   );

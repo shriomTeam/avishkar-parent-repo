@@ -1,13 +1,20 @@
 "use client";
 import { useState } from "react";
 import { useAuth } from "./provider";
-export function SignOut() {
+export function SignOut({
+  className,
+  errorClassName = "my-3 rounded-lg bg-danger-soft px-3.5 py-2.5 text-danger-ink",
+}: {
+  className?: string;
+  errorClassName?: string;
+} = {}) {
   const { write } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   return (
     <div>
       <button
+        className={className}
         disabled={busy}
         onClick={async () => {
           setBusy(true);
@@ -26,7 +33,7 @@ export function SignOut() {
         {busy ? "Signing out…" : "Sign out"}
       </button>
       {error && (
-        <p role="alert" className="form-error">
+        <p role="alert" className={errorClassName}>
           {error}
         </p>
       )}

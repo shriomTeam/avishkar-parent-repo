@@ -9,7 +9,7 @@ There is no standalone `apps/voice-receptionist` folder. Voice receptionist is a
 | Responsibility | Location |
 | --- | --- |
 | Voice pages | `packages/features/voice-receptionist/web/pages`; thin routes in `apps/web/app/(fullscreen)/voice-receptionist` |
-| Voice screens and scoped CSS | `packages/features/voice-receptionist/web/components`, `packages/features/voice-receptionist/web/styles/voice.css` |
+| Voice screens (Tailwind; shared building blocks in `packages/ui/src`) | `packages/features/voice-receptionist/web/components` |
 | Sample data/service adapter | `packages/features/voice-receptionist/web/lib` |
 | Shared frontend session/API helpers | `packages/core/web` |
 | Shared auth components/styles | `packages/ui/src/auth.tsx`, `packages/ui/styles/auth.css` |
@@ -66,7 +66,7 @@ Existing source users/workspaces/database data are not imported by this code mig
 - Feature backend endpoints remain `/features/voice_receptionist/*` and use the existing feature entitlement gate. The voice frontend layout also calls `requireFeature`.
 - Global auth tables use the restricted `clinic_auth` connection. Verified-user membership lookup and atomic provisioning use narrowly scoped system-session operations. Feature requests then use tenant RLS sessions as before.
 - Authenticated platform writes require CSRF and the configured public origin. Server actions forward cookies, CSRF and origin to FastAPI; browser authentication uses same-origin cookies.
-- Voice routes retain the original Avishkar sidebar, workspace card, header and responsive shell. The parent sidebar is replaced on these routes; “All clinic products” returns to the platform overview. Source CSS is prefixed with `.voice-scope` to prevent styling other products.
+- Voice routes retain the original Avishkar sidebar, workspace card, header and responsive shell. The parent sidebar is replaced on these routes; “All clinic products” returns to the platform overview. Styling is Tailwind; the shell and base font live in `web/components/shell.tsx` and `web/pages/layout.tsx`.
 - Sample mutations last across voice navigation until refresh. Reset demo does not reset your real identity or clinic. No real calls, tool requests, recordings or patient records are produced by the sample dashboard.
 
 ## Checks

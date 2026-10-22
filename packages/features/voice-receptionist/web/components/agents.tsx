@@ -15,11 +15,25 @@ import {
 } from "../lib/inbound/starters";
 import { dateLabel } from "../lib/format";
 import {
+  Avatar,
+  Button,
+  buttonStyles,
+  DialogActions,
+  H2,
+  Muted,
+  Note,
+  Panel,
+  PanelHead,
+  Pill,
+  SidebarLayout,
+  SummaryList,
+} from "@clinic/ui";
+import {
   Heading,
   Badge,
   Dialog,
+  Dropdown,
   Field,
-  Select,
   Tabs,
   FormError,
   Empty,
@@ -88,48 +102,57 @@ function List() {
         title="Voice agents"
         description="Configure and test your practice’s voice assistants."
         actions={
-          <button className="primary" onClick={() => setCreating(true)}>
+          <Button variant="brand" onClick={() => setCreating(true)}>
             <Plus size={16} />
             Create agent
-          </button>
+          </Button>
         }
       />
       {agents.length === 0 ? (
-        <section className="panel">
+        <Panel>
           <Empty
             title="No voice agents yet"
             description="Create your first agent, then try it from your browser in Test studio."
           />
-        </section>
+        </Panel>
       ) : (
-        <div className="agentgrid">
+        <div className="grid grid-cols-3 gap-[22px] max-[1100px]:grid-cols-2 max-app:grid-cols-1 [&>*]:min-w-0">
           {agents.map((agent) => {
             const agentCalls = calls.filter((c) => c.agent_id === agent.id);
             return (
-              <article className="card agentcard" key={agent.id}>
-                <div className="panelHead">
-                  <div className="avatar">{agent.name[0]}</div>
+              <article
+                className="rounded-[13px] border border-line bg-white p-6 transition-transform hover:-translate-y-[3px] max-app:p-[18px]"
+                key={agent.id}
+              >
+                <div className="mb-5 flex items-center justify-between gap-3 max-app:flex-wrap">
+                  <Avatar size="lg">{agent.name[0]}</Avatar>
                   <Badge>{agent.is_active ? "Active" : "Disabled"}</Badge>
                 </div>
-                <h2>{agent.name}</h2>
-                <p>{agent.description || "No description yet."}</p>
-                <div className="inline agent-pills">
-                  <span className="pill">{agent.language}</span>
-                  <span className="pill">{agent.voice}</span>
+                <H2 className="mb-1 mt-3.5">{agent.name}</H2>
+                <Muted>{agent.description || "No description yet."}</Muted>
+                <div className="mt-[18px] flex flex-wrap items-center gap-2.5">
+                  <Pill>{agent.language}</Pill>
+                  <Pill>{agent.voice}</Pill>
                 </div>
-                <div className="agentstats">
+                <div className="my-[22px] flex gap-[25px] border-t border-line pt-[18px]">
                   <div>
-                    <strong>{agentCalls.length}</strong>
-                    <small>Total calls</small>
+                    <strong className="text-[16px]">{agentCalls.length}</strong>
+                    <small className="block text-[12px] text-muted">
+                      Total calls
+                    </small>
                   </div>
                   <div>
-                    <strong>{agent.fields?.length ?? 0}</strong>
-                    <small>Details captured</small>
+                    <strong className="text-[16px]">
+                      {agent.fields?.length ?? 0}
+                    </strong>
+                    <small className="block text-[12px] text-muted">
+                      Details captured
+                    </small>
                   </div>
                 </div>
                 <Link
                   href={`/voice-receptionist/agents/${agent.id}`}
-                  className="button"
+                  className={buttonStyles("outline", { className: "w-full" })}
                 >
                   Open agent
                 </Link>
@@ -140,10 +163,10 @@ function List() {
       )}
       {creating && (
         <Dialog title="Create a voice agent" onClose={() => setCreating(false)}>
-          <p>
+          <Muted>
             Start with a name and a purpose. We fill in a prompt and the usual
             details to capture; you can change everything next.
-          </p>
+          </Muted>
           <form
             onSubmit={async (event) => {
               event.preventDefault();
@@ -157,20 +180,27 @@ function List() {
               maxLength={80}
               pattern=".*\S.*"
             />
-            <Select label="Purpose" name="purpose">
-              {Object.keys(STARTERS).map((purpose) => (
-                <option key={purpose}>{purpose}</option>
-              ))}
-            </Select>
+            <Dropdown
+              label="Purpose"
+              name="purpose"
+              options={Object.keys(STARTERS).map((purpose) => ({
+                value: purpose,
+                label: purpose,
+              }))}
+            />
             <FormError message={error} />
-            <div className="actions dialog-actions">
-              <button type="button" onClick={() => setCreating(false)}>
+            <DialogActions>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setCreating(false)}
+              >
                 Cancel
-              </button>
-              <button className="primary" disabled={busy}>
+              </Button>
+              <Button type="submit" variant="brand" disabled={busy}>
                 Create agent
-              </button>
-            </div>
+              </Button>
+            </DialogActions>
           </form>
         </Dialog>
       )}
@@ -191,15 +221,18 @@ function EditorLoader({ id }: { id: string }) {
   const agent = agents.find((a) => a.id === id);
   if (!agent)
     return (
-      <section className="panel">
+      <Panel>
         <Empty
           title="Agent not found"
           description="This agent may have been deleted."
         />
-        <Link className="button" href="/voice-receptionist/agents">
+        <Link
+          className={buttonStyles("outline")}
+          href="/voice-receptionist/agents"
+        >
           Back to agents
         </Link>
-      </section>
+      </Panel>
     );
   return <Editor key={agent.id} agent={agent} />;
 }
@@ -267,21 +300,21 @@ function Editor({ agent }: { agent: Agent }) {
         actions={
           <>
             <Link
-              className="button"
+              className={buttonStyles("outline")}
               href={`/voice-receptionist/test?agent=${agent.id}`}
             >
               Test agent
             </Link>
-            <button disabled={busy} onClick={() => setDeleting(true)}>
-              Delete
-            </button>
-            <button
-              className="primary"
-              disabled={busy || !dirty}
-              onClick={save}
+            <Button
+              variant="outline"
+              disabled={busy}
+              onClick={() => setDeleting(true)}
             >
+              Delete
+            </Button>
+            <Button variant="brand" disabled={busy || !dirty} onClick={save}>
               Save changes
-            </button>
+            </Button>
           </>
         }
       />
@@ -291,8 +324,8 @@ function Editor({ agent }: { agent: Agent }) {
         onChange={setTab}
       />
       <FormError message={error} />
-      <div className="editor">
-        <section className="panel" role="tabpanel" aria-label={tab}>
+      <SidebarLayout>
+        <Panel role="tabpanel" aria-label={tab}>
           {tab === "Configuration" && (
             <ConfigurationFields draft={draft} onChange={setDraft} />
           )}
@@ -305,74 +338,60 @@ function Editor({ agent }: { agent: Agent }) {
           {tab === "Data & privacy" && (
             <PrivacyFields draft={draft} onChange={setDraft} />
           )}
-        </section>
+        </Panel>
         <div>
-          <section className="panel">
-            <div className="panelHead">
-              <h2>Agent readiness</h2>
-              <Badge>{agent.is_active ? "Active" : "Disabled"}</Badge>
-            </div>
-            <div className="summarylist">
-              <div>
-                <span>Prompt</span>
-                <strong>
-                  {draft.prompt.trim() ? "Configured" : "Missing"}
-                </strong>
-              </div>
-              <div>
-                <span>Voice</span>
-                <strong>
-                  {draft.voice} · {draft.language}
-                </strong>
-              </div>
-              <div>
-                <span>Details to capture</span>
-                <strong>
-                  {draft.fields.length}
-                  {required ? ` (${required} required)` : ""}
-                </strong>
-              </div>
-              <div>
-                <span>Tools</span>
-                <strong>{draft.tool_ids.length} selected</strong>
-              </div>
-              <div>
-                <span>Last test call</span>
-                <strong>
-                  {lastTest
+          <Panel>
+            <PanelHead
+              title="Agent readiness"
+              action={<Badge>{agent.is_active ? "Active" : "Disabled"}</Badge>}
+            />
+            <SummaryList
+              items={[
+                ["Prompt", draft.prompt.trim() ? "Configured" : "Missing"],
+                ["Voice", `${draft.voice} · ${draft.language}`],
+                [
+                  "Details to capture",
+                  `${draft.fields.length}${required ? ` (${required} required)` : ""}`,
+                ],
+                ["Tools", `${draft.tool_ids.length} selected`],
+                [
+                  "Last test call",
+                  lastTest
                     ? dateLabel(
                         lastTest.started_at,
                         state?.workspace.timezone || "UTC",
                       )
-                    : "Not run"}
-                </strong>
-              </div>
-            </div>
-          </section>
-          <div className="note spaced">
+                    : "Not run",
+                ],
+              ]}
+            />
+          </Panel>
+          <Note className="mt-5">
             <strong>Test before callers do</strong>
             <p>
               Save your changes, then call the agent from your browser in Test
               studio. Every call keeps a copy of the settings it used.
             </p>
-          </div>
+          </Note>
         </div>
-      </div>
+      </SidebarLayout>
       {deleting && (
         <Dialog
           title={`Delete ${agent.name}?`}
           onClose={() => setDeleting(false)}
         >
-          <p>
+          <Muted>
             The agent and its list of fields are removed. Calls it already took,
             and what they captured, are kept.
-          </p>
-          <div className="actions dialog-actions">
-            <button onClick={() => setDeleting(false)}>Cancel</button>
-            <button className="primary" disabled={busy} onClick={remove}>
+          </Muted>
+          <DialogActions>
+            <Button variant="outline" onClick={() => setDeleting(false)}>
+              Cancel
+            </Button>
+            <Button variant="brand" disabled={busy} onClick={remove}>
               Delete agent
-            </button>
-          </div>
+            </Button>
+          </DialogActions>
         </Dialog>
       )}
     </>

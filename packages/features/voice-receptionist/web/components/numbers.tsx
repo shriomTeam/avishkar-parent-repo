@@ -5,7 +5,21 @@ import { Plus } from "lucide-react";
 import type { PhoneNumber } from "../lib/types";
 import { useDemo } from "../lib/demo/provider";
 import { useVoiceStatus } from "../lib/voice/provider";
-import { Heading, Badge, Dialog, Field, Select, FormError } from "./ui";
+import {
+  Button,
+  buttonStyles,
+  DataTable,
+  DialogActions,
+  FooterRow,
+  H2,
+  Muted,
+  Panel,
+  Td,
+  Th,
+  Tr,
+  WideSplit,
+} from "@clinic/ui";
+import { Heading, Badge, Dialog, Dropdown, Field, FormError } from "./ui";
 export function Numbers() {
   const { state, run, busy } = useDemo();
   const { agents } = useVoiceStatus();
@@ -20,8 +34,8 @@ export function Numbers() {
         title="Phone numbers"
         description="Connect an inbound number and route it to an agent."
         actions={
-          <button
-            className="primary"
+          <Button
+            variant="brand"
             onClick={() => {
               setError("");
               setEditing("new");
@@ -29,77 +43,81 @@ export function Numbers() {
           >
             <Plus size={16} />
             Connect number
-          </button>
+          </Button>
         }
       />
-      <section className="panel">
-        <div className="tablewrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Phone number</th>
-                <th>Provider</th>
-                <th>Assigned agent</th>
-                <th>Status</th>
-                <th>Routing</th>
-              </tr>
-            </thead>
-            <tbody>
-              {state.numbers.map((n) => (
-                <tr key={n.id}>
-                  <td>
-                    <strong>{n.number}</strong>
-                    <small>Sample number</small>
-                  </td>
-                  <td>{n.provider}</td>
-                  <td>
-                    {(agents ?? []).find((a) => a.id === n.agentId)?.name ||
-                      "Not assigned"}
-                  </td>
-                  <td>
-                    <Badge>{n.agentId ? "Connected" : "Unassigned"}</Badge>
-                  </td>
-                  <td>
-                    <button
-                      aria-label={`Manage ${n.number}`}
-                      onClick={() => {
-                        setError("");
-                        setEditing(n);
-                      }}
-                    >
-                      Manage
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-      <div className="two spaced">
-        <section className="panel">
-          <h2>How inbound routing works</h2>
-          <p>Caller → phone provider → published voice agent</p>
-          <div className="rowline">
+      <Panel>
+        <DataTable>
+          <thead>
+            <tr>
+              <Th>Phone number</Th>
+              <Th>Provider</Th>
+              <Th>Assigned agent</Th>
+              <Th>Status</Th>
+              <Th>Routing</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {state.numbers.map((n) => (
+              <Tr key={n.id}>
+                <Td>
+                  <strong>{n.number}</strong>
+                  <small className="block text-[12px] text-muted">
+                    Sample number
+                  </small>
+                </Td>
+                <Td>{n.provider}</Td>
+                <Td>
+                  {(agents ?? []).find((a) => a.id === n.agentId)?.name ||
+                    "Not assigned"}
+                </Td>
+                <Td>
+                  <Badge>{n.agentId ? "Connected" : "Unassigned"}</Badge>
+                </Td>
+                <Td>
+                  <Button
+                    variant="outline"
+                    aria-label={`Manage ${n.number}`}
+                    onClick={() => {
+                      setError("");
+                      setEditing(n);
+                    }}
+                  >
+                    Manage
+                  </Button>
+                </Td>
+              </Tr>
+            ))}
+          </tbody>
+        </DataTable>
+      </Panel>
+      <WideSplit className="mt-5">
+        <Panel>
+          <H2>How inbound routing works</H2>
+          <Muted>Caller → phone provider → published voice agent</Muted>
+          <FooterRow>
             <span>Default greeting</span>
             <strong>Agent greeting</strong>
-          </div>
-          <div className="rowline">
+          </FooterRow>
+          <FooterRow>
             <span>Outside opening hours</span>
             <strong>Collect callback details</strong>
-          </div>
-        </section>
-        <section className="panel">
-          <h2>Before going live</h2>
-          <p>
+          </FooterRow>
+        </Panel>
+        <Panel>
+          <H2>Before going live</H2>
+          <Muted>
             Verify inbound routing with your provider, test a real call and
             confirm the greeting and consent message.
-          </p>
-          <Link className="button spaced" href="/voice-receptionist/test">
+          </Muted>
+          <Link
+            className={buttonStyles("outline", { className: "mt-5" })}
+            href="/voice-receptionist/test"
+          >
             Open test studio
           </Link>
-        </section>
-      </div>
+        </Panel>
+      </WideSplit>
       {editing && (
         <Dialog
           title={
@@ -107,9 +125,9 @@ export function Numbers() {
           }
           onClose={() => setEditing(null)}
         >
-          <p>
+          <Muted>
             This updates sample routing only. No carrier connection is made.
-          </p>
+          </Muted>
           <form
             onSubmit={async (event) => {
               event.preventDefault();
@@ -153,38 +171,40 @@ export function Numbers() {
               placeholder="+14155550100"
               defaultValue={editing === "new" ? "" : editing.number}
             />
-            <Select
+            <Dropdown
               label="Provider"
               name="provider"
               defaultValue={editing === "new" ? "Twilio" : editing.provider}
-            >
-              <option>Twilio</option>
-              <option>Telnyx · SIP</option>
-            </Select>
-            <Select
+              options={[
+                { value: "Twilio", label: "Twilio" },
+                { value: "Telnyx · SIP", label: "Telnyx · SIP" },
+              ]}
+            />
+            <Dropdown
               label="Assigned agent"
               name="agent"
               defaultValue={editing === "new" ? "" : editing.agentId || ""}
-            >
-              <option value="">Unassigned</option>
-              {published.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </Select>
+              options={[
+                { value: "", label: "Unassigned" },
+                ...published.map((a) => ({ value: a.id, label: a.name })),
+              ]}
+            />
             {!published.length && (
-              <p>Create an active agent before assigning a number.</p>
+              <Muted>Create an active agent before assigning a number.</Muted>
             )}
             <FormError message={error} />
-            <div className="actions dialog-actions">
-              <button type="button" onClick={() => setEditing(null)}>
+            <DialogActions>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditing(null)}
+              >
                 Cancel
-              </button>
-              <button className="primary" disabled={busy}>
+              </Button>
+              <Button type="submit" variant="brand" disabled={busy}>
                 Save routing
-              </button>
-            </div>
+              </Button>
+            </DialogActions>
           </form>
         </Dialog>
       )}
