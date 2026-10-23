@@ -265,7 +265,13 @@ export function Members({
           <PanelHead
             title="Invitations"
             action={
-              <Button variant="outline" onClick={invitations.retry}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  invitations.retry();
+                  members.retry();
+                }}
+              >
                 Refresh invitations
               </Button>
             }
@@ -281,8 +287,8 @@ export function Members({
             <p role="status">Loading invitations…</p>
           ) : !invitations.data.invitations.length ? (
             <EmptyState
-              title="No invitations yet"
-              description="Invite someone to join this workspace."
+              title="No pending invitations"
+              description="Accepted members appear in Workspace members. Invite someone new to join your workspace."
             />
           ) : (
             <DataTable>

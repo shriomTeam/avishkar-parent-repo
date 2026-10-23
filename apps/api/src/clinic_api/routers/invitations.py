@@ -89,7 +89,11 @@ async def listing(workspace_id: uuid.UUID, request: Request, principal: CurrentS
         rows = (
             await db.scalars(
                 select(Invitation)
-                .where(Invitation.tenant_id == workspace_id)
+                .where(
+                    Invitation.tenant_id == workspace_id,
+                    Invitation.status == "pending",
+                    Invitation.expires_at > now(),
+                )
                 .order_by(Invitation.created_at.desc())
                 .limit(100)
             )
@@ -107,7 +111,7 @@ async def listing(workspace_id: uuid.UUID, request: Request, principal: CurrentS
                     id=invite.id,
                     email=invite.email,
                     role=invite.role,
-                    status="expired" if invite.status == "pending" and invite.expires_at <= now() else invite.status,
+                    status=invite.status,
                     expires_at=invite.expires_at.isoformat(),
                     delivery_status=delivery.status if delivery else "unknown",
                 )

@@ -422,6 +422,7 @@ async def test_invitation_accepts_same_workspace_and_cannot_escalate(system):
         assert me["workspace"]["id"] == workspace["id"]
         assert me["memberships"][0]["role"] == "front_desk"
         assert len(me["memberships"]) == 1
+        assert (await owner.get(base + "/invitations")).json()["invitations"] == []
         assert (
             await user.post(
                 base + "/invitations", headers=user_csrf, json={"email": "other@example.com", "role": "office_manager"}
@@ -500,6 +501,7 @@ async def test_invitation_wrong_email_resend_revoke_and_expiry(system):
     fresh = await invitation_link(app)
     assert fresh != token
     assert (await owner.post(base + "/invitations/" + ident + "/revoke", headers=csrf)).status_code == 200
+    assert (await owner.get(base + "/invitations")).json()["invitations"] == []
     assert (await owner.post("/api/v1/invitations/context", headers=csrf, json={"token": fresh})).status_code == 410
 
     expired = await owner.post(
@@ -509,6 +511,7 @@ async def test_invitation_wrong_email_resend_revoke_and_expiry(system):
     async with system_session(database_url=app.state.settings.database_system_url) as db:
         row = await db.get(Invitation, uuid.UUID(expired.json()["id"]))
         row.expires_at = now() - timedelta(seconds=1)
+    assert (await owner.get(base + "/invitations")).json()["invitations"] == []
     assert (
         await owner.post("/api/v1/invitations/context", headers=csrf, json={"token": expired_token})
     ).status_code == 410

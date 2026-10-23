@@ -15,7 +15,10 @@ can grant Owner, remove/demote an Owner, or change their own membership here.
 Ownership transfer is intentionally outside this interface. Removed memberships
 stay inactive until a fresh re-invitation is accepted. Resend rotates the token;
 revoke invalidates it.
-The UI lists the latest 100 invitations with provider submission status.
+The UI lists up to 100 pending, unexpired invitations with provider submission
+status. Accepted, revoked and expired invitations remain stored for history and
+auditing but are excluded from this list; accepted people appear in Workspace
+members. Refresh invitations also refreshes the member list.
 
 Front desk can read voice calls/transcripts/recordings and reactivation summaries
 in their workspace. Agent configuration, tools, variables, test calls, imports,
