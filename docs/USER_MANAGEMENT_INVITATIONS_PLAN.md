@@ -461,14 +461,19 @@ The user has created a SendGrid account/API key but has not configured sender or
 domain authentication. Initial test sends may use the signup address after
 **Single Sender Verification**. Account creation/API-key creation alone does not
 verify that address as a sending identity. Default sender display name: Avishkar.
-The exact From email is still needed; it cannot be inferred from the API key.
+The user confirmed the initial From address as
+`iabhinavkakran.work@gmail.com`; EMAIL_FROM_NAME is `Avishkar`. These sender values
+are saved in local configuration, but verification and delivery have not been
+tested. Gmail is the initial test sender; use an authenticated branded domain for
+production delivery.
 Use EMAIL_FROM_ADDRESS / EMAIL_FROM_NAME so switching to a verified branded
 sender later requires configuration changes, not template/provider rewrites.
 Domain authentication remains the recommended production setup.
 
 Remaining inputs:
 
-- SendGrid-verified From email and sender display name; optional Reply-to.
+- Complete Single Sender Verification for the confirmed From address; optional
+  Reply-to can be added later.
 - Single Sender Verification for initial testing, followed by domain
   authentication for production; confirm the key has mail-send permissions.
 - Final business approval of the role/action matrix and any within-clinic record
