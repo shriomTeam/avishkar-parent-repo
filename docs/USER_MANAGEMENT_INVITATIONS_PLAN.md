@@ -457,25 +457,27 @@ origin. Build invitation links from `/invite` at the app root. Keep localhost
 configuration unchanged for local development, and configure the Google callback
 consistently in the production environment.
 
-The user has created a SendGrid account/API key but has not configured sender or
-domain authentication. Initial test sends may use the signup address after
-**Single Sender Verification**. Account creation/API-key creation alone does not
-verify that address as a sending identity. Default sender display name: Avishkar.
-The user confirmed the initial From address as
-`iabhinavkakran.work@gmail.com`; EMAIL_FROM_NAME is `Avishkar`. These sender values
-are saved in local configuration, but verification and delivery have not been
-tested. Gmail is the initial test sender; use an authenticated branded domain for
-production delivery.
-Use EMAIL_FROM_ADDRESS / EMAIL_FROM_NAME so switching to a verified branded
-sender later requires configuration changes, not template/provider rewrites.
-Domain authentication remains the recommended production setup.
+The user supplied a SendGrid Single Sender Verification screenshot showing a
+verified sender with the following values:
+
+```text
+EMAIL_FROM_ADDRESS=abhinav.chaudhary@avishkar.app
+EMAIL_FROM_NAME=Avishkar
+EMAIL_REPLY_TO=abhinav.chaudhary@avishkar.app
+```
+
+These values replace the initial Gmail sender in local configuration. This is
+user-provided evidence of Single Sender Verification; domain authentication and
+actual API-key permissions/delivery have not been independently tested. No live
+email has been sent. Domain authentication remains the recommended production
+setup. The SendGrid signup email can remain different from the sending identity.
+Sender changes stay configuration-only.
 
 Remaining inputs:
 
-- Complete Single Sender Verification for the confirmed From address; optional
-  Reply-to can be added later.
-- Single Sender Verification for initial testing, followed by domain
-  authentication for production; confirm the key has mail-send permissions.
+- Configure domain authentication for production and confirm that the API key
+  has mail-send permissions. Single Sender Verification is now confirmed by the
+  supplied screenshot.
 - Final business approval of the role/action matrix and any within-clinic record
   restrictions. Proposed invite grant rules above are the starting defaults.
 - Production secret/worker provisioning ownership; verification webhook decision.
