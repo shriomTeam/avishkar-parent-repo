@@ -369,6 +369,63 @@ test("variables: add, edit, use in a prompt, refuse unknown names, block deletin
   await expect(row).toHaveCount(0);
 });
 
+test("knowledge base: upload, see it become ready, replace, and delete", async ({
+  page,
+}) => {
+  const name = `hours-${Date.now()}.txt`;
+  const text = (words: string) => Buffer.from(`Opening hours\n\n${words}`);
+  await page.goto("/voice-receptionist");
+  await page.getByRole("link", { name: "Knowledge base", exact: true }).click();
+  await page.getByLabel("Choose a file").setInputFiles({
+    name,
+    mimeType: "text/plain",
+    buffer: text(`We are open nine to five. ${name}`),
+  });
+  const row = page.getByRole("row").filter({ hasText: name });
+  await expect(row).toContainText("Ready", CALL);
+
+  // Test search shows what an agent would find, and says so when nothing fits.
+  await page.getByLabel("Question").fill("we are open nine to five");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await expect(page.getByTestId("search-result").first()).toContainText(
+    name,
+    CALL,
+  );
+  await page.getByLabel("Question").fill("quantum chromodynamics lattice");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await expect(page.getByText("Nothing in your documents")).toBeVisible();
+
+  // The same file again is refused in plain words.
+  await page.getByLabel("Choose a file").setInputFiles({
+    name: `copy-${name}`,
+    mimeType: "text/plain",
+    buffer: text(`We are open nine to five. ${name}`),
+  });
+  await expect(
+    page
+      .getByRole("alert")
+      .filter({ hasText: "already in your knowledge base" }),
+  ).toBeVisible();
+
+  // A different file with the same name asks what to do.
+  await page.getByLabel("Choose a file").setInputFiles({
+    name,
+    mimeType: "text/plain",
+    buffer: text(`Now open until six. ${name}`),
+  });
+  await page.getByRole("button", { name: "Replace", exact: true }).click();
+  // The old file is removed once the new one is ready; reload so the list is the server's, not a stale view.
+  await expect(async () => {
+    await page.reload();
+    await expect(row).toHaveCount(1, { timeout: 2_000 });
+    await expect(row).toContainText("Ready", { timeout: 2_000 });
+  }).toPass(CALL);
+
+  await page.getByRole("button", { name: `Delete ${name}` }).click();
+  await page.getByRole("button", { name: "Delete document" }).click();
+  await expect(row).toHaveCount(0);
+});
+
 test("reset demo keeps the signed-in workspace", async ({ page }) => {
   await page.goto("/voice-receptionist/settings");
   await expect(page.getByTestId("clinic-name")).toContainText(

@@ -9,7 +9,9 @@ from typing import Any
 
 from clinic_core.database import tenant_session
 from clinic_db.models.voice import Tool
+from clinic_knowledge.embeddings import Embedder
 from clinic_voice_receptionist.config import get_voice_settings
+from clinic_voice_receptionist.knowledge.lookup import run_search
 from clinic_voice_receptionist.tools import secrets
 from clinic_voice_receptionist.tools.builtin import run_lead
 from clinic_voice_receptionist.tools.http_tool import call_http
@@ -44,6 +46,7 @@ async def execute(
     call_id: uuid.UUID | None,
     key: str,
     database_url: str | None,
+    embedder: Embedder | None = None,
 ) -> ToolOutcome:
     """Run ``tool`` with already-validated ``args``. Never raises; failures come back as an outcome."""
     started = time.monotonic()
@@ -67,6 +70,9 @@ async def execute(
                     database_url=database_url,
                     create=tool.builtin_key == "create_lead",
                 )
+                return finish(bool(result.get("ok")), result, result.get("error"))
+            if tool.builtin_key == "search_knowledge":
+                result = await run_search(tenant_id=tenant_id, args=args, embedder=embedder, database_url=database_url)
                 return finish(bool(result.get("ok")), result, result.get("error"))
             return finish(False, {"ok": False, "error": "This tool can only run during a call."}, "unavailable")
         auth = None
@@ -92,8 +98,15 @@ async def execute(
 class ToolRunner:
     """Runs the tools of one live call."""
 
-    def __init__(self, *, tenant_id: uuid.UUID, call_id: uuid.UUID, database_url: str | None = None):
-        self.tenant_id, self.call_id, self._url = tenant_id, call_id, database_url
+    def __init__(
+        self,
+        *,
+        tenant_id: uuid.UUID,
+        call_id: uuid.UUID,
+        database_url: str | None = None,
+        embedder: Embedder | None = None,
+    ):
+        self.tenant_id, self.call_id, self._url, self._embedder = tenant_id, call_id, database_url, embedder
 
     async def run(self, ref: dict, args: dict[str, Any], key: str) -> ToolOutcome:
         """``ref`` is the tool entry from the call's snapshot; settings are read fresh so edits and disabling apply."""
@@ -116,5 +129,11 @@ class ToolRunner:
         if tool is None or not tool.enabled:
             return refuse({"ok": False, "error": "This tool is not available."}, "tool unavailable")
         return await execute(
-            tool, cleaned, tenant_id=self.tenant_id, call_id=self.call_id, key=key, database_url=self._url
+            tool,
+            cleaned,
+            tenant_id=self.tenant_id,
+            call_id=self.call_id,
+            key=key,
+            database_url=self._url,
+            embedder=self._embedder,
         )

@@ -1,0 +1,8 @@
+{
+  "name": "@clinic/knowledge",
+  "private": true,
+  "scripts": {
+    "lint": "uv run ruff check src tests",
+    "test": "uv run pytest tests -q"
+  }
+}

@@ -14,6 +14,9 @@ export type CatalogItem = Schemas["CatalogItemOut"];
 export type Variable = Schemas["VariableOut"];
 export type BuiltinVariable = Schemas["BuiltinOut"];
 export type Variables = Schemas["VariablesOut"];
+export type KnowledgeDocument = Schemas["DocumentOut"];
+export type Knowledge = Schemas["KnowledgeOut"];
+export type SearchResult = Schemas["SearchHitOut"];
 
 // Same-origin: Next rewrites /api/platform/* to the FastAPI backend, so the session cookie is sent.
 const BASE = "/api/platform/features/voice_receptionist/inbound";
@@ -22,6 +25,8 @@ export class ApiError extends Error {
   constructor(
     readonly status: number,
     message: string,
+    /** Set when the API names the problem, for example "same_name" when a file with that name exists. */
+    readonly code?: string,
   ) {
     super(message);
   }
@@ -41,12 +46,20 @@ function messageFor(status: number): string {
 }
 
 /** The API explains rejected tool and agent settings in plain words; show those instead of a generic line. */
-async function detailOf(response: Response): Promise<string | null> {
+async function detailOf(
+  response: Response,
+): Promise<{ message: string; code?: string } | null> {
   if (![409, 422].includes(response.status)) return null;
   try {
-    const body = (await response.json()) as { detail?: unknown };
-    return typeof body.detail === "string" && /\s/.test(body.detail)
-      ? body.detail
+    const { detail } = (await response.json()) as { detail?: unknown };
+    if (typeof detail === "string")
+      return /\s/.test(detail) ? { message: detail } : null;
+    const named = detail as { code?: unknown; message?: unknown } | undefined;
+    return typeof named?.message === "string"
+      ? {
+          message: named.message,
+          code: typeof named.code === "string" ? named.code : undefined,
+        }
       : null;
   } catch {
     return null;
@@ -61,7 +74,9 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
   ): Promise<Response> {
     const headers: Record<string, string> = { "X-CSRF-Token": session.csrf };
     if (session.tenantId) headers["X-Tenant-Id"] = session.tenantId;
-    if (body !== undefined) headers["Content-Type"] = "application/json";
+    // A file upload sets its own multipart content type; everything else is JSON.
+    if (body !== undefined && !(body instanceof FormData))
+      headers["Content-Type"] = "application/json";
     let response: Response;
     try {
       response = await fetch(`${BASE}${path}`, {
@@ -69,7 +84,10 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
         credentials: "same-origin",
         cache: "no-store",
         headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
+        body:
+          body === undefined || body instanceof FormData
+            ? (body as FormData | undefined)
+            : JSON.stringify(body),
       });
     } catch {
       throw new ApiError(
@@ -77,11 +95,14 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
         "Could not reach the server. Check your connection.",
       );
     }
-    if (!response.ok)
+    if (!response.ok) {
+      const detail = await detailOf(response);
       throw new ApiError(
         response.status,
-        (await detailOf(response)) ?? messageFor(response.status),
+        detail?.message ?? messageFor(response.status),
+        detail?.code,
       );
+    }
     return response;
   }
   async function request<T>(
@@ -131,6 +152,21 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
     updateVariable: (id: string, value: string) =>
       request<Variable>("PUT", `/variables/${id}`, { value }),
     deleteVariable: (id: string) => request<void>("DELETE", `/variables/${id}`),
+    listKnowledge: () => request<Knowledge>("GET", "/knowledge/documents"),
+    uploadDocument: (file: File, sameName?: "replace" | "keep") => {
+      const form = new FormData();
+      form.append("file", file);
+      if (sameName) form.append("same_name", sameName);
+      return request<KnowledgeDocument>("POST", "/knowledge/documents", form);
+    },
+    retryDocument: (id: string) =>
+      request<KnowledgeDocument>("POST", `/knowledge/documents/${id}/retry`),
+    deleteDocument: (id: string) =>
+      request<void>("DELETE", `/knowledge/documents/${id}`),
+    searchKnowledge: (query: string) =>
+      request<{ results: SearchResult[] }>("POST", "/knowledge/search", {
+        query,
+      }),
     startTestCall: (agentId: string) =>
       request<TestCall>("POST", `/agents/${agentId}/test-call`),
   };

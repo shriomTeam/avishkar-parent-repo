@@ -92,7 +92,11 @@ async def test_internal_tools_come_from_a_catalog_and_are_added_on_demand(client
     a, b = await create_test_tenant(), await create_test_tenant()
     assert await _tools(client, a) == []  # nothing is added for a clinic until it chooses
     catalog = (await client.get("/inbound/tools/catalog", headers=_h(a))).json()
-    assert [(c["key"], c["added"]) for c in catalog] == [("create_lead", False), ("update_lead", False)]
+    assert [(c["key"], c["added"]) for c in catalog] == [
+        ("create_lead", False),
+        ("update_lead", False),
+        ("search_knowledge", False),
+    ]
     assert all(c["title"] and c["description"] for c in catalog)
 
     lead = await _add_internal(client, a)
@@ -100,7 +104,7 @@ async def test_internal_tools_come_from_a_catalog_and_are_added_on_demand(client
     assert "phone" in lead["input_schema"]["properties"] and lead["builtin_key"] == "create_lead"
     assert [t["name"] for t in await _tools(client, a)] == ["create_lead"]
     added = {c["key"]: c["added"] for c in (await client.get("/inbound/tools/catalog", headers=_h(a))).json()}
-    assert added == {"create_lead": True, "update_lead": False}
+    assert added == {"create_lead": True, "update_lead": False, "search_knowledge": False}
 
     again = await client.post("/inbound/tools/internal", json={"builtin_key": "create_lead"}, headers=_h(a))
     assert again.status_code == 409 and "already added" in again.json()["detail"]
