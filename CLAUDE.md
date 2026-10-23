@@ -15,6 +15,8 @@ apps/
       (platform)/              authenticated platform routes
         layout.tsx             shared auth provider and platform shell
         page.tsx               clinic product overview
+        settings/              shared workspace editing, members and audit
+                               (accessed through the bottom profile menu)
         import/                patient data import
         (features)/
           blueprints/          existing patient blueprint pages
@@ -22,6 +24,7 @@ apps/
     components/
       auth/                    onboarding and sign-out controls
       platform-frame.tsx       generic platform shell (no feature path checks)
+      platform-navigation.tsx  platform navigation and workspace header
     lib/
       auth/                    compatibility exports of shared core auth
     public/brand/               platform branding assets

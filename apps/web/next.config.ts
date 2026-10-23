@@ -3,6 +3,8 @@ import { loadEnvConfig } from "@next/env";
 import { resolve } from "node:path";
 loadEnvConfig(resolve(process.cwd(), "../.."));
 const config: NextConfig = {
+  // Keep development controls clear of the bottom-left account menu.
+  devIndicators: { position: "bottom-right" },
   transpilePackages: ["@clinic/ui", "@clinic/api-client", "@clinic/core"],
   output: "standalone",
   // Next buffers a proxied (rewritten) request body and cuts it off at 10 MB by default, which then fails the

@@ -1,5 +1,5 @@
-import { Settings } from "../../components/settings";
+import { redirect } from "next/navigation";
 export const metadata = { title: "Settings" };
 export default function Page() {
-  return <Settings />;
+  redirect("/settings");
 }

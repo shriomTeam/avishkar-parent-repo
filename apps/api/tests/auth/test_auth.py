@@ -261,3 +261,72 @@ async def test_auth_role_cannot_read_clinic_data(system):
     async with app.state.session_factory() as db:
         with pytest.raises(DBAPIError, match="permission denied"):
             await db.execute(text("SELECT * FROM core.patients"))
+
+
+async def test_workspace_settings_enforce_membership_roles_csrf_and_audit(system):
+    from clinic_db.models.core import Staff, Tenant
+
+    app, client = system
+    await login(client)
+    csrf = await headers(client)
+    workspace = (
+        await client.post("/api/v1/workspaces", headers=csrf, json={"name": "Management test", "timezone": "UTC"})
+    ).json()
+    path = "/api/v1/workspaces/" + workspace["id"]
+    user_id = uuid.UUID((await client.get("/api/v1/auth/me")).json()["user"]["id"])
+    payload = {
+        "name": "Updated clinic",
+        "timezone": "Asia/Kolkata",
+        "clinic_type": "wellness",
+        "phone": "+919876543210",
+        "address": "Bengaluru",
+    }
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        tenant = await db.get(Tenant, uuid.UUID(workspace["id"]))
+        tenant.settings = {**tenant.settings, "unrelated_config": {"enabled": True}}
+    assert (await client.post(path + "/settings", json=payload)).status_code == 403
+    assert (
+        await client.post(path + "/settings", headers={**csrf, "Origin": "https://evil.example"}, json=payload)
+    ).status_code == 403
+    for field, value in (("name", "  "), ("timezone", "Invalid/Zone"), ("phone", "123"), ("clinic_type", "other")):
+        assert (await client.post(path + "/settings", headers=csrf, json={**payload, field: value})).status_code == 422
+    assert (
+        await client.post(path + "/settings", headers=csrf, json={**payload, "baa_signed_at": "2026-01-01"})
+    ).status_code == 422
+    result = await client.post(path + "/settings", headers=csrf, json=payload)
+    assert result.status_code == 200, result.text
+    assert result.json()["name"] == "Updated clinic"
+    assert (await client.get(path + "/settings")).json()["address"] == "Bengaluru"
+    assert (await client.get("/api/v1/auth/me")).json()["workspace"]["name"] == "Updated clinic"
+    assert len((await client.get(path + "/members")).json()) == 1
+    events = (await client.get(path + "/audit")).json()
+    assert any(event["action"] == "workspace.updated" for event in events)
+    foreign_id = uuid.uuid4()
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        db.add(Tenant(id=foreign_id, name="Unrelated workspace", timezone="UTC", clinic_type="wellness"))
+    foreign = "/api/v1/workspaces/" + str(foreign_id)
+    for suffix in ("settings", "members", "audit"):
+        assert (await client.get(foreign + "/" + suffix)).status_code == 403
+    assert (await client.post(foreign + "/settings", headers=csrf, json=payload)).status_code == 403
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        tenant = await db.get(Tenant, uuid.UUID(workspace["id"]))
+        assert tenant.settings["unrelated_config"] == {"enabled": True}
+        assert tenant.baa_signed_at is None
+        member = await db.scalar(select(Staff).where(Staff.user_id == user_id))
+        member.role = "front_desk"
+    assert (await client.get(path + "/settings")).status_code == 200
+    for suffix in ("members", "audit"):
+        assert (await client.get(path + "/" + suffix)).status_code == 403
+    assert (await client.post(path + "/settings", headers=csrf, json=payload)).status_code == 403
+    # Permission is checked from the current database membership, not a role supplied by the client.
+    assert (
+        await client.post(path + "/settings", headers={**csrf, "X-Staff-Role": "owner"}, json=payload)
+    ).status_code == 403
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        member = await db.scalar(select(Staff).where(Staff.user_id == user_id))
+        member.role = "office_manager"
+    assert (await client.post(path + "/settings", headers=csrf, json=payload)).status_code == 200
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        member = await db.scalar(select(Staff).where(Staff.user_id == user_id))
+        member.active = False
+    assert (await client.get(path + "/settings")).status_code == 403
