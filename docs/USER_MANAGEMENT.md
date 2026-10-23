@@ -292,16 +292,25 @@ storage. Deleting a tenant cascades deletion of its audit rows.
 
 Each row stores a bigint identity, workspace ID, actor type/ID, action, optional
 entity type/UUID, JSON details and timestamp. Current indexing includes the tenant
-ID and primary key; a composite tenant/time/ID index has not been added for history
-browsing at scale.
+ID, primary key and a composite tenant/time/ID index for history browsing. Run
+`pnpm db:migrate` to apply the new concurrent index migration.
 
 **Implemented:**
 
 - Owner/Office Manager access only, with server-side workspace membership checks.
-- Latest 100 events ordered by timestamp and ID; no pagination or older-history UI.
-  This is a display/query limit, not a storage limit.
+- 50 events per page, ordered newest first by timestamp and ID, with Previous/Next
+  navigation and matching result counts. All stored history is accessible.
+- From/To dates (inclusive calendar days in the workspace timezone), Actor and Event
+  filters combine together. Apply filters resets pagination; Clear filters restores
+  the full history. Actor choices include historical IDs and system actors.
+- Download CSV exports **all** matching rows, independently of the current page.
+  With no filters applied it exports the entire workspace history. Exports include
+  event/actor/entity IDs and UTC timestamps; arbitrary JSON details are excluded.
+  The server reads batches of 500 rows and excludes new events added after the
+  export starts. Spreadsheet formula prefixes in text are escaped. Downloads use
+  the same manager/workspace authorization as the table and are not cached.
 - The Settings table displays event, actor and workspace-local time. Actor names
-  resolve from current staff records, falling back to actor type when unavailable;
+  resolve from current staff records, falling back to staff ID or actor type when unavailable;
   names are not historical snapshots.
 - Workspace updates, invitation creation/resend/revoke/acceptance, member role
   changes/removal/restoration are recorded. Workspace updates record field names,
@@ -314,15 +323,13 @@ browsing at scale.
   Administrative/provisioning roles remain privileged; this is not a tamper-proof
   or cryptographically verified audit trail.
 
-**Not implemented yet:** pagination, date/action/actor filters, export, structured
-entity/detail display, comprehensive before/after change history, stable historical
+**Not implemented yet:** structured entity/detail display, comprehensive before/after change history, stable historical
 actor labels, archival/retention management, or comprehensive failed/denied-action
 coverage. Login/logout events are application logger messages, not entries in this
 workspace audit table. Their retention depends on the logging deployment.
 
-Next improvements should start with cursor pagination and a matching composite
-index, then safe event metadata (including old/new roles), readable entity/actor
-presentation and filters. Choose an explicit retention/archive policy before
+Further improvements include safe event metadata (including old/new roles) and
+stable historical actor labels. Choose an explicit retention/archive policy before
 introducing automatic deletion. Avoid putting credentials, invitation tokens or
 unnecessary patient information into event details.
 

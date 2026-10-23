@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 export function useWorkspaceResource<T>(url: string, enabled: boolean) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState("");
+  const [loadedUrl, setLoadedUrl] = useState("");
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     if (!enabled) return;
@@ -22,16 +23,23 @@ export function useWorkspaceResource<T>(url: string, enabled: boolean) {
               : "Could not load this information. Please retry.",
           );
         const result: T = await response.json();
-        if (!abort.signal.aborted) setData(result);
+        if (!abort.signal.aborted) {
+          setData(result);
+          setError("");
+          setLoadedUrl(url);
+        }
       })
       .catch((cause) => {
-        if (!abort.signal.aborted) setError(cause.message);
+        if (!abort.signal.aborted) {
+          setError(cause.message);
+          setLoadedUrl(url);
+        }
       });
     return () => abort.abort();
   }, [url, enabled, attempt]);
   return {
-    data,
-    error,
+    data: enabled && loadedUrl === url ? data : null,
+    error: enabled && loadedUrl === url ? error : "",
     retry: () => {
       setData(null);
       setError("");

@@ -3,12 +3,12 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Request
 from sqlalchemy import select
 
+from clinic_api.routers.workspace_audit import router as audit_router
 from clinic_core.auth.dependencies import DB, CurrentSession, ProtectedWrite, get_settings
 from clinic_core.auth.repository import limit
 from clinic_core.tenancy.management import settings_out, update_workspace, workspace_access
 from clinic_core.tenancy.repository import memberships
 from clinic_core.tenancy.schemas import (
-    WorkspaceAuditOut,
     WorkspaceCreate,
     WorkspaceMemberOut,
     WorkspaceOut,
@@ -17,9 +17,9 @@ from clinic_core.tenancy.schemas import (
 )
 from clinic_core.tenancy.service import create_workspace
 from clinic_db.models.core import Staff
-from clinic_db.models.ops import AuditLog
 
 router = APIRouter(prefix="/api/v1/workspaces", tags=["workspaces"])
+router.include_router(audit_router)
 
 
 def workspace_out(tenant):
@@ -74,29 +74,4 @@ async def members(workspace_id: UUID, request: Request, principal: CurrentSessio
                 created_at=m.created_at.isoformat(),
             )
             for m in rows
-        ]
-
-
-@router.get("/{workspace_id}/audit", response_model=list[WorkspaceAuditOut])
-async def activity(workspace_id: UUID, request: Request, principal: CurrentSession):
-    async with workspace_access(principal.user.id, workspace_id, get_settings(request), manage=True) as (db, _, _):
-        rows = (
-            await db.scalars(
-                select(AuditLog)
-                .where(AuditLog.tenant_id == workspace_id)
-                .order_by(AuditLog.occurred_at.desc(), AuditLog.id.desc())
-                .limit(100)
-            )
-        ).all()
-        staff = {
-            str(m.id): m.name for m in (await db.scalars(select(Staff).where(Staff.tenant_id == workspace_id))).all()
-        }
-        return [
-            WorkspaceAuditOut(
-                id=str(row.id),
-                action=row.action,
-                actor=staff.get(row.actor_id, row.actor_type),
-                occurred_at=row.occurred_at.isoformat(),
-            )
-            for row in rows
         ]

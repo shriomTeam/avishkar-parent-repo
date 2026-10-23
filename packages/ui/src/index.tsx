@@ -137,3 +137,4 @@ export const formatCents = (cents: number) =>
 export { Brand, Field, Select, FormError } from "./auth";
 export { ProductCard, ProductGrid, navigationItemStyles } from "./workspace";
 export { AccountMenu } from "./account-menu";
+export { Pagination } from "./pagination";

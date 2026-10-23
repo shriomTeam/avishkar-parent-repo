@@ -150,3 +150,29 @@ failures are `test_bad_tool_definitions_are_refused_with_a_message_staff_can_act
 suite: requests expected to return 422 instead returned 201. Root cause has not
 been established in this audit review. This run does not establish a clean full
 suite or release readiness; the failures need investigation before merge.
+
+## Audit history follow-up
+
+The Settings audit table now has 50-row pages, inclusive workspace-local date
+filters, exact Actor/Event filters and CSV downloads of all matching history.
+The CSV endpoint uses 500-row batches, a fixed maximum event ID and the same
+workspace manager checks; CSV text is protected against spreadsheet formulas.
+A concurrent tenant/time/ID index migration supports the history queries.
+
+Validation for this follow-up:
+
+- Auth/invitation/workspace API suite: 21 passed, including the new audit regression.
+  It covers 556 events, tied timestamps, page boundaries, timezone day boundaries,
+  combined filters, exports crossing the 500-row batch boundary, formula escaping,
+  invalid inputs, foreign workspace denial and all five membership roles.
+- Existing Settings browser journey passed. The new audit browser journey passed
+  pagination, actor/event filters, full-history and date-filtered CSV downloads,
+  clearing filters and mobile layout.
+- Production frontend build, TypeScript, web ESLint, targeted Ruff checks/format,
+  architecture boundaries and the single migration-head check pass. The index migration was applied to the
+  disposable validation database.
+- Browser tests use a separate Next output directory so local development can
+  continue while those tests run. Node runtime configuration was not changed.
+
+The earlier three Voice tool URL validation failures remain outside this change;
+this follow-up does not claim a clean full-repository test rerun.

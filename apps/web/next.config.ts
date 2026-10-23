@@ -7,6 +7,8 @@ const config: NextConfig = {
   devIndicators: { position: "bottom-right" },
   transpilePackages: ["@clinic/ui", "@clinic/api-client", "@clinic/core"],
   output: "standalone",
+  // Keep browser verification independent of a running local development server.
+  distDir: process.env.PLAYWRIGHT_TEST_OUTPUT === "1" ? ".next/playwright" : ".next",
   // Next buffers a proxied (rewritten) request body and cuts it off at 10 MB by default, which then fails the
   // request. Dormant patients' Import CSV posts files up to 25 MB through /api/platform, so allow 30 MB.
   experimental: { proxyClientMaxBodySize: "30mb", agentUpgrade: "security" },

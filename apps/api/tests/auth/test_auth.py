@@ -299,7 +299,7 @@ async def test_workspace_settings_enforce_membership_roles_csrf_and_audit(system
     assert (await client.get(path + "/settings")).json()["address"] == "Bengaluru"
     assert (await client.get("/api/v1/auth/me")).json()["workspace"]["name"] == "Updated clinic"
     assert len((await client.get(path + "/members")).json()) == 1
-    events = (await client.get(path + "/audit")).json()
+    events = (await client.get(path + "/audit")).json()["items"]
     assert any(event["action"] == "workspace.updated" for event in events)
     foreign_id = uuid.uuid4()
     async with system_session(database_url=app.state.settings.database_system_url) as db:
@@ -958,3 +958,92 @@ async def test_office_manager_cannot_reinvite_removed_manager_as_lower_role(syst
                 json={"email": "removed-manager@example.com", "role": "front_desk"},
             )
         ).status_code == 403
+
+
+async def test_audit_history_filters_pagination_export_and_permissions(system):
+    import csv
+    import io
+    from datetime import UTC, datetime
+
+    from clinic_db.models.core import Staff, Tenant
+    from clinic_db.models.ops import AuditLog
+
+    app, client = system
+    await login(client)
+    workspace = (
+        await client.post(
+            "/api/v1/workspaces",
+            headers=await headers(client),
+            json={"name": "Audit clinic", "timezone": "Asia/Kolkata"},
+        )
+    ).json()
+    wid = uuid.UUID(workspace["id"])
+    path = f"/api/v1/workspaces/{wid}/audit"
+    instant = datetime(2026, 10, 22, 18, 30, tzinfo=UTC)  # Oct 23 midnight in clinic timezone
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        member = await db.scalar(select(Staff).where(Staff.tenant_id == wid))
+        member.name = '=HYPERLINK("evil")'
+        actor_id = str(member.id)
+        foreign_id = uuid.uuid4()
+        db.add(Tenant(id=foreign_id, name="Other clinic", timezone="UTC", clinic_type="wellness"))
+        await db.flush()
+        for _ in range(555):
+            db.add(
+                AuditLog(
+                    tenant_id=wid,
+                    actor_type="staff",
+                    actor_id=actor_id,
+                    action="member.role_changed",
+                    occurred_at=instant,
+                )
+            )
+        db.add(
+            AuditLog(
+                tenant_id=wid, actor_type="system", action="workspace.updated", occurred_at=instant + timedelta(days=1)
+            )
+        )
+        db.add(AuditLog(tenant_id=foreign_id, actor_type="system", action="foreign.secret", occurred_at=instant))
+    result = await client.get(path)
+    assert result.status_code == 200, result.text
+    first = result.json()
+    assert first["total"] == 556 and first["page_size"] == 50 and len(first["items"]) == 50
+    second = (await client.get(path, params={"page": 2})).json()
+    assert not ({x["id"] for x in first["items"]} & {x["id"] for x in second["items"]})
+    assert len((await client.get(path, params={"page": 12})).json()["items"]) == 6
+    query = {
+        "start_date": "2026-10-23",
+        "end_date": "2026-10-23",
+        "actor": f"staff:{actor_id}",
+        "action": "member.role_changed",
+    }
+    filtered = (await client.get(path, params=query)).json()
+    assert filtered["total"] == 555
+    assert (await client.get(path, params={"end_date": "2026-10-22"})).json()["total"] == 0
+    assert (await client.get(path, params={"start_date": "2026-10-24"})).json()["total"] == 1
+    assert (await client.get(path, params={"action": "foreign.secret"})).json()["total"] == 0
+    opts = (await client.get(path + "/options")).json()
+    assert "foreign.secret" not in opts["events"]
+    assert {"value": f"staff:{actor_id}", "label": '=HYPERLINK("evil")'} in opts["actors"]
+    download = await client.get(path + "/export", params=query)
+    assert download.status_code == 200 and "attachment" in download.headers["content-disposition"]
+    assert "no-store" in download.headers["cache-control"]
+    records = list(csv.DictReader(io.StringIO(download.text.lstrip("\ufeff"))))
+    assert len(records) == 555 and len({row["ID"] for row in records}) == 555
+    assert all(row["Actor"].startswith("'=") for row in records)
+    assert len(list(csv.DictReader(io.StringIO((await client.get(path + "/export")).text.lstrip("\ufeff"))))) == 556
+    for suffix in ("", "/export"):
+        assert (
+            await client.get(path + suffix, params={"start_date": "2026-10-24", "end_date": "2026-10-23"})
+        ).status_code == 422
+        assert (await client.get(path + suffix, params={"actor": "invalid"})).status_code == 422
+        assert (await client.get(path + suffix, params={"end_date": "9999-12-31"})).status_code == 422
+    assert (await client.get(path, params={"page": 0})).status_code == 422
+    for suffix in ("", "/options", "/export"):
+        assert (await client.get(f"/api/v1/workspaces/{foreign_id}/audit" + suffix)).status_code == 403
+    for role in ("office_manager", "front_desk", "provider", "consultant"):
+        async with system_session(database_url=app.state.settings.database_system_url) as db:
+            member = await db.scalar(select(Staff).where(Staff.tenant_id == wid))
+            member.role = role
+        for suffix in ("", "/options", "/export"):
+            response = await client.get(path + suffix)
+            assert response.status_code == (200 if role == "office_manager" else 403)
