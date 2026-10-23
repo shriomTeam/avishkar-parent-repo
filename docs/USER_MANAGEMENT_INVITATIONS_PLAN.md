@@ -444,12 +444,33 @@ permission and browser suites pass. Verify deleting Voice Receptionist leaves
 invitations, email templates and workspace administration functional. Document
 operational alerts for delayed/failed deliveries and suspicious invite activity.
 
-## 11. Inputs still needed
+## 11. Confirmed deployment inputs and remaining setup
+
+The user confirmed this production application origin:
+
+```text
+PUBLIC_APP_ORIGIN=https://prod-avishkar-web-287171356403.us-east1.run.app
+```
+
+The provided `/voice-receptionist` suffix is a feature route, not part of the
+origin. Build invitation links from `/invite` at the app root. Keep localhost
+configuration unchanged for local development, and configure the Google callback
+consistently in the production environment.
+
+The user has created a SendGrid account/API key but has not configured sender or
+domain authentication. Initial test sends may use the signup address after
+**Single Sender Verification**. Account creation/API-key creation alone does not
+verify that address as a sending identity. Default sender display name: Avishkar.
+The exact From email is still needed; it cannot be inferred from the API key.
+Use EMAIL_FROM_ADDRESS / EMAIL_FROM_NAME so switching to a verified branded
+sender later requires configuration changes, not template/provider rewrites.
+Domain authentication remains the recommended production setup.
+
+Remaining inputs:
 
 - SendGrid-verified From email and sender display name; optional Reply-to.
-- Confirmation that sender/domain authentication is complete; key permissions are
-  mail-send only. A set environment variable alone cannot prove either fact.
-- Production PUBLIC_APP_ORIGIN, distinct from local localhost links.
+- Single Sender Verification for initial testing, followed by domain
+  authentication for production; confirm the key has mail-send permissions.
 - Final business approval of the role/action matrix and any within-clinic record
   restrictions. Proposed invite grant rules above are the starting defaults.
 - Production secret/worker provisioning ownership; verification webhook decision.
@@ -466,6 +487,7 @@ for this plan. External references guide provider/identity/security details:
 
 - [SendGrid Mail Send](https://www.twilio.com/docs/sendgrid/api-reference/mail-send/mail-send)
 - [SendGrid API key permissions](https://www.twilio.com/docs/sendgrid/api-reference/api-key-permissions)
+- [Single Sender Verification](https://www.twilio.com/docs/sendgrid/ui/sending-email/sender-verification)
 - [Sender domain authentication](https://www.twilio.com/docs/sendgrid/ui/account-and-settings/how-to-set-up-domain-authentication)
 - [SendGrid Event Webhook security](https://www.twilio.com/docs/sendgrid/for-developers/tracking-events/getting-started-event-webhook-security-features)
 - [Google OpenID Connect and stable sub identity](https://developers.google.com/identity/openid-connect/openid-connect)
