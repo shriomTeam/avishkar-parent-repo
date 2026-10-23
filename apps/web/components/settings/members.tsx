@@ -48,6 +48,9 @@ export function Members({
   const [filterRole, setFilterRole] = useState("all");
   const [status, setStatus] = useState("all");
   const [invite, setInvite] = useState(false);
+  const [reinvite, setReinvite] = useState<
+    Schemas["WorkspaceMemberOut"] | null
+  >(null);
   const [edit, setEdit] = useState<Schemas["WorkspaceMemberOut"] | null>(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -106,7 +109,11 @@ export function Members({
               <Button
                 variant="brand"
                 disabled={!invitations.data?.enabled}
-                onClick={() => setInvite(true)}
+                onClick={() => {
+                  setReinvite(null);
+                  setError("");
+                  setInvite(true);
+                }}
               >
                 <Plus size={16} aria-hidden="true" />
                 Invite user
@@ -216,6 +223,19 @@ export function Members({
                         })}
                       </Td>
                       <Td>
+                        {!m.active && m.user_id && roles.includes(m.role) && (
+                          <Button
+                            variant="outline"
+                            disabled={busy || !invitations.data?.enabled}
+                            onClick={() => {
+                              setReinvite(m);
+                              setError("");
+                              setInvite(true);
+                            }}
+                          >
+                            Re-invite {m.name}
+                          </Button>
+                        )}
                         {m.active &&
                           m.user_id !== userId &&
                           roles.includes(m.role) && (
@@ -344,6 +364,7 @@ export function Members({
       {invite && (
         <InviteUser
           roles={roles}
+          member={reinvite}
           error={error}
           onClose={() => setInvite(false)}
           onSend={async (body) => {
@@ -378,6 +399,7 @@ export function Members({
 }
 function InviteUser({
   roles,
+  member,
   error,
   onClose,
   onSend,
@@ -386,15 +408,21 @@ function InviteUser({
   onClose: () => void;
   onSend: (body: { email: string; role: string }) => Promise<boolean>;
   error: string;
+  member: Schemas["WorkspaceMemberOut"] | null;
 }) {
   const [role, setRole] = useState(
-    roles.includes("front_desk") ? "front_desk" : (roles[0] ?? ""),
+    member?.role ??
+      (roles.includes("front_desk") ? "front_desk" : (roles[0] ?? "")),
   );
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(member?.email ?? "");
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   return (
-    <Dialog title="Invite user" onClose={onClose} placement="right">
+    <Dialog
+      title={member ? "Re-invite member" : "Invite user"}
+      onClose={onClose}
+      placement="right"
+    >
       <form
         className="flex min-h-[calc(100dvh-130px)] flex-col"
         onSubmit={async (e) => {
@@ -409,8 +437,9 @@ function InviteUser({
         }}
       >
         <p className="mb-6 text-sm text-muted">
-          Give someone access to this workspace. They must sign in with the
-          invited email and accept before they can access it.
+          {member
+            ? "Send a fresh invitation to restore this member’s access. They stay inactive until they sign in with their original account and accept. Choose the role they should have when they return."
+            : "Give someone access to this workspace. They must sign in with the invited email and accept before they can access it."}
         </p>
         <TextField
           label="Email address"
@@ -418,6 +447,7 @@ function InviteUser({
           required
           maxLength={254}
           value={email}
+          readOnly={Boolean(member)}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="name@clinic.com"
           autoComplete="email"
@@ -430,8 +460,8 @@ function InviteUser({
           disabled={busy}
         />
         <Note>
-          The invitation email includes its expiry time. Access is limited by the
-          assigned role and this workspace’s enabled products.
+          The invitation email includes its expiry time. Access is limited by
+          the assigned role and this workspace’s enabled products.
         </Note>
         {failed && (
           <Alert>
@@ -449,7 +479,7 @@ function InviteUser({
               Cancel
             </Button>
             <Button type="submit" variant="brand" disabled={busy || !role}>
-              {busy ? "Queuing…" : "Send invitation"}
+              {busy ? "Sending…" : "Send invitation"}
             </Button>
           </DialogActions>
         </div>

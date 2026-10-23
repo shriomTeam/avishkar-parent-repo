@@ -5,7 +5,7 @@ import uuid
 from datetime import timedelta
 
 from fastapi import HTTPException
-from sqlalchemy import select, update
+from sqlalchemy import or_, select, update
 
 from clinic_core.auth.security import digest, now, random_token
 from clinic_core.tenancy.permissions import grantable_roles, require_grant
@@ -49,8 +49,13 @@ async def create_invitation(db, tenant, actor, *, email, role, settings):
     email = normalize_email(email)
     staff = await db.scalar(select(Staff).where(Staff.tenant_id == tenant.id, Staff.email == email))
     if staff:
-        # Imported unlinked active staff may join only with exactly the recorded role.
-        if staff.user_id or not staff.active or staff.role != role:
+        if not staff.active and staff.user_id:
+            # Re-inviting never restores access until the original account accepts.
+            # Check the old role too: managers cannot bypass manager/Owner protection
+            # by requesting a lower role for the removed member.
+            require_grant(actor.role, staff.role)
+        elif staff.user_id or not staff.active or staff.role != role:
+            # Imported unlinked active staff may join only with the recorded role.
             raise HTTPException(409, detail="member_already_exists_or_requires_review")
     existing = await db.scalar(
         select(Invitation).where(
@@ -216,13 +221,24 @@ async def accept(db, context, principal, verification_code=None):
     user = await db.get(User, principal.user.id)
     if not user or not user.active:
         raise HTTPException(403, detail="account_disabled")
-    member = await db.scalar(select(Staff).where(Staff.tenant_id == tenant.id, Staff.user_id == user.id))
-    if member:
-        raise HTTPException(409, detail="member_already_exists")
+    member = await db.scalar(
+        select(Staff).where(Staff.tenant_id == tenant.id, Staff.user_id == user.id).with_for_update()
+    )
     imported = await db.scalar(
         select(Staff).where(Staff.tenant_id == tenant.id, Staff.email == invite.email).with_for_update()
     )
-    if imported:
+    restored = False
+    if member:
+        if member.active:
+            raise HTTPException(409, detail="member_already_exists")
+        if not imported or imported.id != member.id:
+            raise HTTPException(409, detail="membership_requires_review")
+        inviter = await db.get(Staff, invite.invited_by)
+        require_grant(inviter.role, member.role)
+        member.active, member.role = True, invite.role
+        restored = True
+    elif imported:
+        # Never transfer a removed account's membership to a different Google identity.
         if imported.user_id or not imported.active or imported.role != invite.role:
             raise HTTPException(409, detail="membership_requires_review")
         imported.user_id = user.id
@@ -259,6 +275,8 @@ async def accept(db, context, principal, verification_code=None):
     await cancel_deliveries(db, invite)
     await db.flush()
     record(db, tenant.id, member.id, "invitation.accepted", invite.id)
+    if restored:
+        record(db, tenant.id, member.id, "member.restored", member.id, entity_type="staff")
     return tenant
 
 
@@ -281,10 +299,18 @@ async def change_member(db, tenant, actor, member_id, *, role=None, deactivate=F
         raise HTTPException(422, detail="role_required")
     # Pending grants are invalidated when their creator loses their grant authority.
     pending = (
-        await db.scalars(select(Invitation).where(Invitation.invited_by == member.id, Invitation.status == "pending"))
+        await db.scalars(
+            select(Invitation).where(
+                Invitation.tenant_id == tenant.id,
+                Invitation.status == "pending",
+                or_(Invitation.invited_by == member.id, Invitation.email == member.email if deactivate else False),
+            )
+        )
     ).all()
     for invite in pending:
-        if not member.active or invite.role not in grantable_roles(member.role):
+        if (deactivate and invite.email == member.email) or (
+            invite.invited_by == member.id and (not member.active or invite.role not in grantable_roles(member.role))
+        ):
             invite.status = "revoked"
             await cancel_deliveries(db, invite)
     record(

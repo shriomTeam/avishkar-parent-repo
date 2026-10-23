@@ -190,6 +190,9 @@ does not send real emails.
 To test, open **account menu → Settings → User management → Invite user** and use
 an email that is not already a workspace member. The recipient opens the email,
 signs in with that email and accepts to join the **existing workspace**.
+To restore someone you removed, filter members by **Inactive**, click
+**Re-invite <name>**, choose their new role and send a fresh invitation. Access
+returns only after the original account accepts; their membership is reused.
 
 | Email delivery status | Meaning / next step |
 |---|---|

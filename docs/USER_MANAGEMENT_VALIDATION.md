@@ -111,3 +111,21 @@ for PR review with the development-tooling advisory explicitly disclosed above.
 Production readiness remains conditional on the listed environment rollout and
 smoke tests. No push, pull request creation, deployment or infrastructure apply
 is implied by this local sign-off.
+
+## Re-invitation follow-up
+
+Removed members can now receive a fresh invitation and reactivate their existing
+membership only after the original Google identity accepts. The new invitation
+sets the restored role. Removal revokes older outstanding invitations to that
+email; old accepted links cannot reactivate an inactive member. Original manager
+roles remain protected against lower-role re-invitation by an office manager.
+No database migration is introduced.
+
+Follow-up verification: **777 Python tests** (including **20 auth/invitation
+integration tests**) pass. The extended browser journey removes a member,
+re-invites them, verifies access is still denied while pending, then accepts and
+checks the original user/workspace/membership IDs are preserved. It passes.
+TypeScript, ESLint, Ruff checks, production build and boundaries pass. The earlier
+full browser/removal runs above describe the base implementation; this follow-up
+reruns the affected complete invitation journey rather than claiming a new run of
+all 85 browser tests.

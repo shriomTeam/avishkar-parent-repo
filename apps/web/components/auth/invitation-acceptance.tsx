@@ -30,6 +30,10 @@ const errors: Record<string, string> = {
   rate_limited: "Too many attempts. Please wait before trying again.",
   member_already_exists:
     "You already belong to this workspace. Return to the app and choose your workspace.",
+  membership_requires_review:
+    "This membership requires the original Google account. Sign in with that account or contact the workspace owner.",
+  role_grant_denied:
+    "The inviter can no longer restore this membership with the requested role. Ask the workspace owner for a new invitation.",
   invitations_not_configured:
     "Invitations are not configured for this environment yet.",
 };

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("an invited Google account joins the existing workspace and owner can remove access", async ({
+test("an invited account joins, loses access and accepts a re-invitation into the same membership", async ({
   browser,
   page,
   request,
@@ -94,5 +94,50 @@ test("an invited Google account joins the existing workspace and owner can remov
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   expect((await guest.request.get("/api/platform/me")).status()).toBe(403);
+  const beforeRemoval = await page.request.get(
+    `/api/v1/workspaces/${auth.workspace.id}/members`,
+  );
+  const removedMember = (await beforeRemoval.json()).find(
+    (m: { user_id: string }) => m.user_id === joined.user.id,
+  );
+  await page
+    .getByRole("button", { name: "Re-invite Browser Owner", exact: true })
+    .click();
+  const reinvite = page.getByRole("dialog", { name: "Re-invite member" });
+  await expect(reinvite.getByLabel("Email address")).toHaveValue(
+    "browser@example.com",
+  );
+  await expect(reinvite.getByLabel("Email address")).toHaveAttribute(
+    "readonly",
+    "",
+  );
+  await reinvite.getByRole("button", { name: "Send invitation" }).click();
+  await expect(reinvite).toHaveCount(0);
+  expect((await guest.request.get("/api/platform/me")).status()).toBe(403);
+  const redelivery = await request.get("http://127.0.0.1:8001/_test/emails");
+  const resent = ((await redelivery.json()) as { to: string; text: string }[])
+    .filter((m) => m.to === "browser@example.com")
+    .at(-1)!;
+  const freshLink = resent.text.match(/https?:\/\/\S+\/invite#token=\S+/)![0];
+  expect(freshLink).not.toBe(link);
+  await guest.goto(freshLink);
+  await guest
+    .getByRole("button", { name: "Accept invitation", exact: true })
+    .click();
+  await expect(guest).toHaveURL(/\/$/);
+  const restored = await guest.request.get("/api/v1/auth/me");
+  const restoredAuth = await restored.json();
+  expect(restoredAuth.user.id).toBe(joined.user.id);
+  expect(restoredAuth.workspace.id).toBe(auth.workspace.id);
+  expect(restoredAuth.memberships).toHaveLength(1);
+  const afterRestore = await page.request.get(
+    `/api/v1/workspaces/${auth.workspace.id}/members`,
+  );
+  const returned = (await afterRestore.json()).filter(
+    (m: { user_id: string }) => m.user_id === joined.user.id,
+  );
+  expect(returned).toHaveLength(1);
+  expect(returned[0].id).toBe(removedMember.id);
+  expect(returned[0].active).toBe(true);
   await recipient.close();
 });

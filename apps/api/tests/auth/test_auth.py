@@ -800,3 +800,158 @@ async def test_office_manager_grants_are_scoped_and_demotion_revokes_pending_inv
                 )
             )
             assert audit.entity_type == "staff" and audit.entity_id == manager_id
+
+
+async def test_reinvite_restores_original_membership_only_after_fresh_acceptance(system):
+    from sqlalchemy import func
+
+    from clinic_db.models.core import Staff
+    from clinic_db.models.membership import Invitation
+    from clinic_db.models.ops import AuditLog
+
+    app, owner, csrf, workspace = await invitation_setup(system)
+    subject = "returning" + uuid.uuid4().hex
+    base = f"/api/v1/workspaces/{workspace['id']}"
+    invitation_data = {"email": subject + "@example.com", "role": "office_manager"}
+    assert (await owner.post(base + "/invitations", headers=csrf, json=invitation_data)).status_code == 201
+    original_token = await invitation_link(app)
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app, client=(uuid.uuid4().hex, 123)), base_url="http://localhost:3000"
+    ) as user:
+        await user.post("/api/v1/invitations/context", headers=csrf, json={"token": original_token})
+        await login(user, subject)
+        user_csrf = await headers(user)
+        old_context = user.cookies.get("avishkar_invitation")
+        assert (await user.post("/api/v1/invitations/accept", headers=user_csrf, json={})).status_code == 200
+        identity = (await user.get("/api/v1/auth/me")).json()
+        member = next(m for m in (await owner.get(base + "/members")).json() if m["user_id"] == identity["user"]["id"])
+        member_id = member["id"]
+        # A legacy outstanding grant must also be invalidated when access is removed.
+        stale_token = uuid.uuid4().hex + uuid.uuid4().hex
+        async with system_session(database_url=app.state.settings.database_system_url) as db:
+            inviter = await db.scalar(
+                select(Staff).where(Staff.tenant_id == uuid.UUID(workspace["id"]), Staff.role == "owner")
+            )
+            db.add(
+                Invitation(
+                    tenant_id=inviter.tenant_id,
+                    email=invitation_data["email"],
+                    role="front_desk",
+                    invited_by=inviter.id,
+                    token_hash=digest(stale_token),
+                    generation=1,
+                    status="pending",
+                    expires_at=now() + timedelta(hours=1),
+                    last_sent_at=now(),
+                )
+            )
+        assert (
+            await owner.post(base + "/members/" + member_id, headers=csrf, json={"deactivate": True})
+        ).status_code == 200
+        assert (await user.get("/me")).status_code == 403
+        assert (
+            await user.post("/api/v1/invitations/context", headers=user_csrf, json={"token": stale_token})
+        ).status_code == 410
+        reinvite = {**invitation_data, "role": "front_desk"}
+        assert (await owner.post(base + "/invitations", headers=csrf, json=reinvite)).status_code == 201
+        assert (await owner.post(base + "/invitations", headers=csrf, json=reinvite)).status_code == 409
+        fresh_token = await invitation_link(app)
+        assert fresh_token != original_token
+        # Issuing the new invitation does not reactivate membership or make old accepts usable.
+        user.cookies.set("avishkar_invitation", old_context, domain="localhost.local", path="/")
+        assert (await user.post("/api/v1/invitations/accept", headers=user_csrf, json={})).status_code == 403
+        assert (await user.get("/me")).status_code == 403
+
+        class ReassignedGoogle(InvitationGoogle):
+            async def identity(self, code, nonce, verifier):
+                claims = await super().identity(code, nonce, verifier)
+                if code == "reassigned":
+                    claims["email"] = invitation_data["email"]
+                return claims
+
+        app.state.google = ReassignedGoogle()
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app, client=(uuid.uuid4().hex, 123)), base_url="http://localhost:3000"
+        ) as other:
+            await other.post("/api/v1/invitations/context", headers=csrf, json={"token": fresh_token})
+            await login(other, "reassigned")
+            assert (
+                await other.post("/api/v1/invitations/accept", headers=await headers(other), json={})
+            ).status_code == 409
+            assert (await other.get("/me")).status_code == 403
+        await user.post("/api/v1/invitations/context", headers=user_csrf, json={"token": fresh_token})
+        requests = [
+            user.build_request("POST", "/api/v1/invitations/accept", headers=user_csrf, json={}) for _ in range(2)
+        ]
+        accepted = await asyncio.gather(*(user.send(request) for request in requests))
+        assert [r.status_code for r in accepted] == [200, 200], [r.text for r in accepted]
+        restored = (await user.get("/api/v1/auth/me")).json()
+        assert restored["workspace"]["id"] == workspace["id"]
+        assert restored["memberships"][0]["role"] == "front_desk"
+        assert len(restored["memberships"]) == 1
+        assert (await user.get(base + "/members")).status_code == 403  # Old manager rights were not restored.
+        async with system_session(database_url=app.state.settings.database_system_url) as db:
+            rows = (
+                await db.scalars(
+                    select(Staff).where(
+                        Staff.tenant_id == uuid.UUID(workspace["id"]),
+                        Staff.user_id == uuid.UUID(identity["user"]["id"]),
+                    )
+                )
+            ).all()
+            assert len(rows) == 1 and str(rows[0].id) == member_id and rows[0].active
+            assert (
+                await db.scalar(
+                    select(func.count())
+                    .select_from(AuditLog)
+                    .where(AuditLog.tenant_id == uuid.UUID(workspace["id"]), AuditLog.action == "member.restored")
+                )
+                == 1
+            )
+
+
+async def test_office_manager_cannot_reinvite_removed_manager_as_lower_role(system):
+    from clinic_db.models.core import Staff
+
+    app, owner, csrf, workspace = await invitation_setup(system)
+    base = f"/api/v1/workspaces/{workspace['id']}"
+    subject = "manager" + uuid.uuid4().hex
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app, client=(uuid.uuid4().hex, 123)), base_url="http://localhost:3000"
+    ) as manager:
+        await login(manager, subject)
+        identity = (await manager.get("/api/v1/auth/me")).json()
+        async with app.state.session_factory() as auth_db:
+            removed_user = User(email="removed-manager@example.com", display_name="Removed manager")
+            auth_db.add(removed_user)
+            await auth_db.flush()
+            removed_user_id = removed_user.id
+            await auth_db.commit()
+        async with system_session(database_url=app.state.settings.database_system_url) as db:
+            db.add(
+                Staff(
+                    tenant_id=uuid.UUID(workspace["id"]),
+                    user_id=uuid.UUID(identity["user"]["id"]),
+                    email=subject + "@example.com",
+                    name="Active manager",
+                    role="office_manager",
+                    active=True,
+                )
+            )
+            db.add(
+                Staff(
+                    tenant_id=uuid.UUID(workspace["id"]),
+                    user_id=removed_user_id,
+                    email="removed-manager@example.com",
+                    name="Removed manager",
+                    role="office_manager",
+                    active=False,
+                )
+            )
+        assert (
+            await manager.post(
+                base + "/invitations",
+                headers=await headers(manager),
+                json={"email": "removed-manager@example.com", "role": "front_desk"},
+            )
+        ).status_code == 403

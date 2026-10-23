@@ -12,8 +12,9 @@ a workspace selector. The selected workspace is stored on the server-side sessio
 An Owner can invite Office managers, Front desk, Providers and Consultants. An
 Office manager can invite/manage Front desk, Providers and Consultants. Nobody
 can grant Owner, remove/demote an Owner, or change their own membership here.
-Ownership transfer is intentionally outside this interface. Disabled memberships
-are not silently reactivated. Resend rotates the token; revoke invalidates it.
+Ownership transfer is intentionally outside this interface. Removed memberships
+stay inactive until a fresh re-invitation is accepted. Resend rotates the token;
+revoke invalidates it.
 The UI lists the latest 100 invitations with provider submission status.
 
 Front desk can read voice calls/transcripts/recordings and reactivation summaries
@@ -30,6 +31,25 @@ running a configured tool, and fail closed when validation is unavailable.
 Client session refresh redirects on role/workspace changes, rather than retaining
 an outdated management interface. There is no claim of a completed penetration
 test or a guarantee against every future security defect.
+
+## Re-invite a removed member
+
+1. Open **Settings → User management** and use the **Inactive** status filter if needed.
+2. Click **Re-invite <name>** on the removed member. Their email is prefilled and
+   read-only; select the role they should have when they return.
+3. Send the invitation. The member stays inactive until they open the fresh link,
+   sign in with the original Google account and accept.
+
+Acceptance reactivates the same membership ID in the same workspace and uses the
+new invitation's role; it does not create a duplicate member or restore old roles
+implicitly. A different Google identity cannot take over an inactive membership,
+even if it now owns the same email address. Owners can re-invite removed office
+managers; office managers cannot bypass that restriction by choosing a lower role.
+Owner memberships and inactive imported records without a linked user remain
+protected. Duplicate pending invitations use the existing Resend/Revoke actions.
+Removing access also revokes outstanding invitations to that member, so old
+pending links cannot restore access. Restoration emits a `member.restored` audit
+record. No database migration is needed for this flow.
 
 ## Email configuration
 
