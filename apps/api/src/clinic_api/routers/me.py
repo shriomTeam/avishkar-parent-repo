@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from clinic_core.api import RequestContext, get_request_context, get_session
 from clinic_core.entitlements import enabled_feature_keys
 from clinic_core.features import load_features
+from clinic_core.tenancy.permissions import can_use_feature
 from clinic_db.models.core import Tenant
 
 router = APIRouter(tags=["platform"])
@@ -23,6 +24,7 @@ class FeatureOut(BaseModel):
     name: str
     description: str
     enabled: bool
+    accessible: bool
     trial_eligible: bool
     phi_sensitive: bool
 
@@ -55,6 +57,7 @@ async def me(ctx: RequestContext = Depends(get_request_context), session: AsyncS
                 name=f.name,
                 description=f.description,
                 enabled=f.key in enabled,
+                accessible=can_use_feature(ctx.role, f.key),
                 trial_eligible=f.trial_eligible,
                 phi_sensitive=f.phi_sensitive,
             )
@@ -63,7 +66,7 @@ async def me(ctx: RequestContext = Depends(get_request_context), session: AsyncS
         nav=[
             NavItemOut(feature=f.key, label=item.label, path=item.path)
             for f in features.values()
-            if f.key in enabled
+            if f.key in enabled and can_use_feature(ctx.role, f.key)
             for item in f.nav
             if not item.roles or ctx.role in item.roles
         ],

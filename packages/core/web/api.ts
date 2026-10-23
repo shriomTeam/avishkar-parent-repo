@@ -41,6 +41,16 @@ export async function getMe(): Promise<Me | null> {
 }
 export async function requireFeature(key: string): Promise<Me> {
   const me = await getMe();
-  if (!me || !me.features.find((f) => f.key === key && f.enabled)) notFound();
+  if (
+    !me ||
+    !me.features.find((f) => f.key === key && f.enabled && f.accessible)
+  )
+    notFound();
+  return me;
+}
+
+export async function requireManagement() {
+  const me = await getMe();
+  if (!me || !["owner", "office_manager"].includes(me.role)) notFound();
   return me;
 }

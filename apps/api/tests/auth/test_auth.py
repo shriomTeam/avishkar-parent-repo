@@ -330,3 +330,473 @@ async def test_workspace_settings_enforce_membership_roles_csrf_and_audit(system
         member = await db.scalar(select(Staff).where(Staff.user_id == user_id))
         member.active = False
     assert (await client.get(path + "/settings")).status_code == 403
+
+
+class InvitationGoogle(FakeGoogle):
+    async def identity(self, code, nonce, verifier):
+        return {"sub": code, "email": code + "@example.com", "name": code, "email_verified": True, "hd": "example.com"}
+
+
+async def invitation_setup(system):
+    from cryptography.fernet import Fernet
+    from pydantic import SecretStr
+
+    app, client = system
+    app.state.google = InvitationGoogle()
+    settings = app.state.settings
+    settings.invitations_enabled = True
+    settings.email_provider = "test"
+    settings.email_payload_encryption_key = SecretStr(Fernet.generate_key().decode())
+    await login(client, "owner" + uuid.uuid4().hex)
+    csrf = await headers(client)
+    workspace = (
+        await client.post("/api/v1/workspaces", headers=csrf, json={"name": "Shared workspace", "timezone": "UTC"})
+    ).json()
+    return app, client, csrf, workspace
+
+
+async def invitation_link(app):
+    from clinic_engagement.email.service import deliver_due
+
+    messages = []
+
+    async def capture(**kwargs):
+        messages.append(kwargs)
+        return "captured"
+
+    await deliver_due(app.state.settings, sender=capture)
+    assert messages
+    import re
+
+    return re.search(r"/invite#token=([^\s]+)", messages[-1]["template"].text).group(1)
+
+
+def feature_denied_status(key):
+    # The platform-removal check also runs this suite without optional features installed.
+    from clinic_core.features import load_features
+
+    return 403 if key in load_features() else 404
+
+
+async def test_invitation_accepts_same_workspace_and_cannot_escalate(system):
+    from sqlalchemy import func
+
+    from clinic_db.models.core import Staff
+    from clinic_db.models.membership import EmailDelivery
+
+    app, owner, csrf, workspace = await invitation_setup(system)
+    recipient = "recipient" + uuid.uuid4().hex
+    base = "/api/v1/workspaces/" + workspace["id"]
+    data = {"email": recipient + "@example.com", "role": "front_desk"}
+    assert (await owner.post(base + "/invitations", json=data)).status_code == 403
+    assert (await owner.post(base + "/invitations", headers=csrf, json={**data, "role": "owner"})).status_code == 403
+    created = await owner.post(base + "/invitations", headers=csrf, json=data)
+    assert created.status_code == 201, created.text
+    assert (await owner.post(base + "/invitations", headers=csrf, json=data)).status_code == 409
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        row = await db.scalar(select(EmailDelivery).where(EmailDelivery.tenant_id == uuid.UUID(workspace["id"])))
+        assert recipient not in row.payload  # recipient and bearer link are encrypted at rest
+    token = await invitation_link(app)
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app, client=(uuid.uuid4().hex, 123)), base_url="http://localhost:3000"
+    ) as user:
+        assert (await user.post("/api/v1/invitations/context", json={"token": token})).status_code == 403
+        assert (
+            await user.post(
+                "/api/v1/invitations/context", headers={"Origin": "http://localhost:3000"}, json={"token": token}
+            )
+        ).status_code == 200
+        result = await login(user, recipient)
+        assert result.headers["location"].endswith("/invite")
+        assert (await user.get("/api/v1/invitations/current")).json()["workspace_name"] == "Shared workspace"
+        user_csrf = await headers(user)
+        result = await user.post("/api/v1/invitations/accept", headers=user_csrf, json={"role": "owner"})
+        assert result.status_code == 422
+        context_cookie = user.cookies.get("avishkar_invitation")
+        requests = [
+            user.build_request("POST", "/api/v1/invitations/accept", headers=user_csrf, json={}) for _ in range(2)
+        ]
+        accepted = await asyncio.gather(*(user.send(request) for request in requests))
+        assert [result.status_code for result in accepted] == [200, 200], [result.text for result in accepted]
+        me = (await user.get("/api/v1/auth/me")).json()
+        assert me["workspace"]["id"] == workspace["id"]
+        assert me["memberships"][0]["role"] == "front_desk"
+        assert len(me["memberships"]) == 1
+        assert (
+            await user.post(
+                base + "/invitations", headers=user_csrf, json={"email": "other@example.com", "role": "office_manager"}
+            )
+        ).status_code == 403
+        assert (await user.get(base + "/members")).status_code == 403
+        assert (await user.get("/me", headers={"X-Tenant-Id": str(uuid.uuid4())})).status_code == 403
+        assert (
+            await user.post("/features/voice_receptionist/inbound/agents", headers=user_csrf, json={})
+        ).status_code in {feature_denied_status("voice_receptionist"), 422}
+        # A lost response/replayed same-browser accept cannot grant another membership.
+        user.cookies.set("avishkar_invitation", context_cookie)
+        assert (await user.post("/api/v1/invitations/accept", headers=user_csrf, json={})).status_code == 200
+        async with system_session(database_url=app.state.settings.database_system_url) as db:
+            # Other packages create tenants concurrently under Turbo. Assert this
+            # recipient received no new owner workspace instead of counting global tenants.
+            assert (
+                await db.scalar(
+                    select(func.count())
+                    .select_from(Staff)
+                    .where(Staff.user_id == uuid.UUID(me["user"]["id"]), Staff.role == "owner")
+                )
+                == 0
+            )
+            staff = await db.scalar(
+                select(Staff).where(
+                    Staff.tenant_id == uuid.UUID(workspace["id"]), Staff.user_id == uuid.UUID(me["user"]["id"])
+                )
+            )
+            staff_id = str(staff.id)
+            from clinic_db.models.ops import AuditLog
+
+            accepted_audit = await db.scalar(
+                select(AuditLog).where(AuditLog.tenant_id == staff.tenant_id, AuditLog.action == "invitation.accepted")
+            )
+            assert accepted_audit.actor_type == "staff" and accepted_audit.actor_id == staff_id
+        assert (
+            await owner.post(base + "/members/" + staff_id, headers=csrf, json={"role": "consultant"})
+        ).status_code == 200
+        assert (await user.get("/features/voice_receptionist/inbound/calls")).status_code == feature_denied_status(
+            "voice_receptionist"
+        )
+        assert (
+            await owner.post(base + "/members/" + staff_id, headers=csrf, json={"deactivate": True})
+        ).status_code == 200
+        assert (await user.post("/api/v1/invitations/accept", headers=user_csrf, json={})).status_code == 403
+
+
+async def test_invitation_wrong_email_resend_revoke_and_expiry(system):
+    from clinic_db.models.membership import Invitation
+
+    app, owner, csrf, workspace = await invitation_setup(system)
+    base = "/api/v1/workspaces/" + workspace["id"]
+    created = await owner.post(
+        base + "/invitations", headers=csrf, json={"email": "intended@example.com", "role": "provider"}
+    )
+    ident = created.json()["id"]
+    token = await invitation_link(app)
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app, client=(uuid.uuid4().hex, 123)), base_url="http://localhost:3000"
+    ) as wrong:
+        await wrong.post(
+            "/api/v1/invitations/context", headers={"Origin": "http://localhost:3000"}, json={"token": token}
+        )
+        await login(wrong, "wrong" + uuid.uuid4().hex)
+        assert (await wrong.get("/api/v1/invitations/current")).status_code == 403
+        assert (
+            await wrong.post("/api/v1/invitations/accept", headers=await headers(wrong), json={})
+        ).status_code == 403
+    assert (await owner.post(base + "/invitations/" + ident + "/resend", headers=csrf)).status_code == 429
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        row = await db.get(Invitation, uuid.UUID(ident))
+        row.last_sent_at = now() - timedelta(minutes=2)
+    assert (await owner.post(base + "/invitations/" + ident + "/resend", headers=csrf)).status_code == 200
+    assert (await owner.post("/api/v1/invitations/context", headers=csrf, json={"token": token})).status_code == 410
+    fresh = await invitation_link(app)
+    assert fresh != token
+    assert (await owner.post(base + "/invitations/" + ident + "/revoke", headers=csrf)).status_code == 200
+    assert (await owner.post("/api/v1/invitations/context", headers=csrf, json={"token": fresh})).status_code == 410
+
+    expired = await owner.post(
+        base + "/invitations", headers=csrf, json={"email": "expired@example.com", "role": "provider"}
+    )
+    expired_token = await invitation_link(app)
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        row = await db.get(Invitation, uuid.UUID(expired.json()["id"]))
+        row.expires_at = now() - timedelta(seconds=1)
+    assert (
+        await owner.post("/api/v1/invitations/context", headers=csrf, json={"token": expired_token})
+    ).status_code == 410
+
+
+async def test_email_transport_template_and_retry(system):
+    from pydantic import SecretStr
+
+    from clinic_engagement.email import send_email
+    from clinic_engagement.email.service import EmailFailure
+    from clinic_engagement.email.template import invitation
+
+    app, _, _, _ = await invitation_setup(system)
+    settings = app.state.settings
+    settings.email_provider, settings.sendgrid_api_key = "sendgrid", SecretStr("test-never-sent")
+    settings.email_from_address = "sender@example.com"
+    content = invitation(
+        workspace='<script>alert("x")</script>',
+        inviter="Owner",
+        role="provider",
+        email="user@example.com",
+        url="https://example.com/invite#token=abc",
+        hours=72,
+    )
+    assert "<script>" not in content.html
+    assert "&lt;script&gt;" in content.html
+
+    def transport(request):
+        import json
+
+        body = json.loads(request.content)
+        assert request.url.host == "api.sendgrid.com"
+        assert body["tracking_settings"]["click_tracking"]["enable"] is False
+        return httpx.Response(202, headers={"X-Message-Id": "test-id"})
+
+    assert (
+        await send_email(
+            to="user@example.com", template=content, settings=settings, transport=httpx.MockTransport(transport)
+        )
+        == "test-id"
+    )
+    with pytest.raises(EmailFailure):
+        await send_email(
+            to="user@example.com",
+            template=content,
+            settings=settings,
+            transport=httpx.MockTransport(lambda _: httpx.Response(403)),
+        )
+
+
+async def test_invitation_existing_user_selects_target_workspace_and_requires_mailbox_proof(system):
+    from clinic_db.models.auth import AuthSession
+    from clinic_engagement.email.service import deliver_due
+
+    app, owner, csrf, workspace = await invitation_setup(system)
+    recipient = "existing" + uuid.uuid4().hex
+    base = "/api/v1/workspaces/" + workspace["id"]
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app, client=(uuid.uuid4().hex, 123)), base_url="http://localhost:3000"
+    ) as user:
+        await login(user, recipient)
+        user_headers = await headers(user)
+        previous = (
+            await user.post(
+                "/api/v1/workspaces", headers=user_headers, json={"name": "Original workspace", "timezone": "UTC"}
+            )
+        ).json()
+        assert (
+            await owner.post(
+                base + "/invitations", headers=csrf, json={"email": recipient + "@example.com", "role": "provider"}
+            )
+        ).status_code == 201
+        token = await invitation_link(app)
+        await user.post("/api/v1/invitations/context", headers=user_headers, json={"token": token})
+        # Non-authoritative Google email claims require a second, current mailbox proof.
+        async with app.state.session_factory() as db:
+            session = await db.scalar(
+                select(AuthSession).where(AuthSession.token_hash == digest(user.cookies.get("avishkar_session")))
+            )
+            session.mailbox_authoritative = False
+            await db.commit()
+        assert (await user.post("/api/v1/invitations/accept", headers=user_headers, json={})).status_code == 403
+        assert (await user.post("/api/v1/invitations/verification", headers=user_headers, json={})).status_code == 200
+        messages = []
+
+        async def capture(**kw):
+            messages.append(kw)
+            return "verified-captured"
+
+        await deliver_due(app.state.settings, sender=capture)
+        import re
+
+        code = re.search(r"\b\d{6}\b", messages[-1]["template"].text).group(0)
+        assert (
+            await user.post(
+                "/api/v1/invitations/accept",
+                headers=user_headers,
+                json={"verification_code": "000000" if code != "000000" else "111111"},
+            )
+        ).status_code == 403
+        accepted = await user.post("/api/v1/invitations/accept", headers=user_headers, json={"verification_code": code})
+        assert accepted.status_code == 200, accepted.text
+        me = (await user.get("/api/v1/auth/me")).json()
+        assert len(me["memberships"]) == 2
+        assert me["workspace"]["id"] == workspace["id"]
+        # Provider does not inherit owner rights from the user's other workspace.
+        assert (await user.get(base + "/members")).status_code == 403
+        assert (await user.get("/features/voice_receptionist/inbound/calls")).status_code == feature_denied_status(
+            "voice_receptionist"
+        )
+        assert (
+            await user.post("/api/v1/auth/workspace", headers=user_headers, json={"workspace_id": str(uuid.uuid4())})
+        ).status_code == 403
+        assert (
+            await user.post("/api/v1/auth/workspace", headers=user_headers, json={"workspace_id": previous["id"]})
+        ).status_code == 200
+        assert (await user.get("/api/v1/auth/me")).json()["workspace"]["id"] == previous["id"]
+        assert (await user.get("/api/v1/workspaces/" + previous["id"] + "/members")).status_code == 200
+
+
+async def test_email_retry_is_durable_and_revocation_stops_queued_delivery(system):
+    from clinic_db.models.membership import EmailDelivery
+    from clinic_engagement.email.service import EmailFailure, deliver_due
+
+    app, owner, csrf, workspace = await invitation_setup(system)
+    result = await owner.post(
+        "/api/v1/workspaces/" + workspace["id"] + "/invitations",
+        headers=csrf,
+        json={"email": "retry@example.com", "role": "front_desk"},
+    )
+    invite_id = uuid.UUID(result.json()["id"])
+
+    async def unavailable(**kw):
+        raise EmailFailure(429, "600")
+
+    await deliver_due(app.state.settings, sender=unavailable)
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        row = await db.scalar(select(EmailDelivery).where(EmailDelivery.invitation_id == invite_id))
+        assert row.status == "retry" and row.payload and row.error == "provider_429"
+        assert row.next_attempt_at >= now() + timedelta(seconds=590)
+        row.next_attempt_at = now() - timedelta(seconds=1)
+    assert (
+        await owner.post(f"/api/v1/workspaces/{workspace['id']}/invitations/{invite_id}/revoke", headers=csrf)
+    ).status_code == 200
+
+    async def never_send(**kw):
+        pytest.fail("Revoked invitations must not be dispatched")
+
+    await deliver_due(app.state.settings, sender=never_send)
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        row = await db.scalar(select(EmailDelivery).where(EmailDelivery.invitation_id == invite_id))
+        assert row.status == "cancelled" and row.payload is None
+
+
+async def test_invitation_sends_immediately_after_commit_and_preserves_retry(system, monkeypatch):
+    from clinic_db.models.membership import EmailDelivery, Invitation
+    from clinic_engagement.email import service
+
+    app, owner, csrf, workspace = await invitation_setup(system)
+    base = f"/api/v1/workspaces/{workspace['id']}/invitations"
+    # Existing backlog must not delay or get dispatched by this request.
+    backlog = await owner.post(base, headers=csrf, json={"email": "backlog@example.com", "role": "provider"})
+    assert backlog.status_code == 201
+    calls = []
+    fail = False
+
+    async def provider(*, to, template, settings):
+        async with system_session(database_url=settings.database_system_url) as db:
+            invite = await db.scalar(
+                select(Invitation).where(Invitation.tenant_id == uuid.UUID(workspace["id"]), Invitation.email == to)
+            )
+            assert invite is not None  # Visible from another connection: enqueue transaction already committed.
+        calls.append(to)
+        if fail:
+            raise service.EmailFailure(429, "600")
+        return "immediate-provider-id"
+
+    monkeypatch.setattr(service, "send_email", provider)
+    app.state.settings.email_provider = "sendgrid"
+    created = await owner.post(base, headers=csrf, json={"email": "immediate@example.com", "role": "front_desk"})
+    assert created.status_code == 201, created.text
+    ident = uuid.UUID(created.json()["id"])
+    assert calls == ["immediate@example.com"]  # No worker/scheduler/captured-dispatch call.
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        delivered = await db.scalar(select(EmailDelivery).where(EmailDelivery.invitation_id == ident))
+        assert delivered.status == "accepted" and delivered.attempts == 1 and delivered.payload is None
+        old = await db.scalar(
+            select(EmailDelivery).where(EmailDelivery.invitation_id == uuid.UUID(backlog.json()["id"]))
+        )
+        assert old.status == "queued" and old.attempts == 0
+        invite = await db.get(Invitation, ident)
+        invite.last_sent_at = now() - timedelta(minutes=2)
+    fail = True
+    resent = await owner.post(f"{base}/{ident}/resend", headers=csrf)
+    assert resent.status_code == 200  # Transient provider errors do not undo the valid invitation.
+    assert calls == ["immediate@example.com", "immediate@example.com"]
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        retry = await db.scalar(
+            select(EmailDelivery).where(EmailDelivery.invitation_id == ident, EmailDelivery.generation == 2)
+        )
+        assert retry.status == "retry" and retry.payload and retry.error == "provider_429"
+        assert retry.next_attempt_at >= now() + timedelta(seconds=590)
+        retry.next_attempt_at = now() - timedelta(seconds=1)
+        delivery_id = retry.id
+    fail = False
+    # Concurrent API/worker wakeups must respect the same lease and submit only once.
+    await asyncio.gather(*(service.deliver_email(delivery_id, app.state.settings) for _ in range(2)))
+    assert calls == ["immediate@example.com"] * 3
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        retry = await db.get(EmailDelivery, delivery_id)
+        assert retry.status == "accepted" and retry.attempts == 2
+
+
+async def test_office_manager_grants_are_scoped_and_demotion_revokes_pending_invites(system):
+    from clinic_core.database import tenant_session
+    from clinic_db.models.core import Staff, Tenant
+    from clinic_db.models.membership import EmailDelivery, Invitation
+
+    app, owner, csrf, workspace = await invitation_setup(system)
+    base = f"/api/v1/workspaces/{workspace['id']}"
+    manager_subject = "manager" + uuid.uuid4().hex
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app, client=(uuid.uuid4().hex, 123)), base_url="http://localhost:3000"
+    ) as manager:
+        await login(manager, manager_subject)
+        identity = (await manager.get("/api/v1/auth/me")).json()
+        async with system_session(database_url=app.state.settings.database_system_url) as db:
+            member = Staff(
+                tenant_id=uuid.UUID(workspace["id"]),
+                user_id=uuid.UUID(identity["user"]["id"]),
+                email=manager_subject + "@example.com",
+                name="Office manager",
+                role="office_manager",
+                active=True,
+            )
+            db.add(member)
+            foreign = Tenant(name="Foreign workspace", timezone="UTC", clinic_type="wellness")
+            db.add(foreign)
+            await db.flush()
+            manager_id, foreign_id = member.id, foreign.id
+            owner_member = await db.scalar(
+                select(Staff).where(Staff.tenant_id == uuid.UUID(workspace["id"]), Staff.role == "owner")
+            )
+            owner_id = owner_member.id
+        manager_csrf = await headers(manager)
+        assert (await manager.get(base + "/members")).status_code == 200
+        for role in ("owner", "office_manager"):
+            assert (
+                await manager.post(
+                    base + "/invitations", headers=manager_csrf, json={"email": "forbidden@example.com", "role": role}
+                )
+            ).status_code == 403
+        for target in (owner_id, manager_id):
+            assert (
+                await manager.post(f"{base}/members/{target}", headers=manager_csrf, json={"deactivate": True})
+            ).status_code == 403
+        foreign_base = f"/api/v1/workspaces/{foreign_id}"
+        assert (await manager.get(foreign_base + "/members")).status_code == 403
+        assert (
+            await manager.post(
+                foreign_base + "/invitations",
+                headers=manager_csrf,
+                json={"email": "other@example.com", "role": "front_desk"},
+            )
+        ).status_code == 403
+        created = await manager.post(
+            base + "/invitations", headers=manager_csrf, json={"email": "allowed@example.com", "role": "front_desk"}
+        )
+        assert created.status_code == 201, created.text
+        invitation_id = uuid.UUID(created.json()["id"])
+        # Runtime-role RLS hides both the invitation and its encrypted email from a different tenant.
+        async with tenant_session(foreign_id, database_url=app.state.settings.database_url) as db:
+            assert await db.get(Invitation, invitation_id) is None
+            assert await db.scalar(select(EmailDelivery).where(EmailDelivery.invitation_id == invitation_id)) is None
+        assert (
+            await owner.post(f"{base}/members/{manager_id}", headers=csrf, json={"role": "front_desk"})
+        ).status_code == 200
+        assert (await manager.get(base + "/members")).status_code == 403
+        async with system_session(database_url=app.state.settings.database_system_url) as db:
+            invite = await db.get(Invitation, invitation_id)
+            delivery = await db.scalar(select(EmailDelivery).where(EmailDelivery.invitation_id == invitation_id))
+            assert invite.status == "revoked"
+            assert delivery.status == "cancelled" and delivery.payload is None
+            from clinic_db.models.ops import AuditLog
+
+            audit = await db.scalar(
+                select(AuditLog).where(
+                    AuditLog.tenant_id == uuid.UUID(workspace["id"]), AuditLog.action == "member.role_changed"
+                )
+            )
+            assert audit.entity_type == "staff" and audit.entity_id == manager_id

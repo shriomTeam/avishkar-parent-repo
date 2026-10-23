@@ -16,11 +16,14 @@ the old `/voice-receptionist/settings` URL redirects to `/settings`.
 - Privacy shows the actual BAA status. Editing workspace details cannot grant a
   BAA, change a plan or modify unrelated tenant configuration.
 
-## Prepared for follow-up
+## User management
 
-- The invitation drawer is a UI preview. Sending is disabled; it does not send
-  email, create members, or grant access. Invitation delivery/acceptance, role
-  updates and member removal still need their management workflows.
+Invitations, acceptance, resend/revoke, role changes and member removal are now
+implemented. See [User management](USER_MANAGEMENT.md) for setup, role rules,
+email delivery and deployment requirements.
+
+## Other follow-up
+
 - Workspace-wide recording/retention enforcement and logo uploads are not added
   by this change. The old voice-specific simulated settings have been removed.
 

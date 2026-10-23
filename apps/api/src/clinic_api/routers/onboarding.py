@@ -32,6 +32,8 @@ def workspace_out(tenant):
 async def onboarding(data: WorkspaceCreate, request: Request, principal: ProtectedWrite, db: DB):
     await limit(db, "workspace:" + str(principal.user.id), 10)
     tenant = await create_workspace(principal.user.id, data, get_settings(request))
+    principal.session.active_workspace_id = tenant.id
+    await db.commit()
     return workspace_out(tenant)
 
 

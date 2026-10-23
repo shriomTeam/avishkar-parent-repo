@@ -15,8 +15,9 @@ export default async function Overview() {
   const me = await getMe();
   if (!me) throw new Error("Unable to load clinic access");
   const navByFeature = new Map(me.nav.map((n) => [n.feature, n]));
-  const active = me.features.filter((f) => f.enabled);
-  const available = me.features.filter((f) => !f.enabled);
+  const visible = me.features.filter((f) => f.accessible);
+  const active = visible.filter((f) => f.enabled);
+  const available = visible.filter((f) => !f.enabled);
   const firstName = auth.user.display_name.trim().split(/\s+/)[0];
   const card = (feature: (typeof me.features)[number]) => {
     const presentation = featurePresentation(feature);
@@ -54,10 +55,12 @@ export default async function Overview() {
         title={firstName ? `Welcome back, ${firstName}.` : "Welcome back."}
         description="Your clinic’s tools, connected in one place."
         actions={
-          <Link href="/import" className={buttonStyles("brand")}>
-            <Upload size={16} aria-hidden="true" />
-            Import data
-          </Link>
+          ["owner", "office_manager"].includes(me.role) && (
+            <Link href="/import" className={buttonStyles("brand")}>
+              <Upload size={16} aria-hidden="true" />
+              Import data
+            </Link>
+          )
         }
       />
       <div className="mb-9 flex flex-wrap items-center gap-3 text-[12px] text-muted">

@@ -96,7 +96,7 @@ test("platform sign-in and onboarding are independent of voice UI", async ({
   await expect(page.getByRole("dialog", { name: "Invite user" })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Send invitation" }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   await page.screenshot({
     path: testInfo.outputPath("settings-invite.png"),
     fullPage: false,

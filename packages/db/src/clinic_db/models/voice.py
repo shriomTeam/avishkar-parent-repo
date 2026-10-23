@@ -69,6 +69,7 @@ class AgentField(IdMixin, TenantMixin, TimestampMixin, Base):
 
 
 class Call(IdMixin, TenantMixin, TimestampMixin, Base):
+    auth_session_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("auth.auth_sessions.id", ondelete="SET NULL"))
     __tablename__ = "calls"
     __table_args__ = (
         Index("ix_voice_calls_tenant_started", "tenant_id", "started_at"),

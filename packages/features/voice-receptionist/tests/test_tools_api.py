@@ -130,7 +130,7 @@ async def test_only_managers_can_add_internal_tools(client):
     t = await create_test_tenant()
     r = await client.post("/inbound/tools/internal", json={"builtin_key": "create_lead"}, headers=_h(t, "front_desk"))
     assert r.status_code == 403
-    assert (await client.get("/inbound/tools/catalog", headers=_h(t, "front_desk"))).status_code == 200
+    assert (await client.get("/inbound/tools/catalog", headers=_h(t, "front_desk"))).status_code == 403
 
 
 async def test_built_in_wording_follows_the_code_until_a_clinic_writes_its_own(client):
@@ -262,11 +262,11 @@ async def test_builtin_tools_keep_their_name_and_arguments_but_allow_a_new_descr
     assert tested.status_code == 409 and "test call" in tested.json()["detail"]
 
 
-async def test_only_managers_can_change_tools_but_front_desk_can_read(client):
+async def test_only_managers_can_read_or_change_tool_configuration(client):
     t = await create_test_tenant()
     tool = await _create(client, t)
     desk = _h(t, "front_desk")
-    assert (await client.get("/inbound/tools", headers=desk)).status_code == 200
+    assert (await client.get("/inbound/tools", headers=desk)).status_code == 403
     assert (await client.post("/inbound/tools", json=_tool(name="x_tool"), headers=desk)).status_code == 403
     assert (await client.put(f"/inbound/tools/{tool['id']}", json=_tool(), headers=desk)).status_code == 403
     assert (await client.delete(f"/inbound/tools/{tool['id']}", headers=desk)).status_code == 403

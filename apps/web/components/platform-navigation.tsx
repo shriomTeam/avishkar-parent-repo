@@ -10,6 +10,7 @@ import {
 } from "@clinic/ui";
 import { ChevronRight, LayoutGrid, Upload, Sparkles } from "lucide-react";
 import { featurePresentation } from "@/lib/feature-presentation";
+import { WorkspaceSwitcher } from "@/components/auth/workspace-switcher";
 import { useAuth } from "@/lib/auth/provider";
 import { initials } from "@/lib/auth/types";
 
@@ -33,7 +34,9 @@ export function PlatformNavigation({
   const { auth, write } = useAuth();
   const items = [
     { path: "/", label: "Overview", icon: LayoutGrid },
-    { path: "/import", label: "Import data", icon: Upload },
+    ...(["owner", "office_manager"].includes(role)
+      ? [{ path: "/import", label: "Import data", icon: Upload }]
+      : []),
     ...nav.map((item) => ({
       ...item,
       icon: featurePresentation({
@@ -69,6 +72,9 @@ export function PlatformNavigation({
             </div>
           </div>
         </div>
+      </div>
+      <div className="px-5">
+        <WorkspaceSwitcher />
       </div>
       <p className="px-7 pb-2 text-[10px] font-semibold tracking-[1.8px] text-muted">
         WORKSPACE

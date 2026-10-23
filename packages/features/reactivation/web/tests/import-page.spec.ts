@@ -84,17 +84,10 @@ test("the Overview and the file results both lead to the import page", async ({ 
   await expect(page.getByTestId("csv-choose")).toBeFocused();
 });
 
-// The page refuses a role that cannot import. The browser role is faked here, so this covers the sidebar and the page
-// as the browser sees them; the server's own check of me.role on this route and the API's 403s are not exercised by a
-// browser test, because the seed cannot create a real front-desk member (see PROGRESS.md).
+// Assign a real role in the disposable database so browser, SSR and API authorization agree.
 test("front desk sees no Import data item, and the page refuses them by URL", async ({ page }) => {
   helper("seed", workspace, ["--scenario", "full"]);
-  await page.route("**/api/v1/auth/me", async (route) => {
-    const response = await route.fetch();
-    const body = await response.json();
-    for (const m of body.memberships) m.role = "front_desk";
-    await route.fulfill({ response, json: body });
-  });
+  helper("front-desk", workspace);
   await page.goto("/reactivation");
   await expect(tid(page, "tile-dormant")).toBeVisible();
   await expect(page.getByRole("link", { name: "Import data" })).toHaveCount(0);

@@ -29,7 +29,7 @@ class ConsoleProvider:
         return SendResult(ok=True, provider_message_id="console")
 
     async def send_email(self, to: str, subject: str, body: str) -> SendResult:
-        log.info("[email -> %s] %s | %s", to, subject, body)
+        log.info("email_not_sent_console_provider")
         return SendResult(ok=True, provider_message_id="console")
 
 
@@ -51,8 +51,32 @@ class TwilioProvider:
         return SendResult(ok=False, error="email provider not configured")
 
 
+class CombinedProvider:
+    """Keep the existing SMS adapter while sharing the configured email transport."""
+
+    def __init__(self, sms):
+        self.sms = sms
+
+    async def send_sms(self, to, body):
+        return await self.sms.send_sms(to, body)
+
+    async def send_email(self, to, subject, body):
+        from html import escape
+
+        from clinic_engagement.email import EmailContent, send_email
+
+        try:
+            ident = await send_email(to=to, template=EmailContent(subject, body, "<p>" + escape(body) + "</p>"))
+            return SendResult(ok=True, provider_message_id=ident)
+        except Exception:
+            return SendResult(ok=False, error="email_provider_unavailable")
+
+
 def get_provider() -> MessagingProvider:
     s = get_settings()
-    if s.messaging_provider == "twilio":
-        return TwilioProvider(s.twilio_account_sid, s.twilio_auth_token, s.twilio_from_number)
-    return ConsoleProvider()
+    sms = (
+        TwilioProvider(s.twilio_account_sid, s.twilio_auth_token, s.twilio_from_number)
+        if s.messaging_provider == "twilio"
+        else ConsoleProvider()
+    )
+    return CombinedProvider(sms) if s.email_provider == "sendgrid" else sms

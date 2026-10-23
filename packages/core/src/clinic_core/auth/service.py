@@ -9,12 +9,13 @@ from clinic_core.settings import Settings
 from clinic_db.models.auth import AuthSession, OAuthTransaction
 
 
-async def start_login(db: AsyncSession, settings: Settings):
+async def start_login(db: AsyncSession, settings: Settings, invitation_context_hash=None):
     state, nonce, verifier, binding = (random_token() for _ in range(4))
     await clean_expired(db)
     db.add(
         OAuthTransaction(
             state_hash=digest(state),
+            invitation_context_hash=invitation_context_hash,
             binding_hash=digest(binding),
             nonce=nonce,
             verifier=verifier,
@@ -33,6 +34,8 @@ async def create_session(db: AsyncSession, claims: dict, settings: Settings, old
     db.add(
         AuthSession(
             user_id=user.id,
+            authenticated_email=claims["email"],
+            mailbox_authoritative=claims["email"].lower().endswith("@gmail.com") or bool(claims.get("hd")),
             token_hash=digest(raw),
             csrf_token_hash=digest(csrf_token(raw)),
             expires_at=now() + timedelta(seconds=settings.session_ttl_seconds),

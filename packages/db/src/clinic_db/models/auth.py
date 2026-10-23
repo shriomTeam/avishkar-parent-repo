@@ -44,6 +44,9 @@ class AuthSession(Record, Base):
     token_hash: Mapped[str] = mapped_column(String(64), unique=True)
     csrf_token_hash: Mapped[str] = mapped_column(String(64))
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    active_workspace_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("core.tenants.id", ondelete="SET NULL"))
+    authenticated_email: Mapped[str | None] = mapped_column(String(320))
+    mailbox_authoritative: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
@@ -51,6 +54,7 @@ class OAuthTransaction(Record, Base):
     __tablename__ = "oauth_transactions"
     __table_args__ = {"schema": "auth"}
     state_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    invitation_context_hash: Mapped[str | None] = mapped_column(String(64))
     binding_hash: Mapped[str] = mapped_column(String(64))
     nonce: Mapped[str] = mapped_column(String(128))
     verifier: Mapped[str] = mapped_column(String(128))

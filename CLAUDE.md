@@ -34,6 +34,7 @@ apps/
     src/clinic_api/routers/
       auth.py                  /api/v1/auth/* Google login and sessions
       onboarding.py            /api/v1/workspaces clinic onboarding
+      invitations.py           scoped invitations, acceptance and member management
     tests/auth/                auth, tenant and entitlement integration tests
     tests/browser_server.py    test-only simulated Google provider
     Dockerfile                 optional API/worker container image
@@ -52,6 +53,7 @@ packages/
     tests/auth/                shared auth unit tests
   integrations/                client data import
   engagement/                  shared SMS and email engine
+    src/clinic_engagement/email/ encrypted durable mail, SendGrid transport, template/ factories
   features/
     reactivation/
       src/                     reactivation backend (analysis engine, runs, CSV import)
@@ -168,3 +170,5 @@ Gotchas:
 ## Checks before a PR
 
 `pnpm lint`, `pnpm test`, `pnpm boundaries`, and `pnpm typecheck` (needs the local DB from `pnpm db:up` and `pnpm db:migrate`). After an API change run `pnpm api-client:generate` and commit the result. For infra: `terraform fmt -recursive` and `terraform validate` from `infra/terraform`.
+
+Workspace invitations and email delivery setup: [docs/USER_MANAGEMENT.md](docs/USER_MANAGEMENT.md). Keep sender credentials server-side and use the shared email templates/service.

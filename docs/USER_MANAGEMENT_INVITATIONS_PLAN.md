@@ -1,6 +1,7 @@
 # Workspace invitations and reusable transactional email
 
-Status: implementation plan, not an implemented invitation feature.
+Status: implemented on `user/management`. This document records the original design;
+see [USER_MANAGEMENT.md](USER_MANAGEMENT.md) for current behavior, setup and rollout.
 Branch: `user/management`. Existing homepage and shared Settings changes were
 committed as `b1bafbe` before this plan was written.
 
@@ -462,7 +463,7 @@ verified sender with the following values:
 
 ```text
 EMAIL_FROM_ADDRESS=abhinav.chaudhary@avishkar.app
-EMAIL_FROM_NAME=Avishkar
+EMAIL_FROM_NAME=Avishkar AI
 EMAIL_REPLY_TO=abhinav.chaudhary@avishkar.app
 ```
 

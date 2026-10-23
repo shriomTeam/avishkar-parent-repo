@@ -26,6 +26,7 @@ from clinic_core.settings import get_settings
 from clinic_db.models.core import TenantFeature
 from clinic_db.models.ops import OutboxEvent
 from clinic_engagement import PLATFORM_EVENT_HANDLERS, run_due, tenants_with_due_work
+from clinic_engagement.email.service import deliver_due
 
 log = logging.getLogger("clinic_worker")
 
@@ -70,6 +71,9 @@ async def process_event(job, token) -> None:
         payload=d["payload"],
         created_at=datetime.fromisoformat(d["created_at"]),
     )
+    if event.type == "email.queued":
+        await deliver_due()
+        return
     handlers = _event_handlers().get(event.type, [])
     if not handlers:
         return
@@ -190,6 +194,7 @@ async def main() -> None:
 
     tasks = [
         asyncio.create_task(_every(RELAY_INTERVAL, relay_outbox_once, stop)),
+        asyncio.create_task(_every(10, deliver_due, stop)),
         asyncio.create_task(_every(ENGAGEMENT_INTERVAL, engagement_tick_once, stop)),
         asyncio.create_task(_every(30, lambda: schedules_tick(redis), stop)),
     ]

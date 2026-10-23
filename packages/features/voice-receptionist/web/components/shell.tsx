@@ -35,6 +35,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useDemo();
   const { auth, write } = useAuth();
+  const memberRole = auth.memberships.find(
+    (m) => m.workspace_id === auth.workspace?.id,
+  )?.role;
+  const manager = memberRole === "owner" || memberRole === "office_manager";
+  const visibleNavigation = navigation.filter(
+    (item) =>
+      manager ||
+      item.path === "/voice-receptionist" ||
+      item.path === "/voice-receptionist/calls",
+  );
   const active = navigation.find((item) =>
     item.path === "/voice-receptionist"
       ? pathname === item.path
@@ -80,7 +90,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           aria-label="Workspace navigation"
           className="max-app:mt-3 max-app:flex max-app:gap-1 max-app:overflow-auto"
         >
-          {navigation.map(({ path, name, icon: Icon }) => {
+          {visibleNavigation.map(({ path, name, icon: Icon }) => {
             const current = active?.path === path;
             return (
               <Link
@@ -138,13 +148,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span className="max-app:hidden">
               <StatusBadge>Live agents &amp; calls</StatusBadge>
             </span>
-            <Link
-              className={buttonStyles("outline", { size: "adaptive" })}
-              href="/voice-receptionist/test"
-            >
-              <Mic size={15} />
-              Test agent
-            </Link>
+            {manager && (
+              <Link
+                className={buttonStyles("outline", { size: "adaptive" })}
+                href="/voice-receptionist/test"
+              >
+                <Mic size={15} />
+                Test agent
+              </Link>
+            )}
           </div>
         </header>
         <main

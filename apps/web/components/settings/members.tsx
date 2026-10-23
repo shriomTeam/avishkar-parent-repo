@@ -20,17 +20,18 @@ import {
   Th,
   Tr,
 } from "@clinic/ui";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import { initials } from "@/lib/auth/types";
+import { useAuth } from "@/lib/auth/provider";
 import { useWorkspaceResource } from "./use-workspace-resource";
 
-const roles = [
-  { value: "owner", label: "Owner" },
-  { value: "office_manager", label: "Office manager" },
-  { value: "front_desk", label: "Front desk" },
-  { value: "provider", label: "Provider" },
-  { value: "consultant", label: "Consultant" },
-];
+const roleOptions = [
+  "owner",
+  "office_manager",
+  "front_desk",
+  "provider",
+  "consultant",
+].map((value) => ({ value, label: value.replaceAll("_", " ") }));
 export function Members({
   workspaceId,
   userId,
@@ -40,29 +41,73 @@ export function Members({
   userId: string;
   canManage: boolean;
 }) {
+  const { write, auth } = useAuth();
+  const role =
+    auth.memberships.find((m) => m.workspace_id === workspaceId)?.role ?? "";
   const [query, setQuery] = useState("");
-  const [role, setRole] = useState("all");
+  const [filterRole, setFilterRole] = useState("all");
   const [status, setStatus] = useState("all");
   const [invite, setInvite] = useState(false);
-  const { data, error, retry } = useWorkspaceResource<
-    Schemas["WorkspaceMemberOut"][]
-  >(`/api/v1/workspaces/${workspaceId}/members`, canManage);
-  const filtered = data?.filter(
-    (member) =>
-      `${member.name} ${member.email}`
-        .toLowerCase()
-        .includes(query.toLowerCase()) &&
-      (role === "all" || member.role === role) &&
-      (status === "all" || (member.active ? "active" : "inactive") === status),
+  const [edit, setEdit] = useState<Schemas["WorkspaceMemberOut"] | null>(null);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const members = useWorkspaceResource<Schemas["WorkspaceMemberOut"][]>(
+    `/api/v1/workspaces/${workspaceId}/members`,
+    canManage,
   );
+  const invitations = useWorkspaceResource<Schemas["InvitationList"]>(
+    `/api/v1/workspaces/${workspaceId}/invitations`,
+    canManage,
+  );
+  const roles = invitations.data?.grantable_roles ?? [];
+  const filtered = members.data?.filter(
+    (m) =>
+      `${m.name} ${m.email}`.toLowerCase().includes(query.toLowerCase()) &&
+      (filterRole === "all" || m.role === filterRole) &&
+      (status === "all" || (m.active ? "active" : "inactive") === status),
+  );
+  const act = async (
+    path: string,
+    body?: unknown,
+    success = "Change saved.",
+  ) => {
+    setBusy(true);
+    setError("");
+    setMessage("");
+    try {
+      await write(path, body);
+      setMessage(success);
+      members.retry();
+      invitations.retry();
+      return true;
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Could not save this change.",
+      );
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
-    <>
+    <div className="grid gap-6">
+      {error && <Alert>{error}</Alert>}
+      {message && (
+        <p role="status" className="text-sm text-brand-ink">
+          {message}
+        </p>
+      )}
       <Panel>
         <PanelHead
           title="Workspace members"
           action={
             canManage && (
-              <Button variant="brand" onClick={() => setInvite(true)}>
+              <Button
+                variant="brand"
+                disabled={!invitations.data?.enabled}
+                onClick={() => setInvite(true)}
+              >
                 <Plus size={16} aria-hidden="true" />
                 Invite user
               </Button>
@@ -74,33 +119,29 @@ export function Members({
         </p>
         {!canManage ? (
           <Note>
-            Only workspace owners and office managers can view the workspace
-            member list.
+            Only workspace owners and office managers can manage members.
           </Note>
         ) : (
           <>
-            <div className="mb-5 grid gap-3 lg:grid-cols-[minmax(180px,1fr)_180px_160px]">
-              <label className="relative">
-                <span className="sr-only">Search members</span>
-                <Search
-                  size={17}
-                  className="pointer-events-none absolute top-3.5 left-3 text-muted"
-                  aria-hidden="true"
-                />
-                <Input
-                  className="pl-10"
-                  placeholder="Search by name or email"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                />
-              </label>
+            {invitations.data && !invitations.data.enabled && (
+              <Note>
+                Email invitations are not configured for this environment yet.
+              </Note>
+            )}
+            <div className="my-5 grid gap-3 lg:grid-cols-[minmax(180px,1fr)_180px_160px]">
+              <Input
+                aria-label="Search members"
+                placeholder="Search by name or email"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
               <Dropdown
                 label="Filter by role"
                 hideLabel
                 flush
-                value={role}
-                onChange={setRole}
-                options={[{ value: "all", label: "All roles" }, ...roles]}
+                value={filterRole}
+                onChange={setFilterRole}
+                options={[{ value: "all", label: "All roles" }, ...roleOptions]}
               />
               <Dropdown
                 label="Filter by status"
@@ -115,18 +156,21 @@ export function Members({
                 ]}
               />
             </div>
-            {error ? (
+            {members.error ? (
               <Alert>
-                {error}{" "}
-                <Button variant="outline" onClick={retry}>
+                {members.error}
+                <Button variant="outline" onClick={members.retry}>
                   Retry
                 </Button>
               </Alert>
-            ) : !data ? (
-              <p role="status" className="py-8 text-sm text-muted">
-                Loading workspace members…
-              </p>
-            ) : filtered?.length ? (
+            ) : !members.data ? (
+              <p role="status">Loading workspace members…</p>
+            ) : !filtered?.length ? (
+              <EmptyState
+                title="No members found"
+                description="Try a different name, email or filter."
+              />
+            ) : (
               <DataTable>
                 <thead>
                   <tr>
@@ -134,105 +178,345 @@ export function Members({
                     <Th>Role</Th>
                     <Th>Status</Th>
                     <Th>Added</Th>
+                    <Th>Actions</Th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((member) => (
-                    <Tr key={member.id}>
+                  {filtered.map((m) => (
+                    <Tr key={m.id}>
                       <Td>
                         <div className="flex items-center gap-3">
-                          <Avatar>{initials(member.name)}</Avatar>
+                          <Avatar>{initials(m.name)}</Avatar>
                           <div>
                             <p className="font-medium">
-                              {member.name}{" "}
-                              {member.user_id === userId && (
+                              {m.name}{" "}
+                              {m.user_id === userId && (
                                 <span className="ml-1 rounded bg-brand-soft px-1.5 py-0.5 text-[10px] text-brand-ink">
                                   You
                                 </span>
                               )}
                             </p>
-                            <p className="mt-1 text-xs text-muted">
-                              {member.email}
-                            </p>
+                            <p className="mt-1 text-xs text-muted">{m.email}</p>
                           </div>
                         </div>
                       </Td>
                       <Td>
                         <span className="capitalize">
-                          {member.role.replaceAll("_", " ")}
+                          {m.role.replaceAll("_", " ")}
                         </span>
                       </Td>
                       <Td>
-                        <StatusBadge tone={member.active ? "brand" : "muted"}>
-                          {member.active ? "Active" : "Inactive"}
+                        <StatusBadge tone={m.active ? "brand" : "muted"}>
+                          {m.active ? "Active" : "Inactive"}
                         </StatusBadge>
                       </Td>
                       <Td>
-                        {new Date(member.created_at).toLocaleDateString(
-                          "en-GB",
-                          { timeZone: "UTC" },
-                        )}
+                        {new Date(m.created_at).toLocaleDateString("en-GB", {
+                          timeZone: "UTC",
+                        })}
+                      </Td>
+                      <Td>
+                        {m.active &&
+                          m.user_id !== userId &&
+                          roles.includes(m.role) && (
+                            <Button
+                              variant="outline"
+                              onClick={() => setEdit(m)}
+                            >
+                              Manage {m.name}
+                            </Button>
+                          )}
                       </Td>
                     </Tr>
                   ))}
                 </tbody>
               </DataTable>
-            ) : (
-              <EmptyState
-                title="No members found"
-                description="Try a different name, email or filter."
-              />
             )}
-            <p className="mt-5 text-[12px] leading-5 text-muted">
-              Access follows the workspace’s existing roles. Role changes and
-              removing members will be added with user management.
+            <p className="mt-5 text-xs leading-5 text-muted">
+              Owners control manager access. Office managers can manage front
+              desk, provider and consultant memberships. Owner access cannot be
+              changed here.
             </p>
           </>
         )}
       </Panel>
-      {invite && <InviteUser onClose={() => setInvite(false)} />}
-    </>
+      {canManage && (
+        <Panel>
+          <PanelHead
+            title="Invitations"
+            action={
+              <Button variant="outline" onClick={invitations.retry}>
+                Refresh invitations
+              </Button>
+            }
+          />
+          {invitations.error ? (
+            <Alert>
+              {invitations.error}
+              <Button variant="outline" onClick={invitations.retry}>
+                Retry
+              </Button>
+            </Alert>
+          ) : !invitations.data ? (
+            <p role="status">Loading invitations…</p>
+          ) : !invitations.data.invitations.length ? (
+            <EmptyState
+              title="No invitations yet"
+              description="Invite someone to join this workspace."
+            />
+          ) : (
+            <DataTable>
+              <thead>
+                <tr>
+                  <Th>Email</Th>
+                  <Th>Role</Th>
+                  <Th>Status</Th>
+                  <Th>Email delivery</Th>
+                  <Th>Actions</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {invitations.data.invitations.map((item) => (
+                  <Tr key={item.id}>
+                    <Td>{item.email}</Td>
+                    <Td>
+                      <span className="capitalize">
+                        {item.role.replaceAll("_", " ")}
+                      </span>
+                    </Td>
+                    <Td>
+                      <StatusBadge
+                        tone={item.status === "pending" ? "warn" : "muted"}
+                      >
+                        {item.status}
+                      </StatusBadge>
+                    </Td>
+                    <Td>
+                      {item.delivery_status === "accepted"
+                        ? "Accepted by email provider"
+                        : item.delivery_status}
+                    </Td>
+                    <Td>
+                      {["pending", "expired"].includes(item.status) &&
+                        roles.includes(item.role) && (
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              disabled={busy}
+                              onClick={() =>
+                                void act(
+                                  `/api/v1/workspaces/${workspaceId}/invitations/${item.id}/resend`,
+                                  undefined,
+                                  "New invitation link created. Previous links no longer work.",
+                                )
+                              }
+                            >
+                              Resend
+                            </Button>
+                            <Button
+                              variant="dangerOutline"
+                              disabled={busy}
+                              onClick={() => {
+                                if (
+                                  window.confirm(
+                                    `Revoke the invitation for ${item.email}?`,
+                                  )
+                                )
+                                  void act(
+                                    `/api/v1/workspaces/${workspaceId}/invitations/${item.id}/revoke`,
+                                    undefined,
+                                    "Invitation revoked.",
+                                  );
+                              }}
+                            >
+                              Revoke
+                            </Button>
+                          </div>
+                        )}
+                    </Td>
+                  </Tr>
+                ))}
+              </tbody>
+            </DataTable>
+          )}
+        </Panel>
+      )}
+      {invite && (
+        <InviteUser
+          roles={roles}
+          error={error}
+          onClose={() => setInvite(false)}
+          onSend={async (body) => {
+            const ok = await act(
+              `/api/v1/workspaces/${workspaceId}/invitations`,
+              body,
+              "Invitation created. Its email delivery status appears below.",
+            );
+            if (ok) setInvite(false);
+            return ok;
+          }}
+        />
+      )}
+      {edit && (
+        <MemberDialog
+          member={edit}
+          roles={roles}
+          onClose={() => setEdit(null)}
+          onSave={async (body) => {
+            const ok = await act(
+              `/api/v1/workspaces/${workspaceId}/members/${edit.id}`,
+              body,
+            );
+            if (ok) setEdit(null);
+            return ok;
+          }}
+        />
+      )}
+      <span className="sr-only">Current role: {role}</span>
+    </div>
   );
 }
-
-function InviteUser({ onClose }: { onClose: () => void }) {
-  const [role, setRole] = useState("front_desk");
+function InviteUser({
+  roles,
+  error,
+  onClose,
+  onSend,
+}: {
+  roles: string[];
+  onClose: () => void;
+  onSend: (body: { email: string; role: string }) => Promise<boolean>;
+  error: string;
+}) {
+  const [role, setRole] = useState(
+    roles.includes("front_desk") ? "front_desk" : (roles[0] ?? ""),
+  );
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
   return (
     <Dialog title="Invite user" onClose={onClose} placement="right">
-      <div className="flex min-h-[calc(100dvh-130px)] flex-col">
+      <form
+        className="flex min-h-[calc(100dvh-130px)] flex-col"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setBusy(true);
+          setFailed(false);
+          const ok = await onSend({ email: email.trim(), role });
+          if (!ok) {
+            setBusy(false);
+            setFailed(true);
+          }
+        }}
+      >
         <p className="mb-6 text-sm text-muted">
-          Give someone access to this workspace.
+          Give someone access to this workspace. They must sign in with the
+          invited email and accept before they can access it.
         </p>
         <TextField
           label="Email address"
           type="email"
+          required
+          maxLength={254}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="name@clinic.com"
           autoComplete="email"
         />
         <Dropdown
           label="Role"
-          options={roles.filter((item) => item.value !== "owner")}
+          options={roleOptions.filter((r) => roles.includes(r.value))}
           value={role}
           onChange={setRole}
+          disabled={busy}
         />
-        <p className="mb-6 text-xs leading-5 text-muted">
-          Access will be limited by their assigned role.
-        </p>
         <Note>
-          Invitations are coming soon. Sending invitations and granting new
-          access are not available yet.
+          The invitation email includes its expiry time. Access is limited by the
+          assigned role and this workspace’s enabled products.
         </Note>
+        {failed && (
+          <Alert>
+            {error || "Could not create this invitation. Please retry."}
+          </Alert>
+        )}
         <div className="mt-auto pt-8">
           <DialogActions>
-            <Button variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy}
+              onClick={onClose}
+            >
               Cancel
             </Button>
-            <Button variant="brand" disabled>
-              Send invitation
+            <Button type="submit" variant="brand" disabled={busy || !role}>
+              {busy ? "Queuing…" : "Send invitation"}
             </Button>
           </DialogActions>
         </div>
-      </div>
+      </form>
+    </Dialog>
+  );
+}
+function MemberDialog({
+  member,
+  roles,
+  onClose,
+  onSave,
+}: {
+  member: Schemas["WorkspaceMemberOut"];
+  roles: string[];
+  onClose: () => void;
+  onSave: (body: { role?: string; deactivate?: boolean }) => Promise<boolean>;
+}) {
+  const [role, setRole] = useState(member.role);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const save = async (body: { role?: string; deactivate?: boolean }) => {
+    setBusy(true);
+    setFailed(false);
+    if (!(await onSave(body))) {
+      setBusy(false);
+      setFailed(true);
+    }
+  };
+  return (
+    <Dialog title={`Manage ${member.name}`} onClose={onClose}>
+      <p className="mb-5 text-sm text-muted">{member.email}</p>
+      <Dropdown
+        label="Member role"
+        value={role}
+        onChange={setRole}
+        options={roleOptions.filter((r) => roles.includes(r.value))}
+        disabled={busy}
+      />
+      <p className="mb-5 text-xs text-muted">
+        Removing access does not delete this person’s account or affect their
+        other workspaces.
+      </p>
+      {failed && (
+        <Alert>
+          Could not update this member. Refresh and check your permissions.
+        </Alert>
+      )}
+      <DialogActions>
+        <Button
+          variant="dangerOutline"
+          disabled={busy}
+          onClick={() => {
+            if (window.confirm(`Remove ${member.name} from this workspace?`))
+              void save({ deactivate: true });
+          }}
+        >
+          Remove access
+        </Button>
+        <Button
+          variant="brand"
+          disabled={busy || role === member.role}
+          onClick={() => void save({ role })}
+        >
+          Save role
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }

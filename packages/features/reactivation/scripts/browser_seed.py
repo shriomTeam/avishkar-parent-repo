@@ -3,11 +3,13 @@
     uv run python packages/features/reactivation/scripts/browser_seed.py seed    --tenant-name NAME --scenario full
     uv run python packages/features/reactivation/scripts/browser_seed.py work    --tenant-name NAME
     uv run python packages/features/reactivation/scripts/browser_seed.py cleanup --tenant-name NAME
+    uv run python packages/features/reactivation/scripts/browser_seed.py front-desk --tenant-name NAME
 
 Scenarios for `seed`: full (a previous run plus this one, one type unavailable, one retention type), first (a
 first analysis with nothing to compare with), failed (a completed run followed by a failed one), none (patients
 but no runs), empty (no patients and no runs: the welcome page), large (one run of about `--patients N`
 dormant patients, for scale measurements).
+`front-desk` assigns the test workspace owner a real front-desk role, so server and browser permissions agree.
 `work` plays the worker for the queued run the browser asked for. `cleanup` removes every run for the tenant and
 every patient and service this script created. The workspace itself is created by the browser sign-in and is left
 alone, like the other browser journeys.
@@ -59,10 +61,10 @@ _guard()
 
 from datetime import UTC, datetime, timedelta  # noqa: E402
 
-from sqlalchemy import delete, select  # noqa: E402
+from sqlalchemy import delete, select, update  # noqa: E402
 
 from clinic_core.database import dispose_engines, system_session, tenant_session  # noqa: E402
-from clinic_db.models.core import Patient, Service, Tenant  # noqa: E402
+from clinic_db.models.core import Patient, Service, Staff, Tenant  # noqa: E402
 from clinic_db.models.reactivation import Run, RunPatient, RunType  # noqa: E402
 from clinic_reactivation.analysis.settings import ReactivationSettings  # noqa: E402
 from clinic_reactivation.runs import execute_run  # noqa: E402
@@ -378,9 +380,19 @@ async def cleanup(args) -> dict:
     return {"cleaned": str(tenant.id)}
 
 
+async def set_role(args) -> dict:
+    """Assign a real role in this guarded disposable workspace, including SSR/API checks."""
+    tenant = await _tenant(args.tenant_name)
+    async with system_session() as session:
+        await session.execute(
+            update(Staff).where(Staff.tenant_id == tenant.id, Staff.role == "owner").values(role="front_desk")
+        )
+    return {"role": "front_desk"}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=["seed", "work", "cleanup"])
+    parser.add_argument("command", choices=["seed", "work", "cleanup", "front-desk"])
     parser.add_argument("--tenant-name", required=True)
     parser.add_argument("--scenario", choices=["full", "first", "failed", "none", "empty", "large"], default="full")
     parser.add_argument("--delay", type=float, default=0.0)
@@ -389,7 +401,7 @@ def main() -> None:
 
     async def go() -> dict:
         try:
-            return await {"seed": seed, "work": work, "cleanup": cleanup}[args.command](args)
+            return await {"seed": seed, "work": work, "cleanup": cleanup, "front-desk": set_role}[args.command](args)
         finally:
             await dispose_engines()
 

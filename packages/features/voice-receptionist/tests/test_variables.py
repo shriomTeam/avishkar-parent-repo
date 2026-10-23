@@ -134,10 +134,10 @@ async def test_names_are_unique_and_cannot_change(client):
     assert renamed.json()["name"] == "hours"  # only the value is accepted
 
 
-async def test_only_managers_change_variables_and_clinics_are_separate(client):
+async def test_only_managers_read_or_change_variables_and_clinics_are_separate(client):
     t, other = await create_test_tenant(), await create_test_tenant()
     made = await _variable(client, t)
-    assert (await client.get("/inbound/variables", headers=_h(t, "front_desk"))).status_code == 200
+    assert (await client.get("/inbound/variables", headers=_h(t, "front_desk"))).status_code == 403
     denied = await client.post("/inbound/variables", json={"name": "x", "value": "y"}, headers=_h(t, "front_desk"))
     assert denied.status_code == 403
     assert (await client.get("/inbound/variables", headers=_h(other))).json()["custom"] == []

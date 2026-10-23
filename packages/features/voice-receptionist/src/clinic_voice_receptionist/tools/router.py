@@ -37,12 +37,12 @@ async def _audit(session: AsyncSession, ctx: RequestContext, action: str, tool_i
     await audit(session, action, actor_type="staff", actor_id=ctx.actor_id, entity_type="voice.tool", entity_id=tool_id)
 
 
-@router.get("/tools", response_model=list[ToolOut])
+@router.get("/tools", response_model=list[ToolOut], dependencies=MANAGERS)
 async def list_tools(session: AsyncSession = Depends(get_session)) -> list[ToolOut]:
     return [service.tool_out(t) for t in await service.list_tools(session)]
 
 
-@router.get("/tools/catalog", response_model=list[CatalogItemOut])
+@router.get("/tools/catalog", response_model=list[CatalogItemOut], dependencies=MANAGERS)
 async def tool_catalog(session: AsyncSession = Depends(get_session)) -> list[dict]:
     """The internal tools a clinic can add, and which it already has."""
     return await service.catalog(session)
@@ -78,7 +78,7 @@ async def create_tool(
     return service.tool_out(tool)
 
 
-@router.get("/tools/{tool_id}", response_model=ToolOut)
+@router.get("/tools/{tool_id}", response_model=ToolOut, dependencies=MANAGERS)
 async def get_tool(tool_id: uuid.UUID, session: AsyncSession = Depends(get_session)) -> ToolOut:
     return service.tool_out(await _tool_or_404(session, tool_id))
 

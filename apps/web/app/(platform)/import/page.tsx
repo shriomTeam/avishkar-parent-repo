@@ -1,8 +1,10 @@
+import { requireManagement } from "@/lib/api";
 import { PageHeader } from "@clinic/ui";
 
 import { ImportWizard } from "./import-wizard";
 
-export default function ImportPage() {
+export default async function ImportPage() {
+  await requireManagement();
   return (
     <>
       <PageHeader

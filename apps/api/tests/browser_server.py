@@ -29,6 +29,9 @@ settings = Settings(
     database_system_url=os.environ.get("TEST_SYSTEM_DATABASE_URL", os.environ["TEST_DATABASE_URL"]),
     public_app_origin="http://127.0.0.1:3100",
     google_redirect_uri="http://127.0.0.1:3100/api/v1/auth/google/callback",
+    invitations_enabled=True,
+    email_provider="test",
+    email_payload_encryption_key="dGVzdC1vbmx5LW5vdC1hLXByb2R1Y3Rpb24ta2V5ISE=",
     google_client_id="browser-test",
     google_client_secret="browser-test",
 )
@@ -44,6 +47,7 @@ class BrowserGoogle:
             "email": "browser@example.com",
             "name": "Browser Owner",
             "email_verified": True,
+            "hd": "example.com",
         }
 
 
@@ -66,3 +70,33 @@ async def echo(request: Request):
         "echo": dict(request.query_params) or (await request.json() if await request.body() else {}),
         "open": "9 to 5",
     }
+
+
+# Explicit test-only capture endpoint. This module is never the production app entry point.
+_captured_emails = []
+
+
+@app.get("/_test/emails", include_in_schema=False)
+async def emails():
+    from clinic_engagement.email.service import deliver_due
+
+    async def capture(*, to, template):
+        _captured_emails.append({"to": to, "text": template.text, "subject": template.subject})
+        return "captured"
+
+    await deliver_due(settings, sender=capture)
+    return _captured_emails
+
+
+@app.post("/_test/owner-email", include_in_schema=False)
+async def owner_email(request: Request):
+    from sqlalchemy import select
+
+    from clinic_core.database import system_session
+    from clinic_db.models.core import Staff
+
+    body = await request.json()
+    async with system_session(database_url=settings.database_system_url) as db:
+        member = await db.scalar(select(Staff).where(Staff.user_id == uuid.UUID(body["user_id"])))
+        member.email = body["email"]
+    return {"ok": True}
