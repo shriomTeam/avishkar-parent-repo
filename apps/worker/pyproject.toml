@@ -7,11 +7,15 @@ dependencies = [
     "clinic-core",
     "clinic-db",
     "clinic-engagement",
+    "clinic-knowledge",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
     "bullmq>=2.11",
 ]
 
 [project.scripts]
 clinic-worker = "clinic_worker.main:run"
+clinic-ingest = "clinic_worker.knowledge_ingest:run"
 
 [build-system]
 requires = ["hatchling"]
