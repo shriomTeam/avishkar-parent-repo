@@ -814,6 +814,84 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/voice_receptionist/inbound/knowledge/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Documents */
+        get: operations["list_documents_features_voice_receptionist_inbound_knowledge_documents_get"];
+        put?: never;
+        /**
+         * Upload Document
+         * @description Save the file, then start reading it in the background. The row is committed before the job starts.
+         */
+        post: operations["upload_document_features_voice_receptionist_inbound_knowledge_documents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/knowledge/documents/{document_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry Document */
+        post: operations["retry_document_features_voice_receptionist_inbound_knowledge_documents__document_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/knowledge/documents/{document_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Document
+         * @description Remove the file and everything searchable made from it.
+         */
+        delete: operations["delete_document_features_voice_receptionist_inbound_knowledge_documents__document_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/knowledge/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Search
+         * @description What an agent would find for this question. For staff to check their documents answer what callers ask.
+         */
+        post: operations["test_search_features_voice_receptionist_inbound_knowledge_search_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/voice_receptionist/inbound/tools": {
         parameters: {
             query?: never;
@@ -1200,6 +1278,13 @@ export interface components {
             /** File */
             file: string;
         };
+        /** Body_upload_document_features_voice_receptionist_inbound_knowledge_documents_post */
+        Body_upload_document_features_voice_receptionist_inbound_knowledge_documents_post: {
+            /** File */
+            file: string;
+            /** Same Name */
+            same_name?: ("replace" | "keep") | null;
+        };
         /** BookIn */
         BookIn: {
             /**
@@ -1574,6 +1659,33 @@ export interface components {
             /** Has Completed Run */
             has_completed_run: boolean;
         };
+        /** DocumentOut */
+        DocumentOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Filename */
+            filename: string;
+            /** Size Bytes */
+            size_bytes: number;
+            /** Status */
+            status: string;
+            /** Error */
+            error: string | null;
+            /** Chunk Count */
+            chunk_count: number;
+            /** Replaces Id */
+            replaces_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Processed At */
+            processed_at: string | null;
+        };
         /** DormantRule */
         DormantRule: {
             /**
@@ -1778,6 +1890,17 @@ export interface components {
         InternalToolIn: {
             /** Builtin Key */
             builtin_key: string;
+        };
+        /** KnowledgeOut */
+        KnowledgeOut: {
+            /** Documents */
+            documents: components["schemas"]["DocumentOut"][];
+            /** Max Documents */
+            max_documents: number;
+            /** Max File Bytes */
+            max_file_bytes: number;
+            /** Enabled */
+            enabled: boolean;
         };
         /** LapsedHighValue */
         LapsedHighValue: {
@@ -2356,6 +2479,32 @@ export interface components {
             /** Settings Version */
             settings_version: number;
             last_run: components["schemas"]["LastRunOut"] | null;
+        };
+        /** SearchHitOut */
+        SearchHitOut: {
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /** Filename */
+            filename: string;
+            /** Heading */
+            heading: string | null;
+            /** Text */
+            text: string;
+            /** Similarity */
+            similarity: number;
+        };
+        /** SearchIn */
+        SearchIn: {
+            /** Query */
+            query: string;
+        };
+        /** SearchOut */
+        SearchOut: {
+            /** Results */
+            results: components["schemas"]["SearchHitOut"][];
         };
         /** SettingsOut */
         SettingsOut: {
@@ -4569,6 +4718,181 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TestCallOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_documents_features_voice_receptionist_inbound_knowledge_documents_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KnowledgeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_document_features_voice_receptionist_inbound_knowledge_documents_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_document_features_voice_receptionist_inbound_knowledge_documents_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_document_features_voice_receptionist_inbound_knowledge_documents__document_id__retry_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_document_features_voice_receptionist_inbound_knowledge_documents__document_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_search_features_voice_receptionist_inbound_knowledge_search_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SearchIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchOut"];
                 };
             };
             /** @description Validation Error */

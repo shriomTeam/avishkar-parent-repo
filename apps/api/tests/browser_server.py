@@ -52,6 +52,11 @@ app = create_app(settings, google=BrowserGoogle())
 if ScriptedConnector is not None:
     app.state.voice_connector = ScriptedConnector()
     app.state.recording_store = MemoryRecordingStore()
+    # Knowledge-base uploads stay in memory and embeddings are fake, so browser tests never reach Google.
+    from clinic_knowledge.testing import FakeEmbedder, MemoryFileStore
+
+    app.state.knowledge_store = MemoryFileStore()
+    app.state.knowledge_embedder = FakeEmbedder()
 
 
 @app.api_route("/_test/echo", methods=["GET", "POST"], include_in_schema=False)

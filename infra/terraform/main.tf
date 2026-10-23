@@ -10,6 +10,7 @@ resource "google_project_service" "apis" {
     "artifactregistry.googleapis.com",
     "aiplatform.googleapis.com", # Vertex AI: the Gemini Live model behind voice agents
     "storage.googleapis.com",
+    "cloudtasks.googleapis.com", # knowledge-base ingestion jobs
   ])
 
   service            = each.key
@@ -61,6 +62,15 @@ module "migrate_job" {
   network_id = module.network.vpc_id
   subnet_id  = module.network.subnet_id
   secret_ids = module.cloudsql.secret_ids
+
+  depends_on = [google_project_service.apis]
+}
+
+module "knowledge_queue" {
+  source = "./modules/task-queue"
+
+  name   = "${local.name}-knowledge-ingest"
+  region = var.region
 
   depends_on = [google_project_service.apis]
 }

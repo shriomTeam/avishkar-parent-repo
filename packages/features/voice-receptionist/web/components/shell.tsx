@@ -9,6 +9,7 @@ import {
   Mic,
   Code,
   Brackets,
+  BookOpen,
   Settings,
   ChevronRight,
 } from "lucide-react";
@@ -25,6 +26,11 @@ export const navigation = [
   { path: "/voice-receptionist/test", name: "Test studio", icon: Mic },
   { path: "/voice-receptionist/tools", name: "Tools", icon: Code },
   { path: "/voice-receptionist/variables", name: "Variables", icon: Brackets },
+  {
+    path: "/voice-receptionist/knowledge",
+    name: "Knowledge base",
+    icon: BookOpen,
+  },
   { path: "/voice-receptionist/settings", name: "Settings", icon: Settings },
 ];
 export function Shell({ children }: { children: React.ReactNode }) {

@@ -11,3 +11,7 @@ GRANT CONNECT ON DATABASE clinic TO clinic_app;
 -- code that scans across tenants and then does the real work in a tenant session.
 CREATE ROLE clinic_system LOGIN PASSWORD 'clinic_system' BYPASSRLS;
 GRANT CONNECT ON DATABASE clinic TO clinic_system;
+
+-- The knowledge base stores embeddings with pgvector. Creating the extension needs a superuser, so it is
+-- done here (and by Cloud SQL's admin in production) rather than by the migration role.
+CREATE EXTENSION IF NOT EXISTS vector;

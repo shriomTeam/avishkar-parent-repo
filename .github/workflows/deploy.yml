@@ -1,7 +1,8 @@
 name: Deploy
 
-# On a merge to main: build the images, migrate the database, then deploy the API and the web app (in that order,
-# so the web app never calls an API that is older than it expects). Pull requests only check that the images build.
+# On a merge to main: build the images, migrate the database, then deploy the knowledge-base ingest service, the API
+# and the web app (in that order, so the API never queues work for an ingest service older than it expects, and the
+# web app never calls an API that is older than it expects). Pull requests only check that the images build.
 # Infrastructure (the Cloud Run services themselves) is created by terraform.yml; apply that first on a new project.
 
 on:
@@ -45,6 +46,7 @@ env:
   REGISTRY: ${{ vars.REGION }}-docker.pkg.dev/${{ vars.PROJECT_ID }}/prod-avishkar-docker
   API_SERVICE: prod-avishkar-api
   WEB_SERVICE: prod-avishkar-web
+  INGEST_SERVICE: prod-avishkar-ingest
   MIGRATE_JOB: prod-avishkar-migrate
   SQL_INSTANCE: prod-avishkar-postgres
 
@@ -55,7 +57,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        image: [api, web, migrate]
+        image: [api, web, migrate, ingest]
     steps:
       - uses: actions/checkout@v4
       - name: Sign in to Google Cloud
@@ -80,6 +82,7 @@ jobs:
           case "${{ matrix.image }}" in
             api)     DOCKERFILE=apps/api/Dockerfile;      ARGS=() ;;
             migrate) DOCKERFILE=packages/db/Dockerfile;   ARGS=() ;;
+            ingest)  DOCKERFILE=apps/worker/Dockerfile;   ARGS=() ;;
             web)
               DOCKERFILE=apps/web/Dockerfile
               # Next.js bakes the API address into the build. Pull requests only check that the build works,
@@ -118,9 +121,25 @@ jobs:
       - name: Run migrations
         run: gcloud run jobs execute "${MIGRATE_JOB}" --region="${REGION}" --wait
 
+  deploy-ingest:
+    name: Deploy the knowledge ingest service
+    needs: migrate
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.CICD_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy
+        # The service is private, so there is no public address to smoke test. The update waits for the new
+        # revision to start and answer on its port, and fails the release if it cannot.
+        run: gcloud run services update "${INGEST_SERVICE}" --region="${REGION}" --image="${REGISTRY}/ingest:${GITHUB_SHA}"
+
   deploy-api:
     name: Deploy the API
-    needs: migrate
+    needs: deploy-ingest
     runs-on: ubuntu-latest
     environment: production
     steps:

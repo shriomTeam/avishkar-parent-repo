@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "clinic-core",
     "clinic-db",
+    "clinic-knowledge",
     "google-genai>=1.0",
     "google-cloud-storage>=2.18",
     "httpx>=0.28",
