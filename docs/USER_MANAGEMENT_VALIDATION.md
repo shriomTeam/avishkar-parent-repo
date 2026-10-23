@@ -176,3 +176,16 @@ Validation for this follow-up:
 
 The earlier three Voice tool URL validation failures remain outside this change;
 this follow-up does not claim a clean full-repository test rerun.
+
+### Legacy audit actor names
+
+A local historical invitation-acceptance event used an account ID instead of a
+workspace member ID. The name resolver now accepts either ID through memberships
+in that workspace only, including inactive memberships. It never searches the
+global user directory for unmatched audit IDs. Table, actor options and CSV share
+the resolver; unresolved staff actors show “Unknown member” while CSV preserves
+the original actor ID. Audit rows are not rewritten.
+
+The auth/invitation/workspace suite passes **22 tests**, including a regression for
+both ID formats and preventing names from a different workspace being exposed.
+Targeted Ruff and diff checks pass.

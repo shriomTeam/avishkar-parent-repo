@@ -310,8 +310,10 @@ ID, primary key and a composite tenant/time/ID index for history browsing. Run
   export starts. Spreadsheet formula prefixes in text are escaped. Downloads use
   the same manager/workspace authorization as the table and are not cached.
 - The Settings table displays event, actor and workspace-local time. Actor names
-  resolve from current staff records, falling back to staff ID or actor type when unavailable;
-  names are not historical snapshots.
+  resolve from workspace staff records (including inactive members), supporting
+  both current member IDs and legacy account IDs. Unresolvable staff actors show
+  “Unknown member”; other actor types keep their type label. Original IDs remain
+  available in CSV exports. Names are not historical snapshots.
 - Workspace updates, invitation creation/resend/revoke/acceptance, member role
   changes/removal/restoration are recorded. Workspace updates record field names,
   but not before/after values; member role changes do not record old/new roles.

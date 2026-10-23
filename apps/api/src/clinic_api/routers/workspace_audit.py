@@ -75,14 +75,19 @@ class AuditPage(BaseModel):
 
 
 async def staff_names(db, workspace_id):
-    return dict(
-        (str(row.id), row.name)
-        for row in (await db.scalars(select(Staff).where(Staff.tenant_id == workspace_id))).all()
-    )
+    members = (await db.scalars(select(Staff).where(Staff.tenant_id == workspace_id))).all()
+    names = {str(member.id): member.name for member in members}
+    # Older invitation acceptance events stored auth.users.id as a staff actor.
+    # Resolve only through this workspace's memberships, including inactive ones;
+    # never look up arbitrary actor IDs in the global user directory.
+    for member in members:
+        if member.user_id:
+            names.setdefault(str(member.user_id), member.name)
+    return names
 
 
 def actor_label(row, names):
-    return names.get(row.actor_id, row.actor_id or row.actor_type) if row.actor_type == "staff" else row.actor_type
+    return (names.get(row.actor_id) or "Unknown member") if row.actor_type == "staff" else row.actor_type
 
 
 @router.get("/{workspace_id}/audit/options", response_model=AuditOptions)

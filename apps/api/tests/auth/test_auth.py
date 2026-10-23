@@ -1047,3 +1047,58 @@ async def test_audit_history_filters_pagination_export_and_permissions(system):
         for suffix in ("", "/options", "/export"):
             response = await client.get(path + suffix)
             assert response.status_code == (200 if role == "office_manager" else 403)
+
+
+async def test_audit_resolves_legacy_account_ids_only_within_workspace(system):
+    import csv
+    import io
+
+    from clinic_db.models.core import Staff, Tenant
+    from clinic_db.models.ops import AuditLog
+
+    app, client = system
+    await login(client)
+    workspace = (
+        await client.post(
+            "/api/v1/workspaces", headers=await headers(client), json={"name": "Legacy audit", "timezone": "UTC"}
+        )
+    ).json()
+    wid = uuid.UUID(workspace["id"])
+    foreign_user = uuid.uuid4()
+    async with app.state.session_factory() as auth_db:
+        auth_db.add(User(id=foreign_user, email="foreign-actor@example.com", display_name="Private foreign name"))
+        await auth_db.commit()
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        member = await db.scalar(select(Staff).where(Staff.tenant_id == wid))
+        account_id, member_id, name = str(member.user_id), str(member.id), member.name
+        foreign_tenant = Tenant(name="Other workspace", timezone="UTC", clinic_type="wellness")
+        db.add(foreign_tenant)
+        await db.flush()
+        db.add(
+            Staff(
+                tenant_id=foreign_tenant.id,
+                user_id=foreign_user,
+                name="Private foreign name",
+                email="foreign-actor@example.com",
+                role="front_desk",
+                active=True,
+            )
+        )
+        for ident in (account_id, member_id, str(foreign_user)):
+            db.add(AuditLog(tenant_id=wid, actor_type="staff", actor_id=ident, action="invitation.accepted"))
+    path = f"/api/v1/workspaces/{wid}/audit"
+    rows = (await client.get(path)).json()["items"]
+    assert [row["actor"] for row in rows].count(name) == 2
+    assert [row["actor"] for row in rows].count("Unknown member") == 1
+    options = (await client.get(path + "/options")).json()["actors"]
+    assert {"value": f"staff:{account_id}", "label": name} in options
+    assert {"value": f"staff:{member_id}", "label": name} in options
+    filtered = (await client.get(path, params={"actor": f"staff:{account_id}"})).json()
+    assert filtered["total"] == 1 and filtered["items"][0]["actor"] == name
+    download = await client.get(path + "/export")
+    records = list(csv.DictReader(io.StringIO(download.text.lstrip("\ufeff"))))
+    assert {row["Actor ID"]: row["Actor"] for row in records} == {
+        account_id: name,
+        member_id: name,
+        str(foreign_user): "Unknown member",
+    }
