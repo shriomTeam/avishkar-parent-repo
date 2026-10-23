@@ -4,7 +4,7 @@ import os
 import uuid
 from urllib.parse import urlencode
 
-from fastapi import Request
+from fastapi import Request, Response
 
 from clinic_api.main import create_app
 from clinic_core.settings import Settings
@@ -24,6 +24,7 @@ if not os.environ.get("TEST_DATABASE_URL"):
 
 settings = Settings(
     app_env="test",
+    trusted_proxy_hops=0,
     database_url=os.environ["TEST_DATABASE_URL"],
     database_auth_url=os.environ.get("TEST_AUTH_DATABASE_URL", os.environ["TEST_DATABASE_URL"]),
     database_system_url=os.environ.get("TEST_SYSTEM_DATABASE_URL", os.environ["TEST_DATABASE_URL"]),
@@ -51,7 +52,41 @@ class BrowserGoogle:
         }
 
 
+class BrowserClientIsolation:
+    """Test-only client identities keep independent cookie jars out of one IP bucket.
+
+    Every context retains the real limiter within its own identity. Production
+    never imports this module and continues to count actual client addresses.
+    """
+
+    cookie_name = "browser_test_client"
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        raw = Request(scope).cookies.get(self.cookie_name, "")
+        valid = len(raw) == 32 and all(c in "0123456789abcdef" for c in raw)
+        ident = raw if valid else uuid.uuid4().hex
+        scope = {**scope, "client": ("browser-test-" + ident, 0)}
+
+        async def reply(message):
+            if message["type"] == "http.response.start" and not valid:
+                cookie = Response()
+                cookie.set_cookie(self.cookie_name, ident, max_age=3600, httponly=True, samesite="lax")
+                message = {
+                    **message,
+                    "headers": [*message.get("headers", []), *[h for h in cookie.raw_headers if h[0] == b"set-cookie"]],
+                }
+            await send(message)
+
+        await self.app(scope, receive, reply)
+
+
 app = create_app(settings, google=BrowserGoogle())
+app.add_middleware(BrowserClientIsolation)
 # Voice calls use a scripted model so browser tests never reach Vertex.
 if ScriptedConnector is not None:
     app.state.voice_connector = ScriptedConnector()

@@ -35,6 +35,87 @@ Client session refresh redirects on role/workspace changes, rather than retainin
 an outdated management interface. There is no claim of a completed penetration
 test or a guarantee against every future security defect.
 
+## Roles and access permissions
+
+This table describes the current backend policy, not planned capabilities. Permissions
+apply only to the selected workspace with an active membership. Feature access also
+requires that product to be enabled for the workspace; an Owner role does not bypass
+entitlements. A role in one workspace grants no authority in another.
+
+| Capability | Owner (`owner`) | Office Manager (`office_manager`) | Front Desk (`front_desk`) | Provider (`provider`) | Consultant (`consultant`) |
+| --- | --- | --- | --- | --- | --- |
+| Sign in, view own account, sign out | Yes | Yes | Yes | Yes | Yes |
+| Switch between workspaces where actively enrolled | Yes | Yes | Yes | Yes | Yes |
+| Read workspace details, including clinic contact information | Yes | Yes | Yes | Yes | Yes |
+| Edit workspace/clinic settings | Yes | Yes | No | No | No |
+| View workspace member directory and pending invitations | Yes | Yes | No | No | No |
+| View workspace audit log | Yes | Yes | No | No | No |
+| Invite Front Desk, Provider or Consultant | Yes | Yes | No | No | No |
+| Invite an Office Manager | Yes | No | No | No | No |
+| Change roles, remove or re-invite Front Desk, Provider or Consultant | Yes, except self | Yes, except self | No | No | No |
+| Change role, remove or re-invite an Office Manager | Yes | No | No | No | No |
+| Grant Owner, change/remove an Owner, or change own membership | No | No | No | No | No |
+| Read Voice Receptionist calls, transcripts and saved recordings | Yes | Yes | Yes | No | No |
+| Read/manage voice agents, tools and variables; run test/browser calls | Yes | Yes | No | No | No |
+| Read Dormant patients run status, type totals, data status and schedule | Yes | Yes | Yes | No | No |
+| Start reactivation runs, analyse CSVs or edit reactivation settings | Yes | Yes | No | No | No |
+| Read patient-level reactivation lists, detailed summary and report endpoints | Yes | Yes | No | No | No |
+| Import patient/appointment data | Yes | Yes | No | No | No |
+| Access Patient Blueprints and other enabled feature routers | Yes | Yes | No | No | No |
+
+### Role-specific limits
+
+- **Owner:** manages workspace settings and all non-owner roles. Ownership transfer
+  is not implemented through invitations or member management. Owners cannot edit
+  their own membership or another Owner's membership through these endpoints.
+- **Office Manager:** manages workspace settings and the three member roles (Front
+  Desk, Provider and Consultant). Cannot manage an Owner or another Office Manager,
+  promote someone to Office Manager, or demote a manager to bypass that restriction.
+- **Front Desk:** has the read access listed above for Voice Receptionist and Dormant
+  patients. Cannot configure voice agents, tools or variables, start test calls,
+  access patient-level reactivation reports, import data, edit workspace details,
+  view the member directory/audit log or manage invitations.
+- **Provider:** can use account/workspace basics but currently has no product feature
+  access. The role name does not grant clinical records or patient access. Further
+  provider capabilities need an explicit permission policy and implementation.
+- **Consultant:** has the same current account/workspace-only access as Provider.
+  No reporting, patient data or administrative access is implied by this role.
+
+### Invitation and removal restrictions
+
+Owners and Office Managers can see the workspace's pending invitation list, but
+resend/revoke actions require authority over the invitation's target role. For
+example, an Office Manager cannot resend or revoke an Office Manager invitation.
+Acceptance rechecks the inviter's current authority; an old link cannot retain
+permissions the inviter has since lost. Issuance/resend also depends on the
+invitation feature flag and configured delivery settings.
+
+Re-inviting an inactive member requires authority over both their previous role
+and the new invitation role. An Office Manager cannot restore a former Office
+Manager by selecting Front Desk. Re-invitation is available only for eligible
+members linked to a user; the original Google identity must accept. Pending
+invitations do not grant access before acceptance.
+
+Removed members lose access to that workspace, including its settings and feature
+APIs, while retaining any separate active memberships elsewhere. Nobody can view
+another workspace's records by changing a URL or tenant header. The backend enforces
+these restrictions; hiding a navigation item is not the authorization boundary.
+
+### Policy implementation references
+
+- `packages/core/src/clinic_core/tenancy/permissions.py`: feature eligibility and
+  grantable roles.
+- `packages/core/src/clinic_core/tenancy/management.py`: workspace settings,
+  membership and manager checks.
+- `packages/core/src/clinic_core/tenancy/invitations.py`: invitation acceptance,
+  role changes, removal and restoration restrictions.
+- `apps/api/src/clinic_api/routers/onboarding.py` and `invitations.py`: settings,
+  member directory, audit and invitation endpoints.
+- `apps/api/src/clinic_api/main.py`: import permissions and feature entitlement gates.
+- Voice feature `inbound/router.py`, `tools/router.py`, `variables/router.py`, and
+  reactivation feature `api/roles.py`, `api/settings.py`, `api/results.py`:
+  operation-specific manager/viewer restrictions.
+
 ## Re-invite a removed member
 
 1. Open **Settings → User management** and use the **Inactive** status filter if needed.
@@ -200,6 +281,50 @@ no third-party content, no framing, and a no-referrer policy.
 
 The production feature flag defaults off. Revocation remains available if issuance
 is disabled. Existing members are not removed when invitations are disabled.
+
+## Audit log: current implementation and limits
+
+Workspace audit events are persisted in PostgreSQL `ops.audit_log`, separate from
+application authentication log messages. There is no application-defined row/count
+quota, automatic expiry, retention job or archive policy. Actual capacity depends
+on database disk, indexes, backups and infrastructure limits; this is not unlimited
+storage. Deleting a tenant cascades deletion of its audit rows.
+
+Each row stores a bigint identity, workspace ID, actor type/ID, action, optional
+entity type/UUID, JSON details and timestamp. Current indexing includes the tenant
+ID and primary key; a composite tenant/time/ID index has not been added for history
+browsing at scale.
+
+**Implemented:**
+
+- Owner/Office Manager access only, with server-side workspace membership checks.
+- Latest 100 events ordered by timestamp and ID; no pagination or older-history UI.
+  This is a display/query limit, not a storage limit.
+- The Settings table displays event, actor and workspace-local time. Actor names
+  resolve from current staff records, falling back to actor type when unavailable;
+  names are not historical snapshots.
+- Workspace updates, invitation creation/resend/revoke/acceptance, member role
+  changes/removal/restoration are recorded. Workspace updates record field names,
+  but not before/after values; member role changes do not record old/new roles.
+- Voice records agent/tool/variable changes, tool tests, test-call starts,
+  transcript views and recording playback. Reactivation explicitly records run
+  requests, CSV analysis, settings changes and selected sensitive report reads.
+  This is explicit call-site coverage, not automatic auditing of every endpoint.
+- The normal tenant application database role cannot update/delete audit rows.
+  Administrative/provisioning roles remain privileged; this is not a tamper-proof
+  or cryptographically verified audit trail.
+
+**Not implemented yet:** pagination, date/action/actor filters, export, structured
+entity/detail display, comprehensive before/after change history, stable historical
+actor labels, archival/retention management, or comprehensive failed/denied-action
+coverage. Login/logout events are application logger messages, not entries in this
+workspace audit table. Their retention depends on the logging deployment.
+
+Next improvements should start with cursor pagination and a matching composite
+index, then safe event metadata (including old/new roles), readable entity/actor
+presentation and filters. Choose an explicit retention/archive policy before
+introducing automatic deletion. Avoid putting credentials, invitation tokens or
+unnecessary patient information into event details.
 
 ## Production rollout
 

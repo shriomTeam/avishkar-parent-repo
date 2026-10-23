@@ -275,6 +275,11 @@ The database must be up and migrated (steps 3 and 4).
 | `pnpm turbo run test lint --filter=@clinic/feature-reactivation` | Only one package |
 | `uv run ruff format .` | Auto-format Python code |
 
+Browser tests use a test-only cookie to give each browser context an independent
+synthetic client address. Login limits still apply within that context; scenarios
+and repeated suite runs do not share localhost counters or need counter resets.
+Production continues to use real client addresses and the unchanged rate limit.
+
 Turborepo caches builds and static checks; database tests run every time. CI
 (`.github/workflows/ci.yml`) runs all of the above on every pull request.
 

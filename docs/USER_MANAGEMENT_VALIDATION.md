@@ -27,7 +27,7 @@ all security defects are absent or that production infrastructure is configured.
 | `pnpm install --frozen-lockfile`, `uv sync --frozen` | Pass |
 | Full CI typecheck/test/build task graph | 13 tasks pass, without cache |
 | Python package suites | 775 tests pass; final direct rerun also 775 pass after audit fix |
-| Reactivation frontend unit suite | 98 tests pass |
+| Reactivation frontend unit suite | 98 cases: 97 pass, 1 optional `mutool` check skipped |
 | Workspace lint tasks | 15 tasks pass, including web ESLint |
 | Ruff check and format check | Pass |
 | Python and frontend architecture boundaries | Pass |
@@ -39,7 +39,7 @@ all security defects are absent or that production infrastructure is configured.
 | API, frontend and migration Docker image builds | Pass |
 | API image email/template import smoke test | Pass |
 | Browser journeys | 85 tests pass across platform, reactivation and voice (5.4 minutes) |
-| Voice feature-removal validation | Pass: build, 597 Python tests, 98 frontend unit tests, boundaries, types and 71 browser journeys |
+| Voice feature-removal validation | Pass: build, 597 Python tests, 98 frontend unit cases, boundaries, types and 71 browser journeys |
 
 The complete Python suite also ran directly before the additional office-manager
 regression was added: 774 tests passed. The final package task graph includes that
@@ -129,3 +129,24 @@ TypeScript, ESLint, Ruff checks, production build and boundaries pass. The earli
 full browser/removal runs above describe the base implementation; this follow-up
 reruns the affected complete invitation journey rather than claiming a new run of
 all 85 browser tests.
+
+## Browser rate-counter isolation follow-up
+
+- Only the browser-test entry point assigns synthetic per-cookie-jar client
+  addresses. The real login/callback limiter remains enabled within each context.
+  No limiter is disabled and no database counters are manually reset.
+- A regression run twice against the same database confirms a context hits 429 at
+  the real threshold while a fresh context can log in. The same regression also
+  confirms changing the test cookie cannot bypass the normal application's IP limit.
+- The targeted API run passes 21 tests (20 invitation/auth plus the new isolation
+  regression). The full browser suite also passes all 85 tests without manual
+  counter resets.
+
+### Latest full Python rerun
+
+The subsequent full rerun completed with **775 passed and 3 failed**. All three
+failures are `test_bad_tool_definitions_are_refused_with_a_message_staff_can_act_on`
+(`change0-HTTPS`, `change2-not public`, `change3-not public`) in the Voice tools API
+suite: requests expected to return 422 instead returned 201. Root cause has not
+been established in this audit review. This run does not establish a clean full
+suite or release readiness; the failures need investigation before merge.
