@@ -10,10 +10,9 @@ import {
   Code,
   Brackets,
   BookOpen,
-  Settings,
   ChevronRight,
 } from "lucide-react";
-import { Avatar, buttonStyles, StatusBadge } from "@clinic/ui";
+import { AccountMenu, Avatar, buttonStyles, StatusBadge } from "@clinic/ui";
 import { Brand, DemoBoundary } from "./ui";
 import { useAuth } from "@clinic/core/web/auth/provider";
 import { initials } from "@clinic/core/web/auth/types";
@@ -31,12 +30,21 @@ export const navigation = [
     name: "Knowledge base",
     icon: BookOpen,
   },
-  { path: "/voice-receptionist/settings", name: "Settings", icon: Settings },
 ];
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useDemo();
-  const { auth } = useAuth();
+  const { auth, write } = useAuth();
+  const memberRole = auth.memberships.find(
+    (m) => m.workspace_id === auth.workspace?.id,
+  )?.role;
+  const manager = memberRole === "owner" || memberRole === "office_manager";
+  const visibleNavigation = navigation.filter(
+    (item) =>
+      manager ||
+      item.path === "/voice-receptionist" ||
+      item.path === "/voice-receptionist/calls",
+  );
   const active = navigation.find((item) =>
     item.path === "/voice-receptionist"
       ? pathname === item.path
@@ -82,7 +90,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           aria-label="Workspace navigation"
           className="max-app:mt-3 max-app:flex max-app:gap-1 max-app:overflow-auto"
         >
-          {navigation.map(({ path, name, icon: Icon }) => {
+          {visibleNavigation.map(({ path, name, icon: Icon }) => {
             const current = active?.path === path;
             return (
               <Link
@@ -101,26 +109,28 @@ export function Shell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="mt-auto max-app:hidden">
-          <div className="rounded-[10px] bg-[#f7faf5] p-3.5 text-[12px]">
+        <div className="mt-auto max-app:mt-4">
+          <div className="mb-5 rounded-[10px] bg-[#f7faf5] p-3.5 text-[12px] max-app:hidden">
             <strong>Authenticated workspace</strong>
             <p className="my-1 text-[14px] text-muted">
               Agents, calls, tools and variables are live · other sections are
               demo
             </p>
           </div>
-          <Link
-            className="focus-ring flex gap-3 px-[5px] pt-5 text-[14px]"
-            href="/voice-receptionist/settings"
-          >
-            <Avatar tone="dark">{initials(auth.user.display_name)}</Avatar>
-            <div>
-              <strong>{auth.user.display_name}</strong>
-              <small className="block text-[12px] text-muted">
-                {auth.memberships[0]?.role || "Member"}
-              </small>
-            </div>
-          </Link>
+          <AccountMenu
+            name={auth.user.display_name}
+            email={auth.user.email}
+            role={
+              auth.memberships.find(
+                (m) => m.workspace_id === auth.workspace?.id,
+              )?.role || "Member"
+            }
+            initials={initials(auth.user.display_name)}
+            onSignOut={async () => {
+              await write("/api/v1/auth/logout");
+              window.location.replace("/login");
+            }}
+          />
         </div>
       </aside>
       <div className="ml-[245px] max-[1100px]:ml-[205px] max-app:ml-0">
@@ -138,13 +148,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span className="max-app:hidden">
               <StatusBadge>Live agents &amp; calls</StatusBadge>
             </span>
-            <Link
-              className={buttonStyles("outline", { size: "adaptive" })}
-              href="/voice-receptionist/test"
-            >
-              <Mic size={15} />
-              Test agent
-            </Link>
+            {manager && (
+              <Link
+                className={buttonStyles("outline", { size: "adaptive" })}
+                href="/voice-receptionist/test"
+              >
+                <Mic size={15} />
+                Test agent
+              </Link>
+            )}
           </div>
         </header>
         <main

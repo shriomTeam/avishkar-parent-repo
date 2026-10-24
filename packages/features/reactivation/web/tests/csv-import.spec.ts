@@ -280,12 +280,7 @@ test("a file over 10 MB passes through the web server untouched", async ({ page 
 
 test("roles that cannot import see no Import CSV button", async ({ page }) => {
   helper("seed", workspace, ["--scenario", "empty"]);
-  await page.route("**/api/v1/auth/me", async (route) => {
-    const response = await route.fetch();
-    const body = await response.json();
-    for (const m of body.memberships) m.role = "front_desk";
-    await route.fulfill({ response, json: body });
-  });
+  helper("front-desk", workspace);
   await page.goto("/reactivation");
   await expect(page.getByRole("heading", { level: 1, name: "Upload your data to find your dormant patients" })).toBeVisible();
   await expect(tid(page, "import-csv")).toHaveCount(0);

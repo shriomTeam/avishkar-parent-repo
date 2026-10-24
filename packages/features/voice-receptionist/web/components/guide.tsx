@@ -49,9 +49,9 @@ export const guide: [string, string, string][] = [
     "Static and runtime context with a resolved prompt preview.",
   ],
   [
-    "/voice-receptionist/settings",
-    "Settings",
-    "Workspace, team, privacy preferences and audit log.",
+    "/settings",
+    "Workspace settings",
+    "Shared workspace details, member directory, privacy status and audit log.",
   ],
   [
     "/login",

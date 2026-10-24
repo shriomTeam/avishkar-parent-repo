@@ -5,6 +5,7 @@ Server sends: binary PCM16 24 kHz agent audio, and JSON events
   ready, transcript, fields, interrupted, ended, error.
 """
 
+import asyncio
 import json
 import logging
 import uuid
@@ -17,6 +18,7 @@ from starlette.websockets import WebSocketDisconnect, WebSocketState
 
 from clinic_core.database import tenant_session
 from clinic_core.entitlements import enabled_feature_keys
+from clinic_core.tenancy.permissions import live_session_allowed
 from clinic_db.models.voice import Call
 from clinic_knowledge.config import get_knowledge_settings
 from clinic_knowledge.queue import embedder_for
@@ -107,7 +109,15 @@ async def live_call(ws: WebSocket, ticket: str = Query(min_length=1, max_length=
         call = await session.get(Call, call_id)
         entitled = FEATURE_KEY in await enabled_feature_keys(session)
         snapshot = call.agent_snapshot if call else None
-    if not entitled or snapshot is None:
+        auth_session_id = call.auth_session_id if call else None
+
+    async def authorized():
+        try:
+            return await live_session_allowed(settings, auth_session_id, tenant_id)
+        except Exception:
+            return False  # fail closed if membership/session revalidation is unavailable
+
+    if not entitled or snapshot is None or not await authorized():
         await fail_call(tenant_id, call_id, "not_allowed", settings.database_url)
         await ws.close(POLICY_VIOLATION)
         return
@@ -122,7 +132,8 @@ async def live_call(ws: WebSocket, ticket: str = Query(min_length=1, max_length=
             return
         connector = getattr(ws.app.state, "voice_connector", None) or GeminiConnector(voice)
         recorder = CallRecorder(tenant_id, call_id, snapshot, settings.database_url)
-        await CallSession(
+        running = CallSession(
+            authorize=authorized,
             snapshot=snapshot,
             transport=WebSocketTransport(ws),
             connector=connector,
@@ -136,7 +147,23 @@ async def live_call(ws: WebSocket, ticket: str = Query(min_length=1, max_length=
             ),
             audio=CallAudio(voice.max_call_seconds) if snapshot.get("save_recording") else None,
             store=store_for(ws.app, voice),
-        ).run()
+        )
+
+        async def watch_access():
+            while True:
+                await asyncio.sleep(5)
+                if not await authorized():
+                    running._end("access_revoked", failed=True)
+                    if ws.application_state == WebSocketState.CONNECTED:
+                        await ws.close(POLICY_VIOLATION)
+                    return
+
+        monitor = asyncio.create_task(watch_access())
+        try:
+            await running.run()
+        finally:
+            monitor.cancel()
+            await asyncio.gather(monitor, return_exceptions=True)
     finally:
         _active_calls -= 1
         if ws.application_state == WebSocketState.CONNECTED:

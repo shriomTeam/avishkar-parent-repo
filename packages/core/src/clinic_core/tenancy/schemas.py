@@ -33,3 +33,32 @@ class WorkspaceOut(BaseModel):
     name: str
     timezone: str
     phone: str | None
+
+
+class WorkspaceUpdate(WorkspaceCreate):
+    model_config = ConfigDict(extra="forbid")
+    address: str = Field(default="", max_length=500)
+
+
+class WorkspaceSettingsOut(WorkspaceOut):
+    clinic_type: str
+    address: str
+    status: str
+    baa_signed_at: str | None
+
+
+class WorkspaceMemberOut(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID | None
+    name: str
+    email: str
+    role: str
+    active: bool
+    created_at: str
+
+
+class WorkspaceAuditOut(BaseModel):
+    id: str
+    action: str
+    actor: str
+    occurred_at: str

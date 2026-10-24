@@ -162,12 +162,7 @@ test("the rows stay in this tab: no request, storage, console line or URL carrie
 });
 
 test("front desk has no Imported file item, and the page refuses them by URL", async ({ page }) => {
-  await page.route("**/api/v1/auth/me", async (route) => {
-    const response = await route.fetch();
-    const body = await response.json();
-    for (const m of body.memberships) m.role = "front_desk";
-    await route.fulfill({ response, json: body });
-  });
+  helper("front-desk", workspace);
   await page.goto("/reactivation");
   await expect(page.getByRole("link", { name: "Imported file" })).toHaveCount(0);
   await page.goto("/reactivation/file");

@@ -1,0 +1,4 @@
+$inviter invited you to join $workspace on Avishkar AI as $role.
+Sign in with $email and confirm acceptance at:
+$url
+This invitation expires in $hours hours. Ignore it if unexpected.

@@ -2,13 +2,16 @@
 # secret that Cloud Run injects at start (see secrets.tf and modules/cloudsql for where each one comes from).
 
 locals {
-  api_secrets = {
+  api_secrets = merge({
     DATABASE_URL         = module.cloudsql.secret_ids["app-url"]
     DATABASE_SYSTEM_URL  = module.cloudsql.secret_ids["system-url"]
     DATABASE_AUTH_URL    = module.cloudsql.secret_ids["auth-url"]
     GOOGLE_CLIENT_SECRET = google_secret_manager_secret.google_client_secret.secret_id
     VOICE_SECRETS_KEY    = google_secret_manager_secret.voice_secrets_key.secret_id
-  }
+    }, var.invitations_enabled ? {
+    SENDGRID_API_KEY             = google_secret_manager_secret.email["sendgrid-api-key"].secret_id
+    EMAIL_PAYLOAD_ENCRYPTION_KEY = google_secret_manager_secret.email["email-payload-key"].secret_id
+  } : {})
 
   # The ingest service reads and writes tenant data like the API does, so it gets the same production settings (the
   # shared configuration check requires them) but only the secrets it needs.
@@ -86,6 +89,11 @@ module "api" {
   memory          = "1Gi"
 
   env = merge(local.platform_env, {
+    INVITATIONS_ENABLED     = tostring(var.invitations_enabled)
+    EMAIL_PROVIDER          = var.invitations_enabled ? "sendgrid" : "console"
+    EMAIL_FROM_ADDRESS      = var.email_from_address
+    EMAIL_FROM_NAME         = var.email_from_name
+    EMAIL_REPLY_TO          = var.email_reply_to
     TRUSTED_PROXY_HOPS      = "1" # Cloud Run's front end is the one proxy; see clinic_api.forwarded
     VOICE_GCP_PROJECT       = var.project_id
     VOICE_RECORDINGS_BUCKET = module.storage.name # recordings go under voice-recordings/
@@ -96,7 +104,7 @@ module "api" {
     KNOWLEDGE_TASKS_REGION        = var.region
     KNOWLEDGE_INGEST_URL          = local.ingest_url
     KNOWLEDGE_TASKS_INVOKER_EMAIL = google_service_account.queue.email
-  })
+  }, local.email_task_environment)
   secret_env = local.api_secrets
 
   depends_on = [

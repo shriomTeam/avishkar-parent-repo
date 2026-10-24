@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from clinic_core.auth.security import digest, now
 from clinic_db.models.auth import AuthSession, OAuthTransaction, RateBucket, User
+from clinic_db.models.membership import InvitationContext
 
 
 async def claim_transaction(db: AsyncSession, state: str, binding: str):
@@ -64,5 +65,6 @@ async def limit(db: AsyncSession, key: str, maximum: int, seconds=60):
 
 
 async def clean_expired(db: AsyncSession):
+    await db.execute(delete(InvitationContext).where(InvitationContext.expires_at <= now()))
     await db.execute(delete(OAuthTransaction).where(OAuthTransaction.expires_at <= now()))
     await db.execute(delete(AuthSession).where(AuthSession.expires_at <= now()))

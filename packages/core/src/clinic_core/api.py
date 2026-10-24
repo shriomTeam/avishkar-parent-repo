@@ -9,6 +9,7 @@ from clinic_core.auth.dependencies import DB, get_current_session, get_settings
 from clinic_core.auth.security import check_csrf
 from clinic_core.database import tenant_session
 from clinic_core.entitlements import enabled_feature_keys
+from clinic_core.tenancy.permissions import can_use_feature
 from clinic_core.tenancy.repository import memberships
 from clinic_db.models.core import StaffRole
 
@@ -19,6 +20,7 @@ class RequestContext:
     actor_id: str
     role: StaffRole
     database_url: str | None = None
+    session_id: uuid.UUID | None = None
 
 
 async def get_request_context(
@@ -38,9 +40,16 @@ async def get_request_context(
     if request.method not in ("GET", "HEAD", "OPTIONS"):
         check_csrf(request, principal.session.csrf_token_hash, settings)
     rows = await memberships(principal.user.id, settings)
+    selected = principal.session.active_workspace_id
+    if selected is None and len(rows) == 1:
+        selected = rows[0][1].id
+    if x_tenant_id is not None and x_tenant_id != selected:
+        raise HTTPException(403, "workspace_selection_mismatch")
     for staff, tenant in rows:
-        if x_tenant_id is None or tenant.id == x_tenant_id:
-            return RequestContext(tenant.id, str(staff.id), StaffRole(staff.role), settings.database_url)
+        if tenant.id == selected:
+            return RequestContext(
+                tenant.id, str(staff.id), StaffRole(staff.role), settings.database_url, principal.session.id
+            )
     raise HTTPException(status.HTTP_403_FORBIDDEN, "workspace_access_denied")
 
 
@@ -52,7 +61,11 @@ async def get_session(ctx: RequestContext = Depends(get_request_context)) -> Asy
 def require_feature(feature_key: str) -> Callable:
     """Applied by the API to every feature router: 403 unless the tenant has it."""
 
-    async def dependency(session: AsyncSession = Depends(get_session)) -> None:
+    async def dependency(
+        session: AsyncSession = Depends(get_session), ctx: RequestContext = Depends(get_request_context)
+    ) -> None:
+        if not can_use_feature(ctx.role, feature_key):
+            raise HTTPException(403, "feature_access_denied")
         if feature_key not in await enabled_feature_keys(session):
             raise HTTPException(status.HTTP_403_FORBIDDEN, f"Feature '{feature_key}' is not enabled")
 

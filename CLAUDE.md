@@ -15,6 +15,8 @@ apps/
       (platform)/              authenticated platform routes
         layout.tsx             shared auth provider and platform shell
         page.tsx               clinic product overview
+        settings/              shared workspace editing, members and audit
+                               (accessed through the bottom profile menu)
         import/                patient data import
         (features)/
           blueprints/          existing patient blueprint pages
@@ -22,6 +24,7 @@ apps/
     components/
       auth/                    onboarding and sign-out controls
       platform-frame.tsx       generic platform shell (no feature path checks)
+      platform-navigation.tsx  platform navigation and workspace header
     lib/
       auth/                    compatibility exports of shared core auth
     public/brand/               platform branding assets
@@ -31,10 +34,12 @@ apps/
     src/clinic_api/routers/
       auth.py                  /api/v1/auth/* Google login and sessions
       onboarding.py            /api/v1/workspaces clinic onboarding
+      invitations.py           scoped invitations, acceptance and member management
     tests/auth/                auth, tenant and entitlement integration tests
     tests/browser_server.py    test-only simulated Google provider
     Dockerfile                 optional API/worker container image
-  worker/                      one background worker
+  worker/                      general worker plus private Cloud Tasks HTTP handlers
+    email.Dockerfile           private transactional-email sender image
 packages/
   db/                          all SQLAlchemy tables and one Alembic stream
     src/clinic_db/models/
@@ -49,6 +54,7 @@ packages/
     tests/auth/                shared auth unit tests
   integrations/                client data import
   engagement/                  shared SMS and email engine
+    src/clinic_engagement/email/ encrypted mail, tasks.py dispatch, task_app.py private handler, template/ factories
   features/
     reactivation/
       src/                     reactivation backend (analysis engine, runs, CSV import)
@@ -165,3 +171,5 @@ Gotchas:
 ## Checks before a PR
 
 `pnpm lint`, `pnpm test`, `pnpm boundaries`, and `pnpm typecheck` (needs the local DB from `pnpm db:up` and `pnpm db:migrate`). After an API change run `pnpm api-client:generate` and commit the result. For infra: `terraform fmt -recursive` and `terraform validate` from `infra/terraform`.
+
+Workspace invitations and email delivery setup: [docs/USER_MANAGEMENT.md](docs/USER_MANAGEMENT.md). Keep sender credentials server-side and use the shared email templates/service.
