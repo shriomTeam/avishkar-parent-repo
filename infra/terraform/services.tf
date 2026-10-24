@@ -8,8 +8,8 @@ locals {
     DATABASE_AUTH_URL    = module.cloudsql.secret_ids["auth-url"]
     GOOGLE_CLIENT_SECRET = google_secret_manager_secret.google_client_secret.secret_id
     VOICE_SECRETS_KEY    = google_secret_manager_secret.voice_secrets_key.secret_id
-  }, var.invitations_enabled ? {
-    SENDGRID_API_KEY = google_secret_manager_secret.email["sendgrid-api-key"].secret_id
+    }, var.invitations_enabled ? {
+    SENDGRID_API_KEY             = google_secret_manager_secret.email["sendgrid-api-key"].secret_id
     EMAIL_PAYLOAD_ENCRYPTION_KEY = google_secret_manager_secret.email["email-payload-key"].secret_id
   } : {})
 
@@ -89,11 +89,11 @@ module "api" {
   memory          = "1Gi"
 
   env = merge(local.platform_env, {
-    INVITATIONS_ENABLED = tostring(var.invitations_enabled)
-    EMAIL_PROVIDER = var.invitations_enabled ? "sendgrid" : "console"
-    EMAIL_FROM_ADDRESS = var.email_from_address
-    EMAIL_FROM_NAME = var.email_from_name
-    EMAIL_REPLY_TO = var.email_reply_to
+    INVITATIONS_ENABLED     = tostring(var.invitations_enabled)
+    EMAIL_PROVIDER          = var.invitations_enabled ? "sendgrid" : "console"
+    EMAIL_FROM_ADDRESS      = var.email_from_address
+    EMAIL_FROM_NAME         = var.email_from_name
+    EMAIL_REPLY_TO          = var.email_reply_to
     TRUSTED_PROXY_HOPS      = "1" # Cloud Run's front end is the one proxy; see clinic_api.forwarded
     VOICE_GCP_PROJECT       = var.project_id
     VOICE_RECORDINGS_BUCKET = module.storage.name # recordings go under voice-recordings/

@@ -69,3 +69,9 @@ variable "email_reply_to" {
   type    = string
   default = ""
 }
+
+variable "email_secrets_preprovisioned" {
+  type        = bool
+  default     = false
+  description = "Import the two email secret containers when they already exist; values remain outside Terraform."
+}

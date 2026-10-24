@@ -97,7 +97,7 @@ async def deliver_email(delivery_id, settings=None):
     if settings.email_provider != "sendgrid":
         return 0
     try:
-        async with asyncio.timeout(20):
+        async with asyncio.timeout(5):
             return await deliver_due(settings, delivery_id=delivery_id, limit=1)
     except Exception:
         # Never turn a committed invitation into a failed HTTP request or log secrets.

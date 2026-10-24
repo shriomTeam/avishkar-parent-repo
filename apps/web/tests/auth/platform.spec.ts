@@ -126,3 +126,24 @@ test("platform sign-in and onboarding are independent of voice UI", async ({
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
 });
+
+test("workspace creation stays disabled before scripts hydrate", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const response = await context.request.get(
+      "http://127.0.0.1:3100/api/v1/auth/google/login",
+    );
+    expect(response.ok()).toBe(true);
+    const page = await context.newPage();
+    await page.goto("/onboarding");
+    await expect(
+      page.getByRole("button", { name: "Create workspace", exact: true }),
+    ).toBeDisabled();
+    await page.getByLabel("Workspace name").fill("Should not be submitted");
+    await expect(page).toHaveURL(/\/onboarding$/);
+  } finally {
+    await context.close();
+  }
+});

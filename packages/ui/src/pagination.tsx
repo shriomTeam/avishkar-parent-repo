@@ -6,7 +6,9 @@ export function Pagination({
   pageSize,
   total,
   onPageChange,
+  hasNext,
 }: {
+  hasNext?: boolean;
   page: number;
   pageSize: number;
   total: number;
@@ -34,7 +36,7 @@ export function Pagination({
         </Button>
         <Button
           variant="outline"
-          disabled={page >= pages}
+          disabled={hasNext === undefined ? page >= pages : !hasNext}
           onClick={() => onPageChange(page + 1)}
         >
           Next

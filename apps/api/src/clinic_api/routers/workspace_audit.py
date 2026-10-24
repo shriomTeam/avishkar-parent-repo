@@ -70,7 +70,7 @@ class AuditOptions(BaseModel):
 class AuditPage(BaseModel):
     items: list[WorkspaceAuditOut]
     total: int
-    page: int
+    next_cursor: str | None
     page_size: int
 
 
@@ -122,20 +122,24 @@ async def activity(
     request: Request,
     principal: CurrentSession,
     query: AuditFilters = Depends(filters),
-    page: int = Query(1, ge=1, le=1000000),
+    before: int | None = Query(None, gt=0, le=9223372036854775807),
 ):
     async with workspace_access(principal.user.id, workspace_id, get_settings(request), manage=True) as (db, tenant, _):
         clauses = conditions(workspace_id, tenant, query)
         total = await db.scalar(select(func.count()).select_from(AuditLog).where(*clauses))
+        if before is not None:
+            anchor = await db.scalar(select(AuditLog).where(AuditLog.tenant_id == workspace_id, AuditLog.id == before))
+            if anchor is None:
+                raise HTTPException(422, detail="invalid_audit_cursor")
+            clauses.append(tuple_(AuditLog.occurred_at, AuditLog.id) < (anchor.occurred_at, anchor.id))
+
         rows = (
             await db.scalars(
-                select(AuditLog)
-                .where(*clauses)
-                .order_by(AuditLog.occurred_at.desc(), AuditLog.id.desc())
-                .offset((page - 1) * 50)
-                .limit(50)
+                select(AuditLog).where(*clauses).order_by(AuditLog.occurred_at.desc(), AuditLog.id.desc()).limit(51)
             )
         ).all()
+        next_cursor = str(rows[49].id) if len(rows) > 50 else None
+        rows = rows[:50]
         names = await staff_names(db, workspace_id)
         return AuditPage(
             items=[
@@ -148,7 +152,7 @@ async def activity(
                 for row in rows
             ],
             total=total,
-            page=page,
+            next_cursor=next_cursor,
             page_size=50,
         )
 
@@ -157,7 +161,12 @@ def csv_line(values):
     output = io.StringIO(newline="")
     # Prevent spreadsheet formula execution in user-controlled actor names.
     csv.writer(output).writerow(
-        ["'" + str(value) if str(value).lstrip().startswith(("=", "+", "-", "@")) else str(value) for value in values]
+        [
+            "'" + str(value)
+            if str(value).startswith(("\t", "\r")) or str(value).lstrip().startswith(("=", "+", "-", "@"))
+            else str(value)
+            for value in values
+        ]
     )
     return output.getvalue()
 

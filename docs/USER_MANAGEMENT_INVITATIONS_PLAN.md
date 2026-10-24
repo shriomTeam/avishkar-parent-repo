@@ -502,3 +502,16 @@ for this plan. External references guide provider/identity/security details:
 - [Google guidance on non-authoritative email claims](https://developers.google.com/identity/sign-in/android/backend-auth)
 - [OWASP authorization guidance](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
 - [OWASP single-use URL token handling](https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html)
+
+## Review decisions (2026-10-24)
+
+Provider and Consultant remain reserved, denied-by-default feature roles. They can
+sign in and access workspace/account basics, but have no patient/product feature
+permissions until a separately reviewed policy is implemented. The shipped access
+matrix is in USER_MANAGEMENT.md; invitations never imply clinical access.
+
+Immediate delivery stays inside the request (bounded to five seconds), because
+Cloud Run CPU is request-scoped; a post-response task is not a durable delivery
+mechanism. The recovery job runs every five minutes with its own restricted cloud
+identity and email-only settings. Deploy configuration adopts the two existing
+production secret containers without storing their values in Terraform state.

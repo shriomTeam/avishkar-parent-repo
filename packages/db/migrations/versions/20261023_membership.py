@@ -6,7 +6,7 @@ from alembic import op
 from clinic_db.rls import enable_tenant_rls
 
 revision = "20261023_membership"
-down_revision = "51847416ab0c"
+down_revision = "85fd3f8a4f12"
 branch_labels = None
 depends_on = None
 

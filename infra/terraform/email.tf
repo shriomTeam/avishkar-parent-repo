@@ -14,6 +14,35 @@ resource "google_project_service" "email_scheduler" {
   disable_on_destroy = false
 }
 
+locals {
+  email_environment = {
+    APP_ENV             = "production"
+    INVITATIONS_ENABLED = tostring(var.invitations_enabled)
+    EMAIL_PROVIDER      = "sendgrid"
+    EMAIL_FROM_ADDRESS  = var.email_from_address
+    EMAIL_FROM_NAME     = var.email_from_name
+    EMAIL_REPLY_TO      = var.email_reply_to
+  }
+  email_secrets = {
+    DATABASE_SYSTEM_URL          = module.cloudsql.secret_ids["system-url"]
+    SENDGRID_API_KEY             = google_secret_manager_secret.email["sendgrid-api-key"].secret_id
+    EMAIL_PAYLOAD_ENCRYPTION_KEY = google_secret_manager_secret.email["email-payload-key"].secret_id
+  }
+}
+
+resource "google_service_account" "email_worker" {
+  count        = var.invitations_enabled ? 1 : 0
+  account_id   = "${local.name}-email-worker"
+  display_name = "Transactional email recovery only"
+}
+
+resource "google_secret_manager_secret_iam_member" "email_worker" {
+  for_each  = var.invitations_enabled ? local.email_secrets : {}
+  secret_id = each.value
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.email_worker[0].email}"
+}
+
 resource "google_cloud_run_v2_job" "email" {
   count               = var.invitations_enabled ? 1 : 0
   name                = "${local.name}-email"
@@ -22,7 +51,7 @@ resource "google_cloud_run_v2_job" "email" {
   labels              = local.labels
   template {
     template {
-      service_account = google_service_account.api.email
+      service_account = google_service_account.email_worker[0].email
       timeout         = "600s"
       max_retries     = 1
       containers {
@@ -34,14 +63,14 @@ resource "google_cloud_run_v2_job" "email" {
           limits = { cpu = "1", memory = "512Mi" }
         }
         dynamic "env" {
-          for_each = local.api_environment
+          for_each = local.email_environment
           content {
             name  = env.key
             value = env.value
           }
         }
         dynamic "env" {
-          for_each = local.api_secrets
+          for_each = local.email_secrets
           content {
             name = env.key
             value_source {
@@ -65,7 +94,7 @@ resource "google_cloud_run_v2_job" "email" {
   lifecycle {
     ignore_changes = [template[0].template[0].containers[0].image, client, client_version]
   }
-  depends_on = [google_secret_manager_secret_iam_member.api]
+  depends_on = [google_secret_manager_secret_iam_member.email_worker]
 }
 
 resource "google_service_account" "email_scheduler" {
@@ -87,7 +116,7 @@ resource "google_cloud_scheduler_job" "email" {
   count            = var.invitations_enabled ? 1 : 0
   name             = "${local.name}-email"
   region           = var.region
-  schedule         = "* * * * *"
+  schedule         = "*/5 * * * *"
   time_zone        = "Etc/UTC"
   attempt_deadline = "60s"
   http_target {
@@ -100,4 +129,11 @@ resource "google_cloud_scheduler_job" "email" {
     }
   }
   depends_on = [google_project_service.email_scheduler, google_cloud_run_v2_job_iam_member.email_scheduler]
+}
+
+# Adopt pre-existing containers without ever reading their secret values into state.
+import {
+  for_each = var.email_secrets_preprovisioned ? toset(["sendgrid-api-key", "email-payload-key"]) : toset([])
+  to       = google_secret_manager_secret.email[each.value]
+  id       = "projects/${var.project_id}/secrets/${local.name}-${each.value}"
 }

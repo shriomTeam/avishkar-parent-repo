@@ -7,3 +7,6 @@ import os
 os.environ["EMAIL_PROVIDER"] = "test"
 os.environ["INVITATIONS_ENABLED"] = "false"
 os.environ["SENDGRID_API_KEY"] = ""
+
+# Local tool demos must never disable SSRF checks in routine tests.
+os.environ["VOICE_TOOL_ALLOW_PRIVATE_HOSTS"] = "false"

@@ -150,7 +150,7 @@ Starting only the frontend and backend does **not** start a worker. With SendGri
 configured, invitation creation, resend and mailbox verification attempt delivery
 immediately after saving, within the API request—no scheduler wait. The request
 may take a few seconds while SendGrid responds (the immediate attempt is bounded
-to 20 seconds). A worker is still needed to recover interrupted attempts and retry
+to 5 seconds). A worker is still needed to recover interrupted attempts and retry
 temporary failures. Keep the chosen worker running while testing invitations. Use either
 the general worker or the email-only worker locally; do not start both for this
 setup. The general worker may also process existing patient/SMS jobs according to
@@ -210,11 +210,11 @@ SendGrid accepts the email.
 ### Production delivery is automatic after rollout
 
 Production does not use `pnpm dev`. The implementation includes an optional private
-Cloud Run email job triggered every minute by Cloud Scheduler. Provision the
+Cloud Run email job triggered every five minutes by Cloud Scheduler. Provision the
 SendGrid/encryption secret versions, enable Terraform `invitations_enabled` and
 configure the verified sender, apply infrastructure, then deploy the API/job image
 and migrations. New invitations are submitted to SendGrid immediately by the API;
-the minute-based job is a recovery/retry fallback, not the normal initial delivery
+the five-minute job is a recovery/retry fallback, not the normal initial delivery
 path. Once enabled, recovery runs without anyone keeping a terminal open. Running
 the backend alone does not provision or start this job. See the [production rollout instructions](docs/USER_MANAGEMENT.md#production-rollout)
 for prerequisites; these resources still need to be deployed/enabled in the target

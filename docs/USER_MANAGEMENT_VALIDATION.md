@@ -1,6 +1,10 @@
 # User management: PR validation
 
-Validation date: 23 October 2026. Branch: `user/management`.
+Validation dates: 23–24 October 2026. Branch: `user/management`.
+
+The 24 October review follow-up below supersedes the historical three-failure
+result: the full Python suite now passes (843 tests). Earlier sections retain the
+checks performed at each stage rather than implying every historical count is current.
 
 This records local verification of the invitation, membership and transactional
 email changes. It establishes readiness for code review, not a guarantee that
@@ -189,3 +193,48 @@ the original actor ID. Audit rows are not rewritten.
 The auth/invitation/workspace suite passes **22 tests**, including a regression for
 both ID formats and preventing names from a different workspace being exposed.
 Targeted Ruff and diff checks pass.
+
+## Review follow-up (24 October 2026)
+
+Rebased onto `origin/main` at `38e06c7` (Knowledge Base / PR #17), preserving its
+routes, schema, ingestion service and Next.js 16.4.2 update. The membership
+migration now follows `85fd3f8a4f12`; `20261023_audit_history` remains the only head.
+
+| Review point | Resolution |
+| --- | --- |
+| Three Voice URL-validation failures | Root conftest pins `VOICE_TOOL_ALLOW_PRIVATE_HOSTS=false`; an additional runtime validator rejects the override in production. All 13 validation cases also pass with a deliberately true parent environment. |
+| Provider / Consultant feature access | Intentionally reserved and denied by default; workspace/account basics only. This is explicit in the permission matrix and invitation plan. No extra clinical permissions were granted. |
+| Recovery identity and frequency | Dedicated `prod-avishkar-email-worker` cloud account, access to only the system DB URL and two email secrets, no bucket/OAuth secrets. The standalone worker uses an email-only validated settings class. Scheduler runs every five minutes. |
+| Slow immediate submission | Five-second outer budget instead of twenty, still awaited after commit. A cancellation regression proves the encrypted delivery remains recoverable. A post-response background task is deliberately avoided on request-scoped Cloud Run CPU. |
+| CSV leading control characters | Leading tab and carriage return are escaped even without a formula; formula-prefix escaping remains. |
+| BYPASSRLS management endpoints | Foreign-workspace and mismatched-ID regressions cover settings, member listing/update/removal, invitation creation/list/resend/revoke, audit options/history and CSV export. |
+| OFFSET at high page numbers | Removed OFFSET and arbitrary page numbers; audit pages use scoped event-ID cursors and `(occurred_at, id)` keyset comparisons. UI Previous/Next keeps a cursor stack and still shows 50 rows. |
+| Invitation delivery N+1 | One scoped delivery query for the pending invitation batch; a query-count regression verifies five invitations use one delivery SELECT. |
+| Next security patch | Preserved main's Next.js 16.4.2; aligned dependency minimums and regenerated the frozen lockfile. The [reported Server Actions advisory](https://github.com/vercel/next.js/security/advisories/GHSA-p3m5-59mp-jv5r) lists 16.4.1 as patched; it does not establish that 16.4.1 is affected. |
+| Production sender configuration | Enabled invitations and added the requested verified sender/name/reply-to in prod.tfvars. Existing email secret containers are adopted using declarative imports; values stay outside Terraform state. |
+
+Validation on the updated code:
+
+- Full Python suite: **843 passed**, one existing Authlib deprecation warning.
+- Focused new/affected regressions: **44 passed**.
+- Explicit true-parent-environment Voice URL regression: **13 passed**.
+- Frontend unit suite: **97 passed, 1 optional mutool check skipped**, no failures.
+- Frozen pnpm installation, uv frozen sync, API type regeneration, web typecheck,
+  web ESLint, repository Ruff check/format, architecture boundaries and Terraform
+  recursive formatting/validation pass.
+- Fresh isolated pgvector PostgreSQL 17 database migrated through the combined
+  chain; Alembic reports no model drift. Development data was not reset.
+- Full browser suite: **88 passed**, including Knowledge Base, invitations, cursor
+  navigation/filter/export, workspace restoration and the no-JavaScript onboarding
+  guard. The browser-only echo fixture deliberately allows localhost; routine
+  Python tests pin that override off.
+- The rebased onboarding hydration guard uses `useSyncExternalStore`, preserving
+  disabled-until-hydrated behavior while satisfying the current lint rule.
+- Production frontend build with Next.js 16.4.2 passes.
+- Final GitHub CI is triggered by pushing this review commit; consult PR #16 checks
+  for its current result rather than treating the older green head as validation.
+
+No Terraform plan/apply, secret-value read/write or production deployment was
+performed. The secret containers/versions are assumed to exist as confirmed by the
+user. Run Terraform before deploying the new recovery job image. Settings and
+permission tests do not replace a production delivery smoke test.

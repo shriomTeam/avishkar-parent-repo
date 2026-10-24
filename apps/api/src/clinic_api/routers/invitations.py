@@ -98,14 +98,26 @@ async def listing(workspace_id: uuid.UUID, request: Request, principal: CurrentS
                 .limit(100)
             )
         ).all()
+        deliveries = (
+            (
+                await db.scalars(
+                    select(EmailDelivery)
+                    .where(
+                        EmailDelivery.tenant_id == workspace_id,
+                        EmailDelivery.invitation_id.in_([invite.id for invite in rows]),
+                    )
+                    .order_by(EmailDelivery.created_at.desc(), EmailDelivery.id.desc())
+                )
+            ).all()
+            if rows
+            else []
+        )
+        latest = {}
+        for delivery in deliveries:
+            latest.setdefault((delivery.invitation_id, delivery.generation), delivery)
         result = []
         for invite in rows:
-            delivery = await db.scalar(
-                select(EmailDelivery)
-                .where(EmailDelivery.invitation_id == invite.id, EmailDelivery.generation == invite.generation)
-                .order_by(EmailDelivery.created_at.desc())
-                .limit(1)
-            )
+            delivery = latest.get((invite.id, invite.generation))
             result.append(
                 InvitationOut(
                     id=invite.id,

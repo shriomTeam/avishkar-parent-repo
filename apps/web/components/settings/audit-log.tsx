@@ -58,13 +58,18 @@ function AuditHistory({
 }) {
   const [draft, setDraft] = useState<Filters>(empty);
   const [filters, setFilters] = useState<Filters>(empty);
-  const [page, setPage] = useState(1);
+  const [cursors, setCursors] = useState([""]);
+  const page = cursors.length;
   const base = `/api/v1/workspaces/${workspaceId}/audit`;
   const params = new URLSearchParams(
     Object.entries(filters).filter(([, value]) => value),
   );
-  const url = `${base}?${params}&page=${page}`;
-  const resource = useWorkspaceResource<Schemas["AuditPage"]>(url, canManage);
+  const url = `${base}?${params}&before=${cursors.at(-1)}`;
+  const requestUrl = cursors.at(-1) ? url : `${base}?${params}`;
+  const resource = useWorkspaceResource<Schemas["AuditPage"]>(
+    requestUrl,
+    canManage,
+  );
   const options = useWorkspaceResource<Schemas["AuditOptions"]>(
     `${base}/options`,
     canManage,
@@ -124,7 +129,7 @@ function AuditHistory({
               event.preventDefault();
               if (!invalid) {
                 setFilters({ ...draft });
-                setPage(1);
+                setCursors([""]);
               }
             }}
           >
@@ -185,7 +190,7 @@ function AuditHistory({
                 onClick={() => {
                   setDraft(empty);
                   setFilters(empty);
-                  setPage(1);
+                  setCursors([""]);
                 }}
               >
                 Clear filters
@@ -258,7 +263,16 @@ function AuditHistory({
                 page={page}
                 pageSize={50}
                 total={resource.data.total}
-                onPageChange={setPage}
+                hasNext={!!resource.data.next_cursor}
+                onPageChange={(next) => {
+                  if (next < page)
+                    setCursors((previous) => previous.slice(0, -1));
+                  else if (resource.data?.next_cursor)
+                    setCursors((previous) => [
+                      ...previous,
+                      resource.data!.next_cursor!,
+                    ]);
+                }}
               />
             </>
           )}

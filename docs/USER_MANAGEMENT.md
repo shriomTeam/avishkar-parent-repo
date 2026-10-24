@@ -56,7 +56,7 @@ entitlements. A role in one workspace grants no authority in another.
 | Change role, remove or re-invite an Office Manager | Yes | No | No | No | No |
 | Grant Owner, change/remove an Owner, or change own membership | No | No | No | No | No |
 | Read Voice Receptionist calls, transcripts and saved recordings | Yes | Yes | Yes | No | No |
-| Read/manage voice agents, tools and variables; run test/browser calls | Yes | Yes | No | No | No |
+| Read/manage voice agents, tools, variables and Knowledge Base; run test/browser calls | Yes | Yes | No | No | No |
 | Read Dormant patients run status, type totals, data status and schedule | Yes | Yes | Yes | No | No |
 | Start reactivation runs, analyse CSVs or edit reactivation settings | Yes | Yes | No | No | No |
 | Read patient-level reactivation lists, detailed summary and report endpoints | Yes | Yes | No | No | No |
@@ -72,7 +72,7 @@ entitlements. A role in one workspace grants no authority in another.
   Desk, Provider and Consultant). Cannot manage an Owner or another Office Manager,
   promote someone to Office Manager, or demote a manager to bypass that restriction.
 - **Front Desk:** has the read access listed above for Voice Receptionist and Dormant
-  patients. Cannot configure voice agents, tools or variables, start test calls,
+  patients. Cannot configure voice agents, tools, variables or Knowledge Base, start test calls,
   access patient-level reactivation reports, import data, edit workspace details,
   view the member directory/audit log or manage invitations.
 - **Provider:** can use account/workspace basics but currently has no product feature
@@ -186,7 +186,7 @@ With `EMAIL_PROVIDER=sendgrid`, invitation creation, resend and mailbox verifica
 first commit their database transaction, then await `deliver_email(delivery.id,
 settings)` inside the active API request. It claims only that email using the same
 durable lease as the worker and attempts SendGrid immediately. There is no
-scheduler wait on the normal path. The attempt is bounded to 20 seconds; failed or
+scheduler wait on the normal path. The attempt is bounded to 5 seconds; failed or
 interrupted attempts remain recoverable. A provider error does not undo an already
 committed invitation or falsely report that invitation creation failed. This is
 awaited before the response so Cloud Run does not need idle CPU after the request.
@@ -298,7 +298,7 @@ ID, primary key and a composite tenant/time/ID index for history browsing. Run
 **Implemented:**
 
 - Owner/Office Manager access only, with server-side workspace membership checks.
-- 50 events per page, ordered newest first by timestamp and ID, with Previous/Next
+- 50 events per page, ordered newest first by timestamp and ID, with cursor-based Previous/Next
   navigation and matching result counts. All stored history is accessible.
 - From/To dates (inclusive calendar days in the workspace timezone), Actor and Event
   filters combine together. Apply filters resets pagination; Clear filters restores
@@ -344,10 +344,23 @@ Set `invitations_enabled=true`, `email_from_address`, optional `email_reply_to` 
 `email_from_name` only after those versions and the verified sender are ready.
 
 The optional private `${name}-email` Cloud Run Job uses the current API image and
-is invoked every minute by Cloud Scheduler with a job-scoped invoker identity.
+is invoked every five minutes by Cloud Scheduler with a job-scoped invoker identity.
+It runs as a dedicated email-worker service account with access only to the system
+database URL, SendGrid key and email payload key. It has no OAuth/auth/app database
+secret or bucket access. A dedicated settings loader avoids needing API credentials.
 It is the recovery/retry fallback; new invitations are attempted immediately in
 the API request and do not wait for this schedule. The deploy workflow updates its image when it is provisioned. Terraform applies
 and release deployment are not performed by local implementation/testing.
+
+The production tfvars enable invitations and set the verified sender to
+`abhinav.chaudhary@avishkar.app`, named `Avishkar AI`. Since the two secret containers
+were created manually, `email_secrets_preprovisioned=true` imports those containers
+into Terraform management; secret **values** are neither read nor imported into
+state. Leave this option false for a new environment where Terraform should create
+empty containers. Ensure both existing secrets contain enabled versions before
+applying the enabled configuration. Apply Terraform first, then run Deploy so the
+new email job receives the release API image. The deploy and Terraform workflows
+are separate and should not be assumed to finish in that order automatically.
 
 Run the migration before the API release. Verify queued → provider-accepted with
 an approved recipient and check spam/bounce handling manually before a broad

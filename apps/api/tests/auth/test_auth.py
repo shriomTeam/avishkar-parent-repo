@@ -1007,9 +1007,12 @@ async def test_audit_history_filters_pagination_export_and_permissions(system):
     assert result.status_code == 200, result.text
     first = result.json()
     assert first["total"] == 556 and first["page_size"] == 50 and len(first["items"]) == 50
-    second = (await client.get(path, params={"page": 2})).json()
+    second = (await client.get(path, params={"before": first["next_cursor"]})).json()
     assert not ({x["id"] for x in first["items"]} & {x["id"] for x in second["items"]})
-    assert len((await client.get(path, params={"page": 12})).json()["items"]) == 6
+    last = second
+    while last["next_cursor"]:
+        last = (await client.get(path, params={"before": last["next_cursor"]})).json()
+    assert len(last["items"]) == 6
     query = {
         "start_date": "2026-10-23",
         "end_date": "2026-10-23",
@@ -1037,7 +1040,7 @@ async def test_audit_history_filters_pagination_export_and_permissions(system):
         ).status_code == 422
         assert (await client.get(path + suffix, params={"actor": "invalid"})).status_code == 422
         assert (await client.get(path + suffix, params={"end_date": "9999-12-31"})).status_code == 422
-    assert (await client.get(path, params={"page": 0})).status_code == 422
+    assert (await client.get(path, params={"before": 0})).status_code == 422
     for suffix in ("", "/options", "/export"):
         assert (await client.get(f"/api/v1/workspaces/{foreign_id}/audit" + suffix)).status_code == 403
     for role in ("office_manager", "front_desk", "provider", "consultant"):
@@ -1102,3 +1105,140 @@ async def test_audit_resolves_legacy_account_ids_only_within_workspace(system):
         member_id: name,
         str(foreign_user): "Unknown member",
     }
+
+
+async def test_every_workspace_management_endpoint_rejects_foreign_ids(system):
+    from clinic_core.tenancy.invitations import create_invitation
+    from clinic_db.models.core import Staff, Tenant
+    from clinic_db.models.membership import Invitation
+
+    app, client, csrf, workspace = await invitation_setup(system)
+    own = f"/api/v1/workspaces/{workspace['id']}"
+    own_invite = (
+        await client.post(own + "/invitations", headers=csrf, json={"email": "own@test.example", "role": "front_desk"})
+    ).json()["id"]
+    async with app.state.session_factory() as auth_db:
+        stranger = User(email="stranger@test.example", display_name="Stranger")
+        auth_db.add(stranger)
+        await auth_db.commit()
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        tenant = Tenant(name="Foreign workspace", timezone="UTC", clinic_type="wellness")
+        db.add(tenant)
+        await db.flush()
+        member = Staff(
+            tenant_id=tenant.id,
+            user_id=stranger.id,
+            name="Foreign Owner",
+            email=stranger.email,
+            role="owner",
+            active=True,
+        )
+        db.add(member)
+        await db.flush()
+        invite, _ = await create_invitation(
+            db, tenant, member, email="foreign@test.example", role="front_desk", settings=app.state.settings
+        )
+        foreign_id, member_id, invitation_id = tenant.id, member.id, invite.id
+    foreign = f"/api/v1/workspaces/{foreign_id}"
+    for suffix in ("settings", "members", "audit", "audit/options", "audit/export", "invitations"):
+        assert (await client.get(foreign + "/" + suffix)).status_code == 403
+    assert (
+        await client.post(
+            foreign + "/settings",
+            headers=csrf,
+            json={"name": "hacked", "timezone": "UTC", "clinic_type": "wellness", "address": "", "phone": None},
+        )
+    ).status_code == 403
+    assert (
+        await client.post(
+            foreign + "/invitations", headers=csrf, json={"email": "hacked@test.example", "role": "front_desk"}
+        )
+    ).status_code == 403
+    for action in ("resend", "revoke"):
+        assert (await client.post(f"{own}/invitations/{invitation_id}/{action}", headers=csrf)).status_code == 404
+        assert (await client.post(f"{foreign}/invitations/{own_invite}/{action}", headers=csrf)).status_code == 403
+    for body in ({"role": "front_desk"}, {"deactivate": True}):
+        assert (await client.post(f"{own}/members/{member_id}", headers=csrf, json=body)).status_code == 404
+        assert (await client.post(f"{foreign}/members/{member_id}", headers=csrf, json=body)).status_code == 403
+    assert (await client.get(own + "/audit", params={"action": "invitation.created"})).json()["total"] == 1
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        assert (await db.get(Tenant, foreign_id)).name == "Foreign workspace"
+        assert (await db.get(Staff, member_id)).active
+        assert (await db.get(Invitation, invitation_id)).status == "pending"
+
+
+async def test_invitation_delivery_statuses_are_fetched_in_one_query(system):
+    from sqlalchemy import event
+
+    from clinic_core.database import _system_engine
+
+    app, client, csrf, workspace = await invitation_setup(system)
+    path = f"/api/v1/workspaces/{workspace['id']}/invitations"
+    for index in range(5):
+        assert (
+            await client.post(path, headers=csrf, json={"email": f"batch{index}@test.example", "role": "front_desk"})
+        ).status_code == 201
+    queries = []
+
+    def capture(conn, cursor, statement, parameters, context, executemany):
+        if "ops.email_deliveries" in statement and statement.lstrip().upper().startswith("SELECT"):
+            queries.append(statement)
+
+    engine = _system_engine(app.state.settings.database_system_url).sync_engine
+    event.listen(engine, "before_cursor_execute", capture)
+    try:
+        result = await client.get(path)
+    finally:
+        event.remove(engine, "before_cursor_execute", capture)
+    assert result.status_code == 200
+    assert len(result.json()["invitations"]) == 5
+    assert {row["delivery_status"] for row in result.json()["invitations"]} == {"queued"}
+    assert len(queries) == 1
+
+
+async def test_immediate_email_timeout_is_five_seconds_and_queue_recovers(system, monkeypatch):
+    from cryptography.fernet import Fernet
+    from pydantic import SecretStr
+
+    from clinic_db.models.membership import EmailDelivery
+    from clinic_engagement.email import service
+
+    app, client, csrf, workspace = await invitation_setup(system)
+    app.state.settings.email_provider = "sendgrid"
+    app.state.settings.sendgrid_api_key = SecretStr("fake-test-key")
+    app.state.settings.email_from_address = "sender@test.example"
+    app.state.settings.email_payload_encryption_key = SecretStr(Fernet.generate_key().decode())
+    budgets = []
+    real_timeout = asyncio.timeout
+
+    def bounded(seconds):
+        budgets.append(seconds)
+        return real_timeout(0.05)  # Exercise cancellation without waiting five seconds.
+
+    async def slow_provider(**kwargs):
+        await asyncio.Event().wait()
+
+    monkeypatch.setattr(service.asyncio, "timeout", bounded)
+    monkeypatch.setattr(service, "send_email", slow_provider)
+    response = await client.post(
+        f"/api/v1/workspaces/{workspace['id']}/invitations",
+        headers=csrf,
+        json={"email": "slow@test.example", "role": "front_desk"},
+    )
+    assert response.status_code == 201
+    assert budgets == [5]
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        delivery = await db.scalar(
+            select(EmailDelivery).where(EmailDelivery.invitation_id == uuid.UUID(response.json()["id"]))
+        )
+        assert delivery.status == "sending" and delivery.payload
+        delivery.next_attempt_at = now() - timedelta(seconds=1)
+        ident = delivery.id
+
+    async def captured(**kwargs):
+        return "recovered-after-timeout"
+
+    assert await service.deliver_due(app.state.settings, sender=captured, delivery_id=ident, limit=1) == 1
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        delivery = await db.get(EmailDelivery, ident)
+        assert delivery.status == "accepted" and delivery.payload is None
