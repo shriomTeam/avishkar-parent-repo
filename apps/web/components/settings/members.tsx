@@ -32,6 +32,15 @@ const roleOptions = [
   "provider",
   "consultant",
 ].map((value) => ({ value, label: value.replaceAll("_", " ") }));
+// Reserved until these roles have product permissions. Keep existing memberships
+// visible/manageable, but do not offer these roles for new invitations.
+const invitationRoleOptions = [
+  "office_manager",
+  "front_desk",
+  // "provider",
+  // "consultant",
+].map((value) => ({ value, label: value.replaceAll("_", " ") }));
+
 export function Members({
   workspaceId,
   userId,
@@ -416,9 +425,15 @@ function InviteUser({
   error: string;
   member: Schemas["WorkspaceMemberOut"] | null;
 }) {
+  const availableRoles = invitationRoleOptions.filter((r) =>
+    roles.includes(r.value),
+  );
   const [role, setRole] = useState(
-    member?.role ??
-      (roles.includes("front_desk") ? "front_desk" : (roles[0] ?? "")),
+    availableRoles.some((r) => r.value === member?.role)
+      ? member!.role
+      : (availableRoles.find((r) => r.value === "front_desk")?.value ??
+          availableRoles[0]?.value ??
+          ""),
   );
   const [email, setEmail] = useState(member?.email ?? "");
   const [busy, setBusy] = useState(false);
@@ -460,7 +475,7 @@ function InviteUser({
         />
         <Dropdown
           label="Role"
-          options={roleOptions.filter((r) => roles.includes(r.value))}
+          options={availableRoles}
           value={role}
           onChange={setRole}
           disabled={busy}

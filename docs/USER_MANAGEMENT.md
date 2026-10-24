@@ -63,6 +63,14 @@ entitlements. A role in one workspace grants no authority in another.
 | Import patient/appointment data | Yes | Yes | No | No | No |
 | Access Patient Blueprints and other enabled feature routers | Yes | Yes | No | No | No |
 
+**Note:** Provider and Consultant are currently disabled in the invitation modal;
+their options are commented out, not removed. The three working roles available
+for current use are **Owner, Office Manager and Front Desk**. Owner is assigned
+when creating a workspace and cannot be granted by invitation. Owners can invite
+Office Managers or Front Desk; Office Managers can invite Front Desk. The backend
+policy and existing memberships remain as documented above; this change hides
+reserved roles from new invitations and re-invitations without deleting them.
+
 ### Role-specific limits
 
 - **Owner:** manages workspace settings and all non-owner roles. Ownership transfer

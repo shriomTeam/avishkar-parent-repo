@@ -94,6 +94,23 @@ test("platform sign-in and onboarding are independent of voice UI", async ({
   await page.getByRole("textbox", { name: "Search members" }).fill("");
   await page.getByRole("button", { name: "Invite user", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "Invite user" })).toBeVisible();
+  const inviteDialog = page.getByRole("dialog", { name: "Invite user" });
+  await inviteDialog
+    .getByRole("combobox", { name: "Role", exact: true })
+    .click();
+  await expect(
+    page.getByRole("option", { name: "office manager", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("option", { name: "front desk", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("option", { name: "provider", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("option", { name: "consultant", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("option", { name: "front desk", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Send invitation" }),
   ).toBeEnabled();
