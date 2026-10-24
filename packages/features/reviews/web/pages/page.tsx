@@ -1,9 +1,41 @@
 import { api, requireFeature } from "@clinic/core/web/api";
+import {
+  Button,
+  DataTable,
+  H2,
+  H3,
+  Input,
+  Muted,
+  NativeSelect,
+  PageHeading,
+  Panel,
+  StatCard,
+  StatusBadge,
+  Td,
+  TextField,
+  Th,
+  Tr,
+} from "@clinic/ui";
 
 import { activateReviewCampaign, createReviewCampaign, resolveFollowUp, saveGoogleProfile } from "../actions";
 
 export const metadata = { title: "Reviews" };
 export const dynamic = "force-dynamic";
+
+const steps = [
+  {
+    title: "We ask for a rating",
+    body: "When an appointment is completed, the campaign texts or emails the patient a link.",
+  },
+  {
+    title: "They rate the visit here",
+    body: "They choose 1 to 5 stars and can add a comment. That rating stays on Avishkar.",
+  },
+  {
+    title: "Only 4 and 5 stars see Google",
+    body: "Those patients get a button to your Google review link. A lower rating stops there and becomes a follow-up.",
+  },
+];
 
 export default async function ReviewsPage() {
   await requireFeature("reviews");
@@ -18,182 +50,167 @@ export default async function ReviewsPage() {
 
   return (
     <>
-      <div className="heading">
-        <div>
-          <h1>Reviews</h1>
-          <p>After a completed visit, patients rate the practice on Avishkar. Only 4 and 5 star ratings are invited to Google.</p>
-        </div>
+      <PageHeading
+        title="Reviews"
+        description="After a completed visit, patients rate the practice on Avishkar. Only 4 and 5 star ratings are invited to Google."
+      />
+
+      <div className="mb-[22px] grid grid-cols-3 gap-[18px] max-[1100px]:grid-cols-1">
+        <StatCard
+          highlight
+          label="Google review link"
+          value={connected ? "Ready" : "Missing"}
+          hint={connected ? "Happy patients can be sent to Google" : "Add the link below before requests go out"}
+        />
+        <StatCard label="Waiting to send" value={String(scheduled)} hint={`${requests} already sent to patients`} />
+        <StatCard label="Ratings received" value={String(ratings)} hint="Submitted on this page, not on Google" />
       </div>
 
-      <div className="cards">
-        <div className="panel metric feature">
-          <label>Google review link</label>
-          <div className="value">{connected ? "Ready" : "Missing"}</div>
-          <small>{connected ? "Happy patients can be sent to Google" : "Add the link below before requests go out"}</small>
+      <Panel className="mb-[22px]">
+        <div className="mb-5">
+          <H2>What the patient goes through</H2>
         </div>
-        <div className="panel metric">
-          <label>Waiting to send</label>
-          <div className="value">{scheduled}</div>
-          <small>{requests} already sent to patients</small>
+        <div className="grid grid-cols-3 gap-3.5 max-[1100px]:grid-cols-1">
+          {steps.map((step, index) => (
+            <article key={step.title} className="min-w-0 rounded-xl bg-[#f7faf5] p-4">
+              <div className="mb-3 inline-flex size-7 items-center justify-center rounded-lg bg-brand text-[13px] font-bold text-ink">
+                {index + 1}
+              </div>
+              <H3>{step.title}</H3>
+              <Muted flush>{step.body}</Muted>
+            </article>
+          ))}
         </div>
-        <div className="panel metric">
-          <label>Ratings received</label>
-          <div className="value">{ratings}</div>
-          <small>Submitted on this page, not on Google</small>
-        </div>
-      </div>
+      </Panel>
 
-      <section className="panel">
-        <div className="panelHead">
-          <h2>What the patient goes through</h2>
-        </div>
-        <div className="flow">
-          <article>
-            <div className="step">1</div>
-            <h3>We ask for a rating</h3>
-            <p>When an appointment is completed, the campaign texts or emails the patient a link.</p>
-          </article>
-          <article>
-            <div className="step">2</div>
-            <h3>They rate the visit here</h3>
-            <p>They choose 1 to 5 stars and can add a comment. That rating stays on Avishkar.</p>
-          </article>
-          <article>
-            <div className="step">3</div>
-            <h3>Only 4 and 5 stars see Google</h3>
-            <p>Those patients get a button to your Google review link. A lower rating stops there and becomes a follow-up.</p>
-          </article>
-        </div>
-      </section>
-
-      <section className="panel" id="google">
-        <div className="panelHead">
-          <div>
-            <h2>Google review link</h2>
-            <p>This is the page happy patients open. It is not shown to anyone who rates 1, 2, or 3 stars.</p>
-          </div>
+      <Panel className="mb-[22px]" id="google">
+        <div className="mb-5">
+          <H2>Google review link</H2>
+          <Muted>This is the page happy patients open. It is not shown to anyone who rates 1, 2, or 3 stars.</Muted>
         </div>
         <form action={saveGoogleProfile}>
-          <div className="formgrid">
-            <div className="field">
-              <label htmlFor="listing_name">Listing name</label>
-              <input id="listing_name" name="listing_name" required defaultValue={data.integration.listing_name ?? ""} />
-            </div>
-            <div className="field">
-              <label htmlFor="review_url">Review link</label>
-              <input
-                id="review_url"
-                name="review_url"
-                type="url"
-                required
-                placeholder="https://g.page/r/…/review"
-                defaultValue={data.integration.google_review_url ?? ""}
-              />
-            </div>
+          <div className="mb-4 grid grid-cols-2 gap-x-[18px] max-[1100px]:grid-cols-1">
+            <TextField flush label="Listing name" name="listing_name" required defaultValue={data.integration.listing_name ?? ""} />
+            <TextField
+              flush
+              label="Review link"
+              name="review_url"
+              type="url"
+              required
+              placeholder="https://g.page/r/…/review"
+              defaultValue={data.integration.google_review_url ?? ""}
+            />
           </div>
-          <button className="primary" type="submit">
+          <Button variant="brand" type="submit">
             Save link
-          </button>
+          </Button>
         </form>
-      </section>
+      </Panel>
 
-      <section className="panel" id="campaigns">
-        <div className="panelHead">
-          <div>
-            <h2>When the request is sent</h2>
-            <p>A completed appointment schedules one message. Delay is how many minutes we wait before texting or emailing the patient.</p>
-          </div>
+      <Panel className="mb-[22px]" id="campaigns">
+        <div className="mb-5">
+          <H2>When the request is sent</H2>
+          <Muted>
+            A completed appointment schedules one message. Delay is how many minutes we wait before texting or emailing the
+            patient.
+          </Muted>
         </div>
-        <form action={createReviewCampaign} className="inline-form">
-            <div className="field">
-              <label htmlFor="delay_minutes">Delay (minutes)</label>
-              <input id="delay_minutes" name="delay_minutes" type="number" min={0} defaultValue={120} />
-            </div>
-            <div className="field">
-              <label htmlFor="channel">Channel</label>
-              <select id="channel" name="channel">
-                <option value="sms">SMS</option>
-                <option value="email">Email</option>
-              </select>
-            </div>
-            <button type="submit">Create draft</button>
-          </form>
-        {data.campaigns.length === 0 ? (
-          <p>No campaigns yet.</p>
-        ) : (
-          <div className="tablewrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Status</th>
-                  <th>Delay</th>
-                  <th>Sent</th>
-                  <th>Ratings</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {data.campaigns.map((campaign) => (
-                  <tr key={campaign.id}>
-                    <td>{campaign.name}</td>
-                    <td>
-                      <span className={campaign.status === "active" ? "badge" : "badge neutral"}>{campaign.status}</span>
-                    </td>
-                    <td>{campaign.delay_minutes} min</td>
-                    <td>{campaign.stats.requests}</td>
-                    <td>{campaign.stats.ratings_submitted}</td>
-                    <td>
-                      {campaign.status === "draft" ? (
-                        <form action={activateReviewCampaign.bind(null, campaign.id)}>
-                          <button type="submit">Activate</button>
-                        </form>
-                      ) : null}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <section className="panel" id="follow-ups">
-        <div className="panelHead">
+        <form action={createReviewCampaign} className="mb-[18px] flex flex-wrap items-end gap-2.5">
           <div>
-            <h2>Patients not sent to Google</h2>
-            <p>Someone on the team should call these patients. They already saw a thank-you. They did not see the Google link.</p>
+            <label htmlFor="delay_minutes" className="mb-2 block text-[12px] font-medium text-muted">
+              Delay (minutes)
+            </label>
+            <div className="w-28">
+              <Input id="delay_minutes" name="delay_minutes" type="number" min={0} defaultValue={120} />
+            </div>
           </div>
+          <div>
+            <label htmlFor="channel" className="mb-2 block text-[12px] font-medium text-muted">
+              Channel
+            </label>
+            <NativeSelect id="channel" name="channel" inline className="max-w-[7.5rem] [field-sizing:content]">
+              <option value="sms">SMS</option>
+              <option value="email">Email</option>
+            </NativeSelect>
+          </div>
+          <Button variant="outline" type="submit">
+            Create draft
+          </Button>
+        </form>
+        {data.campaigns.length === 0 ? (
+          <Muted>No campaigns yet.</Muted>
+        ) : (
+          <DataTable>
+            <thead>
+              <tr>
+                <Th>Name</Th>
+                <Th>Status</Th>
+                <Th>Delay</Th>
+                <Th>Sent</Th>
+                <Th>Ratings</Th>
+                <Th />
+              </tr>
+            </thead>
+            <tbody>
+              {data.campaigns.map((campaign) => (
+                <Tr key={campaign.id}>
+                  <Td>{campaign.name}</Td>
+                  <Td>
+                    <StatusBadge tone={campaign.status === "active" ? "brand" : "muted"}>{campaign.status}</StatusBadge>
+                  </Td>
+                  <Td>{campaign.delay_minutes} min</Td>
+                  <Td>{campaign.stats.requests}</Td>
+                  <Td>{campaign.stats.ratings_submitted}</Td>
+                  <Td>
+                    {campaign.status === "draft" ? (
+                      <form action={activateReviewCampaign.bind(null, campaign.id)}>
+                        <Button variant="outline" type="submit">
+                          Activate
+                        </Button>
+                      </form>
+                    ) : null}
+                  </Td>
+                </Tr>
+              ))}
+            </tbody>
+          </DataTable>
+        )}
+      </Panel>
+
+      <Panel id="follow-ups">
+        <div className="mb-5">
+          <H2>Patients not sent to Google</H2>
+          <Muted>Someone on the team should call these patients. They already saw a thank-you. They did not see the Google link.</Muted>
         </div>
         {data.pending_follow_ups.length === 0 ? (
-          <p>None waiting. A 1, 2, or 3 star rating will show up here.</p>
+          <Muted>None waiting. A 1, 2, or 3 star rating will show up here.</Muted>
         ) : (
-          <div className="tablewrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Rating</th>
-                  <th>Reason</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {data.pending_follow_ups.map((task) => (
-                  <tr key={task.id}>
-                    <td>{task.rating}</td>
-                    <td>{task.reason.replaceAll("_", " ")}</td>
-                    <td>
-                      <form action={resolveFollowUp.bind(null, task.id)}>
-                        <button type="submit">Resolve</button>
-                      </form>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable>
+            <thead>
+              <tr>
+                <Th>Rating</Th>
+                <Th>Reason</Th>
+                <Th />
+              </tr>
+            </thead>
+            <tbody>
+              {data.pending_follow_ups.map((task) => (
+                <Tr key={task.id}>
+                  <Td>{task.rating}</Td>
+                  <Td>{task.reason.replaceAll("_", " ")}</Td>
+                  <Td>
+                    <form action={resolveFollowUp.bind(null, task.id)}>
+                      <Button variant="outline" type="submit">
+                        Resolve
+                      </Button>
+                    </form>
+                  </Td>
+                </Tr>
+              ))}
+            </tbody>
+          </DataTable>
         )}
-      </section>
+      </Panel>
     </>
   );
 }

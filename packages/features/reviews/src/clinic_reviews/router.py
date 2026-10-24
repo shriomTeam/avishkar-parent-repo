@@ -115,9 +115,10 @@ async def overview(session: AsyncSession = Depends(get_session)) -> OverviewOut:
 
 @router.post("/integration/google", response_model=IntegrationOut, dependencies=MANAGERS)
 async def connect_google(body: ConnectGoogleIn, session: AsyncSession = Depends(get_session)) -> IntegrationOut:
-    url = body.review_url.strip()
-    if not url.startswith("https://"):
-        raise HTTPException(422, "review link must be an https URL")
+    try:
+        url = google_profile.validate_review_url(body.review_url)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
     row = await google_profile.connect(session, listing_name=body.listing_name.strip(), review_url=url)
     return IntegrationOut(
         listing_name=row.listing_name,

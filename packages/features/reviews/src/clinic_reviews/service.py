@@ -16,7 +16,13 @@ from clinic_db.models.engagement import Enrollment
 from clinic_db.models.reviews import Campaign, Feedback, FollowUpTask, ReviewRequest
 from clinic_engagement import enroll
 from clinic_reviews import eligibility
-from clinic_reviews.constants import EMAIL_SEQUENCE_KEY, FEATURE_KEY, GOOGLE_REVIEW_MIN, SMS_SEQUENCE_KEY
+from clinic_reviews.constants import (
+    EMAIL_SEQUENCE_KEY,
+    FEATURE_KEY,
+    GOOGLE_REVIEW_MIN,
+    MAX_DISPATCH_ATTEMPTS,
+    SMS_SEQUENCE_KEY,
+)
 
 
 def new_public_token() -> str:
@@ -80,9 +86,24 @@ async def dispatch_due(ctx: JobContext, _data: dict, *, now: datetime | None = N
     ).all()
     sent = 0
     for request in due:
-        if await _dispatch_one(ctx.session, request, now=now):
+        try:
+            async with ctx.session.begin_nested():
+                queued = await _dispatch_one(ctx.session, request, now=now)
+        except Exception as exc:
+            await _note_dispatch_failure(ctx.session, request, now, exc)
+            continue
+        if queued:
             sent += 1
     return sent
+
+
+async def _note_dispatch_failure(session: AsyncSession, request: ReviewRequest, now: datetime, exc: Exception) -> None:
+    await session.refresh(request)
+    request.attempt_count += 1
+    request.claimed_at = now
+    request.failure_reason = type(exc).__name__[:200]
+    request.status = "failed_permanent" if request.attempt_count >= MAX_DISPATCH_ATTEMPTS else "scheduled"
+    await session.flush()
 
 
 async def _dispatch_one(session: AsyncSession, request: ReviewRequest, *, now: datetime) -> bool:
@@ -127,6 +148,7 @@ async def _dispatch_one(session: AsyncSession, request: ReviewRequest, *, now: d
         )
 
     request.channel = result.channel
+    # submitted means the engagement sequence accepted the message. That sequence sends it.
     request.submitted_at = now
     request.status = "submitted"
     await audit(
@@ -176,9 +198,17 @@ async def submit_feedback(
         comment=comment or None,
         google_review_offered=rating >= GOOGLE_REVIEW_MIN,
     )
-    session.add(feedback)
-    request.status = "completed"
-    await session.flush()
+    try:
+        async with session.begin_nested():
+            session.add(feedback)
+            request.status = "completed"
+            await session.flush()
+    except IntegrityError:
+        session.expunge(feedback)
+        existing = await session.scalar(select(Feedback).where(Feedback.request_id == request.id))
+        if existing is None:
+            raise
+        return existing
     if rating < GOOGLE_REVIEW_MIN:
         session.add(
             FollowUpTask(

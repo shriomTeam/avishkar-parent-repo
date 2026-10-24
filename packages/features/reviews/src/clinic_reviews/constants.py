@@ -2,3 +2,4 @@ FEATURE_KEY = "reviews"
 SMS_SEQUENCE_KEY = "reviews.sms"
 EMAIL_SEQUENCE_KEY = "reviews.email"
 GOOGLE_REVIEW_MIN = 4
+MAX_DISPATCH_ATTEMPTS = 3

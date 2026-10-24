@@ -3,7 +3,7 @@ import { loadEnvConfig } from "@next/env";
 import { resolve } from "node:path";
 loadEnvConfig(resolve(process.cwd(), "../.."));
 const config: NextConfig = {
-  transpilePackages: ["@clinic/ui", "@clinic/api-client", "@clinic/core", "@clinic/feature-reviews"],
+  transpilePackages: ["@clinic/ui", "@clinic/api-client", "@clinic/core"],
   output: "standalone",
   // Next buffers a proxied (rewritten) request body and cuts it off at 10 MB by default, which then fails the
   // request. Dormant patients' Import CSV posts files up to 25 MB through /api/platform, so allow 30 MB.

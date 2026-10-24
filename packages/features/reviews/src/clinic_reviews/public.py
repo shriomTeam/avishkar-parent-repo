@@ -3,9 +3,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 
 from clinic_core.database import system_session, tenant_session
+from clinic_core.entitlements import enabled_feature_keys
 from clinic_db.models.core import Tenant
 from clinic_db.models.reviews import Feedback, Integration, ReviewRequest
 from clinic_reviews import service
+from clinic_reviews.constants import FEATURE_KEY
 
 router = APIRouter(tags=["reviews-public"])
 
@@ -36,6 +38,11 @@ async def _ids_for_token(token: str) -> tuple:
         return row.tenant_id, row.id
 
 
+async def _require_feature(session) -> None:
+    if FEATURE_KEY not in await enabled_feature_keys(session):
+        raise HTTPException(404, "request not found")
+
+
 async def _payload(session, request: ReviewRequest, tenant: Tenant) -> PublicFeedbackOut:
     feedback = await session.scalar(select(Feedback).where(Feedback.request_id == request.id))
     integration = await session.scalar(select(Integration))
@@ -54,6 +61,7 @@ async def _payload(session, request: ReviewRequest, tenant: Tenant) -> PublicFee
 async def get_feedback_page(token: str) -> PublicFeedbackOut:
     tenant_id, request_id = await _ids_for_token(token)
     async with tenant_session(tenant_id) as session:
+        await _require_feature(session)
         request = await session.get(ReviewRequest, request_id)
         tenant = await session.get(Tenant, tenant_id)
         if request is None or tenant is None:
@@ -65,6 +73,7 @@ async def get_feedback_page(token: str) -> PublicFeedbackOut:
 async def submit_feedback_page(token: str, body: PublicFeedbackIn) -> PublicFeedbackOut:
     tenant_id, request_id = await _ids_for_token(token)
     async with tenant_session(tenant_id) as session:
+        await _require_feature(session)
         request = await session.get(ReviewRequest, request_id)
         tenant = await session.get(Tenant, tenant_id)
         if request is None or tenant is None or request.status in ("skipped", "cancelled"):
@@ -77,6 +86,7 @@ async def submit_feedback_page(token: str, body: PublicFeedbackIn) -> PublicFeed
 async def google_click(token: str) -> PublicFeedbackOut:
     tenant_id, request_id = await _ids_for_token(token)
     async with tenant_session(tenant_id) as session:
+        await _require_feature(session)
         request = await session.get(ReviewRequest, request_id)
         tenant = await session.get(Tenant, tenant_id)
         feedback = await session.scalar(select(Feedback).where(Feedback.request_id == request_id)) if request else None
