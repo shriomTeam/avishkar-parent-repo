@@ -3,7 +3,7 @@
 Validation dates: 23–24 October 2026. Branch: `user/management`.
 
 The 24 October review follow-up below supersedes the historical three-failure
-result: the full Python suite now passes (843 tests). Earlier sections retain the
+result: the full Python suite now passes (853 tests). Earlier sections retain the
 checks performed at each stage rather than implying every historical count is current.
 
 This records local verification of the invitation, membership and transactional
@@ -238,3 +238,31 @@ No Terraform plan/apply, secret-value read/write or production deployment was
 performed. The secret containers/versions are assumed to exist as confirmed by the
 user. Run Terraform before deploying the new recovery job image. Settings and
 permission tests do not replace a production delivery smoke test.
+
+
+## Cloud Tasks follow-up (24 October)
+
+Production email now follows Knowledge Base's Cloud Tasks/private HTTP worker
+pattern. After commit the API publishes only a delivery UUID; the OIDC-authenticated
+worker loads the encrypted record and submits to SendGrid. Database leases and
+terminal statuses handle duplicate tasks. The five-minute recovery job republishes
+missing/stale tasks rather than sending production email directly. Local queue
+configuration remains empty and retains direct sending plus worker recovery.
+
+Final verification:
+
+- Full Python suite: **853 passed**, one existing Authlib deprecation warning.
+- Focused auth/Cloud Tasks suite after the final RPC timeout change: **35 passed**.
+- Platform browser journeys: **4 passed**; the prior full browser run was 88 passed.
+- Fresh isolated PostgreSQL migration and Alembic drift check passed; one head
+  `20261024_email_tasks`.
+- Ruff, architecture boundaries, generated API schema comparison, Terraform
+  formatting and validation passed.
+- Fixed a randomized reactivation differential-test fixture responsible for the
+  previous CI failure. Three separate fresh processes passed the unchanged assertion.
+- Local Docker dependency downloads stalled; image validation must be confirmed
+  by the new email image CI build rather than reported as locally successful.
+
+Deploy requires Terraform provisioning of the queue, private sender and identities,
+then the release workflow's email image deployment before the API release. No
+production infrastructure was applied or email sent during these tests.

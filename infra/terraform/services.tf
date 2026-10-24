@@ -104,7 +104,7 @@ module "api" {
     KNOWLEDGE_TASKS_REGION        = var.region
     KNOWLEDGE_INGEST_URL          = local.ingest_url
     KNOWLEDGE_TASKS_INVOKER_EMAIL = google_service_account.queue.email
-  })
+  }, local.email_task_environment)
   secret_env = local.api_secrets
 
   depends_on = [

@@ -58,3 +58,5 @@ class EmailDelivery(IdMixin, TenantMixin, TimestampMixin, Base):
     next_attempt_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     provider_message_id: Mapped[str | None] = mapped_column(String(200))
     error: Mapped[str | None] = mapped_column(String(80))
+    task_dispatch_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    task_generation: Mapped[int] = mapped_column(Integer, default=0, server_default="0")

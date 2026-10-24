@@ -510,8 +510,11 @@ sign in and access workspace/account basics, but have no patient/product feature
 permissions until a separately reviewed policy is implemented. The shipped access
 matrix is in USER_MANAGEMENT.md; invitations never imply clinical access.
 
-Immediate delivery stays inside the request (bounded to five seconds), because
-Cloud Run CPU is request-scoped; a post-response task is not a durable delivery
-mechanism. The recovery job runs every five minutes with its own restricted cloud
-identity and email-only settings. Deploy configuration adopts the two existing
-production secret containers without storing their values in Terraform state.
+Production requests now publish delivery IDs to Cloud Tasks after committing,
+using a bounded task-creation call rather than waiting for SendGrid. A separate
+private Cloud Run HTTP service authenticates the queue's OIDC caller and processes
+the encrypted delivery. Direct sending remains only as the local no-queue fallback.
+The five-minute recovery job republishes failed/stale dispatches; generation names,
+DB leases and terminal-state checks protect against duplicates. Deploy provisions
+scoped queue identities and updates the private handler before the API. Existing
+secret containers are adopted without putting their values into Terraform state.

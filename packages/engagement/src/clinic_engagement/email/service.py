@@ -88,7 +88,7 @@ async def enqueue_email(
 
 
 async def deliver_email(delivery_id, settings=None):
-    """Attempt one committed email now; the durable queue handles interrupted/failed attempts.
+    """Dispatch one committed email via Cloud Tasks, or send directly in local development.
 
     Await this after leaving the enqueue transaction, inside the active API request.
     Test/console providers intentionally keep mail queued for a captured dispatcher.
@@ -98,6 +98,10 @@ async def deliver_email(delivery_id, settings=None):
         return 0
     try:
         async with asyncio.timeout(5):
+            if settings.email_tasks_queue:
+                from clinic_engagement.email.tasks import publish
+
+                return await publish(delivery_id, settings)
             return await deliver_due(settings, delivery_id=delivery_id, limit=1)
     except Exception:
         # Never turn a committed invitation into a failed HTTP request or log secrets.

@@ -165,6 +165,9 @@ async def copy_with_derived_ids(source: uuid.UUID) -> uuid.UUID:
     for appt in sc.appointments:
         if appt.status == "completed" and appt.starts_at <= AS_OF:
             done.setdefault(appt.patient_id, []).append(appt)
+    # Source UUID ordering is random: patient index 20 may have no completed visits.
+    # Choose an eligible patient explicitly so every run exercises exactly one outlier.
+    outlier_patient_id = min(done)
     for i, patient in sorted(patients.values(), key=lambda x: x[0]):
         visits = sorted(done.get(patient.id, []), key=lambda a: a.starts_at)
         if visits and i % 7 == 4:  # the first visit was a consult
@@ -183,7 +186,7 @@ async def copy_with_derived_ids(source: uuid.UUID) -> uuid.UUID:
             extra_txn(patient, 9900, "membership", AS_OF - timedelta(days=20))
         if i % 15 == 2:
             extra_txn(patient, 20000, "package", AS_OF - timedelta(days=60))
-        if visits and i == 20:  # an outlier far above 50x the median
+        if patient.id == outlier_patient_id:  # an outlier far above 50x the median
             extra_txn(patient, 3_000_000, "product", visits[-1].starts_at, visits[-1])
         if i % 5 == 1:
             status = ["active", "cancelled", "lapsed", "expired"][(i // 5) % 4]

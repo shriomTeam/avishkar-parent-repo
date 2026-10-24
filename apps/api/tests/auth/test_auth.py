@@ -1242,3 +1242,159 @@ async def test_immediate_email_timeout_is_five_seconds_and_queue_recovers(system
     async with system_session(database_url=app.state.settings.database_system_url) as db:
         delivery = await db.get(EmailDelivery, ident)
         assert delivery.status == "accepted" and delivery.payload is None
+
+
+def cloud_email_config(settings):
+    from pydantic import SecretStr
+
+    settings.email_provider = "sendgrid"
+    settings.sendgrid_api_key = SecretStr("fake-cloud-task-test-key")
+    settings.email_from_address = "sender@example.com"
+    settings.email_tasks_project = "test-project"
+    settings.email_tasks_region = "us-east1"
+    settings.email_tasks_queue = "test-email"
+    settings.email_tasks_url = "https://email.example.com"
+    settings.email_tasks_audience = "https://email.example.com"
+    settings.email_tasks_invoker_email = "tasks@test-project.iam.gserviceaccount.com"
+
+
+async def test_invitation_queues_after_commit_worker_sends_once_and_revocation_cancels(system, monkeypatch):
+    from unittest.mock import AsyncMock
+
+    from google.oauth2 import id_token
+
+    from clinic_core.settings import EmailWorkerSettings
+    from clinic_db.models.membership import EmailDelivery
+    from clinic_engagement.email import service, tasks
+    from clinic_engagement.email.task_app import create_app as worker_app
+
+    app, client, csrf, workspace = await invitation_setup(system)
+    cloud_email_config(app.state.settings)
+    scheduled = []
+    monkeypatch.setattr(tasks, "_create_task", lambda cfg, ident, generation: scheduled.append((ident, generation)))
+    sender = AsyncMock(return_value="accepted-in-worker")
+    monkeypatch.setattr(service, "send_email", sender)
+    monkeypatch.setattr(
+        id_token,
+        "verify_oauth2_token",
+        lambda *a, **k: {"email": app.state.settings.email_tasks_invoker_email, "email_verified": True},
+    )
+    path = f"/api/v1/workspaces/{workspace['id']}/invitations"
+    response = await client.post(path, headers=csrf, json={"email": "queued@example.com", "role": "front_desk"})
+    assert response.status_code == 201
+    assert len(scheduled) == 1 and scheduled[0][1] == 1
+    sender.assert_not_awaited()  # API request never contacts SendGrid when tasks are configured.
+    delivery_id = scheduled[0][0]
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        row = await db.get(EmailDelivery, delivery_id)
+        assert row.status == "queued" and row.payload and row.task_dispatch_at is not None
+    cfg = EmailWorkerSettings(**app.state.settings.model_dump())
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=worker_app(cfg)), base_url=cfg.email_tasks_url
+    ) as worker:
+        body, auth = {"delivery_id": str(delivery_id)}, {"Authorization": "Bearer signed-test"}
+        first = await worker.post("/tasks/email/send", json=body, headers=auth)
+        assert first.status_code == 200 and first.json()["status"] == "accepted"
+        assert (await worker.post("/tasks/email/send", json=body, headers=auth)).status_code == 200
+        sender.assert_awaited_once()
+        second = await client.post(
+            path, headers=csrf, json={"email": "revoked-queued@example.com", "role": "front_desk"}
+        )
+        assert second.status_code == 201
+        assert (await client.post(f"{path}/{second.json()['id']}/revoke", headers=csrf)).status_code == 200
+        cancelled = await worker.post("/tasks/email/send", json={"delivery_id": str(scheduled[-1][0])}, headers=auth)
+        assert cancelled.status_code == 200 and cancelled.json()["status"] == "cancelled"
+        sender.assert_awaited_once()
+        assert (await worker.post("/tasks/email/send", json={"delivery_id": str(uuid.uuid4())}, headers=auth)).json()[
+            "status"
+        ] == "missing"
+
+
+async def test_task_enqueue_failure_concurrent_dispatch_and_lost_task_recovery(system, monkeypatch):
+    from clinic_db.models.membership import EmailDelivery
+    from clinic_engagement.email import tasks
+
+    app, client, csrf, workspace = await invitation_setup(system)
+    cloud_email_config(app.state.settings)
+
+    def unavailable(*args):
+        raise RuntimeError("simulated Cloud Tasks outage")
+
+    monkeypatch.setattr(tasks, "_create_task", unavailable)
+    response = await client.post(
+        f"/api/v1/workspaces/{workspace['id']}/invitations",
+        headers=csrf,
+        json={"email": "recover-task@example.com", "role": "front_desk"},
+    )
+    assert response.status_code == 201  # Committed invitation survives enqueue failure.
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        row = await db.scalar(
+            select(EmailDelivery).where(EmailDelivery.invitation_id == uuid.UUID(response.json()["id"]))
+        )
+        ident = row.id
+        assert row.task_dispatch_at is None and row.payload and row.status == "queued" and row.task_generation == 1
+    scheduled = []
+    monkeypatch.setattr(tasks, "_create_task", lambda cfg, ident, generation: scheduled.append((ident, generation)))
+    assert sorted(
+        await asyncio.gather(tasks.publish(ident, app.state.settings), tasks.publish(ident, app.state.settings))
+    ) == [0, 1]
+    assert scheduled == [(ident, 2)]
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        row = await db.get(EmailDelivery, ident)
+        row.task_dispatch_at = now() - tasks.DISPATCH_LEASE - timedelta(seconds=1)
+        row.next_attempt_at = now() - timedelta(days=3650)  # First due record, independent of other test fixtures.
+    assert await tasks.dispatch_due(app.state.settings, limit=1) == 1
+    assert scheduled[-1] == (ident, 3)  # New task name rescues an exhausted/lost prior task.
+
+
+async def test_email_http_worker_retries_transient_provider_errors_and_acknowledges_terminal_failure(
+    system, monkeypatch
+):
+    from unittest.mock import AsyncMock
+
+    from google.oauth2 import id_token
+
+    from clinic_core.settings import EmailWorkerSettings
+    from clinic_db.models.membership import EmailDelivery
+    from clinic_engagement.email import service, tasks
+    from clinic_engagement.email.sendgrid import EmailFailure
+    from clinic_engagement.email.task_app import create_app as worker_app
+
+    app, client, csrf, workspace = await invitation_setup(system)
+    cloud_email_config(app.state.settings)
+    scheduled = []
+    monkeypatch.setattr(tasks, "_create_task", lambda cfg, ident, generation: scheduled.append(ident))
+    monkeypatch.setattr(
+        id_token,
+        "verify_oauth2_token",
+        lambda *a, **k: {"email": app.state.settings.email_tasks_invoker_email, "email_verified": True},
+    )
+    response = await client.post(
+        f"/api/v1/workspaces/{workspace['id']}/invitations",
+        headers=csrf,
+        json={"email": "worker-retry@example.com", "role": "front_desk"},
+    )
+    assert response.status_code == 201
+    sender = AsyncMock(side_effect=[EmailFailure(429, "300"), "accepted-after-retry"])
+    monkeypatch.setattr(service, "send_email", sender)
+    cfg = EmailWorkerSettings(**app.state.settings.model_dump())
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=worker_app(cfg)), base_url=cfg.email_tasks_url
+    ) as worker:
+        body, auth = {"delivery_id": str(scheduled[0])}, {"Authorization": "Bearer signed-test"}
+        result = await worker.post("/tasks/email/send", json=body, headers=auth)
+        assert result.status_code == 503 and int(result.headers["Retry-After"]) > 0
+        assert (await worker.post("/tasks/email/send", json=body, headers=auth)).status_code == 503
+        sender.assert_awaited_once()  # Backoff/active lease cannot be bypassed by duplicate tasks.
+        async with system_session(database_url=cfg.database_system_url) as db:
+            row = await db.get(EmailDelivery, scheduled[0])
+            assert row.status == "retry" and row.payload
+            row.next_attempt_at = now() - timedelta(seconds=1)
+        assert (await worker.post("/tasks/email/send", json=body, headers=auth)).json()["status"] == "accepted"
+        assert sender.await_count == 2
+        async with system_session(database_url=cfg.database_system_url) as db:
+            row = await db.get(EmailDelivery, scheduled[0])
+            assert row.payload is None
+            row.status = "failed"
+        assert (await worker.post("/tasks/email/send", json=body, headers=auth)).json()["status"] == "failed"
+        assert sender.await_count == 2

@@ -471,7 +471,11 @@ dependencies = [
     { name = "clinic-core" },
     { name = "clinic-db" },
     { name = "cryptography" },
+    { name = "fastapi" },
+    { name = "google-auth", extra = ["requests"] },
+    { name = "google-cloud-tasks" },
     { name = "httpx" },
+    { name = "uvicorn" },
 ]
 
 [package.metadata]
@@ -479,7 +483,11 @@ requires-dist = [
     { name = "clinic-core", editable = "packages/core" },
     { name = "clinic-db", editable = "packages/db" },
     { name = "cryptography", specifier = ">=43" },
+    { name = "fastapi", specifier = ">=0.115" },
+    { name = "google-auth", extras = ["requests"], specifier = ">=2.0" },
+    { name = "google-cloud-tasks", specifier = ">=2.16" },
     { name = "httpx", specifier = ">=0.28" },
+    { name = "uvicorn", specifier = ">=0.32" },
 ]
 
 [[package]]

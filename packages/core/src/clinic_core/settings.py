@@ -24,9 +24,37 @@ class EmailSettings(BaseSettings):
     email_from_address: str = ""
     email_from_name: str = "Avishkar AI"
     email_reply_to: str = ""
+    email_tasks_project: str = ""
+    email_tasks_region: str = ""
+    email_tasks_queue: str = ""
+    email_tasks_url: str = ""
+    email_tasks_invoker_email: str = ""
+    email_tasks_audience: str = ""
 
     @model_validator(mode="after")
     def validate_email_config(self):
+        task_fields = [
+            self.email_tasks_project,
+            self.email_tasks_region,
+            self.email_tasks_queue,
+            self.email_tasks_url,
+            self.email_tasks_invoker_email,
+            self.email_tasks_audience,
+        ]
+        if any(task_fields) and not all(task_fields):
+            raise ValueError("Email Cloud Tasks requires project, region, queue, URL, invoker and audience")
+        if self.email_tasks_url:
+            for value in (self.email_tasks_url, self.email_tasks_audience):
+                target = urlsplit(value)
+                if (
+                    target.scheme != "https"
+                    or not target.netloc
+                    or target.path
+                    or target.query
+                    or target.fragment
+                    or target.username
+                ):
+                    raise ValueError("Email task URL and audience must be HTTPS origins")
         if not 1 <= self.invitation_ttl_hours <= 168:
             raise ValueError("Invitation lifetime must be between 1 and 168 hours")
         if self.invitations_enabled:

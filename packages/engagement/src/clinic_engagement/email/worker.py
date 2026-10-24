@@ -6,15 +6,16 @@ import logging
 
 from clinic_core.database import dispose_engines
 from clinic_core.settings import EmailWorkerSettings
-from clinic_engagement.email.service import deliver_due
+from clinic_engagement.email.tasks import dispatch_due
 
 
 async def main(once=False):
     settings = EmailWorkerSettings()
     try:
         while True:
-            count = await deliver_due(settings, limit=20)
-            logging.getLogger("email.worker").info("email_provider_accepted=%d", count)
+            count = await dispatch_due(settings, limit=20)
+            metric = "email_tasks_published" if settings.email_tasks_queue else "email_provider_accepted"
+            logging.getLogger("email.worker").info("%s=%d", metric, count)
             if once:
                 return
             await asyncio.sleep(10)

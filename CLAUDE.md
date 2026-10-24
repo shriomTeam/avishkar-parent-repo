@@ -38,7 +38,8 @@ apps/
     tests/auth/                auth, tenant and entitlement integration tests
     tests/browser_server.py    test-only simulated Google provider
     Dockerfile                 optional API/worker container image
-  worker/                      one background worker
+  worker/                      general worker plus private Cloud Tasks HTTP handlers
+    email.Dockerfile           private transactional-email sender image
 packages/
   db/                          all SQLAlchemy tables and one Alembic stream
     src/clinic_db/models/
@@ -53,7 +54,7 @@ packages/
     tests/auth/                shared auth unit tests
   integrations/                client data import
   engagement/                  shared SMS and email engine
-    src/clinic_engagement/email/ encrypted durable mail, SendGrid transport, template/ factories
+    src/clinic_engagement/email/ encrypted mail, tasks.py dispatch, task_app.py private handler, template/ factories
   features/
     reactivation/
       src/                     reactivation backend (analysis engine, runs, CSV import)

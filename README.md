@@ -146,9 +146,9 @@ To process up to 20 due emails once and exit:
 uv run python -m clinic_engagement.email.worker --once
 ```
 
-Starting only the frontend and backend does **not** start a worker. With SendGrid
-configured, invitation creation, resend and mailbox verification attempt delivery
-immediately after saving, within the API request—no scheduler wait. The request
+Starting only the frontend and backend does **not** start a worker. Locally, with
+SendGrid configured and `EMAIL_TASKS_*` left blank, invitation creation, resend and
+mailbox verification attempt delivery immediately after saving, within the API request. The request
 may take a few seconds while SendGrid responds (the immediate attempt is bounded
 to 5 seconds). A worker is still needed to recover interrupted attempts and retry
 temporary failures. Keep the chosen worker running while testing invitations. Use either
@@ -209,16 +209,19 @@ SendGrid accepts the email.
 
 ### Production delivery is automatic after rollout
 
-Production does not use `pnpm dev`. The implementation includes an optional private
-Cloud Run email job triggered every five minutes by Cloud Scheduler. Provision the
-SendGrid/encryption secret versions, enable Terraform `invitations_enabled` and
-configure the verified sender, apply infrastructure, then deploy the API/job image
-and migrations. New invitations are submitted to SendGrid immediately by the API;
-the five-minute job is a recovery/retry fallback, not the normal initial delivery
-path. Once enabled, recovery runs without anyone keeping a terminal open. Running
-the backend alone does not provision or start this job. See the [production rollout instructions](docs/USER_MANAGEMENT.md#production-rollout)
-for prerequisites; these resources still need to be deployed/enabled in the target
-environment.
+Production does not use `pnpm dev`. New emails are committed to the encrypted
+PostgreSQL queue, then their delivery IDs are queued immediately in **Google Cloud
+Tasks**. Cloud Tasks calls a dedicated private Cloud Run email service using OIDC;
+that service sends through SendGrid and retries transient failures. The invitation
+request waits only for bounded task creation, not the SendGrid response.
+
+The five-minute Cloud Scheduler job remains a safety net: it re-enqueues records
+whose task creation failed, or whose dispatch reservation is older than 15 minutes.
+It does not poll SendGrid on the normal production path. Apply Terraform and the
+new database migration first; Deploy builds the `email` image and updates the
+private email service **before** the API. No extra email API key is needed beyond
+the existing SendGrid/payload secrets. Queue settings and scoped IAM are managed by
+Terraform. See [production rollout](docs/USER_MANAGEMENT.md#production-rollout).
 
 The configured production app origin is
 `https://prod-avishkar-web-287171356403.us-east1.run.app` (without a feature path).

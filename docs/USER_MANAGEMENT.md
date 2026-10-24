@@ -184,28 +184,40 @@ pnpm db:migrate
 
 With `EMAIL_PROVIDER=sendgrid`, invitation creation, resend and mailbox verification
 first commit their database transaction, then await `deliver_email(delivery.id,
-settings)` inside the active API request. It claims only that email using the same
-durable lease as the worker and attempts SendGrid immediately. There is no
-scheduler wait on the normal path. The attempt is bounded to 5 seconds; failed or
-interrupted attempts remain recoverable. A provider error does not undo an already
-committed invitation or falsely report that invitation creation failed. This is
-awaited before the response so Cloud Run does not need idle CPU after the request.
-Console/test providers retain queued records for explicit captured dispatch and
-never send real email through this path.
+settings)`. In production, where `EMAIL_TASKS_*` is configured, this publishes a
+Cloud Task and does **not** contact SendGrid in the API request. Task creation has a
+three-second RPC deadline inside a five-second API budget. The task contains only
+`delivery_id`; no address, template, bearer token or API key enters Cloud Tasks.
 
-The existing `clinic-worker` recovers queued records and retries due failures.
-For local testing or a deployment that only needs email recovery, run the isolated dispatcher:
+The private `/tasks/email/send` worker validates a Google-signed OIDC token for its
+exact audience and queue caller service account, then claims the delivery's existing
+durable lease, rechecks invitation validity/permissions and sends through SendGrid.
+It returns 2xx for terminal states (accepted, failed, cancelled or missing) and 503
+with Retry-After for retry/backoff/in-progress records. Duplicate tasks respect the
+same lease and terminal-state checks. At most five actual provider attempts occur;
+queue retries do not bypass the stored backoff or consume attempts before due.
+
+Cloud Tasks and PostgreSQL cannot commit atomically. Before publishing, a delivery
+gets a dispatch reservation and increasing generation. RPC failures clear that
+reservation for recovery; a process crash or exhausted/lost task is repaired after
+15 minutes. A five-minute recovery job scans due records and publishes replacement
+tasks with new generation names. Task name deduplication is useful but is not the
+only duplicate protection. An enqueue error never undoes a committed invitation.
+
+Locally, leave all `EMAIL_TASKS_*` settings blank. The existing five-second direct
+send remains, with `clinic-worker` or the email-only dispatcher handling retries:
 
 ```sh
 uv run python -m clinic_engagement.email.worker
+# Process up to 20 due records and exit:
+uv run python -m clinic_engagement.email.worker --once
 ```
 
-This dispatcher only processes transactional email, not patient sequences or SMS.
-For a scheduler/job execution, pass `--once`; each invocation drains up to 20 due
-records. The continuous process polls every ten seconds. A healthy SendGrid initial
-submission works even without a dispatcher, but interrupted requests and retries
-need this recovery process. Creating an invitation never pretends inbox delivery
-has been confirmed.
+With Cloud Tasks configured, these commands reconcile task dispatch instead of
+sending directly. Without it they send due records locally. The continuous process
+polls every ten seconds; the production recovery job uses `--once` every five
+minutes. Console/test providers never send real email via the API path. Tests that
+exercise the Cloud Tasks path explicitly inject fake SendGrid and task transports.
 
 The SendGrid transport uses the fixed v3 Mail Send endpoint and server credentials,
 disables open/click tracking, and never logs the body, token or recipient. A 202
@@ -244,7 +256,7 @@ delivery = await enqueue_email(
 Call this inside the same transaction as the business operation. After the
 transaction context has exited successfully (committed), optionally call
 `await deliver_email(delivery.id, settings)` before returning the API response for
-immediate submission. Never call it inside the transaction: another connection
+immediate task dispatch (or a local direct-send attempt when no queue is configured). Never call it inside the transaction: another connection
 must be able to see the saved record. Queue-only background operations can leave
 submission to the worker. Future templates
 live in `packages/engagement/src/clinic_engagement/email/template/` and return an
@@ -266,7 +278,7 @@ email to this transport without replacing the SMS provider or consent engine.
 - `auth.invitation_contexts`: opaque browser-bound invitation continuation and
   optional short-lived verification challenge. No raw invitation token is stored.
 - `ops.email_deliveries`: encrypted recipient/content/URL, scoped deduplication
-  key, attempt lease, error code and provider submission metadata. Ciphertext is
+  key, attempt lease, task dispatch reservation/generation, error code and provider submission metadata. Ciphertext is
   bound to its delivery/tenant identity. Redis/outbox payloads only contain ids.
 - `auth.auth_sessions.active_workspace_id`: selected workspace, reauthorized
   against current memberships. A narrow system-role grant lets acceptance update
@@ -343,14 +355,31 @@ Terraform through the secret workflow. Do not put key values into tfvars or stat
 Set `invitations_enabled=true`, `email_from_address`, optional `email_reply_to` and
 `email_from_name` only after those versions and the verified sender are ready.
 
-The optional private `${name}-email` Cloud Run Job uses the current API image and
-is invoked every five minutes by Cloud Scheduler with a job-scoped invoker identity.
-It runs as a dedicated email-worker service account with access only to the system
-database URL, SendGrid key and email payload key. It has no OAuth/auth/app database
-secret or bucket access. A dedicated settings loader avoids needing API credentials.
-It is the recovery/retry fallback; new invitations are attempted immediately in
-the API request and do not wait for this schedule. The deploy workflow updates its image when it is provisioned. Terraform applies
-and release deployment are not performed by local implementation/testing.
+Terraform provisions a separate `${name}-email` Cloud Tasks queue (two dispatches
+per second, one concurrent request), a private `${name}-email-send` Cloud Run
+service and a `${name}-email-tasks` caller identity. The API and recovery runner can
+enqueue only onto this queue and act as only this caller. Only that caller gets
+Run Invoker on the email service. The dedicated email-worker runtime has the system
+DB URL, SendGrid/payload secrets and scoped queue publication permissions; it has
+no API OAuth, auth/app DB secret or storage-bucket access.
+
+Terraform sets these non-secret environment variables for API and email runtimes:
+
+```dotenv
+EMAIL_TASKS_PROJECT=<project-id>
+EMAIL_TASKS_REGION=us-east1
+EMAIL_TASKS_QUEUE=prod-avishkar-email
+EMAIL_TASKS_URL=https://prod-avishkar-email-send-<project-number>.us-east1.run.app
+EMAIL_TASKS_AUDIENCE=https://prod-avishkar-email-send-<project-number>.us-east1.run.app
+EMAIL_TASKS_INVOKER_EMAIL=prod-avishkar-email-tasks@<project-id>.iam.gserviceaccount.com
+```
+
+The existing `${name}-email` Cloud Run Job is invoked every five minutes by Cloud
+Scheduler with a job-scoped identity. It now only repairs dispatch failures/stale
+reservations in Cloud Tasks; normal messages do not wait for that schedule. The
+Deploy workflow builds a dedicated `email` image and deploys the private service
+before updating the API; it updates the recovery job using the API image as before.
+The new `20261024_email_tasks` migration must run before publishing or processing.
 
 The production tfvars enable invitations and set the verified sender to
 `abhinav.chaudhary@avishkar.app`, named `Avishkar AI`. Since the two secret containers
@@ -359,7 +388,7 @@ into Terraform management; secret **values** are neither read nor imported into
 state. Leave this option false for a new environment where Terraform should create
 empty containers. Ensure both existing secrets contain enabled versions before
 applying the enabled configuration. Apply Terraform first, then run Deploy so the
-new email job receives the release API image. The deploy and Terraform workflows
+private email service and recovery job receive their release images. The deploy and Terraform workflows
 are separate and should not be assumed to finish in that order automatically.
 
 Run the migration before the API release. Verify queued → provider-accepted with
