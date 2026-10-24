@@ -56,6 +56,7 @@ class AgentIn(BaseModel):
     is_active: bool = True
     save_transcript: bool = True
     save_raw_events: bool = True
+    save_recording: bool = False
     fields: list[FieldIn] = Field(default_factory=list, max_length=MAX_FIELDS)
     tool_ids: list[uuid.UUID] = Field(default_factory=list, max_length=20)
 
@@ -96,6 +97,7 @@ class AgentOut(BaseModel):
     is_active: bool
     save_transcript: bool
     save_raw_events: bool
+    save_recording: bool
     created_at: datetime
     updated_at: datetime
     fields: list[FieldOut] = Field(default_factory=list)
@@ -114,6 +116,7 @@ class CallSummaryOut(BaseModel):
     started_at: datetime
     duration_seconds: int | None
     summary: str | None
+    recording_status: str | None = None  # "saved" or "failed" if the agent recorded this call, else null
     captured_count: int = 0
 
 

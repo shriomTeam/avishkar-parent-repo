@@ -6,6 +6,6 @@ Features without tables yet: blueprints (computed from core), lead_response,
 scribe, command_center, photos.
 """
 
-from clinic_db.models import auth, core, engagement, ops, reactivation, reviews, staging, voice
+from clinic_db.models import auth, core, engagement, knowledge, ops, reactivation, reviews, staging, voice
 
-__all__ = ["auth", "core", "engagement", "ops", "reactivation", "reviews", "staging", "voice"]
+__all__ = ["auth", "core", "engagement", "knowledge", "ops", "reactivation", "reviews", "staging", "voice"]

@@ -34,7 +34,16 @@ output "google_oauth_redirect_uri" {
   value       = "${local.web_url}/api/v1/auth/google/callback"
 }
 
+output "ingest_url" {
+  description = "Private knowledge-base ingestion service. Only the Cloud Tasks queue's service account can call it."
+  value       = local.ingest_url
+}
+
+output "knowledge_queue" {
+  value = module.knowledge_queue.name
+}
+
 output "files_bucket" {
-  description = "Private bucket for feature files; voice recordings go under recordings/."
+  description = "Private bucket for feature files; voice recordings go under voice-recordings/."
   value       = module.storage.name
 }

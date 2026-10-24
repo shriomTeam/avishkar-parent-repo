@@ -8,7 +8,7 @@ test("platform sign-in and onboarding are independent of voice UI", async ({
     "src",
     "/brand/avishkar-logo.png",
   );
-  await expect(page.locator(".voice-scope")).toHaveCount(0);
+  await expect(page.getByTestId("voice-app")).toHaveCount(0);
   await expect(page.locator(".login-page")).toHaveCSS("display", "grid");
   await page.getByRole("link", { name: "Continue with Google" }).click();
   await expect(page).toHaveURL(/\/onboarding$/);

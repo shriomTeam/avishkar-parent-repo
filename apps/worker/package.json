@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "uv run clinic-worker",
-    "lint": "uv run ruff check src"
+    "dev:ingest": "uv run clinic-ingest",
+    "lint": "uv run ruff check src tests",
+    "test": "uv run pytest tests -q"
   }
 }

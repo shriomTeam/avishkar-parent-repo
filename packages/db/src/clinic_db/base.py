@@ -13,7 +13,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 # Order matters only for readability; the initial migration creates them all.
-PLATFORM_SCHEMAS = ["core", "staging", "ops", "engagement", "auth"]
+PLATFORM_SCHEMAS = ["core", "staging", "ops", "engagement", "auth", "knowledge"]
 FEATURE_SCHEMAS = [
     "reactivation",
     "blueprints",

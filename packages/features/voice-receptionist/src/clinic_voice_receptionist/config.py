@@ -21,6 +21,9 @@ class VoiceSettings(BaseSettings):
     max_call_seconds: int = 600
     max_concurrent_calls: int = 50  # per API instance; extra calls are refused politely
 
+    # Private bucket for call recordings (voice-recordings/ folder). Unset: agents cannot record.
+    recordings_bucket: str = ""
+
     # Custom tools. The key encrypts tool auth headers at rest; required outside dev and test.
     secrets_key: str = ""
     # Dev and tests only: lets tools call localhost and private addresses. Never enable in production.

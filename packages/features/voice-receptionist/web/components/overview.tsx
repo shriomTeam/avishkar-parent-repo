@@ -4,7 +4,18 @@ import { useState } from "react";
 import { useDemo } from "../lib/demo/provider";
 import { useVoice } from "../lib/voice/provider";
 import { callDuration, plural } from "../lib/format";
-import { Heading, Metric, Badge, Empty } from "./ui";
+import {
+  Avatar,
+  buttonStyles,
+  FooterRow,
+  Panel,
+  panelLinkStyles,
+  PanelHead,
+  Pill,
+  StatGrid,
+  WideSplit,
+} from "@clinic/ui";
+import { Heading, Metric, Badge, Dropdown, Empty } from "./ui";
 import { CallsTable } from "./calls-table";
 import { VoiceBoundary } from "./voice-boundary";
 
@@ -54,22 +65,28 @@ function Summary() {
         description="A clear view of how your voice agents are doing."
         actions={
           <>
-            <select
-              className="period-select"
-              aria-label="Overview period"
-              value={period}
-              onChange={(e) => setPeriod(Number(e.target.value))}
+            <Dropdown
+              inline
+              className="min-w-[130px] max-app:flex-1"
+              label="Overview period"
+              hideLabel
+              value={String(period)}
+              onChange={(value) => setPeriod(Number(value))}
+              options={[
+                { value: "7", label: "Last 7 days" },
+                { value: "30", label: "Last 30 days" },
+              ]}
+            />
+            <Link
+              className={buttonStyles("brand")}
+              href="/voice-receptionist/agents"
             >
-              <option value={7}>Last 7 days</option>
-              <option value={30}>Last 30 days</option>
-            </select>
-            <Link className="button primary" href="/voice-receptionist/agents">
               Manage agents
             </Link>
           </>
         }
       />
-      <div className="cards">
+      <StatGrid>
         <Metric
           label="Total calls"
           value={String(calls.length)}
@@ -91,17 +108,15 @@ function Summary() {
           value={average === null ? "—" : callDuration(average)}
           sub="Completed calls"
         />
-      </div>
-      <div className="two">
-        <section className="panel">
-          <div className="panelHead">
-            <h2>Call activity</h2>
-            <span className="pill">
-              {plural(calls.length, "call")} in this period
-            </span>
-          </div>
+      </StatGrid>
+      <WideSplit>
+        <Panel>
+          <PanelHead
+            title="Call activity"
+            action={<Pill>{plural(calls.length, "call")} in this period</Pill>}
+          />
           <div
-            className={`chart ${period === 30 ? "chart-month" : ""}`}
+            className={`relative flex h-[195px] items-end bg-[repeating-linear-gradient(to_top,transparent_0,transparent_44px,#f0eff4_45px,#f0eff4_46px)] px-3 pb-6 min-[1500px]:h-[240px] ${period === 30 ? "gap-[5px] max-app:gap-[3px]" : "gap-[17px] max-app:gap-2.5"}`}
             role="img"
             aria-label={buckets
               .map((b) => `${b.key}: ${b.count} calls`)
@@ -109,24 +124,37 @@ function Summary() {
           >
             {buckets.map((b, index) => (
               <div
-                className="bar"
+                className={`relative flex-1 rounded-t-[5px] bg-[#d1f5bc] transition-[height] duration-200 last:bg-brand hover:bg-[#7fda44] ${period === 30 ? "min-w-[3px]" : ""}`}
                 key={b.key}
                 style={{ height: `${Math.max(2, (b.count / max) * 90)}%` }}
                 title={`${b.key}: ${b.count} calls`}
               >
                 {(period === 7 || index % 5 === 0) && (
-                  <span>{period === 7 ? b.day : Number(b.key.slice(-2))}</span>
+                  <span
+                    className={`absolute -bottom-[25px] left-1/2 -translate-x-1/2 text-muted ${period === 30 ? "text-[10px]" : "text-[12px]"}`}
+                  >
+                    {period === 7 ? b.day : Number(b.key.slice(-2))}
+                  </span>
                 )}
               </div>
             ))}
           </div>
-          <div className="legend">Browser test calls · dates in UTC</div>
-        </section>
-        <section className="panel">
-          <div className="panelHead">
-            <h2>Your agents</h2>
-            <Link href="/voice-receptionist/agents">View all</Link>
+          <div className="mt-3 text-[12px] text-muted">
+            Browser test calls · dates in UTC
           </div>
+        </Panel>
+        <Panel>
+          <PanelHead
+            title="Your agents"
+            action={
+              <Link
+                className={panelLinkStyles}
+                href="/voice-receptionist/agents"
+              >
+                View all
+              </Link>
+            }
+          />
           {agents.length === 0 && (
             <Empty
               title="No agents yet"
@@ -135,14 +163,14 @@ function Summary() {
           )}
           {agents.slice(0, 2).map((agent) => (
             <Link
-              className="agentmini"
+              className="focus-ring my-[18px] flex items-center gap-3"
               key={agent.id}
               href={`/voice-receptionist/agents/${agent.id}`}
             >
-              <div className="avatar">{agent.name[0]}</div>
-              <div className="grow">
-                <strong>{agent.name}</strong>
-                <small>
+              <Avatar>{agent.name[0]}</Avatar>
+              <div className="flex-1">
+                <strong className="text-[14px]">{agent.name}</strong>
+                <small className="block text-[12px] text-muted">
                   {plural(
                     all.filter((c) => c.agent_id === agent.id).length,
                     "call",
@@ -153,17 +181,21 @@ function Summary() {
               <Badge>{agent.is_active ? "Active" : "Disabled"}</Badge>
             </Link>
           ))}
-          <div className="rowline">
+          <FooterRow>
             <span>Active agents</span>
             <strong>{agents.filter((a) => a.is_active).length}</strong>
-          </div>
-        </section>
-      </div>
-      <section className="panel">
-        <div className="panelHead">
-          <h2>Recent calls</h2>
-          <Link href="/voice-receptionist/calls">View call history</Link>
-        </div>
+          </FooterRow>
+        </Panel>
+      </WideSplit>
+      <Panel>
+        <PanelHead
+          title="Recent calls"
+          action={
+            <Link className={panelLinkStyles} href="/voice-receptionist/calls">
+              View call history
+            </Link>
+          }
+        />
         <CallsTable
           calls={all.slice(0, 4)}
           timezone={state?.workspace.timezone || "UTC"}
@@ -172,7 +204,7 @@ function Summary() {
             description: "Take a test call in Test studio to see it here.",
           }}
         />
-      </section>
+      </Panel>
     </>
   );
 }

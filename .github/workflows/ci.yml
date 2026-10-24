@@ -14,7 +14,7 @@ jobs:
       TEST_SYSTEM_DATABASE_URL: postgresql+psycopg://clinic_system:clinic_system@localhost:5432/clinic
     services:
       postgres:
-        image: postgres:17
+        image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: clinic_owner
           POSTGRES_PASSWORD: clinic_owner

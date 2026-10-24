@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Brand, Field, Select, FormError } from "@clinic/ui";
 import { useAuth } from "@/lib/auth/provider";
 import { SignOut } from "./sign-out";
@@ -7,6 +7,10 @@ export function Onboarding() {
   const { auth, write } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // Until the page has loaded its scripts the form below has no handler, and the browser would submit it as a
+  // plain GET, putting the name and phone number in the address. The button stays off until the handler exists.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   return (
     <main className="onboarding-page">
       <Brand />
@@ -75,7 +79,7 @@ export function Onboarding() {
               placeholder="+919876543210"
             />
             <FormError message={error} />
-            <button className="primary" disabled={busy}>
+            <button className="primary" disabled={busy || !ready}>
               {busy ? "Creating workspace…" : "Create workspace"}
             </button>
           </form>

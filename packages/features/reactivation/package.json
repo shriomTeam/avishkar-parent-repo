@@ -5,8 +5,8 @@
   "scripts": {
     "lint": "uv run ruff check src tests",
     "typecheck": "tsc --noEmit",
-    "test": "uv run pytest tests -q && node --test web/unit/*.test.ts",
-    "test:web": "node --test web/unit/*.test.ts"
+    "test": "uv run pytest tests -q && node --import ./web/unit/ts-resolve.mjs --test web/unit/*.test.ts",
+    "test:web": "node --import ./web/unit/ts-resolve.mjs --test web/unit/*.test.ts"
   },
   "exports": {
     "./web/*": "./web/pages/*.tsx"
@@ -17,7 +17,7 @@
     "@clinic/ui": "workspace:*"
   },
   "peerDependencies": {
-    "next": "^16.4.0",
+    "next": "^16.4.2",
     "react": "^19.3.0"
   },
   "devDependencies": {

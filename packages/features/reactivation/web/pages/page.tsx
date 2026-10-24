@@ -6,10 +6,11 @@ const IN_FLIGHT = new Set(["queued", "running"]);
 
 export default async function OverviewPage() {
   const { client } = await api();
-  const [runsRes, latestRes, statusRes] = await Promise.all([
+  const [runsRes, latestRes, statusRes, scheduleRes] = await Promise.all([
     client.GET("/features/reactivation/runs"),
     client.GET("/features/reactivation/runs/latest"),
     client.GET("/features/reactivation/data-status"),
+    client.GET("/features/reactivation/schedule"),
   ]);
   // No completed run yet is a normal first-time state, not an error.
   if (!runsRes.data || (!latestRes.data && latestRes.response.status !== 404))
@@ -28,6 +29,7 @@ export default async function OverviewPage() {
 
   const data: OverviewData = {
     latest,
+    currentSettingsVersion: scheduleRes.data?.settings_version ?? null,
     types: typesRes?.data ?? [],
     inFlight: active
       ? { id: active.id, status: active.status, progress_pct: active.progress_pct }

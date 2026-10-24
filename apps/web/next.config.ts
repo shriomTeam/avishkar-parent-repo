@@ -7,7 +7,7 @@ const config: NextConfig = {
   output: "standalone",
   // Next buffers a proxied (rewritten) request body and cuts it off at 10 MB by default, which then fails the
   // request. Dormant patients' Import CSV posts files up to 25 MB through /api/platform, so allow 30 MB.
-  experimental: { proxyClientMaxBodySize: "30mb" },
+  experimental: { proxyClientMaxBodySize: "30mb", agentUpgrade: "security" },
   async rewrites() {
     const backend = process.env.BACKEND_INTERNAL_URL ?? "http://127.0.0.1:8000";
     return [

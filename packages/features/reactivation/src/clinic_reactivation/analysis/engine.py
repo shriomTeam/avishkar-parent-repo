@@ -452,7 +452,7 @@ def _build(
     enabled_types = [row.type_key for row in revenue.rows]
     types_available = {
         key: {
-            "lapsed_high_value": cohort_ok,
+            "lapsed_high_value": cohort_ok or settings.types.lapsed_high_value.spend_cents_min is not None,
             "churned_member": available["memberships"],
             "unused_balance": available["memberships"],
             "consult_not_converted": any(f.latest_consult_day is not None for f in pool),

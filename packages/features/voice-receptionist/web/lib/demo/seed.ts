@@ -258,33 +258,6 @@ export function createSeed(): DemoState {
         ),
       },
     ],
-    variables: [
-      { id: "var-agent", name: "agent_name", value: "Sophie", type: "Static" },
-      {
-        id: "var-company",
-        name: "company_name",
-        value: "Bloom Aesthetics",
-        type: "Static",
-      },
-      {
-        id: "var-caller",
-        name: "caller_number",
-        value: "Resolved at call start",
-        type: "Call",
-      },
-      {
-        id: "var-date",
-        name: "current_date",
-        value: "Resolved at call start",
-        type: "Runtime",
-      },
-      {
-        id: "var-customer",
-        name: "customer_name",
-        value: "Collected during conversation",
-        type: "Runtime",
-      },
-    ],
     audit: [
       {
         id: "audit-initial",

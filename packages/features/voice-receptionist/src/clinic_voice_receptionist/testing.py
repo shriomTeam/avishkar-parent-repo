@@ -72,6 +72,19 @@ class ScriptedModel:
             yield await self.inbox.get()
 
 
+class MemoryRecordingStore:
+    """Recordings kept in memory, so browser tests can record and play back without a bucket."""
+
+    def __init__(self) -> None:
+        self.objects: dict[str, bytes] = {}
+
+    async def put(self, name: str, data: bytes) -> None:
+        self.objects[name] = data
+
+    async def get(self, name: str) -> bytes | None:
+        return self.objects.get(name)
+
+
 class ScriptedConnector:
     @asynccontextmanager
     async def connect(self, agent: dict, fields: list[dict], resume_handle: str | None = None):

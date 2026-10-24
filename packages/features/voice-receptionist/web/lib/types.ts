@@ -67,12 +67,6 @@ export type Tool = {
   enabled: boolean;
   timeoutSeconds: number;
 };
-export type Variable = {
-  id: string;
-  name: string;
-  value: string;
-  type: "Static" | "Runtime" | "Call";
-};
 export type Workspace = {
   name: string;
   timezone: string;
@@ -94,14 +88,12 @@ export type DemoState = {
   numbers: PhoneNumber[];
   calls: Call[];
   tools: Tool[];
-  variables: Variable[];
   audit: AuditEvent[];
 };
 export type DemoCommand =
   | { type: "save-agent"; agent: Agent; event: string }
   | { type: "save-number"; number: PhoneNumber }
   | { type: "save-tool"; tool: Tool }
-  | { type: "save-variable"; variable: Variable }
   | { type: "save-workspace"; workspace: Workspace }
   | { type: "add-call"; call: Call }
   | { type: "reset" };

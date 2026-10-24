@@ -1,7 +1,7 @@
 """add reviews tables
 
 Revision ID: e4a91c0b7d22
-Revises: 043059e5b093
+Revises: 85fd3f8a4f12
 Create Date: 2026-10-17 22:20:00.000000
 
 Checklist for tenant-scoped tables (anything with tenant_id):
@@ -19,7 +19,7 @@ from sqlalchemy.dialects import postgresql
 from clinic_db.rls import disable_tenant_rls, enable_tenant_rls
 
 revision: str = "e4a91c0b7d22"
-down_revision: str | None = "043059e5b093"
+down_revision: str | None = "85fd3f8a4f12"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

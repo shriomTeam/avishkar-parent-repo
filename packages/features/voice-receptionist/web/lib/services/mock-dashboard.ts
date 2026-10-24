@@ -26,20 +26,8 @@ export function applyCommand(
       next = { ...state, tools: upsert(state.tools, command.tool) };
       event = "Tool configuration saved";
       break;
-    case "save-variable":
-      next = { ...state, variables: upsert(state.variables, command.variable) };
-      event = "Variable saved";
-      break;
     case "save-workspace":
-      next = {
-        ...state,
-        workspace: command.workspace,
-        variables: state.variables.map((v) =>
-          v.name === "company_name"
-            ? { ...v, value: command.workspace.name }
-            : v,
-        ),
-      };
+      next = { ...state, workspace: command.workspace };
       event = "Workspace settings updated";
       break;
     case "add-call":

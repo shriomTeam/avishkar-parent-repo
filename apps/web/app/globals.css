@@ -1,6 +1,51 @@
 @import "tailwindcss";
 @source "../../../packages/ui/src";
-@source "../../../packages/features/reviews/web";
+/* Every feature keeps its screens under packages/features; scanning the folder means adding or removing a
+   feature never touches this file. */
+@source "../../../packages/features";
+/* Shared sign-in and session screens live in packages/core/web. */
+@source "../../../packages/core/web";
+
+/* Brand tokens. Use them as bg-brand, text-ink, border-line and so on. */
+@theme {
+  --color-brand: #a1ff62;
+  --color-brand-hover: #8ee84f;
+  --color-brand-soft: #edffe1;
+  --color-brand-ink: #315218; /* dark green for text on brand surfaces */
+  --color-ink: #201d1d;
+  --color-canvas: #f4f4f4;
+  --font-brand:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --color-line: #e8e7ec;
+  --color-muted: #74717d;
+  --color-focus: #80cc4e;
+  --color-danger: #b3261e;
+  --color-danger-hover: #8f1f19;
+  --color-danger-soft: #ffedf0;
+  --color-danger-ink: #ae3049;
+  --color-warn-soft: #fff0e5;
+  --color-warn-ink: #9a5424;
+  --color-neutral-soft: #f1f0f3;
+  --color-neutral-ink: #777180;
+
+  /* The voice screens switch between their phone and desktop layouts at 700px: app: is wider, max-app: narrower. */
+  --breakpoint-app: 701px;
+
+  --animate-pulse-ring: pulse-ring 1.5s infinite;
+  @keyframes pulse-ring {
+    50% {
+      box-shadow: 0 0 0 20px #edffe170;
+    }
+  }
+}
+
+/* The keyboard focus ring used across the brand controls. */
+@utility focus-ring {
+  &:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+}
 
 body {
   background: #fafaf9;

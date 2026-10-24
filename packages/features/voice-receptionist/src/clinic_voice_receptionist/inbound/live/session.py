@@ -13,6 +13,7 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Protocol
 
+from clinic_voice_receptionist.inbound.live.audio import CallAudio
 from clinic_voice_receptionist.inbound.live.events import (
     AudioOut,
     GoAway,
@@ -29,6 +30,7 @@ from clinic_voice_receptionist.inbound.live.events import (
 from clinic_voice_receptionist.inbound.live.fields import coerce_all
 from clinic_voice_receptionist.inbound.live.prompt import END_TOOL, SAVE_TOOL
 from clinic_voice_receptionist.inbound.live.recorder import CallRecorder
+from clinic_voice_receptionist.inbound.live.storage import RecordingStore, recording_name
 from clinic_voice_receptionist.tools.runner import STORED_LIMIT, ToolOutcome, limited
 
 log = logging.getLogger("voice.call")
@@ -59,10 +61,13 @@ class CallSession:
         recorder: CallRecorder,
         max_seconds: int,
         tool_runner=None,
+        audio: CallAudio | None = None,
+        store: RecordingStore | None = None,
     ):
         self.snapshot = snapshot
         self.fields = snapshot.get("fields", [])
         self.tool_runner = tool_runner
+        self.audio, self.store = audio, store  # audio is None when this call is not being recorded
         self._tools = {t["name"]: t for t in snapshot.get("tools", [])}
         self.transport, self.connector, self.recorder = transport, connector, recorder
         self.max_seconds = max_seconds
@@ -113,14 +118,34 @@ class CallSession:
         self._close_turn()
         status = "failed" if self.failed else "completed"
         reason = self.end_reason or "completed"
+        recording = await self._save_recording()
         try:
-            await self.recorder.finish(status=status, end_reason=reason, started_at=self.started_at, usage=self._usage)
+            await self.recorder.finish(
+                status=status, end_reason=reason, started_at=self.started_at, usage=self._usage, recording=recording
+            )
         except Exception:
             log.exception("could not save call %s", self.recorder.call_id)
         try:
             await self.transport.send_event({"type": "ended", "reason": reason})
         except Exception:
             pass
+
+    async def _save_recording(self) -> tuple[str | None, str] | None:
+        """Upload the call audio. Returns (object name, "saved"/"failed"), or None if there is nothing to keep."""
+        if self.audio is None or self.audio.seconds < 0.5:
+            return None
+        name = recording_name(self.recorder.tenant_id, self.recorder.call_id)
+        if self.store is None:
+            log.error("call %s should be recorded but no storage is configured", self.recorder.call_id)
+            return None, "failed"
+        data = self.audio.to_wav()
+        for attempt in (1, 2):
+            try:
+                await self.store.put(name, data)
+                return name, "saved"
+            except Exception:
+                log.exception("could not upload the recording of call %s (attempt %s)", self.recorder.call_id, attempt)
+        return None, "failed"
 
     # ---- caller -> model -------------------------------------------------------------------------------
 
@@ -133,6 +158,8 @@ class CallSession:
                 continue
             if len(frame) > MAX_FRAME_BYTES or len(frame) % 2:
                 continue  # not a PCM16 frame
+            if self.audio is not None:
+                self.audio.caller(frame, time.monotonic() - self._t0)
             model = self._model
             if model is None:
                 self._pending.append(frame)  # kept briefly; older audio is dropped like a lost packet
@@ -188,11 +215,15 @@ class CallSession:
             for event in received.events:
                 match event:
                     case AudioOut(data):
+                        if self.audio is not None:
+                            self.audio.agent(data, time.monotonic() - self._t0)
                         self._queue_audio(data)
                     case Transcript(speaker, text):
                         await self._on_transcript(speaker, text)
                     case Interrupted():
                         self._drain_audio()
+                        if self.audio is not None:
+                            self.audio.interrupt(time.monotonic() - self._t0)
                         self._close_turn(interrupted=True)
                         await self.transport.send_event({"type": "interrupted"})
                     case TurnComplete():

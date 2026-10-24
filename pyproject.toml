@@ -11,6 +11,7 @@ dependencies = [
     "clinic-core",
     "clinic-integrations",
     "clinic-engagement",
+    "clinic-knowledge",
     "clinic-feature-reactivation",
     "clinic-feature-blueprints",
     "clinic-feature-lead-response",
@@ -34,7 +35,7 @@ dev = [
 package = false
 
 [tool.uv.workspace]
-members = ["apps/api", "apps/worker", "packages/db", "packages/core", "packages/integrations", "packages/engagement", "packages/features/*"]
+members = ["apps/api", "apps/worker", "packages/db", "packages/core", "packages/integrations", "packages/engagement", "packages/knowledge", "packages/features/*"]
 
 [tool.uv.sources]
 clinic-api = { workspace = true }
@@ -43,6 +44,7 @@ clinic-db = { workspace = true }
 clinic-core = { workspace = true }
 clinic-integrations = { workspace = true }
 clinic-engagement = { workspace = true }
+clinic-knowledge = { workspace = true }
 clinic-feature-reactivation = { workspace = true }
 clinic-feature-blueprints = { workspace = true }
 clinic-feature-lead-response = { workspace = true }
@@ -74,7 +76,7 @@ asyncio_default_test_loop_scope = "session"
 # Architectural boundaries, enforced in CI with `pnpm boundaries`.
 [tool.importlinter]
 root_packages = [
-    "clinic_api", "clinic_worker", "clinic_db", "clinic_core", "clinic_integrations", "clinic_engagement",
+    "clinic_api", "clinic_worker", "clinic_db", "clinic_core", "clinic_integrations", "clinic_engagement", "clinic_knowledge",
     "clinic_reactivation", "clinic_blueprints", "clinic_lead_response", "clinic_reviews",
     "clinic_voice_receptionist", "clinic_scribe", "clinic_command_center", "clinic_photos",
 ]
@@ -85,7 +87,7 @@ type = "layers"
 layers = [
     "clinic_api | clinic_worker",
     "clinic_reactivation | clinic_blueprints | clinic_lead_response | clinic_reviews | clinic_voice_receptionist | clinic_scribe | clinic_command_center | clinic_photos",
-    "clinic_integrations | clinic_engagement",
+    "clinic_integrations | clinic_engagement | clinic_knowledge",
     "clinic_core",
     "clinic_db",
 ]

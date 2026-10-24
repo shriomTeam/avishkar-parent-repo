@@ -1,6 +1,7 @@
 "use client";
 import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import { cx } from "./cx";
 
 export type DropdownOption = {
   value: string;
@@ -12,29 +13,44 @@ export type DropdownOption = {
 /**
  * A select in the app's own style, in place of the browser's menu (which ignores the design). Follows the
  * select-only combobox pattern: focus stays on the button; arrows move, Enter chooses, Escape closes.
- * With ``name`` it works inside a plain form, through a hidden input.
+ *
+ * Controlled with `value` and `onChange`, or uncontrolled with `defaultValue`. With `name` it also works in a
+ * plain form, through a hidden input. `hideLabel` keeps the label for screen readers only (for filters);
+ * `inline` sizes to the content instead of filling the row; `flush` drops the space below.
  */
 export function Dropdown({
   label,
-  value,
   options,
+  value,
+  defaultValue,
   onChange,
   name,
   disabled = false,
+  hideLabel = false,
+  inline = false,
+  flush = false,
+  className,
 }: {
   label: string;
-  value: string;
   options: DropdownOption[];
-  onChange: (value: string) => void;
+  value?: string;
+  defaultValue?: string;
+  onChange?: (value: string) => void;
   name?: string;
   disabled?: boolean;
+  hideLabel?: boolean;
+  inline?: boolean;
+  flush?: boolean;
+  className?: string;
 }) {
   const id = useId();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
+  const [own, setOwn] = useState(defaultValue ?? options[0]?.value ?? "");
+  const current = value ?? own;
   const root = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLUListElement>(null);
-  const selected = options.findIndex((o) => o.value === value);
+  const selected = options.findIndex((o) => o.value === current);
 
   useEffect(() => {
     if (!open) return;
@@ -63,21 +79,39 @@ export function Dropdown({
   const choose = (index: number) => {
     const option = options[index];
     if (!option || option.disabled) return;
-    onChange(option.value);
+    setOwn(option.value);
+    onChange?.(option.value);
     setOpen(false);
   };
 
   return (
-    <div className="field dropdown" ref={root}>
-      <label id={`${id}-label`} htmlFor={`${id}-button`}>
+    <div
+      data-field={inline ? undefined : ""}
+      className={cx(
+        "relative",
+        inline ? "inline-block" : !flush && "mb-[21px]",
+        className,
+      )}
+      ref={root}
+    >
+      <label
+        id={`${id}-label`}
+        htmlFor={`${id}-button`}
+        className={cx(
+          hideLabel ? "sr-only" : "mb-2 block text-[14px] font-semibold",
+        )}
+      >
         {label}
       </label>
-      {name && <input type="hidden" name={name} value={value} />}
+      {name && <input type="hidden" name={name} value={current} />}
       <button
         id={`${id}-button`}
         type="button"
         role="combobox"
-        className="dropdown-button"
+        className={cx(
+          "focus-ring flex cursor-pointer items-center justify-between gap-2.5 rounded-lg border border-[#dedce5] bg-white px-[13px] py-[11px] text-left text-[14px] font-normal text-ink hover:border-[#c9c6d2] aria-expanded:border-focus disabled:cursor-not-allowed disabled:opacity-50",
+          inline ? "w-auto" : "w-full",
+        )}
         aria-labelledby={`${id}-label`}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -130,7 +164,11 @@ export function Dropdown({
         }}
       >
         <span>{options[selected]?.label ?? "Choose…"}</span>
-        <ChevronDown size={16} aria-hidden="true" />
+        <ChevronDown
+          size={16}
+          aria-hidden="true"
+          className="shrink-0 text-muted"
+        />
       </button>
       {open && (
         <ul
@@ -138,7 +176,10 @@ export function Dropdown({
           id={`${id}-list`}
           role="listbox"
           aria-labelledby={`${id}-label`}
-          className="dropdown-list"
+          className={cx(
+            "absolute left-0 z-20 mt-1.5 max-h-60 overflow-y-auto rounded-[10px] border border-line bg-white p-1.5 shadow-[0_12px_32px_#201d1d1f]",
+            inline ? "w-max min-w-full" : "right-0",
+          )}
         >
           {options.map((option, index) => (
             <li
@@ -147,14 +188,25 @@ export function Dropdown({
               role="option"
               aria-selected={index === selected}
               aria-disabled={option.disabled || undefined}
-              className={`dropdown-option${index === active ? " active" : ""}${option.disabled ? " disabled" : ""}`}
+              className={cx(
+                "flex items-center justify-between gap-2.5 rounded-lg px-3 py-2.5 text-[14px]",
+                option.disabled
+                  ? "cursor-not-allowed text-muted"
+                  : "cursor-pointer",
+                index === active && !option.disabled && "bg-brand-soft",
+                index === selected && "font-semibold text-brand-ink",
+              )}
               onMouseDown={(event) => event.preventDefault()} // keep focus on the button
               onMouseMove={() => option.disabled || setActive(index)}
               onClick={() => choose(index)}
             >
               <span>
                 {option.label}
-                {option.hint && <small>{option.hint}</small>}
+                {option.hint && (
+                  <small className="ml-2 block text-[12px] font-normal text-muted">
+                    {option.hint}
+                  </small>
+                )}
               </span>
               {index === selected && <Check size={16} aria-hidden="true" />}
             </li>
