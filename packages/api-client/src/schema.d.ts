@@ -246,6 +246,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/appointments/{appointment_id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete
+         * @description Mark a visit completed and emit ``appointment.completed`` for review automation.
+         */
+        post: operations["complete_appointments__appointment_id__complete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/tenants": {
         parameters: {
             query?: never;
@@ -677,6 +697,126 @@ export interface paths {
         get: operations["status_features_reviews_status_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reviews/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Overview */
+        get: operations["overview_features_reviews_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reviews/integration/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Connect Google */
+        post: operations["connect_google_features_reviews_integration_google_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reviews/campaigns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Campaign */
+        post: operations["create_campaign_features_reviews_campaigns_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reviews/campaigns/{campaign_id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activate Campaign */
+        post: operations["activate_campaign_features_reviews_campaigns__campaign_id__activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/reviews/follow-ups/{task_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve Follow Up */
+        post: operations["resolve_follow_up_features_reviews_follow_ups__task_id__resolve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/reviews/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Feedback Page */
+        get: operations["get_feedback_page_public_reviews__token__get"];
+        put?: never;
+        /** Submit Feedback Page */
+        post: operations["submit_feedback_page_public_reviews__token__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/reviews/{token}/google-click": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Google Click */
+        post: operations["google_click_public_reviews__token__google_click_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1422,50 +1562,6 @@ export interface components {
              */
             captured_count: number;
         };
-        /** CampaignIn */
-        CampaignIn: {
-            /**
-             * Name
-             * @default Dormant Revenue Finder
-             */
-            name: string;
-            /** Lapsed Days */
-            lapsed_days?: number | null;
-        };
-        /** CampaignOut */
-        CampaignOut: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Status */
-            status: string;
-            /** Criteria */
-            criteria: {
-                [key: string]: unknown;
-            };
-            /** Launched At */
-            launched_at: string | null;
-            stats: components["schemas"]["CampaignStats"];
-        };
-        /** CampaignStats */
-        CampaignStats: {
-            /** Targets */
-            targets: number;
-            /** By Status */
-            by_status: {
-                [key: string]: number;
-            };
-            /** Booked */
-            booked: number;
-            /** Booked Revenue Cents */
-            booked_revenue_cents: number;
-            /** Dormant Lifetime Value Cents */
-            dormant_lifetime_value_cents: number;
-        };
         /** CapturedValueOut */
         CapturedValueOut: {
             /** Key */
@@ -1535,6 +1631,13 @@ export interface components {
             /** Notes */
             notes: string[];
             limits: components["schemas"]["CsvLimits"];
+        };
+        /** ConnectGoogleIn */
+        ConnectGoogleIn: {
+            /** Listing Name */
+            listing_name: string;
+            /** Review Url */
+            review_url: string;
         };
         /** ConsultNotConverted */
         ConsultNotConverted: {
@@ -1842,6 +1945,30 @@ export interface components {
                 [key: string]: string;
             } | null;
         };
+        /** FollowUpItem */
+        FollowUpItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Rating */
+            rating: number;
+            /** Reason */
+            reason: string;
+            /** Status */
+            status: string;
+        };
+        /** FollowUpOut */
+        FollowUpOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -1885,6 +2012,17 @@ export interface components {
              * @default sms
              */
             channel: string;
+        };
+        /** IntegrationOut */
+        IntegrationOut: {
+            /** Listing Name */
+            listing_name: string | null;
+            /** Google Review Url */
+            google_review_url: string | null;
+            /** Status */
+            status: string;
+            /** Last Validated At */
+            last_validated_at: string | null;
         };
         /** InternalToolIn */
         InternalToolIn: {
@@ -2154,6 +2292,14 @@ export interface components {
              */
             overdue_ratio_max: number;
         };
+        /** OverviewOut */
+        OverviewOut: {
+            integration: components["schemas"]["IntegrationOut"];
+            /** Campaigns */
+            campaigns: components["schemas"]["clinic_reviews__router__CampaignOut"][];
+            /** Pending Follow Ups */
+            pending_follow_ups: components["schemas"]["FollowUpItem"][];
+        };
         /** PatientOut */
         PatientOut: {
             /**
@@ -2238,6 +2384,28 @@ export interface components {
             avg_revenue_per_patient_cents: number;
             /** Avg Purchases */
             avg_purchases: number;
+        };
+        /** PublicFeedbackIn */
+        PublicFeedbackIn: {
+            /** Rating */
+            rating: number;
+            /** Comment */
+            comment?: string | null;
+        };
+        /** PublicFeedbackOut */
+        PublicFeedbackOut: {
+            /** Practice Name */
+            practice_name: string;
+            /** Rating */
+            rating: number | null;
+            /** Comment */
+            comment: string | null;
+            /** Submitted */
+            submitted: boolean;
+            /** Next Step */
+            next_step: string;
+            /** Google Review Url */
+            google_review_url: string | null;
         };
         /** ReactivationSettings */
         ReactivationSettings: {
@@ -3003,6 +3171,113 @@ export interface components {
             /** Phone */
             phone: string | null;
         };
+        /** CampaignIn */
+        clinic_reactivation__router__CampaignIn: {
+            /**
+             * Name
+             * @default Dormant Revenue Finder
+             */
+            name: string;
+            /** Lapsed Days */
+            lapsed_days?: number | null;
+        };
+        /** CampaignOut */
+        clinic_reactivation__router__CampaignOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Status */
+            status: string;
+            /** Criteria */
+            criteria: {
+                [key: string]: unknown;
+            };
+            /** Launched At */
+            launched_at: string | null;
+            stats: components["schemas"]["clinic_reactivation__router__CampaignStats"];
+        };
+        /** CampaignStats */
+        clinic_reactivation__router__CampaignStats: {
+            /** Targets */
+            targets: number;
+            /** By Status */
+            by_status: {
+                [key: string]: number;
+            };
+            /** Booked */
+            booked: number;
+            /** Booked Revenue Cents */
+            booked_revenue_cents: number;
+            /** Dormant Lifetime Value Cents */
+            dormant_lifetime_value_cents: number;
+        };
+        /** CampaignIn */
+        clinic_reviews__router__CampaignIn: {
+            /**
+             * Name
+             * @default Post Appointment Review
+             */
+            name: string;
+            /**
+             * Delay Minutes
+             * @default 120
+             */
+            delay_minutes: number;
+            /** Channels */
+            channels?: string[];
+            /**
+             * Fallback Enabled
+             * @default true
+             */
+            fallback_enabled: boolean;
+            /** Included Service Ids */
+            included_service_ids?: string[];
+            /** Excluded Service Ids */
+            excluded_service_ids?: string[];
+            /**
+             * Frequency Days
+             * @default 30
+             */
+            frequency_days: number;
+        };
+        /** CampaignOut */
+        clinic_reviews__router__CampaignOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Status */
+            status: string;
+            /** Delay Minutes */
+            delay_minutes: number;
+            /** Channels */
+            channels: unknown[];
+            /** Frequency Days */
+            frequency_days: number;
+            /** Activated At */
+            activated_at: string | null;
+            stats: components["schemas"]["clinic_reviews__router__CampaignStats"];
+        };
+        /** CampaignStats */
+        clinic_reviews__router__CampaignStats: {
+            /** Requests */
+            requests: number;
+            /** By Status */
+            by_status: {
+                [key: string]: number;
+            };
+            /** Ratings Submitted */
+            ratings_submitted: number;
+            /** Pending Follow Ups */
+            pending_follow_ups: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -3412,6 +3687,41 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    complete_appointments__appointment_id__complete_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4254,7 +4564,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CampaignOut"][];
+                    "application/json": components["schemas"]["clinic_reactivation__router__CampaignOut"][];
                 };
             };
             /** @description Validation Error */
@@ -4281,7 +4591,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CampaignIn"];
+                "application/json": components["schemas"]["clinic_reactivation__router__CampaignIn"];
             };
         };
         responses: {
@@ -4291,7 +4601,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CampaignOut"];
+                    "application/json": components["schemas"]["clinic_reactivation__router__CampaignOut"];
                 };
             };
             /** @description Validation Error */
@@ -4326,7 +4636,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CampaignOut"];
+                    "application/json": components["schemas"]["clinic_reactivation__router__CampaignOut"];
                 };
             };
             /** @description Validation Error */
@@ -4362,6 +4672,280 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overview_features_reviews_overview_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connect_google_features_reviews_integration_google_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectGoogleIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntegrationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_campaign_features_reviews_campaigns_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["clinic_reviews__router__CampaignIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["clinic_reviews__router__CampaignOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activate_campaign_features_reviews_campaigns__campaign_id__activate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["clinic_reviews__router__CampaignOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_follow_up_features_reviews_follow_ups__task_id__resolve_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_feedback_page_public_reviews__token__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicFeedbackOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_feedback_page_public_reviews__token__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublicFeedbackIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicFeedbackOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    google_click_public_reviews__token__google_click_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicFeedbackOut"];
                 };
             };
             /** @description Validation Error */

@@ -564,12 +564,14 @@ source = { editable = "packages/features/reviews" }
 dependencies = [
     { name = "clinic-core" },
     { name = "clinic-db" },
+    { name = "clinic-engagement" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "clinic-core", editable = "packages/core" },
     { name = "clinic-db", editable = "packages/db" },
+    { name = "clinic-engagement", editable = "packages/engagement" },
 ]
 
 [[package]]

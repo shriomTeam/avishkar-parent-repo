@@ -99,6 +99,8 @@ def create_app(settings: Settings | None = None, google=None) -> FastAPI:
                 prefix=f"/features/{key}",
                 dependencies=[Depends(require_feature(key))],
             )
+        if feature.public_router is not None:
+            app.include_router(feature.public_router, prefix=f"/public/{key}")
         if feature.websocket_router is not None:
             app.include_router(feature.websocket_router, prefix=f"/features/{key}")
     if settings.trusted_proxy_hops:

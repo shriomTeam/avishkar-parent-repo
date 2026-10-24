@@ -21,6 +21,7 @@
     "@next/env": "^16.4.0",
     "@clinic/core": "workspace:*",
     "@clinic/feature-reactivation": "workspace:*",
+    "@clinic/feature-reviews": "workspace:*",
     "@clinic/feature-voice-receptionist": "workspace:*"
   },
   "devDependencies": {
