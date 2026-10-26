@@ -179,7 +179,7 @@ Keep local keys private and stable across API and worker restarts.
   URL-safe base64 representation as the permanent Fernet key. Do not manually set a
   production payload key or replace/taint the random resource. `prevent_destroy`
   guards against accidental replacement. State loss still requires backup recovery.
-- API, sender and recovery job explicitly depend on all required secret version
+- API and the shared sender/recovery service explicitly depend on all required secret version
   resources, as well as their IAM grants, before referencing `latest`.
 - `email_secrets_preprovisioned=true` is retained **only to import the two containers
   already created in GCP**. Terraform now manages their versions. Fresh environments
@@ -197,7 +197,7 @@ has (or this is uncertain), add the previous payload key(s) as comma-separated
 `EMAIL_OLD_PAYLOAD_KEYS` in GitHub's production secrets (no spaces) and set
 `email_old_payload_keys_enabled=true` in the environment tfvars. Both Terraform
 jobs pass this sensitive value; Terraform publishes it as a separate Secret Manager
-version and injects `EMAIL_OLD_PAYLOAD_KEYS` into the API, sender and recovery job.
+version and injects `EMAIL_OLD_PAYLOAD_KEYS` into the API and the shared sender/recovery service.
 Local development still uses the normal `.env` setting. Do not retire old keys
 until all payloads encrypted with them have drained. Adoption/rotation cannot be
 considered safe without this check. A planned future rotation must wire old keys
@@ -256,8 +256,13 @@ queue retries do not bypass the stored backoff or consume attempts before due.
 Cloud Tasks and PostgreSQL cannot commit atomically. Before publishing, a delivery
 gets a dispatch reservation and increasing generation. RPC failures clear that
 reservation for recovery; a process crash or exhausted/lost task is repaired after
-15 minutes. A five-minute recovery job scans due records and publishes replacement
-tasks with new generation names. Task name deduplication is useful but is not the
+15 minutes. Every 30 minutes Scheduler calls `/tasks/email/reconcile` on the same
+private `prod-avishkar-email-send` service to publish replacement tasks with new
+generation names. A newly failed enqueue may wait up to 30 minutes for a scheduled
+check; a stale reservation needs to be at least 15 minutes old when checked.
+Recovery handles at most ten due records per call, so a large backlog takes more
+checks. It has a 45-second budget inside the 60-second request deadline; Scheduler
+retries non-successful calls up to three times with 60–300-second backoff. Task name deduplication is useful but is not the
 only duplicate protection. An enqueue error never undoes a committed invitation.
 
 Locally, leave all `EMAIL_TASKS_*` settings blank. The existing five-second direct
@@ -271,8 +276,8 @@ uv run python -m clinic_engagement.email.worker --once
 
 With Cloud Tasks configured, these commands reconcile task dispatch instead of
 sending directly. Without it they send due records locally. The continuous process
-polls every ten seconds; the production recovery job uses `--once` every five
-minutes. Console/test providers never send real email via the API path. Tests that
+polls every ten seconds; production uses the Scheduler HTTP endpoint instead of
+a Cloud Run Job. Console/test providers never send real email via the API path. Tests that
 exercise the Cloud Tasks path explicitly inject fake SendGrid and task transports.
 
 The SendGrid transport uses the fixed v3 Mail Send endpoint and server credentials,
@@ -416,8 +421,8 @@ Set `invitations_enabled=true`, `email_from_address`, optional `email_reply_to` 
 Terraform provisions a separate `${name}-email` Cloud Tasks queue (two dispatches
 per second, one concurrent request), a private `${name}-email-send` Cloud Run
 service and a `${name}-email-tasks` caller identity. The API and recovery runner can
-enqueue only onto this queue and act as only this caller. Only that caller gets
-Run Invoker on the email service. The dedicated email-worker runtime has the system
+enqueue only onto this queue and act as only this caller. That caller can invoke the delivery endpoint; the separate Scheduler identity
+can invoke only recovery, as checked by the handler. The dedicated email-worker runtime has the system
 DB URL, SendGrid/payload secrets and scoped queue publication permissions; it has
 no API OAuth, auth/app DB secret or storage-bucket access.
 
@@ -430,24 +435,42 @@ EMAIL_TASKS_QUEUE=prod-avishkar-email
 EMAIL_TASKS_URL=https://prod-avishkar-email-send-<project-number>.us-east1.run.app
 EMAIL_TASKS_AUDIENCE=https://prod-avishkar-email-send-<project-number>.us-east1.run.app
 EMAIL_TASKS_INVOKER_EMAIL=prod-avishkar-email-tasks@<project-id>.iam.gserviceaccount.com
+# Email service only:
+EMAIL_RECOVERY_INVOKER_EMAIL=prod-avishkar-email-schedule@<project-id>.iam.gserviceaccount.com
 ```
 
-The existing `${name}-email` Cloud Run Job is invoked every five minutes by Cloud
-Scheduler with a job-scoped identity. It now only repairs dispatch failures/stale
-reservations in Cloud Tasks; normal messages do not wait for that schedule. The
-Deploy workflow builds a dedicated `email` image and deploys the private service
-before updating the API; it updates the recovery job using the API image as before.
-The new `20261024_email_tasks` migration must run before publishing or processing.
+Recovery reuses `${name}-email-send`: Cloud Scheduler calls
+`/tasks/email/reconcile` every 30 minutes using the dedicated `${name}-email-schedule`
+identity with an OIDC token whose audience is the email service origin. The handler
+verifies that exact verified identity; it does not accept the queue caller. The
+send endpoint verifies the queue identity and rejects the Scheduler caller. Both
+identities need service-level Run Invoker; application checks separate endpoint
+permissions. The service scales to zero and uses request-based billing. There is
+no separate production email recovery Job or scheduled container startup. The local
+CLI dispatcher remains available and unchanged.
 
-The production tfvars enable invitations and set the verified sender to
-`abhinav.chaudhary@avishkar.app`, named `Avishkar AI`. Since the two secret containers
-were created manually, `email_secrets_preprovisioned=true` imports those containers (versions are managed by Terraform)
-into Terraform management; secret **values** are neither read nor imported into
-state. Leave this option false for a new environment where Terraform should create
-empty containers. Ensure both existing secrets contain enabled versions before
-applying the enabled configuration. Apply Terraform first, then run Deploy so the
-private email service and recovery job receive their release images. The deploy and Terraform workflows
-are separate and should not be assumed to finish in that order automatically.
+Cloud Scheduler's API is already enabled by the administrator; this module no
+longer manages its enablement. New projects must enable `cloudscheduler.googleapis.com`
+as a prerequisite. The existing one-time CI Scheduler admin IAM prerequisite still
+applies; API enablement is not the same as permission to manage schedules.
+
+Production tfvars enable invitations and use the verified sender
+`abhinav.chaudhary@avishkar.app`, named `Avishkar AI`. Existing container imports
+remain enabled; Terraform creates their versions using GitHub credentials and its
+generated key. Compatibility keys are required for the earlier manually created
+payload key, as described above. Secret values live in protected state/plans.
+
+**Rollout order:** for an already deployed email service, first deploy the new
+`email` image (with the reconciliation endpoint), then apply Terraform to set its
+Scheduler identity, switch the schedule to HTTP and remove the old recovery Job
+and its IAM binding. Until the new identity is configured, recovery fails closed;
+the durable records remain recoverable. Do not switch the schedule to an older
+image lacking the endpoint. For a fresh installation, Terraform must first create
+the service/identities/secrets; deploy the image immediately afterward and verify
+recovery. Normal task dispatch still starts only after the private sender is deployed
+before the API. Terraform and Deploy are separate workflows; a first-run deployment
+may need rerunning once provisioning finishes. The deploy workflow no longer
+updates any email recovery Job image. No automatic workflow ordering is implied.
 
 Run the migration before the API release. Verify queued → provider-accepted with
 an approved recipient and check spam/bounce handling manually before a broad

@@ -287,3 +287,25 @@ invitations). The same offline tests are added to the workflow's validation job.
 Production explicitly enables old-key compatibility for the manually provisioned
 key, so missing GitHub configuration fails validation instead of silently losing
 queued-email decryption. No application behavior or database migrations changed.
+
+
+## Shared-service recovery follow-up (26 October)
+
+Replaces the five-minute Cloud Run recovery Job with a 30-minute OIDC Scheduler
+request to `/tasks/email/reconcile` on the existing `prod-avishkar-email-send`.
+Separate caller verification prevents queue/Scheduler endpoint privilege crossover.
+Recovery publishes at most ten tasks per call with a 45-second budget, retaining
+durable leases and generation-based dispatch protection. Normal immediate enqueue
+and task retries are unchanged. Removed the recovery Job/IAM/image-update step.
+Scheduler API enablement is no longer Terraform-managed, as Vishnu confirmed it
+is already enabled; new projects must enable it as a prerequisite.
+
+No production changes, pushes or cloud secret access were performed. Docker was
+unavailable for this follow-up, so database-backed integration tests were not
+rerun. Prior complete suite results remain historical evidence, not a rerun of
+this head. The rollout sequence and changed recovery latency are documented.
+
+Follow-up validation: 14 HTTP handler/auth tests passed (including missing/wrong
+identity, cross-endpoint denial, fail-closed configuration and retryable timeout).
+Six mocked Terraform tests, Terraform validate/fmt, repository Ruff check/format,
+deployment YAML checks and git whitespace checks passed. No live email was sent.

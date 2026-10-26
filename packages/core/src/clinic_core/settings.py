@@ -30,6 +30,7 @@ class EmailSettings(BaseSettings):
     email_tasks_url: str = ""
     email_tasks_invoker_email: str = ""
     email_tasks_audience: str = ""
+    email_recovery_invoker_email: str = ""
 
     @model_validator(mode="after")
     def validate_email_config(self):

@@ -46,11 +46,7 @@ resource "google_secret_manager_secret_version" "email_old_payload_keys" {
   secret_data = var.email_old_payload_keys
 }
 
-resource "google_project_service" "email_scheduler" {
-  count              = var.invitations_enabled ? 1 : 0
-  service            = "cloudscheduler.googleapis.com"
-  disable_on_destroy = false
-}
+# Cloud Scheduler API is already enabled by the project administrator.
 
 locals {
   email_send_url = "https://${local.name}-email-send-${data.google_project.this.number}.${var.region}.run.app"
@@ -69,7 +65,9 @@ locals {
     EMAIL_FROM_ADDRESS  = var.email_from_address
     EMAIL_FROM_NAME     = var.email_from_name
     EMAIL_REPLY_TO      = var.email_reply_to
-  }, local.email_task_environment)
+    }, local.email_task_environment, var.invitations_enabled ? {
+    EMAIL_RECOVERY_INVOKER_EMAIL = google_service_account.email_scheduler[0].email
+  } : {})
   email_rotation_secrets = var.email_old_payload_keys_enabled ? {
     EMAIL_OLD_PAYLOAD_KEYS = google_secret_manager_secret.email_old_payload_keys[0].secret_id
   } : {}
@@ -159,78 +157,17 @@ resource "google_service_account_iam_member" "email_enqueue_caller" {
   member             = "serviceAccount:${each.value}"
 }
 
-resource "google_cloud_run_v2_job" "email" {
-  count               = var.invitations_enabled ? 1 : 0
-  name                = "${local.name}-email"
-  location            = var.region
-  deletion_protection = false
-  labels              = local.labels
-  template {
-    template {
-      service_account = google_service_account.email_worker[0].email
-      timeout         = "600s"
-      max_retries     = 1
-      containers {
-        # Release workflow replaces this placeholder with the current API image.
-        image   = "us-docker.pkg.dev/cloudrun/container/job:latest"
-        command = ["/app/.venv/bin/python"]
-        args    = ["-m", "clinic_engagement.email.worker", "--once"]
-        resources {
-          limits = { cpu = "1", memory = "512Mi" }
-        }
-        dynamic "env" {
-          for_each = local.email_environment
-          content {
-            name  = env.key
-            value = env.value
-          }
-        }
-        dynamic "env" {
-          for_each = local.email_secrets
-          content {
-            name = env.key
-            value_source {
-              secret_key_ref {
-                secret  = env.value
-                version = "latest"
-              }
-            }
-          }
-        }
-      }
-      vpc_access {
-        egress = "PRIVATE_RANGES_ONLY"
-        network_interfaces {
-          network    = module.network.vpc_id
-          subnetwork = module.network.subnet_id
-        }
-      }
-    }
-  }
-  lifecycle {
-    ignore_changes = [template[0].template[0].containers[0].image, client, client_version]
-  }
-  depends_on = [
-    google_secret_manager_secret_iam_member.email_worker,
-    google_cloud_tasks_queue_iam_member.email_enqueue,
-    google_service_account_iam_member.email_enqueue_caller,
-    google_secret_manager_secret_version.sendgrid_api_key,
-    google_secret_manager_secret_version.email_payload_key,
-    google_secret_manager_secret_version.email_old_payload_keys,
-  ]
-}
-
 resource "google_service_account" "email_scheduler" {
   count        = var.invitations_enabled ? 1 : 0
   account_id   = "${local.name}-email-schedule"
-  display_name = "Invokes only the transactional email job"
+  display_name = "Invokes the email reconciliation endpoint"
 }
 
-resource "google_cloud_run_v2_job_iam_member" "email_scheduler" {
+resource "google_cloud_run_v2_service_iam_member" "email_scheduler" {
   count    = var.invitations_enabled ? 1 : 0
   project  = var.project_id
   location = var.region
-  name     = google_cloud_run_v2_job.email[0].name
+  name     = module.email_sender[0].name
   role     = "roles/run.invoker"
   member   = "serviceAccount:${google_service_account.email_scheduler[0].email}"
 }
@@ -239,19 +176,26 @@ resource "google_cloud_scheduler_job" "email" {
   count            = var.invitations_enabled ? 1 : 0
   name             = "${local.name}-email"
   region           = var.region
-  schedule         = "*/5 * * * *"
+  schedule         = "*/30 * * * *"
   time_zone        = "Etc/UTC"
   attempt_deadline = "60s"
+  retry_config {
+    retry_count          = 3
+    min_backoff_duration = "60s"
+    max_backoff_duration = "300s"
+    max_doublings        = 2
+  }
   http_target {
     http_method = "POST"
-    uri         = "https://run.googleapis.com/v2/projects/${var.project_id}/locations/${var.region}/jobs/${google_cloud_run_v2_job.email[0].name}:run"
+    uri         = "${local.email_send_url}/tasks/email/reconcile"
     body        = base64encode("{}")
     headers     = { "Content-Type" = "application/json" }
-    oauth_token {
+    oidc_token {
       service_account_email = google_service_account.email_scheduler[0].email
+      audience              = local.email_send_url
     }
   }
-  depends_on = [google_project_service.email_scheduler, google_cloud_run_v2_job_iam_member.email_scheduler]
+  depends_on = [google_cloud_run_v2_service_iam_member.email_scheduler]
 }
 
 # Adopt existing containers only; Terraform creates/manages their secret versions above.

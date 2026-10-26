@@ -115,3 +115,75 @@ def test_incomplete_or_insecure_task_configuration_is_rejected():
         EmailWorkerSettings(_env_file=None, email_tasks_queue="only-one-setting")
     with pytest.raises(ValidationError, match="HTTPS origins"):
         task_settings(email_tasks_url="http://email.example.com")
+
+
+@pytest.mark.parametrize("caller", ["scheduler", "tasks", "stranger", "unverified", "bad-token", None])
+async def test_reconcile_accepts_only_scheduler_identity(monkeypatch, caller):
+    from unittest.mock import AsyncMock
+
+    from google.oauth2 import id_token
+
+    from clinic_engagement.email import task_app
+
+    settings = task_settings(email_recovery_invoker_email="scheduler@test-project.iam.gserviceaccount.com")
+    dispatch = AsyncMock(return_value=3)
+    monkeypatch.setattr(task_app, "dispatch_due", dispatch)
+
+    def verify(token, request, *, audience):
+        assert audience == settings.email_tasks_audience
+        if caller == "bad-token":
+            raise ValueError("invalid signature")
+        email = {
+            "scheduler": settings.email_recovery_invoker_email,
+            "tasks": settings.email_tasks_invoker_email,
+            "unverified": settings.email_recovery_invoker_email,
+        }.get(caller, "stranger@example.com")
+        return {"email": email, "email_verified": caller != "unverified"}
+
+    monkeypatch.setattr(id_token, "verify_oauth2_token", verify)
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=create_app(settings)), base_url=settings.email_tasks_url
+    ) as client:
+        headers = {"Authorization": "Bearer test"} if caller else {}
+        response = await client.post("/tasks/email/reconcile", headers=headers)
+        if caller == "scheduler":
+            assert response.status_code == 200 and response.json() == {"published": 3}
+            dispatch.assert_awaited_once_with(settings, limit=10)
+            # The same service IAM permission must not authorize sending as Scheduler.
+            assert (
+                await client.post("/tasks/email/send", headers=headers, json={"delivery_id": str(uuid.uuid4())})
+            ).status_code == 403
+        else:
+            assert response.status_code == (401 if caller in {None, "bad-token"} else 403)
+            dispatch.assert_not_awaited()
+
+
+async def test_reconcile_fails_closed_when_unconfigured_and_retries_timeout(monkeypatch):
+    from unittest.mock import AsyncMock
+
+    from google.oauth2 import id_token
+
+    from clinic_engagement.email import task_app
+
+    settings = task_settings()
+    dispatch = AsyncMock(side_effect=TimeoutError)
+    monkeypatch.setattr(task_app, "dispatch_due", dispatch)
+    monkeypatch.setattr(
+        id_token,
+        "verify_oauth2_token",
+        lambda *a, **kw: {"email": "scheduler@example.com", "email_verified": True},
+    )
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=create_app(settings)), base_url=settings.email_tasks_url
+    ) as client:
+        headers = {"Authorization": "Bearer test"}
+        assert (await client.post("/tasks/email/reconcile", headers=headers)).status_code == 503
+        dispatch.assert_not_awaited()
+        settings.email_recovery_invoker_email = "scheduler@example.com"
+        response = await client.post("/tasks/email/reconcile", headers=headers)
+        assert response.status_code == 503 and response.headers["Retry-After"] == "60"
+        dispatch.assert_awaited_once()
+        dispatch.reset_mock()
+        settings.email_tasks_queue = ""
+        assert (await client.post("/tasks/email/reconcile", headers=headers)).status_code == 503
+        dispatch.assert_not_awaited()  # Never fall back to direct provider sends on this endpoint.

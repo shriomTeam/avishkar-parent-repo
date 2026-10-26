@@ -215,7 +215,8 @@ Tasks**. Cloud Tasks calls a dedicated private Cloud Run email service using OID
 that service sends through SendGrid and retries transient failures. The invitation
 request waits only for bounded task creation, not the SendGrid response.
 
-The five-minute Cloud Scheduler job remains a safety net: it re-enqueues records
+Cloud Scheduler calls a protected recovery endpoint on the **same email service**
+every 30 minutes as a safety net: it re-enqueues records
 whose task creation failed, or whose dispatch reservation is older than 15 minutes.
 It does not poll SendGrid on the normal production path. Apply Terraform and the
 new database migration first; Deploy builds the `email` image and updates the

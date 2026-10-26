@@ -47,7 +47,6 @@ env:
   API_SERVICE: prod-avishkar-api
   WEB_SERVICE: prod-avishkar-web
   INGEST_SERVICE: prod-avishkar-ingest
-  EMAIL_JOB: prod-avishkar-email
   EMAIL_SERVICE: prod-avishkar-email-send
   MIGRATE_JOB: prod-avishkar-migrate
   SQL_INSTANCE: prod-avishkar-postgres
@@ -185,12 +184,6 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
       - name: Deploy
         run: gcloud run services update "${API_SERVICE}" --region="${REGION}" --image="${REGISTRY}/api:${GITHUB_SHA}"
-      - name: Update email delivery job when provisioned
-        run: |
-          EMAIL_JOB_NAME="$(gcloud run jobs list --region="${REGION}" --filter="metadata.name=${EMAIL_JOB}" --format='value(metadata.name)')"
-          if [ "${EMAIL_JOB_NAME}" = "${EMAIL_JOB}" ]; then
-            gcloud run jobs update "${EMAIL_JOB}" --region="${REGION}" --image="${REGISTRY}/api:${GITHUB_SHA}"
-          fi
       - name: Work out the service addresses
         run: |
           PROJECT_NUMBER="$(echo "${{ vars.WIF_PROVIDER }}" | cut -d/ -f2)"

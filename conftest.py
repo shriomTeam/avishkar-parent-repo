@@ -19,5 +19,6 @@ for name in (
     "EMAIL_TASKS_URL",
     "EMAIL_TASKS_AUDIENCE",
     "EMAIL_TASKS_INVOKER_EMAIL",
+    "EMAIL_RECOVERY_INVOKER_EMAIL",
 ):
     os.environ[name] = ""

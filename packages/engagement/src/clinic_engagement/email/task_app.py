@@ -15,6 +15,7 @@ from clinic_core.database import dispose_engines, system_session
 from clinic_core.settings import EmailWorkerSettings
 from clinic_db.models.membership import EmailDelivery
 from clinic_engagement.email.service import deliver_due
+from clinic_engagement.email.tasks import dispatch_due
 
 
 class EmailTask(BaseModel):
@@ -22,8 +23,9 @@ class EmailTask(BaseModel):
     delivery_id: uuid.UUID
 
 
-def check_caller(authorization, settings):
-    if not settings.email_tasks_audience or not settings.email_tasks_invoker_email:
+def check_caller(authorization, settings, *, recovery=False):
+    expected_email = settings.email_recovery_invoker_email if recovery else settings.email_tasks_invoker_email
+    if not settings.email_tasks_audience or not expected_email:
         raise HTTPException(503, "email task authentication is not configured")
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(401, "missing token")
@@ -36,7 +38,7 @@ def check_caller(authorization, settings):
         )
     except Exception:
         raise HTTPException(401, "invalid token") from None
-    if claims.get("email_verified") is not True or claims.get("email") != settings.email_tasks_invoker_email:
+    if claims.get("email_verified") is not True or claims.get("email") != expected_email:
         raise HTTPException(403, "caller not allowed")
 
 
@@ -67,6 +69,21 @@ def create_app(settings=None):
                 return {"status": row.status}
             retry_after = max(1, min(300, int((row.next_attempt_at - now()).total_seconds())))
         raise HTTPException(503, "delivery pending retry", headers={"Retry-After": str(retry_after)})
+
+    @app.post("/tasks/email/reconcile")
+    async def reconcile(authorization: str | None = Header(default=None)):
+        config = app.state.settings
+        await asyncio.to_thread(check_caller, authorization, config, recovery=True)
+        if not config.email_tasks_queue:
+            raise HTTPException(503, "email task dispatch is not configured")
+        try:
+            # Stay within Cloud Run/Scheduler's 60-second deadline. Database dispatch
+            # reservations make concurrent recovery calls and interrupted runs safe.
+            async with asyncio.timeout(45):
+                published = await dispatch_due(config, limit=10)
+        except TimeoutError:
+            raise HTTPException(503, "recovery timed out", headers={"Retry-After": "60"}) from None
+        return {"published": published}
 
     return app
 

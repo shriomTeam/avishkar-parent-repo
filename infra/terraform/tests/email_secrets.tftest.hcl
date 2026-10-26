@@ -1,4 +1,6 @@
-mock_provider "google" {}
+mock_provider "google" {
+  override_during = plan
+}
 mock_provider "random" {}
 
 variables {
@@ -82,5 +84,31 @@ run "disabled_invitations_need_no_sendgrid" {
   assert {
     condition     = length(google_secret_manager_secret_version.sendgrid_api_key) == 0 && !contains(keys(local.api_secrets), "SENDGRID_API_KEY")
     error_message = "Disabled invitations must not require or inject SendGrid."
+  }
+}
+
+run "recovery_reuses_sender_service" {
+  command = plan
+  override_resource {
+    target          = google_service_account.email_scheduler[0]
+    override_during = plan
+    values          = { email = "scheduler@test-project.iam.gserviceaccount.com" }
+  }
+  variables {
+    invitations_enabled = true
+    email_from_address  = "sender@example.com"
+    sendgrid_api_key    = "test-only-sendgrid"
+  }
+  assert {
+    condition     = google_cloud_scheduler_job.email[0].schedule == "*/30 * * * *" && google_cloud_scheduler_job.email[0].http_target[0].uri == "${local.email_send_url}/tasks/email/reconcile"
+    error_message = "Recovery must use the existing email service every 30 minutes."
+  }
+  assert {
+    condition     = google_cloud_scheduler_job.email[0].http_target[0].oidc_token[0].audience == local.email_send_url
+    error_message = "Recovery OIDC tokens must target the email service audience."
+  }
+  assert {
+    condition     = local.email_environment["EMAIL_RECOVERY_INVOKER_EMAIL"] == google_service_account.email_scheduler[0].email
+    error_message = "The handler must receive the dedicated Scheduler identity."
   }
 }
