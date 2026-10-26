@@ -50,7 +50,7 @@ variable "google_client_secret" {
 variable "invitations_enabled" {
   type        = bool
   default     = false
-  description = "Enable only after populating email secret versions and verifying the sender."
+  description = "Enable after configuring the production SENDGRID_API_KEY GitHub secret and verifying the sender."
 }
 variable "email_from_address" {
   type        = string
@@ -73,5 +73,35 @@ variable "email_reply_to" {
 variable "email_secrets_preprovisioned" {
   type        = bool
   default     = false
-  description = "Import the two email secret containers when they already exist; values remain outside Terraform."
+  description = "Import only the two existing email secret containers; Terraform manages their versions."
+}
+
+variable "sendgrid_api_key" {
+  type        = string
+  sensitive   = true
+  default     = ""
+  description = "SendGrid Mail Send credential from the production GitHub SENDGRID_API_KEY secret."
+  validation {
+    condition     = !var.invitations_enabled || length(trimspace(var.sendgrid_api_key)) > 0
+    error_message = "Invitations require the production GitHub SENDGRID_API_KEY secret."
+  }
+}
+
+variable "email_old_payload_keys_enabled" {
+  type        = bool
+  default     = false
+  description = "Inject previous Fernet keys before adopting/rotating the generated payload key."
+}
+
+variable "email_old_payload_keys" {
+  type        = string
+  sensitive   = true
+  default     = ""
+  description = "Comma-separated previous Fernet keys from production GitHub EMAIL_OLD_PAYLOAD_KEYS; retain until old ciphertext is drained."
+  validation {
+    condition = !var.email_old_payload_keys_enabled || alltrue([
+      for key in split(",", var.email_old_payload_keys) : can(regex("^[A-Za-z0-9_-]{43}=$", key))
+    ])
+    error_message = "Enabled email key compatibility requires comma-separated, 44-character URL-safe base64 Fernet keys (no spaces)."
+  }
 }

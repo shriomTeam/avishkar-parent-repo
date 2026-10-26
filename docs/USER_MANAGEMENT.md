@@ -160,17 +160,65 @@ The sender has been verified through Single Sender Verification according to the
 user-provided screenshot. Domain authentication and live delivery are not verified
 by automated tests. Use domain authentication for production deliverability.
 
-Generate the encryption key with:
+For local development only, generate the encryption key with:
 
 ```sh
 uv run python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'
 ```
 
-Keep it private and stable across API and worker restarts. It is separate from
-the SendGrid API key. For rotation, configure comma-separated old keys through
-`EMAIL_OLD_PAYLOAD_KEYS` on both runtimes until existing encrypted deliveries have
-drained. Active encryption uses the new key; old keys only permit decryption.
+Keep local keys private and stable across API and worker restarts.
+
+### Production secret flow
+
+- Add `SENDGRID_API_KEY` to the GitHub **production environment secrets**, even if
+  the same value already exists in GCP Secret Manager. Give the key Mail Send permission.
+- Both production Terraform Plan and Apply jobs pass it as `TF_VAR_sendgrid_api_key`.
+  Terraform creates a `google_secret_manager_secret_version` and Cloud Run reads it.
+  When invitations are enabled, a missing/empty credential fails variable validation.
+- Terraform generates `random_bytes.email_payload_key` (32 bytes) and publishes its
+  URL-safe base64 representation as the permanent Fernet key. Do not manually set a
+  production payload key or replace/taint the random resource. `prevent_destroy`
+  guards against accidental replacement. State loss still requires backup recovery.
+- API, sender and recovery job explicitly depend on all required secret version
+  resources, as well as their IAM grants, before referencing `latest`.
+- `email_secrets_preprovisioned=true` is retained **only to import the two containers
+  already created in GCP**. Terraform now manages their versions. Fresh environments
+  leave it false. Import does not adopt existing version values.
+- Secret values are absent from Git/tfvars and redacted in plan text, but **are stored
+  in Terraform state and saved plans**, like the repo's Google OAuth secret. Restrict
+  access to the state bucket and production plan artifacts.
+
+**Existing ciphertext / key adoption:** before applying the newly generated key,
+check whether production has any encrypted queued/retry/sending deliveries.
+This production configuration already enables `email_old_payload_keys_enabled`
+because a payload key was provisioned manually; copy that existing key into the
+production GitHub `EMAIL_OLD_PAYLOAD_KEYS` secret before planning/applying. If it
+has (or this is uncertain), add the previous payload key(s) as comma-separated
+`EMAIL_OLD_PAYLOAD_KEYS` in GitHub's production secrets (no spaces) and set
+`email_old_payload_keys_enabled=true` in the environment tfvars. Both Terraform
+jobs pass this sensitive value; Terraform publishes it as a separate Secret Manager
+version and injects `EMAIL_OLD_PAYLOAD_KEYS` into the API, sender and recovery job.
+Local development still uses the normal `.env` setting. Do not retire old keys
+until all payloads encrypted with them have drained. Adoption/rotation cannot be
+considered safe without this check. A planned future rotation must wire old keys
+first; it also requires intentionally changing the random-resource lifecycle guard.
 Changing the sender later only changes configuration.
+
+The CI deploy account requires a **one-time** `roles/cloudscheduler.admin` grant,
+managed by the project administrator (the CI identity cannot grant itself access).
+For example, with the actual CI service-account email substituted:
+
+```sh
+gcloud projects add-iam-policy-binding avishkar-market-intelligence \
+  --member="serviceAccount:<github-cicd-service-account-email>" \
+  --role="roles/cloudscheduler.admin"
+```
+
+Terraform and Deploy are separate workflows. On first release, complete Terraform
+Apply before Deploy reaches the new email sender; its provisioning wait is only
+60 seconds. If it times out, rerun Deploy after Apply succeeds. The SendGrid From
+address must remain verified; the earlier screenshot verifies the configured
+sender, while automated tests do not verify actual provider delivery.
 
 Use local `PUBLIC_APP_ORIGIN=http://localhost:3000`. Production origin is:
 
@@ -357,11 +405,13 @@ unnecessary patient information into event details.
 
 ## Production rollout
 
-Terraform creates secret **containers**, never the secret values. Provision current
-versions of `${name}-sendgrid-api-key` and `${name}-email-payload-key` outside
-Terraform through the secret workflow. Do not put key values into tfvars or state.
+Follow **Production secret flow** above: configure GitHub's production SendGrid
+secret, verify the sender, and let Terraform create both containers and versions.
+The payload key is generated and kept stable in protected Terraform state. Before
+adopting that key, configure compatibility keys if existing encrypted mail may
+remain. Never commit credentials to Git/tfvars or publish state/plan artifacts.
 Set `invitations_enabled=true`, `email_from_address`, optional `email_reply_to` and
-`email_from_name` only after those versions and the verified sender are ready.
+`email_from_name` once the required GitHub secrets and verified sender are ready.
 
 Terraform provisions a separate `${name}-email` Cloud Tasks queue (two dispatches
 per second, one concurrent request), a private `${name}-email-send` Cloud Run
@@ -391,7 +441,7 @@ The new `20261024_email_tasks` migration must run before publishing or processin
 
 The production tfvars enable invitations and set the verified sender to
 `abhinav.chaudhary@avishkar.app`, named `Avishkar AI`. Since the two secret containers
-were created manually, `email_secrets_preprovisioned=true` imports those containers
+were created manually, `email_secrets_preprovisioned=true` imports those containers (versions are managed by Terraform)
 into Terraform management; secret **values** are neither read nor imported into
 state. Leave this option false for a new environment where Terraform should create
 empty containers. Ensure both existing secrets contain enabled versions before

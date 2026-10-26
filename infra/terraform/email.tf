@@ -1,11 +1,49 @@
-# Values are provisioned outside Terraform so API keys never enter tfvars or state.
+# External credentials follow GitHub production secrets -> TF_VAR_* -> Secret Manager versions.
+# Secret values are sensitive in plans but are present in the protected Terraform state.
 resource "google_secret_manager_secret" "email" {
   for_each  = toset(["sendgrid-api-key", "email-payload-key"])
   secret_id = "${local.name}-${each.key}"
   replication {
     auto {}
   }
-  labels = local.labels
+  labels     = local.labels
+  depends_on = [google_project_service.apis]
+}
+
+resource "google_secret_manager_secret_version" "sendgrid_api_key" {
+  count       = var.invitations_enabled ? 1 : 0
+  secret      = google_secret_manager_secret.email["sendgrid-api-key"].id
+  secret_data = var.sendgrid_api_key
+}
+
+# Permanent encryption identity: do not taint/replace it while encrypted mail exists.
+resource "random_bytes" "email_payload_key" {
+  length = 32
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "email_payload_key" {
+  secret      = google_secret_manager_secret.email["email-payload-key"].id
+  secret_data = replace(replace(random_bytes.email_payload_key.base64, "+", "-"), "/", "_")
+}
+
+# Enable before adopting/replacing a key if queued ciphertext uses an older key.
+resource "google_secret_manager_secret" "email_old_payload_keys" {
+  count     = var.email_old_payload_keys_enabled ? 1 : 0
+  secret_id = "${local.name}-email-old-payload-keys"
+  labels    = local.labels
+  replication {
+    auto {}
+  }
+  depends_on = [google_project_service.apis]
+}
+
+resource "google_secret_manager_secret_version" "email_old_payload_keys" {
+  count       = var.email_old_payload_keys_enabled ? 1 : 0
+  secret      = google_secret_manager_secret.email_old_payload_keys[0].id
+  secret_data = var.email_old_payload_keys
 }
 
 resource "google_project_service" "email_scheduler" {
@@ -32,11 +70,14 @@ locals {
     EMAIL_FROM_NAME     = var.email_from_name
     EMAIL_REPLY_TO      = var.email_reply_to
   }, local.email_task_environment)
-  email_secrets = {
+  email_rotation_secrets = var.email_old_payload_keys_enabled ? {
+    EMAIL_OLD_PAYLOAD_KEYS = google_secret_manager_secret.email_old_payload_keys[0].secret_id
+  } : {}
+  email_secrets = merge({
     DATABASE_SYSTEM_URL          = module.cloudsql.secret_ids["system-url"]
     SENDGRID_API_KEY             = google_secret_manager_secret.email["sendgrid-api-key"].secret_id
     EMAIL_PAYLOAD_ENCRYPTION_KEY = google_secret_manager_secret.email["email-payload-key"].secret_id
-  }
+  }, local.email_rotation_secrets)
 }
 
 resource "google_service_account" "email_worker" {
@@ -86,7 +127,12 @@ module "email_sender" {
   memory                = "512Mi"
   env                   = local.email_environment
   secret_env            = local.email_secrets
-  depends_on            = [google_secret_manager_secret_iam_member.email_worker]
+  depends_on = [
+    google_secret_manager_secret_iam_member.email_worker,
+    google_secret_manager_secret_version.sendgrid_api_key,
+    google_secret_manager_secret_version.email_payload_key,
+    google_secret_manager_secret_version.email_old_payload_keys,
+  ]
 }
 
 resource "google_cloud_run_v2_service_iam_member" "email_tasks_invoke" {
@@ -164,7 +210,14 @@ resource "google_cloud_run_v2_job" "email" {
   lifecycle {
     ignore_changes = [template[0].template[0].containers[0].image, client, client_version]
   }
-  depends_on = [google_secret_manager_secret_iam_member.email_worker, google_cloud_tasks_queue_iam_member.email_enqueue, google_service_account_iam_member.email_enqueue_caller]
+  depends_on = [
+    google_secret_manager_secret_iam_member.email_worker,
+    google_cloud_tasks_queue_iam_member.email_enqueue,
+    google_service_account_iam_member.email_enqueue_caller,
+    google_secret_manager_secret_version.sendgrid_api_key,
+    google_secret_manager_secret_version.email_payload_key,
+    google_secret_manager_secret_version.email_old_payload_keys,
+  ]
 }
 
 resource "google_service_account" "email_scheduler" {
@@ -201,7 +254,7 @@ resource "google_cloud_scheduler_job" "email" {
   depends_on = [google_project_service.email_scheduler, google_cloud_run_v2_job_iam_member.email_scheduler]
 }
 
-# Adopt pre-existing containers without ever reading their secret values into state.
+# Adopt existing containers only; Terraform creates/manages their secret versions above.
 import {
   for_each = var.email_secrets_preprovisioned ? toset(["sendgrid-api-key", "email-payload-key"]) : toset([])
   to       = google_secret_manager_secret.email[each.value]

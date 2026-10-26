@@ -11,7 +11,7 @@ locals {
     }, var.invitations_enabled ? {
     SENDGRID_API_KEY             = google_secret_manager_secret.email["sendgrid-api-key"].secret_id
     EMAIL_PAYLOAD_ENCRYPTION_KEY = google_secret_manager_secret.email["email-payload-key"].secret_id
-  } : {})
+  } : {}, var.invitations_enabled ? local.email_rotation_secrets : {})
 
   # The ingest service reads and writes tenant data like the API does, so it gets the same production settings (the
   # shared configuration check requires them) but only the secrets it needs.
@@ -112,6 +112,9 @@ module "api" {
     google_secret_manager_secret_iam_member.api,
     google_secret_manager_secret_version.google_client_secret,
     google_secret_manager_secret_version.voice_secrets_key,
+    google_secret_manager_secret_version.sendgrid_api_key,
+    google_secret_manager_secret_version.email_payload_key,
+    google_secret_manager_secret_version.email_old_payload_keys,
   ]
 }
 

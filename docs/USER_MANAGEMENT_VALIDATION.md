@@ -266,3 +266,24 @@ Final verification:
 Deploy requires Terraform provisioning of the queue, private sender and identities,
 then the release workflow's email image deployment before the API release. No
 production infrastructure was applied or email sent during these tests.
+
+
+## Email-secret review follow-up (26 October)
+
+Supersedes the earlier container-only secret provisioning description. SendGrid now
+follows the production GitHub environment -> TF_VAR -> Terraform secret/version flow.
+The payload key is generated once by Terraform with a replacement guard. API,
+sender and recovery job wait for secret versions before reading latest. Existing
+container imports remain supported, but values are now present in protected state
+and saved plans. Optional old-key secret injection supports safe adoption/rotation;
+operators must check existing ciphertext before applying the generated key.
+
+No production secret was read or changed and no Terraform apply was performed.
+
+Local validation: Terraform validate and recursive formatting passed. Five
+mock-provider Terraform tests passed (enabled wiring/URL-safe key, missing
+SendGrid rejection, old-key compatibility, invalid old-key rejection, disabled
+invitations). The same offline tests are added to the workflow's validation job.
+Production explicitly enables old-key compatibility for the manually provisioned
+key, so missing GitHub configuration fails validation instead of silently losing
+queued-email decryption. No application behavior or database migrations changed.
