@@ -417,3 +417,22 @@ runtime changes followed the full Python/browser runs; subsequent edits were the
 test's optional-package assertion and documentation. All final whitespace, Ruff
 and Terraform formatting checks pass. Production JavaScript audit reports zero
 known advisories. This does not independently validate deployed secret values.
+
+
+### CI tool catalog race correction (26 October)
+
+The failed tools browser journey exposed a response/commit race: FastAPI's
+request-scoped yielded session committed after sending HTTP success. Reopening
+the tool catalog could therefore read the previous committed state. Tool routes
+now close their transaction with function scope before sending the response.
+A regression test reads through a separate database transaction at the ASGI
+response-start boundary; it failed before the fix and passes afterward.
+
+Validation: all **864 Python tests**, including **30 tool API tests**, pass.
+The previously failing browser journey passed **five consecutive repetitions**.
+Ruff, Python/frontend architecture boundaries and whitespace checks pass.
+GitHub now lists both required production email secret names, and Terraform run
+40362707111 reports success; secret values were not inspected.
+
+Final full browser rerun: **88 passed** (4.9 minutes). Remote CI must still
+complete on the new commit.

@@ -88,6 +88,28 @@ async def _agent(client, tenant, **overrides):
     return r.json()
 
 
+async def test_added_internal_tool_is_committed_before_success_response():
+    tenant = await create_test_tenant()
+    visible_at_response = []
+
+    async def observe_response(scope, receive, send):
+        async def observe(message):
+            if message["type"] == "http.response.start" and message["status"] == 201:
+                # A browser can open the catalog as soon as this response starts.
+                # Use another transaction so an uncommitted flush cannot pass.
+                async with tenant_session(tenant) as session:
+                    visible_at_response.append(
+                        await session.scalar(select(Tool.id).where(Tool.builtin_key == "create_lead"))
+                    )
+            await send(message)
+
+        await app(scope, receive, observe)
+
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=observe_response), base_url="http://test") as client:
+        tool = await _add_internal(client, tenant)
+    assert visible_at_response == [UUID(tool["id"])]
+
+
 async def test_internal_tools_come_from_a_catalog_and_are_added_on_demand(client):
     a, b = await create_test_tenant(), await create_test_tenant()
     assert await _tools(client, a) == []  # nothing is added for a clinic until it chooses
