@@ -29,12 +29,14 @@ export function ProductCard({
   description,
   icon,
   active = false,
+  available = true,
   action,
 }: {
   title: string;
   description: string;
   icon: ReactNode;
   active?: boolean;
+  available?: boolean;
   action?: ReactNode;
 }) {
   return (
@@ -50,7 +52,7 @@ export function ProductCard({
           {icon}
         </span>
         <StatusBadge tone={active ? "brand" : "muted"}>
-          {active ? "Active" : "Not in plan"}
+          {!available ? "Upcoming" : active ? "Active" : "Inactive"}
         </StatusBadge>
       </div>
       <h3 className="text-[16px] leading-6 font-semibold tracking-[-0.3px]">

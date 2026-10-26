@@ -2,8 +2,8 @@
 
 Validation dates: 23–24 October 2026. Branch: `user/management`.
 
-The 24 October review follow-up below supersedes the historical three-failure
-result: the full Python suite now passes (853 tests). Earlier sections retain the
+The most recent release check below supersedes earlier results: the full Python
+suite passes (863 tests). Earlier sections retain the
 checks performed at each stage rather than implying every historical count is current.
 
 This records local verification of the invitation, membership and transactional
@@ -309,3 +309,111 @@ Follow-up validation: 14 HTTP handler/auth tests passed (including missing/wrong
 identity, cross-endpoint denial, fail-closed configuration and retryable timeout).
 Six mocked Terraform tests, Terraform validate/fmt, repository Ruff check/format,
 deployment YAML checks and git whitespace checks passed. No live email was sent.
+
+
+## Full local PR review (26 October)
+
+Reviewed the complete PR diff against fetched `origin/main` (`38e06c7`), the latest
+GitHub review comments, and the uncommitted Manage Access changes. Main is already
+an ancestor; no conflict resolution was needed. No push, GCP apply, real email or
+production secret read occurred.
+
+| Vishnu request | Current local result |
+| --- | --- |
+| Local private-host override contaminates tests | Root conftest pins false; production rejects override. |
+| Reserved roles have no product access | Explicit permission matrix preserved; Provider/Consultant assignments commented out in invitation, re-invitation and Manage Access selectors. Existing records/backend policy retained. |
+| Email recovery identity/cost | Dedicated runtime and separate verified queue/Scheduler callers; same `prod-avishkar-email-send` serves delivery and 30-minute recovery. Recovery Job removed. |
+| API request waits for SendGrid | Production enqueues UUID-only Cloud Tasks, with a three-second RPC inside a five-second outer budget; provider call runs privately. |
+| CSV/control-prefix protection | Formula prefixes, leading tab and CR neutralised. |
+| Cross-workspace safety | Management/auth regression suite covers foreign and mismatched IDs for settings, members, invites, resend/revoke, audit/options/export. |
+| Audit OFFSET | Scoped keyset cursor pagination and cursor-based export. |
+| Invitation delivery N+1 | Batched SELECT with query-count regression. |
+| Next version | Main's 16.4.2 minimum and lockfile retained. |
+| Managed secret flow/version dependencies | Production GitHub credentials -> TF_VARs -> managed versions; API and sender depend on versions. Permanent generated Fernet key plus old-key compatibility; only existing containers imported. |
+| Scheduler API enablement | Removed email module enablement resource as requested; administrator-confirmed prerequisite documented. |
+| Scheduler IAM, verified sender, first deployment ordering | Explicit rollout prerequisites; actual cloud IAM/secrets/provider delivery not independently verified here. |
+
+Additional review fix: the shared Cloud Run module did not explicitly set
+`cpu_idle` alongside resource limits. Added an optional module parameter (null
+preserves existing consumers) and set email to true, with a Terraform assertion.
+This makes the intended request-based billing explicit. See Google's
+[ResourceRequirements documentation](https://docs.cloud.google.com/run/docs/reference/rpc/google.cloud.run.v2#resourcerequirements).
+Also corrected the older plan's stale claim that secret values remain outside
+Terraform state: protected state and saved plans contain them.
+
+Validation of current application code and final infrastructure:
+
+- Full Python: **860 passed**, one existing Authlib deprecation warning.
+- Full browser: **88 passed**, including Manage Access role-option regression.
+- Frontend units: **97 passed, 1 optional mutool check skipped**.
+- Fresh workspace build/typecheck/lint: **23 tasks passed**, no cached results.
+- Ruff check/format, architecture boundaries, generated API types and whitespace
+  checks passed.
+- Fresh isolated pgvector PostgreSQL 17 migration chain and model-drift check passed;
+  one head `20261024_email_tasks`. Development data was untouched.
+- Terraform validation, recursive formatting and **six mocked tests passed**,
+  including caller configuration, secret flow and explicit email billing mode.
+- Final Voice-removal proof passed: builds, **671 Python tests**, frontend units,
+  architecture boundaries, typechecks and **73 browser journeys** in an isolated
+  source copy with the Voice feature removed.
+
+Deployment still requires GitHub production `SENDGRID_API_KEY` and
+`EMAIL_OLD_PAYLOAD_KEYS`, a stable existing payload key during adoption, verified
+sender and CI Scheduler permissions. Deploy the new handler before switching an
+existing schedule; complete the documented provisioning/release sequence for a
+new service. Final CI must run after the user authorizes a push; earlier remote CI
+is not verification of these local commits/uncommitted changes.
+
+## Trial-expiry pause (26 October)
+
+Automatic onboarding trials are commented out while billing/payments are deferred.
+New workspaces and demo seeds are active with non-expiring starter entitlements.
+Migration `20261026_pause_trials` converts existing trial workspaces and clears
+only enabled feature deadlines matching their exact trial end. Disabled grants,
+suspensions and independently configured feature expiries are preserved. The
+original dates are not reconstructible by downgrade; future billing needs a new
+explicit rollout policy. See WORKSPACE_ACCESS_POLICY.md.
+
+Verification: full Python **862 passed**, platform browser **4 passed**, Ruff
+check/format and whitespace checks passed. New tests cover permanent onboarding
+and migration restriction preservation. Fresh isolated migration/drift checks and
+local development migration passed; one head `20261026_pause_trials`. No production
+migration, commit or push was performed for this change. Earlier full 88-browser
+and Voice-removal runs preceded this policy change and were not repeated here.
+
+
+## Final release check (26 October)
+
+Latest fetched main (`38e06c7`) is already included. Final review covers secure
+workspace management, new secret-version flow, shared-service recovery, permanent
+starter access, product readiness and shared avatar/header/role-selection changes.
+No new application-security blocker was found in the reviewed diff. This is code
+review and automated regression evidence, not a production deployment test.
+
+- Full Python suite: **863 passed**, one existing Authlib deprecation warning.
+- Full browser suite: **88 passed**.
+- Fresh workspace build/type/lint: **23 tasks passed**, cache bypassed.
+- Frontend units: **97 passed, 1 optional mutool check skipped**.
+- Terraform validate/fmt and **6 mocked tests passed**.
+- Ruff, API schema generation, architecture boundaries and whitespace checks pass.
+- Production JavaScript dependency audit: no known advisories reported.
+- Fresh pgvector PostgreSQL 17 migrated to `20261026_pause_trials`, with no model drift.
+- The initial removal run caught a hard-coded installed-feature assumption in the
+  new onboarding test; corrected it to retain the explicit starter allowlist while
+  intersecting installed features. The affected auth suite passed afterward.
+
+The initial metadata-only GitHub check did not list production `SENDGRID_API_KEY` or
+`EMAIL_OLD_PAYLOAD_KEYS` in environment/repository secrets. These remain required
+before Terraform Plan/Apply; otherwise validation fails safely. No values were read
+or written. New production IAM/provider delivery and rollout sequencing still need
+operator verification. No production apply, migration or live email was performed.
+Final CI must run on the pushed head; earlier remote checks do not cover this head.
+
+
+Final removal rerun: **passed** (build, **674 Python tests**, frontend units,
+boundaries, typechecks and **73 browser journeys**). The corrected onboarding
+assertion was also verified by **30 passing auth tests** before that rerun. No
+runtime changes followed the full Python/browser runs; subsequent edits were the
+test's optional-package assertion and documentation. All final whitespace, Ruff
+and Terraform formatting checks pass. Production JavaScript audit reports zero
+known advisories. This does not independently validate deployed secret values.

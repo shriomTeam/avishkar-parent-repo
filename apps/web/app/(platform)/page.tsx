@@ -18,6 +18,8 @@ export default async function Overview() {
   const visible = me.features.filter((f) => f.accessible);
   const active = visible.filter((f) => f.enabled);
   const available = visible.filter((f) => !f.enabled);
+  const upcomingCount = available.filter((f) => !f.available).length;
+  const inactiveCount = available.length - upcomingCount;
   const firstName = auth.user.display_name.trim().split(/\s+/)[0];
   const card = (feature: (typeof me.features)[number]) => {
     const presentation = featurePresentation(feature);
@@ -30,6 +32,7 @@ export default async function Overview() {
         description={presentation.description}
         icon={<Icon size={22} strokeWidth={1.7} />}
         active={feature.enabled}
+        available={feature.available}
         action={
           feature.enabled &&
           (nav ? (
@@ -69,7 +72,10 @@ export default async function Overview() {
           {active.length} active {active.length === 1 ? "product" : "products"}
         </span>
         <span aria-hidden="true">·</span>
-        <span>{available.length} available add-ons</span>
+        <span>
+          {upcomingCount} upcoming products
+          {inactiveCount > 0 && ` · ${inactiveCount} inactive products`}
+        </span>
       </div>
       <section aria-labelledby="active-products">
         <div className="mb-5">
@@ -98,10 +104,10 @@ export default async function Overview() {
               id="available-products"
               className="text-[19px] font-semibold tracking-[-0.5px]"
             >
-              More for your clinic
+              {inactiveCount > 0 ? "More for your clinic" : "Upcoming products"}
             </h2>
             <p className="mt-1 text-[13px] text-muted">
-              Discover what else your workspace can do.
+              Explore what’s coming next for your clinic.
             </p>
           </div>
           <ProductGrid>{available.map(card)}</ProductGrid>

@@ -88,6 +88,21 @@ test("an invited account joins, loses access and accepts a re-invitation into th
   await page.getByRole("tab", { name: "Workspace", exact: true }).click();
   await page.getByRole("tab", { name: "User management" }).click();
   await page.getByRole("button", { name: "Manage Browser Owner" }).click();
+  const manage = page.getByRole("dialog", { name: "Manage Browser Owner" });
+  await manage.getByRole("combobox", { name: "Member role" }).click();
+  await expect(
+    page.getByRole("option", { name: "office manager", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("option", { name: "front desk", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("option", { name: "provider", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("option", { name: "consultant", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("option", { name: "front desk", exact: true }).click();
   page.once("dialog", (dialog) => dialog.accept());
   await page
     .getByRole("button", { name: "Remove access", exact: true })

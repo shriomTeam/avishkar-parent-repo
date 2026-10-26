@@ -515,6 +515,10 @@ using a bounded task-creation call rather than waiting for SendGrid. A separate
 private Cloud Run HTTP service authenticates the queue's OIDC caller and processes
 the encrypted delivery. Direct sending remains only as the local no-queue fallback.
 The 30-minute Scheduler call to the shared email service republishes failed/stale dispatches; generation names,
-DB leases and terminal-state checks protect against duplicates. Deploy provisions
-scoped queue identities and updates the private handler before the API. Existing
-secret containers are adopted without putting their values into Terraform state.
+DB leases and terminal-state checks protect against duplicates. Terraform provisions
+scoped queue identities; Deploy updates the private handler before the API. Existing
+secret containers are imported, while Terraform manages their versions through
+GitHub production credentials and a generated permanent payload key. Values are
+redacted in plan text but present in protected Terraform state and saved plans.
+Configure old-key compatibility before adopting the generated key if existing
+ciphertext may remain. The latest rollout and permissions are in USER_MANAGEMENT.md.

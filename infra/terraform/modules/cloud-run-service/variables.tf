@@ -70,3 +70,9 @@ variable "public" {
   default     = true
   description = "Anyone on the internet can reach the service. The app does its own sign-in."
 }
+
+variable "cpu_idle" {
+  type        = bool
+  default     = null
+  description = "Explicit request-based CPU allocation when true; null preserves existing service behavior."
+}

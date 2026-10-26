@@ -1,4 +1,5 @@
 "use client";
+import { initials } from "@clinic/core/web/auth/types";
 import { useAuth } from "@clinic/core/web/auth/provider";
 import Link from "next/link";
 import { useState } from "react";
@@ -175,7 +176,7 @@ function Summary() {
               key={agent.id}
               href={`/voice-receptionist/agents/${agent.id}`}
             >
-              <Avatar>{agent.name[0]}</Avatar>
+              <Avatar>{initials(agent.name)}</Avatar>
               <div className="flex-1">
                 <strong className="text-[14px]">{agent.name}</strong>
                 <small className="block text-[12px] text-muted">

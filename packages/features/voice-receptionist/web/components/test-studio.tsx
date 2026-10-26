@@ -1,4 +1,5 @@
 "use client";
+import { initials } from "@clinic/core/web/auth/types";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -187,7 +188,11 @@ function Studio() {
                     key={i}
                     from={line.speaker === "agent" ? "agent" : "caller"}
                     initial={
-                      line.speaker === "agent" ? (agent?.name[0] ?? "A") : "Y"
+                      line.speaker === "agent"
+                        ? agent
+                          ? initials(agent.name)
+                          : "A"
+                        : "Y"
                     }
                     name={line.speaker === "agent" ? agent?.name : "You"}
                   >

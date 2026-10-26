@@ -100,6 +100,10 @@ run "recovery_reuses_sender_service" {
     sendgrid_api_key    = "test-only-sendgrid"
   }
   assert {
+    condition     = module.email_sender[0].cpu_idle == true
+    error_message = "Email sending and recovery must use request-based CPU allocation."
+  }
+  assert {
     condition     = google_cloud_scheduler_job.email[0].schedule == "*/30 * * * *" && google_cloud_scheduler_job.email[0].http_target[0].uri == "${local.email_send_url}/tasks/email/reconcile"
     error_message = "Recovery must use the existing email service every 30 minutes."
   }

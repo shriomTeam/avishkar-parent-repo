@@ -32,11 +32,7 @@ export default async function RootLayout({
         }
         header={
           me && (
-            <PlatformHeader
-              status={me.tenant_status}
-              userName={auth.user.display_name}
-              nav={me.nav}
-            />
+            <PlatformHeader userName={auth.user.display_name} nav={me.nav} />
           )
         }
       >

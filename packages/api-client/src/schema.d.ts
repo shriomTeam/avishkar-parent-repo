@@ -2033,6 +2033,8 @@ export interface components {
             description: string;
             /** Enabled */
             enabled: boolean;
+            /** Available */
+            available: boolean;
             /** Accessible */
             accessible: boolean;
             /** Trial Eligible */

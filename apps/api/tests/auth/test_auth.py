@@ -1398,3 +1398,77 @@ async def test_email_http_worker_retries_transient_provider_errors_and_acknowled
             row.status = "failed"
         assert (await worker.post("/tasks/email/send", json=body, headers=auth)).json()["status"] == "failed"
         assert sender.await_count == 2
+
+
+async def test_onboarding_grants_starter_access_without_a_trial_deadline(system):
+    from clinic_core.features import load_features
+    from clinic_db.models.core import Tenant, TenantFeature
+
+    app, client = system
+    await login(client)
+    response = await client.post(
+        "/api/v1/workspaces", headers=await headers(client), json={"name": "Development access", "timezone": "UTC"}
+    )
+    assert response.status_code == 200
+    ident = uuid.UUID(response.json()["id"])
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        tenant = await db.get(Tenant, ident)
+        assert tenant.status == "active" and tenant.trial_ends_at is None
+        features = (await db.scalars(select(TenantFeature).where(TenantFeature.tenant_id == ident))).all()
+        # A removed feature is not installed and must not receive a new entitlement.
+        expected = {"blueprints", "reactivation", "voice_receptionist"} & load_features().keys()
+        assert {f.feature_key for f in features} == expected
+        assert all(f.enabled and f.expires_at is None for f in features)
+
+
+async def test_trial_pause_migration_preserves_manual_and_suspended_restrictions(system):
+    import importlib.util
+    from pathlib import Path
+
+    from alembic.migration import MigrationContext
+    from alembic.operations import Operations
+
+    from clinic_db.models.core import Tenant, TenantFeature
+
+    app, _ = system
+    past = now() - timedelta(days=1)
+    manual = past - timedelta(hours=1)
+    async with system_session(database_url=app.state.settings.database_system_url) as db:
+        trial = Tenant(name="Expired trial", timezone="UTC", clinic_type="wellness", status="trial", trial_ends_at=past)
+        suspended = Tenant(
+            name="Suspended trial", timezone="UTC", clinic_type="wellness", status="suspended", trial_ends_at=past
+        )
+        db.add_all([trial, suspended])
+        await db.flush()
+        db.add_all(
+            [
+                TenantFeature(tenant_id=trial.id, feature_key="blueprints", enabled=True, expires_at=past),
+                TenantFeature(tenant_id=trial.id, feature_key="voice_receptionist", enabled=False, expires_at=past),
+                TenantFeature(tenant_id=trial.id, feature_key="reactivation", enabled=True, expires_at=manual),
+                TenantFeature(tenant_id=suspended.id, feature_key="blueprints", enabled=True, expires_at=past),
+            ]
+        )
+        await db.flush()
+        path = Path(__file__).parents[4] / "packages/db/migrations/versions/20261026_pause_trials.py"
+        spec = importlib.util.spec_from_file_location("pause_trials_test", path)
+        migration = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(migration)
+
+        def apply(sync_session):
+            with Operations.context(MigrationContext.configure(sync_session.connection())):
+                migration.upgrade()
+
+        await db.run_sync(apply)
+        await db.refresh(trial)
+        await db.refresh(suspended)
+        assert trial.status == "active" and trial.trial_ends_at is None
+        assert suspended.status == "suspended" and suspended.trial_ends_at == past
+        rows = (
+            await db.scalars(select(TenantFeature).where(TenantFeature.tenant_id.in_([trial.id, suspended.id])))
+        ).all()
+        by_key = {(r.tenant_id, r.feature_key): r for r in rows}
+        assert by_key[(trial.id, "blueprints")].expires_at is None
+        assert not by_key[(trial.id, "voice_receptionist")].enabled
+        assert by_key[(trial.id, "voice_receptionist")].expires_at == past
+        assert by_key[(trial.id, "reactivation")].expires_at == manual
+        assert by_key[(suspended.id, "blueprints")].expires_at == past

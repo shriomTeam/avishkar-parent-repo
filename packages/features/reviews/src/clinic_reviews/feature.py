@@ -18,6 +18,7 @@ async def status() -> dict:
 
 
 feature = Feature(
+    available=False,
     key="reviews",
     name="The 5-Star Machine",
     description="Requests reviews from happy patients and routes unhappy ones privately.",

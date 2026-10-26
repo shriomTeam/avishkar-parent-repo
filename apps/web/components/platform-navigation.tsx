@@ -2,12 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  AccountMenu,
-  Avatar,
-  navigationItemStyles,
-  StatusBadge,
-} from "@clinic/ui";
+import { AccountMenu, Avatar, navigationItemStyles } from "@clinic/ui";
 import { ChevronRight, LayoutGrid, Upload, Sparkles } from "lucide-react";
 import { featurePresentation } from "@/lib/feature-presentation";
 import { WorkspaceSwitcher } from "@/components/auth/workspace-switcher";
@@ -133,11 +128,9 @@ export function PlatformNavigation({
 }
 
 export function PlatformHeader({
-  status,
   userName,
   nav,
 }: {
-  status: string;
   userName: string;
   nav: Navigation;
 }) {
@@ -161,11 +154,6 @@ export function PlatformHeader({
         <span className="font-medium">{title}</span>
       </div>
       <div className="flex items-center gap-4">
-        <span className="hidden sm:inline">
-          <StatusBadge tone={status === "trial" ? "brand" : "muted"}>
-            {status === "trial" ? "Trial workspace" : status}
-          </StatusBadge>
-        </span>
         <Avatar>{initials(userName)}</Avatar>
       </div>
     </header>

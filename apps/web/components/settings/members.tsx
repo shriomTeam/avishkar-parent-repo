@@ -33,8 +33,8 @@ const roleOptions = [
   "consultant",
 ].map((value) => ({ value, label: value.replaceAll("_", " ") }));
 // Reserved until these roles have product permissions. Keep existing memberships
-// visible/manageable, but do not offer these roles for new invitations.
-const invitationRoleOptions = [
+// visible/manageable, but do not offer these roles for invitations or role changes.
+const assignableRoleOptions = [
   "office_manager",
   "front_desk",
   // "provider",
@@ -262,9 +262,9 @@ export function Members({
               </DataTable>
             )}
             <p className="mt-5 text-xs leading-5 text-muted">
-              Owners control manager access. Office managers can manage front
-              desk, provider and consultant memberships. Owner access cannot be
-              changed here.
+              Owners control manager access. Office managers can assign front
+              desk access. Provider and consultant role assignments are
+              currently unavailable. Owner access cannot be changed here.
             </p>
           </>
         )}
@@ -425,7 +425,7 @@ function InviteUser({
   error: string;
   member: Schemas["WorkspaceMemberOut"] | null;
 }) {
-  const availableRoles = invitationRoleOptions.filter((r) =>
+  const availableRoles = assignableRoleOptions.filter((r) =>
     roles.includes(r.value),
   );
   const [role, setRole] = useState(
@@ -537,7 +537,7 @@ function MemberDialog({
         label="Member role"
         value={role}
         onChange={setRole}
-        options={roleOptions.filter((r) => roles.includes(r.value))}
+        options={assignableRoleOptions.filter((r) => roles.includes(r.value))}
         disabled={busy}
       />
       <p className="mb-5 text-xs text-muted">

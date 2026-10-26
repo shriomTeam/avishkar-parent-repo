@@ -123,6 +123,7 @@ module "email_sender" {
   concurrency           = 1
   timeout_seconds       = 60
   memory                = "512Mi"
+  cpu_idle              = true
   env                   = local.email_environment
   secret_env            = local.email_secrets
   depends_on = [

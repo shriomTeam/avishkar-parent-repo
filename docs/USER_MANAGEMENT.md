@@ -2,6 +2,10 @@
 
 ## Behavior
 
+Automatic 14-day workspace trials are currently disabled during product development.
+See [workspace access policy](WORKSPACE_ACCESS_POLICY.md). Role and entitlement
+checks remain enforced.
+
 Owners and office managers open their profile menu → Settings → User management.
 Invitations are emailed to one recipient, expire after the configured lifetime
 (default 72 hours), and require explicit acceptance with the matching Google
@@ -63,13 +67,13 @@ entitlements. A role in one workspace grants no authority in another.
 | Import patient/appointment data | Yes | Yes | No | No | No |
 | Access Patient Blueprints and other enabled feature routers | Yes | Yes | No | No | No |
 
-**Note:** Provider and Consultant are currently disabled in the invitation modal;
+**Note:** Provider and Consultant are currently disabled in invitation and Manage Access role selectors;
 their options are commented out, not removed. The three working roles available
 for current use are **Owner, Office Manager and Front Desk**. Owner is assigned
 when creating a workspace and cannot be granted by invitation. Owners can invite
 Office Managers or Front Desk; Office Managers can invite Front Desk. The backend
 policy and existing memberships remain as documented above; this change hides
-reserved roles from new invitations and re-invitations without deleting them.
+reserved roles from new invitations, re-invitations and member role changes without deleting them.
 
 ### Role-specific limits
 
@@ -445,7 +449,7 @@ identity with an OIDC token whose audience is the email service origin. The hand
 verifies that exact verified identity; it does not accept the queue caller. The
 send endpoint verifies the queue identity and rejects the Scheduler caller. Both
 identities need service-level Run Invoker; application checks separate endpoint
-permissions. The service scales to zero and uses request-based billing. There is
+permissions. The service scales to zero and explicitly sets `cpu_idle=true` for request-based billing. There is
 no separate production email recovery Job or scheduled container startup. The local
 CLI dispatcher remains available and unchanged.
 

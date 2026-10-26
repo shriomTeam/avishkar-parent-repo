@@ -24,6 +24,7 @@ class FeatureOut(BaseModel):
     name: str
     description: str
     enabled: bool
+    available: bool
     accessible: bool
     trial_eligible: bool
     phi_sensitive: bool
@@ -56,7 +57,8 @@ async def me(ctx: RequestContext = Depends(get_request_context), session: AsyncS
                 key=f.key,
                 name=f.name,
                 description=f.description,
-                enabled=f.key in enabled,
+                enabled=f.available and f.key in enabled,
+                available=f.available,
                 accessible=can_use_feature(ctx.role, f.key),
                 trial_eligible=f.trial_eligible,
                 phi_sensitive=f.phi_sensitive,
@@ -66,7 +68,7 @@ async def me(ctx: RequestContext = Depends(get_request_context), session: AsyncS
         nav=[
             NavItemOut(feature=f.key, label=item.label, path=item.path)
             for f in features.values()
-            if f.key in enabled and can_use_feature(ctx.role, f.key)
+            if f.available and f.key in enabled and can_use_feature(ctx.role, f.key)
             for item in f.nav
             if not item.roles or ctx.role in item.roles
         ],

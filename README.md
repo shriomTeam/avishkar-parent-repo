@@ -345,3 +345,7 @@ packages/api-client         Generated TypeScript API types
 | User management | Workspace invitations, acceptance, role changes/removal and workspace switching; production email rollout required |
 
 See the [PR validation report](docs/USER_MANAGEMENT_VALIDATION.md) for test coverage, dependency findings and release gates.
+
+Workspace trial expiry is currently paused while billing is not implemented.
+See [workspace access policy](docs/WORKSPACE_ACCESS_POLICY.md); run `pnpm db:migrate`
+to convert existing automatic trials without changing disabled products or roles.
