@@ -19,6 +19,7 @@ export {
   Textarea,
 } from "./form";
 export { Tabs } from "./tabs";
+export { LoadingRegion, Skeleton } from "./skeleton";
 export { DataTable, Th, Td, Tr } from "./table";
 export {
   Alert,
