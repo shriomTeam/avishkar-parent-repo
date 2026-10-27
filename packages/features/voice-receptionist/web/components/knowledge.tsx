@@ -25,6 +25,7 @@ import {
 } from "../lib/inbound/api";
 import { Dialog, Empty, FormError, Heading } from "./ui";
 import { VoiceBoundary } from "./voice-boundary";
+import { KnowledgeSkeleton, TableLoading } from "./skeletons";
 
 const POLL_MS = 2500;
 const LABELS: Record<
@@ -49,7 +50,7 @@ function size(bytes: number) {
 
 export function KnowledgeBase() {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<KnowledgeSkeleton />}>
       <DocumentList />
     </VoiceBoundary>
   );
@@ -162,14 +163,12 @@ function DocumentList() {
       )}
       <Panel>
         <H2>Your documents</H2>
-        {documents.length === 0 ? (
+        {!data ? (
+          <TableLoading columns={[220, 56, 100, 80, 130]} />
+        ) : documents.length === 0 ? (
           <Empty
-            title={data ? "No documents yet" : "Loading…"}
-            description={
-              data
-                ? `Upload a PDF, Word, text or Markdown file (up to ${Math.round(data.max_file_bytes / (1024 * 1024))} MB, ${data.max_documents} files).`
-                : ""
-            }
+            title="No documents yet"
+            description={`Upload a PDF, Word, text or Markdown file (up to ${Math.round(data.max_file_bytes / (1024 * 1024))} MB, ${data.max_documents} files).`}
           />
         ) : (
           <DataTable>

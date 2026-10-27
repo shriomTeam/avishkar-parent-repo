@@ -27,10 +27,11 @@ import {
 } from "../lib/inbound/api";
 import { Heading, Badge, Dialog, Dropdown, Field, FormError } from "./ui";
 import { VoiceBoundary } from "./voice-boundary";
+import { NumbersSkeleton, TableLoading } from "./skeletons";
 
 export function Numbers() {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<NumbersSkeleton />}>
       <NumberList />
     </VoiceBoundary>
   );
@@ -110,11 +111,11 @@ function NumberList() {
         </Note>
       )}
       <Panel>
-        {numbers.length === 0 ? (
+        {!data ? (
+          <TableLoading columns={[150, 60, 130, 90, 90]} rows={2} />
+        ) : numbers.length === 0 ? (
           <Muted role="status">
-            {data
-              ? "No phone numbers yet. Buy one to get started."
-              : "Loading…"}
+            No phone numbers yet. Buy one to get started.
           </Muted>
         ) : (
           <DataTable>

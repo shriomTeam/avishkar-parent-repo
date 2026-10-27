@@ -44,10 +44,11 @@ import {
   Empty,
 } from "./ui";
 import { VoiceBoundary } from "./voice-boundary";
+import { LinesSkeleton, ToolsSkeleton } from "./skeletons";
 
 export function Tools() {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<ToolsSkeleton />}>
       <ToolList />
     </VoiceBoundary>
   );
@@ -237,7 +238,7 @@ function ToolList() {
         <Panel>
           <H2>Execution history</H2>
           {executions === null ? (
-            <Muted role="status">Loading…</Muted>
+            <LinesSkeleton />
           ) : executions.length ? (
             executions.map((e) => (
               <Link
@@ -440,7 +441,7 @@ function AddToolDialog({
       ) : (
         <>
           {catalog === null ? (
-            <Muted role="status">Loading…</Muted>
+            <LinesSkeleton />
           ) : (
             <>
               <Dropdown
