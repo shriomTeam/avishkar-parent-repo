@@ -600,6 +600,60 @@ test("tools: add internal and external tools, validation, a real test run, attac
   await expect(panel).toHaveCount(0);
 });
 
+test("tools: a payload template sends captured details, warns about privacy and is tested with sample details", async ({
+  page,
+}) => {
+  await createAgent(page, "Template agent"); // its starter fields include phone_number
+  await page.goto("/voice-receptionist/tools");
+  const lead = page.getByTestId("tool-card").filter({
+    has: page.getByRole("heading", { name: "create_lead", exact: true }),
+  });
+  await expect(lead).toContainText("Taken from the agent");
+
+  await page.getByRole("button", { name: "Add tool" }).click();
+  const dialog = page.getByRole("dialog");
+  await choose(dialog, "Tool type", "External: calls your own API");
+  await dialog.getByLabel("Tool name").fill("send_note");
+  await dialog.getByLabel("Description").fill("Send a note to the clinic CRM");
+  await dialog.getByLabel("Endpoint").fill("http://127.0.0.1:8001/_test/echo");
+  await dialog
+    .getByLabel("Input schema")
+    .fill(
+      '{"type":"object","properties":{"reason":{"type":"string"}},"required":["reason"]}',
+    );
+  await expect(dialog).toContainText("{{field.phone_number}}"); // what the agents capture
+  await expect(
+    dialog.getByText("Details from the call will be sent"),
+  ).toHaveCount(0);
+
+  const template = dialog.getByLabel("Payload template");
+  await template.fill('{"phone": "{{field.nobody_captures_this}}"}');
+  await dialog.getByRole("button", { name: "Save tool" }).click();
+  await expect(dialog.getByRole("alert")).toContainText("No agent captures");
+
+  await template.fill(
+    '{"phone": "{{field.phone_number}}", "why": "{{arg.reason}}"}',
+  );
+  await expect(dialog).toContainText("Details from the call will be sent");
+  await dialog.getByRole("button", { name: "Save tool" }).click();
+
+  const card = page.getByTestId("tool-card").filter({
+    has: page.getByRole("heading", { name: "send_note", exact: true }),
+  });
+  await expect(card).toContainText("A payload template");
+  await card.getByRole("button", { name: "Test tool" }).click();
+  const test = page.getByRole("dialog");
+  await expect(test.getByLabel("Sample captured details")).toHaveValue(
+    /"phone_number": "example"/,
+  );
+  await test
+    .getByLabel("Sample captured details")
+    .fill('{"phone_number": "+15550001111"}');
+  await test.getByRole("button", { name: "Run test" }).click();
+  await expect(test).toContainText("Success", CALL);
+  await expect(test).toContainText("+15550001111");
+});
+
 test("call filters, CSV download and missing record states", async ({
   page,
 }) => {

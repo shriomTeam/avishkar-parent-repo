@@ -3216,6 +3216,10 @@ export interface components {
             input_schema?: {
                 [key: string]: unknown;
             };
+            /** Payload Template */
+            payload_template?: {
+                [key: string]: unknown;
+            } | null;
             /** Auth Header Name */
             auth_header_name?: string | null;
             /** Auth Header Value */
@@ -3256,6 +3260,10 @@ export interface components {
             input_schema: {
                 [key: string]: unknown;
             };
+            /** Payload Template */
+            payload_template?: {
+                [key: string]: unknown;
+            } | null;
             /** Auth Header Name */
             auth_header_name: string | null;
             /**
@@ -3289,6 +3297,12 @@ export interface components {
             input?: {
                 [key: string]: unknown;
             };
+            /** Field Values */
+            field_values?: {
+                [key: string]: string;
+            };
+            /** Caller Number */
+            caller_number?: string | null;
         };
         /** ToolTestOut */
         ToolTestOut: {

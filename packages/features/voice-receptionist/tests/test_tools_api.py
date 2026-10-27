@@ -1,3 +1,4 @@
+import json
 from uuid import UUID
 
 import httpx
@@ -356,6 +357,85 @@ async def test_a_test_call_only_receives_enabled_attached_tools_and_no_secrets(c
         and "Authorization" not in repr(snapshot)
     )
     assert snapshot["tools"][1]["schema"] == SCHEMA
+
+
+async def test_a_test_call_hides_arguments_the_agents_fields_fill_from_the_model(client):
+    t = await create_test_tenant()
+    lead = await _add_internal(client, t)
+    fields = [
+        {"key": "phone", "label": "Phone", "data_type": "phone", "required": True},
+        {"key": "first_name", "label": "First name", "data_type": "text", "required": False},
+    ]
+    agent = await _agent(client, t, tool_ids=[lead["id"]], fields=fields)
+    started = await client.post(f"/inbound/agents/{agent['id']}/test-call", headers=_h(t))
+    assert started.status_code == 201, started.text
+    async with tenant_session(t) as s:
+        tool = (await s.get(Call, UUID(started.json()["call_id"]))).agent_snapshot["tools"][0]
+    assert sorted(tool["schema"]["properties"]) == ["email", "interest", "last_name"]
+    assert {a: m["key"] for a, m in tool["filled"].items()} == {"phone": "phone", "first_name": "first_name"}
+    assert "added automatically" in tool["description"]
+
+
+PHONE = {"key": "phone", "label": "Phone", "data_type": "phone", "required": True}
+REASON_SCHEMA = {"type": "object", "properties": {"reason": {"type": "string"}, "unused": {"type": "string"}}}
+
+
+@pytest.mark.parametrize(
+    ("overrides", "fragment"),
+    [
+        ({"payload_template": {"p": "{{field.nope}}"}}, "No agent captures"),
+        ({"payload_template": {"p": "{{arg.missing}}"}}, "no argument by that name"),
+        ({"endpoint": "https://{{field.phone}}.example.com/x"}, "host name"),
+        ({"payload_template": {"p": "{{field.phone"}}, "not a placeholder"),
+        ({"method": "GET", "payload_template": {"p": ["{{field.phone}}"]}}, "single values"),
+    ],
+)
+async def test_a_bad_payload_template_is_refused_when_saving(client, overrides, fragment):
+    t = await create_test_tenant()
+    await _agent(client, t, fields=[PHONE])
+    body = _tool(input_schema=REASON_SCHEMA, payload_template={"p": "{{field.phone}}"}) | overrides
+    r = await client.post("/inbound/tools", json=body, headers=_h(t))
+    assert r.status_code == 422 and fragment in r.json()["detail"], r.text
+
+
+async def test_a_template_tool_shows_the_model_only_the_arguments_it_uses_and_tests_with_sample_values(
+    client, allow_private
+):
+    t = await create_test_tenant()
+    seen = []
+
+    async def handler(request, n):
+        seen.append((request["target"], json.loads(request["body"] or b"null")))
+        return json_reply({"ok": True})
+
+    async with serve(handler) as (url, _):
+        agent = await _agent(client, t, fields=[PHONE])
+        tool = await _create(
+            client,
+            t,
+            endpoint=url + "/n/{{field.phone}}",
+            method="POST",
+            input_schema=REASON_SCHEMA,
+            payload_template={"phone": "{{field.phone}}", "why": "{{arg.reason}}"},
+        )
+        await client.put(
+            f"/inbound/agents/{agent['id']}",
+            json={"name": "Front desk", "prompt": "Be kind.", "fields": [PHONE], "tool_ids": [tool["id"]]},
+            headers=_h(t),
+        )
+        started = await client.post(f"/inbound/agents/{agent['id']}/test-call", headers=_h(t))
+        async with tenant_session(t) as s:
+            ref = (await s.get(Call, UUID(started.json()["call_id"]))).agent_snapshot["tools"][0]
+        assert list(ref["schema"]["properties"]) == ["reason"] and ref["labels"] == {"phone": "Phone"}
+        missing = await client.post(f"/inbound/tools/{tool['id']}/test", json={"input": {"reason": "x"}}, headers=_h(t))
+        assert missing.status_code == 422 and "Still missing: phone" in missing.json()["detail"]
+        ok = await client.post(
+            f"/inbound/tools/{tool['id']}/test",
+            json={"input": {"reason": "x"}, "field_values": {"phone": "+14155550123"}},
+            headers=_h(t),
+        )
+    assert ok.status_code == 200 and ok.json()["ok"] is True
+    assert seen == [("/n/%2B14155550123", {"phone": "+14155550123", "why": "x"})]
 
 
 async def test_testing_a_tool_really_calls_the_endpoint_with_the_saved_settings(client, allow_private):
