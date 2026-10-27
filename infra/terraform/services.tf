@@ -2,13 +2,15 @@
 # secret that Cloud Run injects at start (see secrets.tf and modules/cloudsql for where each one comes from).
 
 locals {
-  api_secrets = {
+  api_secrets = merge({
     DATABASE_URL         = module.cloudsql.secret_ids["app-url"]
     DATABASE_SYSTEM_URL  = module.cloudsql.secret_ids["system-url"]
     DATABASE_AUTH_URL    = module.cloudsql.secret_ids["auth-url"]
     GOOGLE_CLIENT_SECRET = google_secret_manager_secret.google_client_secret.secret_id
     VOICE_SECRETS_KEY    = google_secret_manager_secret.voice_secrets_key.secret_id
-  }
+    }, var.twilio_enabled ? {
+    TWILIO_AUTH_TOKEN = google_secret_manager_secret.twilio_auth_token[0].secret_id
+  } : {})
 
   # The ingest service reads and writes tenant data like the API does, so it gets the same production settings (the
   # shared configuration check requires them) but only the secrets it needs.
@@ -85,7 +87,7 @@ module "api" {
   timeout_seconds = 3600
   memory          = "1Gi"
 
-  env = merge(local.platform_env, {
+  env = merge(local.platform_env, var.twilio_enabled ? { TWILIO_ACCOUNT_SID = var.twilio_account_sid, VOICE_PUBLIC_API_URL = local.api_url } : {}, {
     TRUSTED_PROXY_HOPS      = "1" # Cloud Run's front end is the one proxy; see clinic_api.forwarded
     VOICE_GCP_PROJECT       = var.project_id
     VOICE_RECORDINGS_BUCKET = module.storage.name # recordings go under voice-recordings/
@@ -104,6 +106,7 @@ module "api" {
     google_secret_manager_secret_iam_member.api,
     google_secret_manager_secret_version.google_client_secret,
     google_secret_manager_secret_version.voice_secrets_key,
+    google_secret_manager_secret_version.twilio_auth_token,
   ]
 }
 

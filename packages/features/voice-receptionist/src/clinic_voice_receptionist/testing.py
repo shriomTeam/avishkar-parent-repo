@@ -7,7 +7,9 @@ creating a lead when the agent has that tool.
 
 import asyncio
 import math
+import random
 import struct
+import uuid
 from contextlib import asynccontextmanager
 
 from clinic_voice_receptionist.inbound.live.events import (
@@ -89,3 +91,51 @@ class ScriptedConnector:
     @asynccontextmanager
     async def connect(self, agent: dict, fields: list[dict], resume_handle: str | None = None):
         yield ScriptedModel(fields, agent.get("tools"))
+
+
+class FakeNumbers:
+    """A stand-in for Twilio's number API, for tests and browser tests that must not buy real numbers."""
+
+    def __init__(self) -> None:
+        self.owned: dict[str, str] = {}  # sid -> number
+        self.urls: dict[str, str] = {}  # sid -> the address its incoming calls go to
+        self.fail_next_buy: str | None = None
+        self.calls: list[tuple] = []
+
+    async def search(self, *, kind, area_code, contains, limit=10):
+        from clinic_voice_receptionist.numbers.twilio import AvailableNumber
+
+        self.calls.append(("search", kind, area_code, contains))
+        prefix = "+1800555" if kind == "toll_free" else f"+1{area_code or '415'}555"
+        # Random line numbers, because a number can belong to one clinic only and test databases keep their rows.
+        lines = random.sample(range(10000), 3)
+        return [AvailableNumber(f"{prefix}{line:04d}", "Sample City", "CA", kind) for line in lines]
+
+    async def buy(self, *, number, friendly_name, voice_url):
+        from clinic_voice_receptionist.numbers.twilio import PurchasedNumber, TwilioError
+
+        self.calls.append(("buy", number, voice_url))
+        if self.fail_next_buy:
+            message, self.fail_next_buy = self.fail_next_buy, None
+            raise TwilioError(message, 409)
+        sid = f"PN{uuid.uuid4().hex}"
+        self.owned[sid] = number
+        self.urls[sid] = voice_url or ""
+        return PurchasedNumber(sid, number)
+
+    async def list_voice_urls(self):
+        self.calls.append(("list_voice_urls",))
+        return dict(self.urls)
+
+    async def set_voice_url(self, sid, voice_url):
+        self.calls.append(("set_voice_url", sid, voice_url))
+        self.urls[sid] = voice_url
+        if self.fail_next_buy:  # reused to simulate Twilio refusing any change
+            message, self.fail_next_buy = self.fail_next_buy, None
+            from clinic_voice_receptionist.numbers.twilio import TwilioError
+
+            raise TwilioError(message, 409)
+
+    async def release(self, sid):
+        self.calls.append(("release", sid))
+        self.owned.pop(sid, None)

@@ -226,14 +226,6 @@ export function createSeed(): DemoState {
     },
     agents,
     calls,
-    numbers: [
-      {
-        id: "number-main",
-        number: "+14155550100",
-        provider: "Telnyx · SIP",
-        agentId: "agent-sophie",
-      },
-    ],
     tools: [
       {
         id: "tool-lead",

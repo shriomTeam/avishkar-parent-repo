@@ -17,6 +17,9 @@ export type Variables = Schemas["VariablesOut"];
 export type KnowledgeDocument = Schemas["DocumentOut"];
 export type Knowledge = Schemas["KnowledgeOut"];
 export type SearchResult = Schemas["SearchHitOut"];
+export type PhoneNumber = Schemas["NumberOut"];
+export type PhoneNumbers = Schemas["NumbersOut"];
+export type AvailableNumber = Schemas["AvailableOut"];
 
 // Same-origin: Next rewrites /api/platform/* to the FastAPI backend, so the session cookie is sent.
 const BASE = "/api/platform/features/voice_receptionist/inbound";
@@ -49,7 +52,7 @@ function messageFor(status: number): string {
 async function detailOf(
   response: Response,
 ): Promise<{ message: string; code?: string } | null> {
-  if (![409, 422].includes(response.status)) return null;
+  if (![409, 422, 502, 503].includes(response.status)) return null;
   try {
     const { detail } = (await response.json()) as { detail?: unknown };
     if (typeof detail === "string")
@@ -163,6 +166,22 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
       request<KnowledgeDocument>("POST", `/knowledge/documents/${id}/retry`),
     deleteDocument: (id: string) =>
       request<void>("DELETE", `/knowledge/documents/${id}`),
+    listNumbers: () => request<PhoneNumbers>("GET", "/numbers"),
+    searchNumbers: (
+      kind: "local" | "toll_free",
+      areaCode: string,
+      contains: string,
+    ) => {
+      const query = new URLSearchParams({ kind });
+      if (areaCode) query.set("area_code", areaCode);
+      if (contains) query.set("contains", contains);
+      return request<AvailableNumber[]>("GET", `/numbers/available?${query}`);
+    },
+    buyNumber: (number: string, agentId: string | null) =>
+      request<PhoneNumber>("POST", "/numbers", { number, agent_id: agentId }),
+    assignNumber: (id: string, agentId: string | null) =>
+      request<PhoneNumber>("PUT", `/numbers/${id}`, { agent_id: agentId }),
+    releaseNumber: (id: string) => request<void>("DELETE", `/numbers/${id}`),
     searchKnowledge: (query: string) =>
       request<{ results: SearchResult[] }>("POST", "/knowledge/search", {
         query,

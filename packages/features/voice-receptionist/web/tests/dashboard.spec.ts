@@ -151,24 +151,37 @@ test("create, edit and save an agent, take a test call, review it and route a nu
   await page.getByRole("tab", { name: "Raw responses" }).click();
   await expect(page.getByTestId("raw-events")).toContainText("turn_complete");
 
+  // Phone numbers: search, buy (against a fake Twilio), assign, and release.
   await page.getByRole("link", { name: "Phone numbers", exact: true }).click();
+  await expect(page.getByText("No phone numbers yet")).toBeVisible();
+  await page.getByRole("button", { name: "Buy a number", exact: true }).click();
+  const buy = page.getByRole("dialog");
+  await buy.getByLabel("Area code (optional)").fill("415");
+  await buy.getByRole("button", { name: "Search numbers" }).click();
+  await buy.getByRole("radio").first().check();
+  await expect(buy).toContainText("charges your Twilio account");
+  await choose(buy, "Assigned agent", "Pilot receptionist");
+  await buy.getByRole("button", { name: "Buy number" }).click();
+  const owned = page.getByRole("row").filter({ hasText: "+1 (415) 555-" });
+  await expect(owned).toContainText("Pilot receptionist");
+  await expect(owned).toContainText("Connected");
+
+  await owned.getByRole("button", { name: /^Manage/ }).click();
+  const manage = page.getByRole("dialog");
+  await choose(manage, "Assigned agent", "Unassigned");
+  await manage.getByRole("button", { name: "Save routing" }).click();
+  await expect(owned).toContainText("Unassigned");
+
+  await owned.getByRole("button", { name: /^Manage/ }).click();
   await page
-    .getByRole("button", { name: "Connect number", exact: true })
+    .getByRole("dialog")
+    .getByRole("button", { name: "Release number" })
     .click();
   await page
     .getByRole("dialog")
-    .getByLabel("Phone number (E.164)")
-    .fill("+919876543210");
-  await choose(
-    page.getByRole("dialog"),
-    "Assigned agent",
-    "Pilot receptionist",
-  );
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Save routing" })
+    .getByRole("button", { name: "Release number" })
     .click();
-  await expect(page.getByText("+919876543210", { exact: true })).toBeVisible();
+  await expect(owned).toHaveCount(0);
 
   // Deleting the agent keeps its calls.
   await page.getByRole("link", { name: "Voice agents", exact: true }).click();

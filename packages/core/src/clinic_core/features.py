@@ -78,6 +78,9 @@ class Feature:
     # Shown in the trial/lead-magnet flow and the plan picker.
     trial_eligible: bool = False
     phi_sensitive: bool = False  # recording / clinical notes / photos: needs BAA + consent checks
+    # Called with the API app each time the API starts. It runs in the background after the app is already serving, and
+    # a failure is logged and ignored, so it must be safe to run on every start and on every instance at once.
+    on_startup: Callable[[Any], Awaitable[None]] | None = None
 
 
 @lru_cache

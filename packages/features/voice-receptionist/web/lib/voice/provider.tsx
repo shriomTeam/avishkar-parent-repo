@@ -44,7 +44,7 @@ type Value = {
 
 const Context = createContext<Value | null>(null);
 
-/** Real agents and calls for the signed-in workspace. Phone numbers stay in the demo provider. */
+/** Real agents, calls, tools and variables for the signed-in workspace. */
 export function VoiceDataProvider({ children }: { children: ReactNode }) {
   const { auth } = useAuth();
   const api = useMemo(

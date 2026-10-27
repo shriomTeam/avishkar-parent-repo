@@ -20,12 +20,6 @@ export type Agent = {
   draft: AgentConfig;
   versions: AgentVersion[];
 };
-export type PhoneNumber = {
-  id: string;
-  number: string;
-  provider: string;
-  agentId: string | null;
-};
 export type TranscriptTurn = {
   speaker: "Agent" | "Caller";
   time: string;
@@ -85,14 +79,12 @@ export type AuditEvent = {
 export type DemoState = {
   workspace: Workspace;
   agents: Agent[];
-  numbers: PhoneNumber[];
   calls: Call[];
   tools: Tool[];
   audit: AuditEvent[];
 };
 export type DemoCommand =
   | { type: "save-agent"; agent: Agent; event: string }
-  | { type: "save-number"; number: PhoneNumber }
   | { type: "save-tool"; tool: Tool }
   | { type: "save-workspace"; workspace: Workspace }
   | { type: "add-call"; call: Call }

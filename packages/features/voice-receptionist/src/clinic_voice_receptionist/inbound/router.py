@@ -1,17 +1,18 @@
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from clinic_core.api import RequestContext, get_request_context, get_session, require_role
 from clinic_core.audit import audit
 from clinic_core.database import tenant_session
-from clinic_db.models.core import StaffRole, Tenant
+from clinic_db.models.core import StaffRole
 from clinic_db.models.voice import Agent, Call
 from clinic_voice_receptionist.config import get_voice_settings
 from clinic_voice_receptionist.inbound import service
+from clinic_voice_receptionist.inbound.call_setup import build_snapshot, expire_stale_calls
 from clinic_voice_receptionist.inbound.live import tickets
 from clinic_voice_receptionist.inbound.live.events import INPUT_RATE, OUTPUT_RATE
 from clinic_voice_receptionist.inbound.live.storage import CONTENT_TYPE, belongs_to, store_for
@@ -27,8 +28,6 @@ from clinic_voice_receptionist.inbound.schemas import (
     ToolExecutionOut,
     TurnOut,
 )
-from clinic_voice_receptionist.tools.service import refresh_builtins
-from clinic_voice_receptionist.variables import service as variables
 
 router = APIRouter(prefix="/inbound", tags=["voice_receptionist"])
 
@@ -237,70 +236,14 @@ async def start_test_call(
     if agent.save_recording and store_for(request.app, voice) is None:
         raise HTTPException(409, "This agent records calls, but recording storage is not set up on this server.")
     now = datetime.now(UTC)
-    # Calls that were never opened, or outlived the call limit (for example after a restart), are over.
-    await session.execute(
-        update(Call)
-        .where(
-            Call.status.in_(("connecting", "in_progress")),
-            ((Call.status == "connecting") & (Call.started_at < now - tickets.TICKET_TTL))
-            | (Call.started_at < now - timedelta(seconds=voice.max_call_seconds + 60)),
-        )
-        .values(status="failed", end_reason="expired", ended_at=now)
-    )
+    await expire_stale_calls(session, voice, now)
     open_calls = await session.scalar(
         select(func.count()).select_from(Call).where(Call.status.in_(("connecting", "in_progress")))
     )
     if open_calls >= MAX_OPEN_TEST_CALLS:
         raise HTTPException(429, "too many calls in progress; end one and try again")
-    fields = await service.agent_fields(session, agent.id)
-    await refresh_builtins(session)  # a call always gets the current wording of built-in tools
-    tools = await service.attached_tools(session, agent.id)
-    # Variables are filled in once, when the call starts, so the call keeps exactly what the agent was told.
-    tenant = await session.get(Tenant, ctx.tenant_id)
-    values = (await variables.custom_values(session)) | variables.builtin_values(
-        agent_name=agent.name,
-        clinic_name=tenant.name if tenant else "",
-        timezone=tenant.timezone if tenant else "UTC",
-        caller_number=None,  # a browser test has no caller number
-        now=now,
-    )
-    snapshot = {
-        "id": str(agent.id),
-        "name": agent.name,
-        "prompt": variables.resolve(agent.prompt, values),
-        "greeting": variables.resolve(agent.greeting, values),
-        "voice": agent.voice,
-        "language": agent.language,
-        "model": agent.model,
-        "save_transcript": agent.save_transcript,
-        "save_raw_events": agent.save_raw_events,
-        "save_recording": agent.save_recording,
-        # Only what the model needs. Endpoints and auth headers stay out of the call record; the runner reads them
-        # fresh when a tool runs, so disabling or deleting a tool takes effect even mid-call.
-        "tools": [
-            {
-                "id": str(t.id),
-                "name": t.name,
-                "description": t.description,
-                "kind": t.kind,
-                "schema": t.input_schema,
-                "timeout_seconds": t.timeout_seconds,
-            }
-            for t in tools
-        ],
-        "fields": [
-            {
-                "id": str(f.id),
-                "key": f.key,
-                "label": f.label,
-                "description": f.description,
-                "data_type": f.data_type,
-                "enum_values": f.enum_values,
-                "required": f.required,
-            }
-            for f in fields
-        ],
-    }
+    # A browser test has no caller number.
+    snapshot = await build_snapshot(session, agent, ctx.tenant_id, caller_number=None, now=now)
     call = Call(
         tenant_id=ctx.tenant_id,
         agent_id=agent.id,

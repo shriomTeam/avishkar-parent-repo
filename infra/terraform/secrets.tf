@@ -39,3 +39,23 @@ resource "google_secret_manager_secret_version" "voice_secrets_key" {
   # A Fernet key is 32 random bytes in URL-safe base64.
   secret_data = replace(replace(random_bytes.voice_secrets_key.base64, "+", "-"), "/", "_")
 }
+
+# The Twilio auth token, only when phone numbers are turned on. Like the Google secret, the value comes from a GitHub
+# secret and is never in the repo.
+resource "google_secret_manager_secret" "twilio_auth_token" {
+  count     = var.twilio_enabled ? 1 : 0
+  secret_id = "${local.name}-twilio-auth-token"
+  labels    = local.labels
+
+  replication {
+    auto {}
+  }
+
+  depends_on = [google_project_service.apis]
+}
+
+resource "google_secret_manager_secret_version" "twilio_auth_token" {
+  count       = var.twilio_enabled ? 1 : 0
+  secret      = google_secret_manager_secret.twilio_auth_token[0].id
+  secret_data = var.twilio_auth_token
+}

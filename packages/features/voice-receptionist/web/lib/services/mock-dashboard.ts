@@ -18,10 +18,6 @@ export function applyCommand(
       next = { ...state, agents: upsert(state.agents, command.agent) };
       event = command.event;
       break;
-    case "save-number":
-      next = { ...state, numbers: upsert(state.numbers, command.number) };
-      event = "Phone routing updated";
-      break;
     case "save-tool":
       next = { ...state, tools: upsert(state.tools, command.tool) };
       event = "Tool configuration saved";
