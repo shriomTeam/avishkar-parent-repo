@@ -36,19 +36,23 @@ jobs:
       - run: terraform fmt -check -recursive
       - run: terraform init -backend=false -input=false
       - run: terraform validate
+      - name: Email secret flow (mocked providers, no cloud access)
+        run: terraform test -no-color
 
   plan:
     name: Plan
     needs: validate
     runs-on: ubuntu-latest
-    environment: production # holds the Google and Twilio credentials for this environment
+    environment: production # holds production credentials for this environment
     env:
-      # Sign-in credentials. Terraform stores the secret in Secret Manager; Cloud Run reads it from there.
+      # External credentials follow the same production environment -> Terraform -> Secret Manager flow.
       TF_VAR_google_client_id: ${{ vars.GOOGLE_CLIENT_ID }}
       TF_VAR_google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       # Phone numbers (used only when twilio_enabled is true in envs/prod.tfvars).
       TF_VAR_twilio_account_sid: ${{ vars.TWILIO_ACCOUNT_SID }}
       TF_VAR_twilio_auth_token: ${{ secrets.TWILIO_AUTH_TOKEN }}
+      TF_VAR_sendgrid_api_key: ${{ secrets.SENDGRID_API_KEY }}
+      TF_VAR_email_old_payload_keys: ${{ secrets.EMAIL_OLD_PAYLOAD_KEYS }}
     steps:
       - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v2
@@ -82,14 +86,16 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: plan
     runs-on: ubuntu-latest
-    environment: production # holds the Google and Twilio credentials for this environment
+    environment: production # holds production credentials for this environment
     env:
-      # Sign-in credentials. Terraform stores the secret in Secret Manager; Cloud Run reads it from there.
+      # External credentials follow the same production environment -> Terraform -> Secret Manager flow.
       TF_VAR_google_client_id: ${{ vars.GOOGLE_CLIENT_ID }}
       TF_VAR_google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       # Phone numbers (used only when twilio_enabled is true in envs/prod.tfvars).
       TF_VAR_twilio_account_sid: ${{ vars.TWILIO_ACCOUNT_SID }}
       TF_VAR_twilio_auth_token: ${{ secrets.TWILIO_AUTH_TOKEN }}
+      TF_VAR_sendgrid_api_key: ${{ secrets.SENDGRID_API_KEY }}
+      TF_VAR_email_old_payload_keys: ${{ secrets.EMAIL_OLD_PAYLOAD_KEYS }}
     steps:
       - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v2

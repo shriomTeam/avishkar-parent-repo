@@ -80,6 +80,8 @@ class CsvNote(BaseModel):
 class CsvAnalysis(BaseModel):
     source: str
     settings_source: str
+    settings_version: int
+    settings: ReactivationSettings
     rate_basis: str
     as_of: datetime
     counts: CsvCounts
@@ -305,6 +307,8 @@ async def csv_analysis(
     return CsvAnalysis(
         source="csv",
         settings_source="saved" if saved else "defaults",
+        settings_version=saved.version if saved else 0,
+        settings=settings,
         rate_basis="assumed",
         as_of=now,
         counts=CsvCounts(rows=len(parsed.lines), patients=parsed.patients, visit_days=built.visit_days),

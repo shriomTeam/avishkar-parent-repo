@@ -39,8 +39,11 @@ Clinics use a hosted multi-tenant SaaS. What a clinic bought is a row in
 It is enforced in three places: API (`require_feature` on every feature
 router → 403), worker (jobs and event handlers skip tenants without the
 feature), web (`/me` returns only enabled nav; feature pages call
-`requireFeature`). Lead-magnet prospects are tenants with `status=trial` and
-entitlements that expire.
+`requireFeature`). Automatic 14-day onboarding trials are currently paused while
+billing is not implemented. New workspaces are active with non-expiring starter
+entitlements; explicit entitlement expiry and suspension are still enforced.
+See [workspace access policy](WORKSPACE_ACCESS_POLICY.md) for existing-trial
+migration behavior and requirements before re-enabling billing/trials.
 
 If a deployment must physically exclude a feature's code (e.g. a dedicated
 install), don't install that feature's package: the API and worker discover

@@ -148,14 +148,21 @@ def _money(cents: int) -> str:
 
 def _lapsed_high_value(f: PatientFacts, s: ReactivationSettings, days: int, interval: int, today: date) -> str | None:
     rule = s.types.lapsed_high_value
-    if f.spend_percentile is None:
-        return None  # D10: the cohort was too small, reported through skipped_types
-    if f.spend_percentile < Fraction(rule.spend_percentile_min, 100):
+    by_percentile = f.spend_percentile is not None and f.spend_percentile >= Fraction(rule.spend_percentile_min, 100)
+    # The dollar cutoff needs no cohort, so it still applies when the cohort is too small for a percentile (D10).
+    # The engine then reports the type as available; skipped_types still records that the percentile rule was skipped.
+    by_dollars = rule.spend_cents_min is not None and f.spend_cents > rule.spend_cents_min
+    if not (by_percentile or by_dollars):
         return None
     if not _at_least(days, interval, ratio_fraction(rule.overdue_ratio_min)):
         return None
+    if by_percentile:
+        return (
+            f"In the top {100 - rule.spend_percentile_min}% of patients by spend and {days} days since the last visit, "
+            f"{_shown_ratio(days, interval)} times the usual {interval} day interval."
+        )
     return (
-        f"In the top {100 - rule.spend_percentile_min}% of patients by spend and {days} days since the last visit, "
+        f"Spent more than {_money(rule.spend_cents_min)} in total and {days} days since the last visit, "
         f"{_shown_ratio(days, interval)} times the usual {interval} day interval."
     )
 

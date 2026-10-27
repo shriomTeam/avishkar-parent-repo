@@ -15,6 +15,8 @@ apps/
       (platform)/              authenticated platform routes
         layout.tsx             shared auth provider and platform shell
         page.tsx               clinic product overview
+        settings/              shared workspace editing, members and audit
+                               (accessed through the bottom profile menu)
         import/                patient data import
         (features)/
           blueprints/          existing patient blueprint pages
@@ -22,6 +24,7 @@ apps/
     components/
       auth/                    onboarding and sign-out controls
       platform-frame.tsx       generic platform shell (no feature path checks)
+      platform-navigation.tsx  platform navigation and workspace header
     lib/
       auth/                    compatibility exports of shared core auth
     public/brand/               platform branding assets
@@ -31,10 +34,12 @@ apps/
     src/clinic_api/routers/
       auth.py                  /api/v1/auth/* Google login and sessions
       onboarding.py            /api/v1/workspaces clinic onboarding
+      invitations.py           scoped invitations, acceptance and member management
     tests/auth/                auth, tenant and entitlement integration tests
     tests/browser_server.py    test-only simulated Google provider
     Dockerfile                 optional API/worker container image
-  worker/                      one background worker
+  worker/                      general worker plus private Cloud Tasks HTTP handlers
+    email.Dockerfile           private transactional-email sender image
 packages/
   db/                          all SQLAlchemy tables and one Alembic stream
     src/clinic_db/models/
@@ -49,6 +54,7 @@ packages/
     tests/auth/                shared auth unit tests
   integrations/                client data import
   engagement/                  shared SMS and email engine
+    src/clinic_engagement/email/ encrypted mail, tasks.py dispatch, task_app.py private handler, template/ factories
   features/
     reactivation/
       src/                     reactivation backend (analysis engine, runs, CSV import)
@@ -152,7 +158,7 @@ Layout: root files wire modules together; `modules/<name>/{main,variables,output
 
 - Three Cloud Run services: two public, `prod-avishkar-api` (FastAPI: also the call WebSocket; scales to zero for now (set `min_instances` to 1 before real callers, or the first call after idle waits for a cold start), 50 calls per instance, 1 hour request timeout, Direct VPC egress to Cloud SQL) and `prod-avishkar-web` (Next.js standalone). and a private third, `prod-avishkar-ingest` (knowledge-base ingestion: scales to zero, one file per instance, at most 2 instances, 10 minute limit, Direct VPC egress, no public access; only the `queue` service account may call it, Cloud Tasks queue `prod-avishkar-knowledge-ingest` rate-limited to 2 concurrent calls to protect the small database). Public addresses follow a fixed pattern (`<service>-<project number>.<region>.run.app`), so each is known before it exists; that is how the API gets the web origin for sign-in and the web build gets the API address.
 - `deploy.yml`: on a merge to `main`, build the `api`, `web`, `migrate` and `ingest` images, run migrations, deploy the ingest service (no smoke test: it is private; the update itself fails if the new revision cannot start), then the API, then the web app, each followed by a smoke test (`/api/v1/health/ready`; `/login` and `/api/v1/health/live` through the web app's rewrite). Pull requests only check that the images build. Terraform creates the services with a placeholder image and ignores image changes; the workflow sets the real one. On a new project, apply Terraform before the first deploy. To roll back, `gcloud run services update-traffic <service> --to-revisions <previous>=100`.
-- Settings: plain values are `env` in `services.tf`; anything sensitive is a Secret Manager secret that Cloud Run injects (`api_secrets`). Terraform generates the database URLs and `VOICE_SECRETS_KEY`. A credential from outside enters as a secret of the GitHub Environment `production`, then `TF_VAR_*` in the jobs of `terraform.yml` that declare `environment: production`, then a secret and version in `secrets.tf`, then an entry in `api_secrets`. The ingest service gets the same production settings as the API (the shared settings check demands them) but only `DATABASE_URL` and `GOOGLE_CLIENT_SECRET`. Today that is `GOOGLE_CLIENT_SECRET` (environment secret) and `GOOGLE_CLIENT_ID` (environment variable). Values that differ per environment live in that environment, so dev and uat are the same names with different values; project-wide values (`PROJECT_ID`, `REGION`, `WIF_PROVIDER`, `CICD_SA`) stay repository variables while they share one project. Keep the environment's deployment branches unrestricted, or the pull-request plan cannot read its values. Secrets are read when an instance starts, so after changing one, deploy again.
+- Settings: plain values are `env` in `services.tf`; anything sensitive is a Secret Manager secret that Cloud Run injects (`api_secrets`). Terraform generates the database URLs, `VOICE_SECRETS_KEY` and permanent `EMAIL_PAYLOAD_ENCRYPTION_KEY`. A credential from outside enters as a secret of the GitHub Environment `production`, then `TF_VAR_*` in the jobs of `terraform.yml` that declare `environment: production`, then a secret and version in `secrets.tf`, then an entry in `api_secrets`. The ingest service gets the same production settings as the API (the shared settings check demands them) but only `DATABASE_URL` and `GOOGLE_CLIENT_SECRET`. External credentials include `SENDGRID_API_KEY` (required with invitations), optional `EMAIL_OLD_PAYLOAD_KEYS` (enable the compatibility secret before key adoption/rotation), and `GOOGLE_CLIENT_SECRET` (environment secret) and `GOOGLE_CLIENT_ID` (environment variable). Values that differ per environment live in that environment, so dev and uat are the same names with different values; project-wide values (`PROJECT_ID`, `REGION`, `WIF_PROVIDER`, `CICD_SA`) stay repository variables while they share one project. Keep the environment's deployment branches unrestricted, or the pull-request plan cannot read its values. Secrets are read when an instance starts, so after changing one, deploy again.
 - The web image bakes in `BACKEND_INTERNAL_URL` and `NEXT_PUBLIC_API_URL` at build time, so an image belongs to one environment. Add `terraform output google_oauth_redirect_uri` to the Google OAuth client by hand.
 - The API sets `TRUSTED_PROXY_HOPS=1` and reads the real client address from the right of `X-Forwarded-For` (`clinic_api.forwarded`). Without it every user would share one login rate limit. Cloud Run replaces instances on a deploy, so a deploy can end calls in progress; release outside busy hours.
 
@@ -167,3 +173,5 @@ Gotchas:
 ## Checks before a PR
 
 `pnpm lint`, `pnpm test`, `pnpm boundaries`, and `pnpm typecheck` (needs the local DB from `pnpm db:up` and `pnpm db:migrate`). After an API change run `pnpm api-client:generate` and commit the result. For infra: `terraform fmt -recursive` and `terraform validate` from `infra/terraform`.
+
+Workspace invitations and email delivery setup: [docs/USER_MANAGEMENT.md](docs/USER_MANAGEMENT.md). Keep sender credentials server-side and use the shared email templates/service.

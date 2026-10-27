@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Button, Card, Stat } from "@clinic/ui";
 import { useAuth } from "@clinic/core/web/auth/provider";
 import type { paths } from "@clinic/api-client";
 
@@ -31,7 +30,7 @@ import {
 import { CsvBanner } from "./csv-results";
 import { useCsvResult } from "./csv-provider";
 import { NotSized } from "./hint";
-import { EmptyState, Notice, Skeleton } from "./kit";
+import { Button, Card, EmptyState, Notice, Skeleton, Stat } from "./kit";
 import { PatientControls } from "./patient-controls";
 import { PatientTable } from "./patient-table";
 

@@ -10,7 +10,10 @@ locals {
     VOICE_SECRETS_KEY    = google_secret_manager_secret.voice_secrets_key.secret_id
     }, var.twilio_enabled ? {
     TWILIO_AUTH_TOKEN = google_secret_manager_secret.twilio_auth_token[0].secret_id
-  } : {})
+    } : {}, var.invitations_enabled ? {
+    SENDGRID_API_KEY             = google_secret_manager_secret.email["sendgrid-api-key"].secret_id
+    EMAIL_PAYLOAD_ENCRYPTION_KEY = google_secret_manager_secret.email["email-payload-key"].secret_id
+  } : {}, var.invitations_enabled ? local.email_rotation_secrets : {})
 
   # The ingest service reads and writes tenant data like the API does, so it gets the same production settings (the
   # shared configuration check requires them) but only the secrets it needs.
@@ -88,6 +91,11 @@ module "api" {
   memory          = "1Gi"
 
   env = merge(local.platform_env, var.twilio_enabled ? { TWILIO_ACCOUNT_SID = var.twilio_account_sid, VOICE_PUBLIC_API_URL = local.api_url } : {}, {
+    INVITATIONS_ENABLED     = tostring(var.invitations_enabled)
+    EMAIL_PROVIDER          = var.invitations_enabled ? "sendgrid" : "console"
+    EMAIL_FROM_ADDRESS      = var.email_from_address
+    EMAIL_FROM_NAME         = var.email_from_name
+    EMAIL_REPLY_TO          = var.email_reply_to
     TRUSTED_PROXY_HOPS      = "1" # Cloud Run's front end is the one proxy; see clinic_api.forwarded
     VOICE_GCP_PROJECT       = var.project_id
     VOICE_RECORDINGS_BUCKET = module.storage.name # recordings go under voice-recordings/
@@ -98,7 +106,7 @@ module "api" {
     KNOWLEDGE_TASKS_REGION        = var.region
     KNOWLEDGE_INGEST_URL          = local.ingest_url
     KNOWLEDGE_TASKS_INVOKER_EMAIL = google_service_account.queue.email
-  })
+  }, local.email_task_environment)
   secret_env = local.api_secrets
 
   depends_on = [
@@ -107,6 +115,9 @@ module "api" {
     google_secret_manager_secret_version.google_client_secret,
     google_secret_manager_secret_version.voice_secrets_key,
     google_secret_manager_secret_version.twilio_auth_token,
+    google_secret_manager_secret_version.sendgrid_api_key,
+    google_secret_manager_secret_version.email_payload_key,
+    google_secret_manager_secret_version.email_old_payload_keys,
   ]
 }
 

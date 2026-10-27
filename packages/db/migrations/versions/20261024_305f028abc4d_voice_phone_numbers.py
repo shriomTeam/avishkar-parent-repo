@@ -1,7 +1,7 @@
 """voice phone numbers
 
 Revision ID: 305f028abc4d
-Revises: 85fd3f8a4f12
+Revises: 20261026_pause_trials
 Create Date: 2026-10-24 19:31:49.619909
 
 Checklist for tenant-scoped tables (anything with tenant_id):
@@ -18,7 +18,7 @@ from alembic import op
 from clinic_db.rls import disable_tenant_rls, enable_tenant_rls
 
 revision: str = "305f028abc4d"
-down_revision: str | None = "85fd3f8a4f12"
+down_revision: str | None = "20261026_pause_trials"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

@@ -1,0 +1,13 @@
+patient_id,visit_date,line_kind,amount,patient_name,service_name
+P0,2026-01-10,service,100.00,Person 0,Facial
+P1,2026-02-11,service,101.00,Person 1,Botox
+P2,2026-03-12,service,102.00,Person 2,Facial
+P3,2026-04-13,service,103.00,Person 3,Botox
+P4,2026-05-14,service,104.00,Person 4,Facial
+P5,2026-06-15,service,105.00,Person 5,Botox
+P6,2026-07-16,service,106.00,Person 6,Facial
+P7,2026-08-17,service,107.00,Person 7,Botox
+P8,2026-09-18,service,108.00,Person 8,Facial
+P9,2026-01-10,service,109.00,Person 9,Botox
+P10,2026-02-11,service,110.00,Person 10,Facial
+P11,2026-03-12,service,111.00,Person 11,Botox

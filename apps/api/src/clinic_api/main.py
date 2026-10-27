@@ -11,8 +11,8 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import JSONResponse
 
 from clinic_api.forwarded import ForwardedClient
-from clinic_api.routers import admin, appointments, auth, dev, imports, me, onboarding
-from clinic_core.api import require_feature
+from clinic_api.routers import admin, appointments, auth, dev, imports, invitations, me, onboarding
+from clinic_core.api import require_feature, require_role
 from clinic_core.auth.database import create_database
 from clinic_core.auth.dependencies import DB
 from clinic_core.auth.google import GoogleProvider
@@ -21,6 +21,7 @@ from clinic_core.database import dispose_engines
 from clinic_core.features import load_features
 from clinic_core.queue import close_queues
 from clinic_core.settings import Settings, get_settings
+from clinic_db.models.core import StaffRole
 
 log = logging.getLogger("clinic_api")
 
@@ -70,6 +71,7 @@ def create_app(settings: Settings | None = None, google=None) -> FastAPI:
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.trusted_hosts)
     app.include_router(auth.router)
     app.include_router(onboarding.router)
+    app.include_router(invitations.router)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -108,8 +110,10 @@ def create_app(settings: Settings | None = None, google=None) -> FastAPI:
         return {"ok": True, "features": list(load_features())}
 
     app.include_router(me.router)
-    app.include_router(imports.router)
-    app.include_router(appointments.router)
+    app.include_router(imports.router, dependencies=[Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER))])
+    app.include_router(
+        appointments.router, dependencies=[Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER))]
+    )
     if settings.is_dev:
         app.include_router(admin.router)
         app.include_router(dev.router)

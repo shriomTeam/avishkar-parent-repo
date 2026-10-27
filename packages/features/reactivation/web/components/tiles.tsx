@@ -1,4 +1,4 @@
-import { Stat } from "@clinic/ui";
+import { Stat } from "./kit";
 
 import { formatCount, formatRange } from "../lib/format";
 import { num } from "../lib/summary";
@@ -24,6 +24,7 @@ export function Tiles({
     <div className="dp-tiles" data-testid="tiles">
       <div data-testid="tile-dormant">
         <Stat
+          lead={!file}
           label="Dormant patients"
           value={dormant === null ? "Not available" : formatCount(dormant)}
           hint={

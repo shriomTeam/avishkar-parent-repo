@@ -4,7 +4,7 @@ import os
 import uuid
 from urllib.parse import urlencode
 
-from fastapi import Request
+from fastapi import Request, Response
 
 from clinic_api.main import create_app
 from clinic_core.settings import Settings
@@ -24,11 +24,21 @@ if not os.environ.get("TEST_DATABASE_URL"):
 
 settings = Settings(
     app_env="test",
+    trusted_proxy_hops=0,
     database_url=os.environ["TEST_DATABASE_URL"],
     database_auth_url=os.environ.get("TEST_AUTH_DATABASE_URL", os.environ["TEST_DATABASE_URL"]),
     database_system_url=os.environ.get("TEST_SYSTEM_DATABASE_URL", os.environ["TEST_DATABASE_URL"]),
     public_app_origin="http://127.0.0.1:3100",
     google_redirect_uri="http://127.0.0.1:3100/api/v1/auth/google/callback",
+    invitations_enabled=True,
+    email_provider="test",
+    email_tasks_project="",
+    email_tasks_region="",
+    email_tasks_queue="",
+    email_tasks_url="",
+    email_tasks_audience="",
+    email_tasks_invoker_email="",
+    email_payload_encryption_key="dGVzdC1vbmx5LW5vdC1hLXByb2R1Y3Rpb24ta2V5ISE=",
     google_client_id="browser-test",
     google_client_secret="browser-test",
 )
@@ -44,10 +54,45 @@ class BrowserGoogle:
             "email": "browser@example.com",
             "name": "Browser Owner",
             "email_verified": True,
+            "hd": "example.com",
         }
 
 
+class BrowserClientIsolation:
+    """Test-only client identities keep independent cookie jars out of one IP bucket.
+
+    Every context retains the real limiter within its own identity. Production
+    never imports this module and continues to count actual client addresses.
+    """
+
+    cookie_name = "browser_test_client"
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        raw = Request(scope).cookies.get(self.cookie_name, "")
+        valid = len(raw) == 32 and all(c in "0123456789abcdef" for c in raw)
+        ident = raw if valid else uuid.uuid4().hex
+        scope = {**scope, "client": ("browser-test-" + ident, 0)}
+
+        async def reply(message):
+            if message["type"] == "http.response.start" and not valid:
+                cookie = Response()
+                cookie.set_cookie(self.cookie_name, ident, max_age=3600, httponly=True, samesite="lax")
+                message = {
+                    **message,
+                    "headers": [*message.get("headers", []), *[h for h in cookie.raw_headers if h[0] == b"set-cookie"]],
+                }
+            await send(message)
+
+        await self.app(scope, receive, reply)
+
+
 app = create_app(settings, google=BrowserGoogle())
+app.add_middleware(BrowserClientIsolation)
 # Voice calls use a scripted model so browser tests never reach Vertex.
 if ScriptedConnector is not None:
     app.state.voice_connector = ScriptedConnector()
@@ -68,3 +113,33 @@ async def echo(request: Request):
         "echo": dict(request.query_params) or (await request.json() if await request.body() else {}),
         "open": "9 to 5",
     }
+
+
+# Explicit test-only capture endpoint. This module is never the production app entry point.
+_captured_emails = []
+
+
+@app.get("/_test/emails", include_in_schema=False)
+async def emails():
+    from clinic_engagement.email.service import deliver_due
+
+    async def capture(*, to, template):
+        _captured_emails.append({"to": to, "text": template.text, "subject": template.subject})
+        return "captured"
+
+    await deliver_due(settings, sender=capture)
+    return _captured_emails
+
+
+@app.post("/_test/owner-email", include_in_schema=False)
+async def owner_email(request: Request):
+    from sqlalchemy import select
+
+    from clinic_core.database import system_session
+    from clinic_db.models.core import Staff
+
+    body = await request.json()
+    async with system_session(database_url=settings.database_system_url) as db:
+        member = await db.scalar(select(Staff).where(Staff.user_id == uuid.UUID(body["user_id"])))
+        member.email = body["email"]
+    return {"ok": True}

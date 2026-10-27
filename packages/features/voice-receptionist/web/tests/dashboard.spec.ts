@@ -101,6 +101,9 @@ test("Google sign-in, protected routes and sign-out", async ({ page }) => {
     page.getByText("browser@example.com", { exact: false }),
   ).toBeVisible();
   await page
+    .getByRole("button", { name: "Account menu for Browser Owner" })
+    .click();
+  await page
     .getByRole("button", { name: "Sign out", exact: true })
     .last()
     .click();
@@ -439,19 +442,17 @@ test("knowledge base: upload, see it become ready, replace, and delete", async (
   await expect(row).toHaveCount(0);
 });
 
-test("reset demo keeps the signed-in workspace", async ({ page }) => {
+test("legacy voice settings redirects to shared workspace settings", async ({
+  page,
+}) => {
   await page.goto("/voice-receptionist/settings");
+  await expect(page).toHaveURL(/\/settings$/);
   await expect(page.getByTestId("clinic-name")).toContainText(
     "Browser Practice",
   );
-  await page.getByRole("button", { name: "Reset demo", exact: true }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Reset demo", exact: true })
-    .click();
-  await expect(page.getByTestId("clinic-name")).toContainText(
-    "Browser Practice",
-  );
+  await expect(
+    page.getByRole("heading", { name: "Workspace information" }),
+  ).toBeVisible();
 });
 
 test("tools: add internal and external tools, validation, a real test run, attaching to an agent, switching off and removing", async ({
@@ -507,7 +508,7 @@ test("tools: add internal and external tools, validation, a real test run, attac
   await expect(
     page.getByRole("button", { name: "View input schema" }),
   ).toHaveCount(0);
-  await expect(page.locator("pre")).toHaveCount(0);
+  await expect(page.getByTestId("voice-main").locator("pre")).toHaveCount(0);
 
   // A built-in tool's wording can be changed, and put back.
   const lead = page.getByTestId("tool-card").filter({
@@ -559,7 +560,7 @@ test("tools: add internal and external tools, validation, a real test run, attac
   await expect(panel).toContainText("X-Api-Key (saved)");
   await expect(page.getByText("secret-123")).toHaveCount(0); // the value is never shown again
 
-  await expect(page.locator("pre")).toHaveCount(0); // schemas stay tucked away until asked for
+  await expect(page.getByTestId("voice-main").locator("pre")).toHaveCount(0); // schemas stay tucked away until asked for
   await panel.getByRole("button", { name: "View input schema" }).click();
   await expect(page.getByRole("dialog")).toContainText('"day"');
   await page.keyboard.press("Escape");
@@ -660,6 +661,9 @@ test("session expiry hides the dashboard and returns to login", async ({
   const firstCheck = page.waitForResponse("**/api/v1/auth/me");
   await page.goto("/voice-receptionist/settings");
   await firstCheck; // the page is hydrated and listening once its own session check has answered
+  await page
+    .getByRole("button", { name: "Account menu for Browser Owner" })
+    .click();
   await expect(
     page.getByRole("button", { name: "Sign out", exact: true }).last(),
   ).toBeVisible();
@@ -680,6 +684,9 @@ test("session service failure hides content and supports retry", async ({
   const firstCheck = page.waitForResponse("**/api/v1/auth/me");
   await page.goto("/voice-receptionist/settings");
   await firstCheck; // the page is hydrated and listening once its own session check has answered
+  await page
+    .getByRole("button", { name: "Account menu for Browser Owner" })
+    .click();
   await expect(
     page.getByRole("button", { name: "Sign out", exact: true }).last(),
   ).toBeVisible();
@@ -699,6 +706,9 @@ test("session service failure hides content and supports retry", async ({
   ).toHaveCount(0);
   await page.unroute("**/api/v1/auth/me");
   await page.getByRole("button", { name: "Retry", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Account menu for Browser Owner" })
+    .click();
   await expect(
     page.getByRole("button", { name: "Sign out", exact: true }).last(),
   ).toBeVisible();

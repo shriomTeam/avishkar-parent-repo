@@ -1,6 +1,4 @@
-import { Card } from "@clinic/ui";
-
-import { Skeleton } from "../components/kit";
+import { Card, Skeleton } from "../components/kit";
 
 export default function Loading() {
   return (

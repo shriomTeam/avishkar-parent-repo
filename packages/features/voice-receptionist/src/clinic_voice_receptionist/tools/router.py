@@ -23,6 +23,7 @@ from clinic_voice_receptionist.tools.schema import check_args
 
 router = APIRouter(prefix="/inbound", tags=["voice_receptionist"])
 
+# Finish tool transactions before sending success: callers immediately reload the catalog.
 MANAGERS = [Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER))]
 
 
@@ -37,13 +38,13 @@ async def _audit(session: AsyncSession, ctx: RequestContext, action: str, tool_i
     await audit(session, action, actor_type="staff", actor_id=ctx.actor_id, entity_type="voice.tool", entity_id=tool_id)
 
 
-@router.get("/tools", response_model=list[ToolOut])
-async def list_tools(session: AsyncSession = Depends(get_session)) -> list[ToolOut]:
+@router.get("/tools", response_model=list[ToolOut], dependencies=MANAGERS)
+async def list_tools(session: AsyncSession = Depends(get_session, scope="function")) -> list[ToolOut]:
     return [service.tool_out(t) for t in await service.list_tools(session)]
 
 
-@router.get("/tools/catalog", response_model=list[CatalogItemOut])
-async def tool_catalog(session: AsyncSession = Depends(get_session)) -> list[dict]:
+@router.get("/tools/catalog", response_model=list[CatalogItemOut], dependencies=MANAGERS)
+async def tool_catalog(session: AsyncSession = Depends(get_session, scope="function")) -> list[dict]:
     """The internal tools a clinic can add, and which it already has."""
     return await service.catalog(session)
 
@@ -52,7 +53,7 @@ async def tool_catalog(session: AsyncSession = Depends(get_session)) -> list[dic
 async def add_internal_tool(
     body: InternalToolIn,
     ctx: RequestContext = Depends(get_request_context),
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_session, scope="function"),
 ) -> ToolOut:
     try:
         tool = await service.add_builtin(session, ctx.tenant_id, body.builtin_key)
@@ -66,7 +67,9 @@ async def add_internal_tool(
 
 @router.post("/tools", response_model=ToolOut, status_code=201, dependencies=MANAGERS)
 async def create_tool(
-    body: ToolIn, ctx: RequestContext = Depends(get_request_context), session: AsyncSession = Depends(get_session)
+    body: ToolIn,
+    ctx: RequestContext = Depends(get_request_context),
+    session: AsyncSession = Depends(get_session, scope="function"),
 ) -> ToolOut:
     try:
         tool = await service.save_tool(session, tenant_id=ctx.tenant_id, body=body)
@@ -78,8 +81,8 @@ async def create_tool(
     return service.tool_out(tool)
 
 
-@router.get("/tools/{tool_id}", response_model=ToolOut)
-async def get_tool(tool_id: uuid.UUID, session: AsyncSession = Depends(get_session)) -> ToolOut:
+@router.get("/tools/{tool_id}", response_model=ToolOut, dependencies=MANAGERS)
+async def get_tool(tool_id: uuid.UUID, session: AsyncSession = Depends(get_session, scope="function")) -> ToolOut:
     return service.tool_out(await _tool_or_404(session, tool_id))
 
 
@@ -88,7 +91,7 @@ async def update_tool(
     tool_id: uuid.UUID,
     body: ToolIn,
     ctx: RequestContext = Depends(get_request_context),
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_session, scope="function"),
 ) -> ToolOut:
     tool = await _tool_or_404(session, tool_id)
     try:
@@ -103,7 +106,9 @@ async def update_tool(
 
 @router.delete("/tools/{tool_id}", status_code=204, dependencies=MANAGERS)
 async def delete_tool(
-    tool_id: uuid.UUID, ctx: RequestContext = Depends(get_request_context), session: AsyncSession = Depends(get_session)
+    tool_id: uuid.UUID,
+    ctx: RequestContext = Depends(get_request_context),
+    session: AsyncSession = Depends(get_session, scope="function"),
 ) -> None:
     """Agents stop using it; past executions keep the tool's name. An internal tool can be added again later."""
     tool = await _tool_or_404(session, tool_id)
@@ -116,7 +121,7 @@ async def test_tool(
     tool_id: uuid.UUID,
     body: ToolTestIn,
     ctx: RequestContext = Depends(get_request_context),
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_session, scope="function"),
 ) -> ToolTestOut:
     """Really call the endpoint with sample input, through the same safeguards a live call uses."""
     tool = await _tool_or_404(session, tool_id)
@@ -140,7 +145,7 @@ async def test_tool(
 
 @router.get("/tool-executions", response_model=list[ToolExecutionOut])
 async def recent_executions(
-    limit: int = Query(default=25, ge=1, le=100), session: AsyncSession = Depends(get_session)
+    limit: int = Query(default=25, ge=1, le=100), session: AsyncSession = Depends(get_session, scope="function")
 ) -> list[ToolExecutionOut]:
     q = select(ToolExecution).order_by(ToolExecution.created_at.desc()).limit(limit)
     return [ToolExecutionOut.model_validate(e) for e in (await session.scalars(q)).all()]

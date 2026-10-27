@@ -84,7 +84,7 @@ async def _audit(session: AsyncSession, ctx: RequestContext, action: str, variab
     )
 
 
-@router.get("/variables", response_model=VariablesOut)
+@router.get("/variables", response_model=VariablesOut, dependencies=MANAGERS)
 async def list_variables(session: AsyncSession = Depends(get_session)) -> VariablesOut:
     used = await service.usage(session)
     return VariablesOut(

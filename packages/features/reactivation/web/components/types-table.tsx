@@ -55,7 +55,7 @@ export function TypesTable({ types, source = "saved" }: { types: TypeEntry[]; so
                     {t.label}
                   </Link>
                   {t.kind === "retention" && (
-                    <span className="dp-badge">Already paid</span>
+                    <span className="dp-badge" data-tone="accent">Already paid</span>
                   )}
                   <p className="dp-type-desc">{t.description}</p>
                 </td>

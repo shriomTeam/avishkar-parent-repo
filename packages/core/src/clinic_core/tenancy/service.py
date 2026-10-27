@@ -1,12 +1,13 @@
 """Atomic initial clinic provisioning; never grants a BAA from onboarding."""
 
 import uuid
-from datetime import timedelta
 
+# Trial billing is paused during product development.
+# from datetime import timedelta
 from fastapi import HTTPException
 from sqlalchemy import select
 
-from clinic_core.auth.security import now
+# from clinic_core.auth.security import now
 from clinic_core.database import system_session
 from clinic_core.entitlements import set_feature
 from clinic_core.features import load_features
@@ -34,15 +35,18 @@ async def create_workspace(user_id: uuid.UUID, data: WorkspaceCreate, settings: 
                 return tenant
         if previous:
             raise HTTPException(403, detail="workspace_access_denied")
-        stamp = now()
-        expires = stamp + timedelta(days=14)
+        # Restore only once billing and explicit trial-expiry UX are implemented:
+        # stamp = now()
+        # expires = stamp + timedelta(days=14)
         tenant = Tenant(
             id=uuid.uuid4(),
             name=data.name,
             timezone=data.timezone,
             clinic_type=data.clinic_type,
-            status=TenantStatus.TRIAL,
-            trial_ends_at=expires,
+            # status=TenantStatus.TRIAL,
+            # trial_ends_at=expires,
+            status=TenantStatus.ACTIVE,
+            trial_ends_at=None,
             settings={"callback_phone": data.phone},
         )
         db.add(tenant)
@@ -57,8 +61,9 @@ async def create_workspace(user_id: uuid.UUID, data: WorkspaceCreate, settings: 
                 active=True,
             )
         )
-        # Initial preview trial; expiry is enforced by platform entitlement checks.
+        # Keep the same starter-product allowlist; only automatic trial expiry is paused.
         for feature in load_features().values():
-            if feature.trial_eligible:
-                await set_feature(db, tenant.id, feature.key, expires_at=expires)
+            if feature.available and feature.trial_eligible:
+                # await set_feature(db, tenant.id, feature.key, expires_at=expires)
+                await set_feature(db, tenant.id, feature.key, expires_at=None)
         return tenant

@@ -213,12 +213,7 @@ test("a type whose data isn't there explains why and what to do, and a paid-up t
 
 test("front desk sees the totals but not the patients, and the patients endpoint is never called", async ({ page }) => {
   helper("seed", workspace, ["--scenario", "full"]);
-  await page.route("**/api/v1/auth/me", async (route) => {
-    const response = await route.fetch();
-    const body = await response.json();
-    for (const m of body.memberships) m.role = "front_desk";
-    await route.fulfill({ response, json: body });
-  });
+  helper("front-desk", workspace);
   const calls: string[] = [];
   page.on("request", (r) => calls.push(r.url()));
   await page.goto("/reactivation/types/overdue_maintenance");

@@ -1,25 +1,30 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Card } from "@clinic/ui";
 import { useAuth } from "@clinic/core/web/auth/provider";
 
 import type { LatestRun, TypeEntry } from "../lib/api-types";
 import { browserClient } from "../lib/client";
 import { formatDateTime, relativeTime } from "../lib/format";
 import { failureMessage, stageLabel } from "../lib/messages";
-import { CsvImportPanel } from "./csv-import";
+import { canRunRole } from "../lib/roles";
+import { num } from "../lib/summary";
 import { useCsvResult } from "./csv-provider";
 import { CsvResults } from "./csv-results";
-import { EmptyState, Notice, ProgressBar } from "./kit";
+import { ExportReportButton } from "./export-button";
+import { SummaryReportButton } from "./summary-button";
+import { Button, ButtonLink, Card, EmptyState, Icon, Notice, ProgressBar } from "./kit";
 import { QualityPanel } from "./quality-panel";
 import { Tiles } from "./tiles";
 import { TypesTable } from "./types-table";
+import { IMPORT_PATH } from "./shell-nav";
 import { Welcome } from "./welcome";
 
 export type InFlight = { id: string; status: string; progress_pct: number };
 export type OverviewData = {
   latest: LatestRun | null;
+  /** The version of the settings saved now, or null when it could not be read. */
+  currentSettingsVersion: number | null;
   types: TypeEntry[];
   inFlight: InFlight | null;
   /** The newest run failed and nothing newer is running. */
@@ -29,7 +34,6 @@ export type OverviewData = {
 };
 
 const POLL_MS = 2000;
-const CAN_RUN = new Set(["owner", "office_manager"]);
 
 function idempotencyKey() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -43,7 +47,7 @@ export function Overview({ data }: { data: OverviewData }) {
   const tenantId = auth.workspace?.id;
   const timeZone = auth.workspace?.timezone ?? "America/New_York";
   const role = auth.memberships.find((m) => m.workspace_id === tenantId)?.role;
-  const canRun = !!role && CAN_RUN.has(role);
+  const canRun = canRunRole(role);
   const client = useMemo(
     () => browserClient(auth.csrf_token, tenantId),
     [auth.csrf_token, tenantId],
@@ -57,7 +61,6 @@ export function Overview({ data }: { data: OverviewData }) {
   const [startError, setStartError] = useState<string | null>(null);
   const [trouble, setTrouble] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
-  const [importing, setImporting] = useState(false);
   const { result: csv } = useCsvResult();
   const params = useSearchParams();
   const forceSaved = params.get("view") === "saved";
@@ -179,19 +182,26 @@ export function Overview({ data }: { data: OverviewData }) {
   const summary = latest?.summary ?? null;
   const runButton = canRun ? (
     <Button onClick={runNow} disabled={busy} data-testid="run-now">
+      {!busy && <Icon name="play" size={16} />}
       {busy ? "Analysing…" : latest ? "Run now" : "Analyse my patients"}
     </Button>
   ) : null;
   const importButton = canRun ? (
-    <Button
-      variant="secondary"
-      onClick={() => setImporting((open) => !open)}
-      aria-expanded={importing}
-      data-testid="import-csv"
-    >
+    <ButtonLink variant="secondary" href={IMPORT_PATH} data-testid="import-csv">
+      <Icon name="upload" size={16} />
       Import CSV
-    </Button>
+    </ButtonLink>
   ) : null;
+
+  const exportButton =
+    canRun && latest ? (
+      <ExportReportButton source={{ kind: "saved", latest, types, dormant: num(summary, "dormant_count") }} />
+    ) : null;
+
+  const summaryButton =
+    canRun && latest ? (
+      <SummaryReportButton source={{ kind: "saved", runId: latest.id, dormant: num(summary, "dormant_count") }} />
+    ) : null;
 
   return (
     <div className="dp-stack">
@@ -227,17 +237,15 @@ export function Overview({ data }: { data: OverviewData }) {
             )}
           </p>
         </div>
-        {(importButton || (latest && runButton)) && (
+        {(importButton || exportButton || summaryButton || (latest && runButton)) && (
           <div className="dp-head-actions">
             {importButton}
+            {exportButton}
+            {summaryButton}
             {latest && runButton}
           </div>
         )}
       </div>
-
-      {importing && canRun && (
-        <CsvImportPanel onDone={() => setImporting(false)} onCancel={() => setImporting(false)} />
-      )}
 
       {startError && <Notice tone="error">{startError}</Notice>}
       {failed && !run && (
@@ -246,6 +254,13 @@ export function Overview({ data }: { data: OverviewData }) {
         </Notice>
       )}
       {run && <ProgressCard run={run} trouble={trouble} />}
+      {latest && !run && data.currentSettingsVersion !== null && latest.settings_version !== data.currentSettingsVersion && (
+        <Notice tone="info" title="Your settings changed after this analysis." >
+          {canRun
+            ? "The figures below still use the earlier settings. Run the analysis again to use the new ones."
+            : "The figures below still use the earlier settings. The clinic owner or office manager can run the analysis again."}
+        </Notice>
+      )}
 
       {!latest ? (
         run ? null : (

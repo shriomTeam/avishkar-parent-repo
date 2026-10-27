@@ -18,6 +18,7 @@ async def status() -> dict:
 
 
 feature = Feature(
+    available=False,
     key="command_center",
     name="The Command Center",
     description="Revenue, conversion, provider performance, attribution and forecasting.",

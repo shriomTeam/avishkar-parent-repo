@@ -3,10 +3,13 @@
     uv run python packages/features/reactivation/scripts/browser_seed.py seed    --tenant-name NAME --scenario full
     uv run python packages/features/reactivation/scripts/browser_seed.py work    --tenant-name NAME
     uv run python packages/features/reactivation/scripts/browser_seed.py cleanup --tenant-name NAME
+    uv run python packages/features/reactivation/scripts/browser_seed.py front-desk --tenant-name NAME
 
 Scenarios for `seed`: full (a previous run plus this one, one type unavailable, one retention type), first (a
 first analysis with nothing to compare with), failed (a completed run followed by a failed one), none (patients
-but no runs), empty (no patients and no runs: the welcome page).
+but no runs), empty (no patients and no runs: the welcome page), large (one run of about `--patients N`
+dormant patients, for scale measurements).
+`front-desk` assigns the test workspace owner a real front-desk role, so server and browser permissions agree.
 `work` plays the worker for the queued run the browser asked for. `cleanup` removes every run for the tenant and
 every patient and service this script created. The workspace itself is created by the browser sign-in and is left
 alone, like the other browser journeys.
@@ -58,10 +61,10 @@ _guard()
 
 from datetime import UTC, datetime, timedelta  # noqa: E402
 
-from sqlalchemy import delete, select  # noqa: E402
+from sqlalchemy import delete, select, update  # noqa: E402
 
 from clinic_core.database import dispose_engines, system_session, tenant_session  # noqa: E402
-from clinic_db.models.core import Patient, Service, Tenant  # noqa: E402
+from clinic_db.models.core import Patient, Service, Staff, Tenant  # noqa: E402
 from clinic_db.models.reactivation import Run, RunPatient, RunType  # noqa: E402
 from clinic_reactivation.analysis.settings import ReactivationSettings  # noqa: E402
 from clinic_reactivation.runs import execute_run  # noqa: E402
@@ -183,12 +186,55 @@ async def _seed_patients(tenant_id, run: Run, rows: list, services: dict, finish
 UNCLASSIFIED_ROWS = 6
 
 
-async def _seed_run(tenant_id, *, first_run: bool, finished: datetime, services: dict, patients: bool = False) -> Run:
+async def _seed_bulk(tenant_id, run: Run, rows: list, services: dict, finished: datetime, unclassified: int) -> None:
+    """The same rows without the per-patient flush, for runs with tens of thousands of patients."""
+    plan = [(r[0], r[1], r[9], r[8]) for r in rows] + [(None, unclassified, "Facial", "new")]
+    n = 0
+    async with tenant_session(tenant_id) as s:
+        for key, count, service, kind in plan:
+            for start in range(0, count, 2000):
+                batch = []
+                for _ in range(min(2000, count - start)):
+                    n += 1
+                    batch.append(
+                        (
+                            n,
+                            Patient(
+                                tenant_id=tenant_id, first_name=FIRST[n % 12], last_name=LAST[(n // 12 + n) % 12],
+                                attributes=dict(MARK),
+                            ),
+                        )
+                    )  # fmt: skip
+                s.add_all(p for _, p in batch)
+                await s.flush()  # ids are made here
+                run_rows = []
+                for k, patient in batch:
+                    days = 120 + (k * 13) % 500
+                    run_rows.append(
+                        RunPatient(
+                            tenant_id=tenant_id, run_id=run.id, patient_id=patient.id, status="dormant",
+                            primary_type=key, matched_types=[key] if key else [],
+                            last_visit_at=finished - timedelta(days=days), days_since_last_visit=days,
+                            overdue_ratio=round(1.1 + (k % 25) / 10, 2), visit_count=2 + k % 5,
+                            total_spend_cents=20_000 + k * 150, usual_service_id=services[service],
+                            revenue_basis_cents=20_000 + (k % 9) * 700, revenue_kind=kind,
+                            likelihood_score=30 + (k * 7) % 55, points=_points(k, services[service]),
+                            change="unchanged", reasons=[f"Last visit {days} days ago"],
+                        )
+                    )  # fmt: skip
+                s.add_all(run_rows)
+                await s.flush()
+
+
+async def _seed_run(
+    tenant_id, *, first_run: bool, finished: datetime, services: dict, patients: bool = False, scale: int = 1
+) -> Run:
     config = ReactivationSettings().model_dump(mode="json")
     config["types"]["churned_member"]["enabled"] = True
     low = high = 0
     rows = []
     for key, count, basis, service, source in NEW_TYPES:
+        count, basis = count * scale, basis * scale
         rate_low, rate_high = _rates(source)
         rows.append(
             (
@@ -206,12 +252,13 @@ async def _seed_run(tenant_id, *, first_run: bool, finished: datetime, services:
         )
         low, high = low + rows[-1][6], high + rows[-1][7]
     key, count, basis, service = RETENTION
+    count, basis = count * scale, basis * scale
     rows.append((key, count, basis, 1.0, 1.0, "assumed", basis, basis, "retention", service))
-    unclassified = 6
+    unclassified = 6 * scale
     dormant = sum(r[1] for r in rows) + unclassified
     summary = {
         "as_of": finished.isoformat(),
-        "patients_total": 235,
+        "patients_total": 235 * scale,
         "patients_scored": 221,
         "dormant_count": dormant,
         "at_risk_count": 18,
@@ -257,8 +304,10 @@ async def _seed_run(tenant_id, *, first_run: bool, finished: datetime, services:
                     revenue_kind=kind, top_service_id=services[service],
                 )
             )  # fmt: skip
-    if patients:
+    if patients and scale == 1:
         await _seed_patients(tenant_id, run, rows, services, finished, at_risk=summary["at_risk_count"])
+    elif patients:
+        await _seed_bulk(tenant_id, run, rows, services, finished, unclassified)
     return run
 
 
@@ -281,6 +330,13 @@ async def seed(args) -> dict:
             await s.flush()
             services[name] = svc.id
     now = datetime.now(UTC)
+    if args.scenario == "large":
+        large = await _seed_run(
+            tenant.id, first_run=True, finished=now - timedelta(hours=1), services=services, patients=True,
+            scale=max(2, args.patients // 186),
+        )  # fmt: skip
+        facts.update(dormant=large.summary["dormant_count"], total=large.summary["patients_total"])
+        return facts
     if args.scenario in ("full", "failed"):
         await _seed_run(tenant.id, first_run=True, finished=now - timedelta(days=9), services=services)
     latest = await _seed_run(
@@ -324,17 +380,28 @@ async def cleanup(args) -> dict:
     return {"cleaned": str(tenant.id)}
 
 
+async def set_role(args) -> dict:
+    """Assign a real role in this guarded disposable workspace, including SSR/API checks."""
+    tenant = await _tenant(args.tenant_name)
+    async with system_session() as session:
+        await session.execute(
+            update(Staff).where(Staff.tenant_id == tenant.id, Staff.role == "owner").values(role="front_desk")
+        )
+    return {"role": "front_desk"}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=["seed", "work", "cleanup"])
+    parser.add_argument("command", choices=["seed", "work", "cleanup", "front-desk"])
     parser.add_argument("--tenant-name", required=True)
-    parser.add_argument("--scenario", choices=["full", "first", "failed", "none", "empty"], default="full")
+    parser.add_argument("--scenario", choices=["full", "first", "failed", "none", "empty", "large"], default="full")
     parser.add_argument("--delay", type=float, default=0.0)
+    parser.add_argument("--patients", type=int, default=12_000, help="for the large scenario")
     args = parser.parse_args()
 
     async def go() -> dict:
         try:
-            return await {"seed": seed, "work": work, "cleanup": cleanup}[args.command](args)
+            return await {"seed": seed, "work": work, "cleanup": cleanup, "front-desk": set_role}[args.command](args)
         finally:
             await dispose_engines()
 
