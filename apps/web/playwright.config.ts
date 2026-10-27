@@ -40,6 +40,7 @@ export default defineConfig({
       command: "pnpm dev --hostname 127.0.0.1 --port 3100",
       url: "http://127.0.0.1:3100",
       env: {
+        PLAYWRIGHT_TEST_OUTPUT: "1",
         BACKEND_INTERNAL_URL: "http://127.0.0.1:8001",
         NEXT_PUBLIC_API_URL: "http://127.0.0.1:8001", // call WebSockets connect straight to the API
       },

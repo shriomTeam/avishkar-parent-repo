@@ -18,6 +18,7 @@ async def status() -> dict:
 
 
 feature = Feature(
+    available=False,
     key="scribe",
     name="The Chart-While-You-Talk System",
     description="Captures the visit conversation and drafts structured notes for provider review.",

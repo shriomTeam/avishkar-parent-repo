@@ -10,9 +10,89 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
 
-class Settings(BaseSettings):
+class EmailSettings(BaseSettings):
+    """Shared transactional email configuration; no Google or web runtime secrets."""
+
     model_config = SettingsConfigDict(env_file=REPO_ROOT / ".env", extra="ignore")
     app_env: Literal["dev", "test", "production"] = "dev"
+    invitations_enabled: bool = False
+    invitation_ttl_hours: int = 72
+    email_provider: Literal["console", "sendgrid", "test"] = "console"
+    sendgrid_api_key: SecretStr = SecretStr("")
+    email_old_payload_keys: SecretStr = SecretStr("")
+    email_payload_encryption_key: SecretStr = SecretStr("")
+    email_from_address: str = ""
+    email_from_name: str = "Avishkar AI"
+    email_reply_to: str = ""
+    email_tasks_project: str = ""
+    email_tasks_region: str = ""
+    email_tasks_queue: str = ""
+    email_tasks_url: str = ""
+    email_tasks_invoker_email: str = ""
+    email_tasks_audience: str = ""
+    email_recovery_invoker_email: str = ""
+
+    @model_validator(mode="after")
+    def validate_email_config(self):
+        task_fields = [
+            self.email_tasks_project,
+            self.email_tasks_region,
+            self.email_tasks_queue,
+            self.email_tasks_url,
+            self.email_tasks_invoker_email,
+            self.email_tasks_audience,
+        ]
+        if any(task_fields) and not all(task_fields):
+            raise ValueError("Email Cloud Tasks requires project, region, queue, URL, invoker and audience")
+        if self.email_tasks_url:
+            for value in (self.email_tasks_url, self.email_tasks_audience):
+                target = urlsplit(value)
+                if (
+                    target.scheme != "https"
+                    or not target.netloc
+                    or target.path
+                    or target.query
+                    or target.fragment
+                    or target.username
+                ):
+                    raise ValueError("Email task URL and audience must be HTTPS origins")
+        if not 1 <= self.invitation_ttl_hours <= 168:
+            raise ValueError("Invitation lifetime must be between 1 and 168 hours")
+        if self.invitations_enabled:
+            if not self.email_payload_encryption_key.get_secret_value():
+                raise ValueError("EMAIL_PAYLOAD_ENCRYPTION_KEY is required for invitations")
+            import base64
+
+            for key in [
+                self.email_payload_encryption_key.get_secret_value(),
+                *filter(None, self.email_old_payload_keys.get_secret_value().split(",")),
+            ]:
+                try:
+                    if len(base64.urlsafe_b64decode(key)) != 32:
+                        raise ValueError()
+                except Exception:
+                    raise ValueError("Email payload encryption keys must be valid Fernet keys") from None
+            if self.email_provider == "sendgrid" and (
+                not self.sendgrid_api_key.get_secret_value() or not self.email_from_address
+            ):
+                raise ValueError("SendGrid requires a key and verified sender")
+            if self.app_env == "production" and self.email_provider != "sendgrid":
+                raise ValueError("Production invitations require a real email provider")
+        return self
+
+
+class EmailWorkerSettings(EmailSettings):
+    database_system_url: str = "postgresql+psycopg://clinic_system:clinic_system@localhost:5432/clinic"
+
+    @model_validator(mode="after")
+    def validate_database(self):
+        if not self.database_system_url.startswith("postgresql+psycopg://"):
+            raise ValueError("Database URLs must use Postgres with psycopg")
+        return self
+
+
+class Settings(EmailSettings):
+    model_config = SettingsConfigDict(env_file=REPO_ROOT / ".env", extra="ignore")
     allow_dev_auth: bool = False
     public_app_origin: str = "http://localhost:3000"
     database_url: str = "postgresql+psycopg://clinic_app:clinic_app@localhost:5432/clinic"

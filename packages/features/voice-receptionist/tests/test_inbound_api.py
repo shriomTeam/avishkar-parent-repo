@@ -115,14 +115,14 @@ async def test_invalid_agents_are_rejected(client, change):
     assert r.status_code == 422
 
 
-async def test_only_managers_can_change_agents_but_front_desk_can_read(client):
+async def test_only_managers_can_read_or_change_agent_configuration(client):
     t = await create_test_tenant()
     agent = await _create(client, t)
     assert (await client.post("/inbound/agents", json=_body(name="x"), headers=_h(t, "front_desk"))).status_code == 403
     r = await client.put(f"/inbound/agents/{agent['id']}", json=_body(), headers=_h(t, "front_desk"))
     assert r.status_code == 403
     assert (await client.delete(f"/inbound/agents/{agent['id']}", headers=_h(t, "front_desk"))).status_code == 403
-    assert (await client.get("/inbound/agents", headers=_h(t, "front_desk"))).status_code == 200
+    assert (await client.get("/inbound/agents", headers=_h(t, "front_desk"))).status_code == 403
 
 
 async def test_a_clinic_cannot_see_or_change_another_clinics_agent(client):

@@ -63,7 +63,9 @@ class CallSession:
         tool_runner=None,
         audio: CallAudio | None = None,
         store: RecordingStore | None = None,
+        authorize=None,
     ):
+        self.authorize = authorize
         self.snapshot = snapshot
         self.fields = snapshot.get("fields", [])
         self.tool_runner = tool_runner
@@ -286,6 +288,9 @@ class CallSession:
 
     async def _run_tool(self, ref: dict, call: ToolCall) -> ToolResult:
         """Run a configured tool. The caller hears silence while it runs (the model waits), so it is time-boxed."""
+        if self.authorize and not await self.authorize():
+            self._end("access_revoked", failed=True)
+            return ToolResult(call.id, call.name, {"ok": False, "error": "Workspace access ended."})
         await self.transport.send_event({"type": "tool", "name": ref["name"], "status": "running"})
         key = f"{self.recorder.call_id}:{call.name}:{call.id}"
         try:

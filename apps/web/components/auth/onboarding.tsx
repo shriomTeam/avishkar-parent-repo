@@ -1,16 +1,22 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Brand, Field, Select, FormError } from "@clinic/ui";
 import { useAuth } from "@/lib/auth/provider";
 import { SignOut } from "./sign-out";
+// Hydration is the only transition: there is no external store to subscribe to.
+const subscribeToHydration = () => () => {};
+
 export function Onboarding() {
   const { auth, write } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   // Until the page has loaded its scripts the form below has no handler, and the browser would submit it as a
   // plain GET, putting the name and phone number in the address. The button stays off until the handler exists.
-  const [ready, setReady] = useState(false);
-  useEffect(() => setReady(true), []);
+  const ready = useSyncExternalStore(
+    subscribeToHydration,
+    () => true,
+    () => false,
+  );
   return (
     <main className="onboarding-page">
       <Brand />

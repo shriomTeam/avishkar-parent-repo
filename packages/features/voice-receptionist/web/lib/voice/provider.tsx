@@ -47,6 +47,10 @@ const Context = createContext<Value | null>(null);
 /** Real agents and calls for the signed-in workspace. Phone numbers stay in the demo provider. */
 export function VoiceDataProvider({ children }: { children: ReactNode }) {
   const { auth } = useAuth();
+  const manager = ["owner", "office_manager"].includes(
+    auth.memberships.find((m) => m.workspace_id === auth.workspace?.id)?.role ??
+      "",
+  );
   const api = useMemo(
     () =>
       createInboundApi({
@@ -68,10 +72,12 @@ export function VoiceDataProvider({ children }: { children: ReactNode }) {
     setError("");
     try {
       const [a, c, t, v] = await Promise.all([
-        api.listAgents(),
+        manager ? api.listAgents() : Promise.resolve([]),
         api.listCalls(undefined, CALLS_LOADED),
-        api.listTools(),
-        api.listVariables(),
+        manager ? api.listTools() : Promise.resolve([]),
+        manager
+          ? api.listVariables()
+          : Promise.resolve({ custom: [], builtin: [] }),
       ]);
       setAgents(a);
       setCalls(c);
@@ -83,7 +89,7 @@ export function VoiceDataProvider({ children }: { children: ReactNode }) {
         e instanceof ApiError ? e.message : "Could not load your voice data.",
       );
     }
-  }, [api]);
+  }, [api, manager]);
   useEffect(() => {
     void load();
   }, [load]);

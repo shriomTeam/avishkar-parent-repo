@@ -70,3 +70,13 @@ Put tests next to your package (`tests/`), with a fresh tenant per test from
 ```bash
 pnpm turbo run test lint --filter=@clinic/feature-lead-response
 ```
+
+
+## Product availability during development
+
+Keep `available=False` on unfinished feature stubs. The platform labels them
+Upcoming and does not expose active product navigation, independently of saved
+workspace entitlements. Set it true only when the product's UI and backend flows
+are usable, then provision entitlements through the platform's normal flow.
+Availability does not bypass role checks or grant access. Automatic workspace
+trial expiry is currently paused; see [workspace access policy](WORKSPACE_ACCESS_POLICY.md).

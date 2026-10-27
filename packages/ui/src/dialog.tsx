@@ -17,10 +17,12 @@ export function Dialog({
   title,
   children,
   onClose,
+  placement = "center",
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
+  placement?: "center" | "right";
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -52,7 +54,12 @@ export function Dialog({
         }
       }}
       // Tailwind's reset zeroes margins, which removes the browser's centring of modal dialogs: m-auto restores it.
-      className="m-auto max-h-[85vh] w-[min(520px,90vw)] overflow-auto rounded-2xl border border-line bg-white p-7 text-ink shadow-[0_20px_80px_#201d1d25] backdrop:bg-[#201d1d60] [&_[data-field]]:my-[15px]"
+      className={cx(
+        "overflow-auto border border-line bg-white p-7 text-ink shadow-[0_20px_80px_#201d1d25] backdrop:bg-[#201d1d60] [&_[data-field]]:my-[15px]",
+        placement === "right"
+          ? "fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-dvh w-[min(440px,100vw)] max-w-full"
+          : "m-auto max-h-[85vh] w-[min(520px,90vw)] rounded-2xl",
+      )}
     >
       <div className="mb-[15px] flex items-center justify-between gap-[18px]">
         <h2

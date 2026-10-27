@@ -1,4 +1,5 @@
 "use client";
+import { initials } from "@clinic/core/web/auth/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -125,7 +126,7 @@ function List() {
                 key={agent.id}
               >
                 <div className="mb-5 flex items-center justify-between gap-3 max-app:flex-wrap">
-                  <Avatar size="lg">{agent.name[0]}</Avatar>
+                  <Avatar size="lg">{initials(agent.name)}</Avatar>
                   <Badge>{agent.is_active ? "Active" : "Disabled"}</Badge>
                 </div>
                 <H2 className="mb-1 mt-3.5">{agent.name}</H2>

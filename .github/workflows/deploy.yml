@@ -1,7 +1,7 @@
 name: Deploy
 
-# On a merge to main: build the images, migrate the database, then deploy the knowledge-base ingest service, the API
-# and the web app (in that order, so the API never queues work for an ingest service older than it expects, and the
+# On a merge to main: build the images, migrate, then deploy private knowledge/email handlers before the API
+# and web app (so the API never queues work for a handler older than it expects, and the
 # web app never calls an API that is older than it expects). Pull requests only check that the images build.
 # Infrastructure (the Cloud Run services themselves) is created by terraform.yml; apply that first on a new project.
 
@@ -47,6 +47,7 @@ env:
   API_SERVICE: prod-avishkar-api
   WEB_SERVICE: prod-avishkar-web
   INGEST_SERVICE: prod-avishkar-ingest
+  EMAIL_SERVICE: prod-avishkar-email-send
   MIGRATE_JOB: prod-avishkar-migrate
   SQL_INSTANCE: prod-avishkar-postgres
 
@@ -57,7 +58,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        image: [api, web, migrate, ingest]
+        image: [api, web, migrate, ingest, email]
     steps:
       - uses: actions/checkout@v4
       - name: Sign in to Google Cloud
@@ -83,6 +84,7 @@ jobs:
             api)     DOCKERFILE=apps/api/Dockerfile;      ARGS=() ;;
             migrate) DOCKERFILE=packages/db/Dockerfile;   ARGS=() ;;
             ingest)  DOCKERFILE=apps/worker/Dockerfile;   ARGS=() ;;
+            email)   DOCKERFILE=apps/worker/email.Dockerfile; ARGS=() ;;
             web)
               DOCKERFILE=apps/web/Dockerfile
               # Next.js bakes the API address into the build. Pull requests only check that the build works,
@@ -137,9 +139,41 @@ jobs:
         # revision to start and answer on its port, and fails the release if it cannot.
         run: gcloud run services update "${INGEST_SERVICE}" --region="${REGION}" --image="${REGISTRY}/ingest:${GITHUB_SHA}"
 
+  deploy-email:
+    name: Deploy the private email sender
+    needs: migrate
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.CICD_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy when provisioned
+        run: |
+          set -euo pipefail
+          ENABLED="$(python -c 'import pathlib,re; s=pathlib.Path("infra/terraform/envs/prod.tfvars").read_text(); print("true" if re.search(r"(?m)^\s*invitations_enabled\s*=\s*true\s*(?:#.*)?$",s) else "false")')"
+          if [ "${ENABLED}" != "true" ]; then
+            echo "Production invitations are disabled; skipping the email service."
+            exit 0
+          fi
+          # Do not silently deploy a task-producing API before its handler exists.
+          # Terraform is a separate workflow; wait briefly, then fail with an actionable release error.
+          for attempt in $(seq 1 6); do
+            if gcloud run services describe "${EMAIL_SERVICE}" --region="${REGION}" --format='value(metadata.name)' >/dev/null 2>&1; then
+              gcloud run services update "${EMAIL_SERVICE}" --region="${REGION}" --image="${REGISTRY}/email:${GITHUB_SHA}"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Email service is missing. Complete Terraform apply, then rerun Deploy."
+          exit 1
+
   deploy-api:
     name: Deploy the API
-    needs: deploy-ingest
+    needs: [deploy-ingest, deploy-email]
     runs-on: ubuntu-latest
     environment: production
     steps:

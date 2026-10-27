@@ -18,6 +18,7 @@ async def status() -> dict:
 
 
 feature = Feature(
+    available=False,
     key="lead_response",
     name="The 60-Second Response System",
     description="Contacts every new lead in under a minute, then follows up until they book.",

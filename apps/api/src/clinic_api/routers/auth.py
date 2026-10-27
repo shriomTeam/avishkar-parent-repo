@@ -1,14 +1,19 @@
+import uuid
+
 from fastapi import APIRouter, HTTPException, Request, Response
+from pydantic import BaseModel
+from sqlalchemy import select
 from starlette.responses import RedirectResponse
 
 from clinic_core.auth.dependencies import DB, CurrentSession, ProtectedWrite, get_settings
 from clinic_core.auth.logging import audit
 from clinic_core.auth.repository import claim_transaction, limit, revoke
 from clinic_core.auth.schemas import AuthMeOut, MembershipOut, UserOut
-from clinic_core.auth.security import clear_cookie, csrf_token, set_cookie
+from clinic_core.auth.security import clear_cookie, csrf_token, digest, set_cookie
 from clinic_core.auth.service import create_session, start_login
 from clinic_core.tenancy.repository import memberships
 from clinic_core.tenancy.schemas import WorkspaceOut
+from clinic_db.models.auth import AuthSession
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
@@ -29,7 +34,9 @@ async def google_login(request: Request, db: DB):
         return login_error(request, "not_configured")
     await limit(db, "login:" + (request.client.host if request.client else "unknown"), 20)
     try:
-        state, nonce, verifier, binding = await start_login(db, settings)
+        context_name = "__Host-invitation" if settings.cookie_secure else "avishkar_invitation"
+        context_raw = request.cookies.get(context_name, "")
+        state, nonce, verifier, binding = await start_login(db, settings, digest(context_raw) if context_raw else None)
         url = await request.app.state.google.authorization_url(state, nonce, verifier)
     except Exception:
         await db.rollback()
@@ -66,6 +73,12 @@ async def google_callback(request: Request, db: DB):
         if not code or len(code) > 4096:
             return login_error(request, "invalid_login")
         claims = await request.app.state.google.identity(code, transaction.nonce, transaction.verifier)
+        context_name = "__Host-invitation" if settings.cookie_secure else "avishkar_invitation"
+        if (
+            transaction.invitation_context_hash
+            and digest(request.cookies.get(context_name, "")) != transaction.invitation_context_hash
+        ):
+            return login_error(request, "invalid_login")
         user, raw = await create_session(
             db,
             claims,
@@ -73,13 +86,21 @@ async def google_callback(request: Request, db: DB):
             request.cookies.get(settings.session_cookie_name, ""),
         )
         rows = await memberships(user.id, settings)
+        session = await db.scalar(select(AuthSession).where(AuthSession.token_hash == digest(raw)))
+        if rows:
+            session.active_workspace_id = rows[0][1].id
+            await db.commit()
     except HTTPException as exc:
         await db.rollback()
         return login_error(request, "account_disabled" if exc.status_code == 403 else "invalid_login")
     except Exception:
         await db.rollback()
         return login_error(request, "failed")
-    response = RedirectResponse(settings.public_app_origin + ("/" if rows else "/onboarding"), status_code=303)
+    response = RedirectResponse(
+        settings.public_app_origin
+        + ("/invite" if transaction.invitation_context_hash else "/" if rows else "/onboarding"),
+        status_code=303,
+    )
     set_cookie(response, settings.session_cookie_name, raw, settings.session_ttl_seconds, settings)
     clear_cookie(response, settings.binding_cookie_name, settings)
     response.headers["Cache-Control"] = "no-store"
@@ -88,7 +109,7 @@ async def google_callback(request: Request, db: DB):
 
 
 @router.get("/me", response_model=AuthMeOut)
-async def me(request: Request, response: Response, principal: CurrentSession):
+async def me(request: Request, response: Response, principal: CurrentSession, db: DB):
     rows = await memberships(principal.user.id, get_settings(request))
     response.headers["Cache-Control"] = "no-store"
     entries = [
@@ -99,10 +120,16 @@ async def me(request: Request, response: Response, principal: CurrentSession):
         )
         for m, w in rows
     ]
+    if principal.session.active_workspace_id is None and len(entries) == 1:
+        principal.session.active_workspace_id = entries[0].workspace_id
+        await db.commit()
+    selected = next(
+        (entry.workspace for entry in entries if entry.workspace_id == principal.session.active_workspace_id), None
+    )
     return AuthMeOut(
         user=UserOut.model_validate(principal.user),
         memberships=entries,
-        workspace=entries[0].workspace if entries else None,
+        workspace=selected,
         needs_onboarding=not entries,
         csrf_token=csrf_token(principal.raw_token),
     )
@@ -119,3 +146,17 @@ async def logout(request: Request, principal: ProtectedWrite, db: DB):
     clear_cookie(response, settings.binding_cookie_name, settings)
     audit("logout")
     return response
+
+
+class WorkspaceSelection(BaseModel):
+    workspace_id: uuid.UUID
+
+
+@router.post("/workspace")
+async def select_workspace(body: WorkspaceSelection, request: Request, principal: ProtectedWrite, db: DB):
+    rows = await memberships(principal.user.id, get_settings(request))
+    if not any(tenant.id == body.workspace_id for _, tenant in rows):
+        raise HTTPException(403, detail="workspace_access_denied")
+    principal.session.active_workspace_id = body.workspace_id
+    await db.commit()
+    return {"ok": True}

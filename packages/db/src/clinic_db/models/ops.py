@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import BigInteger, DateTime, Identity, String, func
+from sqlalchemy import BigInteger, DateTime, Identity, Index, String, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -33,7 +33,7 @@ class AuditLog(TenantMixin, Base):
     """Append-only record of who touched PHI. The app role may insert, never update/delete."""
 
     __tablename__ = "audit_log"
-    __table_args__ = SCHEMA
+    __table_args__ = (Index("ix_audit_log_tenant_time_id", "tenant_id", "occurred_at", "id"), SCHEMA)
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
     actor_type: Mapped[str] = mapped_column(String(32), comment="staff, system, api_key")
