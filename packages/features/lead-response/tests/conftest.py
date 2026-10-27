@@ -9,23 +9,11 @@ import uuid
 from pathlib import Path
 
 import pytest
+from lr_seed import TABLES
 from sqlalchemy import create_engine, text
 
 from clinic_core.settings import REPO_ROOT
 from clinic_core.testing import create_test_tenant
-
-# Children before parents.
-TABLES = [
-    "jobs",
-    "message_events",
-    "consent_records",
-    "tasks",
-    "messages",
-    "conversations",
-    "contact_identities",
-    "contacts",
-    "practice_settings",
-]
 
 
 def owner_url() -> str:

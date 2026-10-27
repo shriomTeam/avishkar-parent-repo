@@ -1,8 +1,7 @@
 """Tenant isolation for every lead_response table."""
 
 import pytest
-from conftest import TABLES
-from lr_seed import seed
+from lr_seed import TABLES, seed
 from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine

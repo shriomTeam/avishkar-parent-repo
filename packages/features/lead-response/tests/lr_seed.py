@@ -18,6 +18,19 @@ from clinic_db.models.lead_response import (
 
 PHONE = "+14155550123"
 
+# Children before parents.
+TABLES = [
+    "jobs",
+    "message_events",
+    "consent_records",
+    "tasks",
+    "messages",
+    "conversations",
+    "contact_identities",
+    "contacts",
+    "practice_settings",
+]
+
 
 async def seed(tenant: uuid.UUID, *, phone: str = PHONE) -> dict[str, uuid.UUID]:
     ids = {name: uuid.uuid4() for name in ("contact", "conversation", "message", "task")}
