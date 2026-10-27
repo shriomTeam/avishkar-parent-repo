@@ -69,7 +69,7 @@ async def _agent_or_404(session: AsyncSession, agent_id: uuid.UUID) -> Agent:
     return agent
 
 
-@router.get("/agents", response_model=list[AgentOut])
+@router.get("/agents", response_model=list[AgentOut], dependencies=MANAGERS)
 async def list_agents(session: AsyncSession = Depends(get_session)) -> list[AgentOut]:
     return await _agents_out(session, await service.list_agents(session))
 
@@ -97,7 +97,7 @@ async def create_agent(
     return await _agent_out(session, agent)
 
 
-@router.get("/agents/{agent_id}", response_model=AgentOut)
+@router.get("/agents/{agent_id}", response_model=AgentOut, dependencies=MANAGERS)
 async def get_agent(agent_id: uuid.UUID, session: AsyncSession = Depends(get_session)) -> AgentOut:
     return await _agent_out(session, await _agent_or_404(session, agent_id))
 
@@ -302,6 +302,7 @@ async def start_test_call(
         ],
     }
     call = Call(
+        auth_session_id=ctx.session_id,
         tenant_id=ctx.tenant_id,
         agent_id=agent.id,
         agent_snapshot=snapshot,

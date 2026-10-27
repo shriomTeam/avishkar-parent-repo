@@ -1,4 +1,4 @@
-"""Dev seed: a demo med spa in lead-magnet trial, loaded from the sample EMR export.
+"""Dev seed: an active demo med spa loaded from the sample EMR export.
 
     pnpm db:seed
 
@@ -7,7 +7,7 @@ Prints the tenant id to use as the X-Tenant-Id header / in the web app.
 """
 
 import asyncio
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 
 from sqlalchemy import select
@@ -34,14 +34,17 @@ async def main() -> None:
         tenant = Tenant(
             name=DEMO_NAME,
             clinic_type=ClinicType.MEDSPA,
-            status=TenantStatus.TRIAL,
-            trial_ends_at=now + timedelta(days=30),
+            # Automatic demo trials are paused along with onboarding trials:
+            # status=TenantStatus.TRIAL,
+            # trial_ends_at=now + timedelta(days=30),
+            status=TenantStatus.ACTIVE,
+            trial_ends_at=None,
             baa_signed_at=now,
             settings={"booking_url": "https://book.example.com/glow"},
         )
         s.add(tenant)
         await s.flush()
-        # The two lead magnets: what a prospect gets before buying anything.
+        # The same two demo starter products, without automatic expiry.
         for key in ("reactivation", "blueprints"):
             await set_feature(s, tenant.id, key, expires_at=tenant.trial_ends_at)
         tenant_id = tenant.id

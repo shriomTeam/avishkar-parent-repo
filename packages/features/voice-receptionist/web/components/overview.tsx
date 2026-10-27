@@ -1,4 +1,6 @@
 "use client";
+import { initials } from "@clinic/core/web/auth/types";
+import { useAuth } from "@clinic/core/web/auth/provider";
 import Link from "next/link";
 import { useState } from "react";
 import { useDemo } from "../lib/demo/provider";
@@ -30,6 +32,11 @@ export function Overview() {
 }
 
 function Summary() {
+  const { auth } = useAuth();
+  const manager = ["owner", "office_manager"].includes(
+    auth.memberships.find((m) => m.workspace_id === auth.workspace?.id)?.role ??
+      "",
+  );
   const { agents, calls: all } = useVoice();
   const { state } = useDemo();
   const [period, setPeriod] = useState(7);
@@ -77,12 +84,14 @@ function Summary() {
                 { value: "30", label: "Last 30 days" },
               ]}
             />
-            <Link
-              className={buttonStyles("brand")}
-              href="/voice-receptionist/agents"
-            >
-              Manage agents
-            </Link>
+            {manager && (
+              <Link
+                className={buttonStyles("brand")}
+                href="/voice-receptionist/agents"
+              >
+                Manage agents
+              </Link>
+            )}
           </>
         }
       />
@@ -167,7 +176,7 @@ function Summary() {
               key={agent.id}
               href={`/voice-receptionist/agents/${agent.id}`}
             >
-              <Avatar>{agent.name[0]}</Avatar>
+              <Avatar>{initials(agent.name)}</Avatar>
               <div className="flex-1">
                 <strong className="text-[14px]">{agent.name}</strong>
                 <small className="block text-[12px] text-muted">

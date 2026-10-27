@@ -220,12 +220,7 @@ test("with no dormant patients there is nothing to report, and it says so", asyn
 
 test("front desk has no summary report button", async ({ page }) => {
   helper("seed", workspace, ["--scenario", "full"]);
-  await page.route("**/api/v1/auth/me", async (route) => {
-    const response = await route.fetch();
-    const body = await response.json();
-    for (const m of body.memberships) m.role = "front_desk";
-    await route.fulfill({ response, json: body });
-  });
+  helper("front-desk", workspace);
   await page.goto("/reactivation");
   await expect(tid(page, "tile-dormant")).toBeVisible();
   await expect(tid(page, "summary-report")).toHaveCount(0);

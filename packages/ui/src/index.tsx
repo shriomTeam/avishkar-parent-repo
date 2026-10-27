@@ -135,3 +135,6 @@ export const formatCents = (cents: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(cents / 100);
 
 export { Brand, Field, Select, FormError } from "./auth";
+export { ProductCard, ProductGrid, navigationItemStyles } from "./workspace";
+export { AccountMenu } from "./account-menu";
+export { Pagination } from "./pagination";

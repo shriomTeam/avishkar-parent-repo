@@ -77,6 +77,7 @@ class Feature:
     sequences: Sequence[Any] = ()
     # Shown in the trial/lead-magnet flow and the plan picker.
     trial_eligible: bool = False
+    available: bool = True  # False for unfinished products; separate from workspace entitlements.
     phi_sensitive: bool = False  # recording / clinical notes / photos: needs BAA + consent checks
 
 

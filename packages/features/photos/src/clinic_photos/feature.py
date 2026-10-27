@@ -18,6 +18,7 @@ async def status() -> dict:
 
 
 feature = Feature(
+    available=False,
     key="photos",
     name="Before/After Photo Pipeline",
     description="Consent-tracked photo capture through approved publishing.",

@@ -229,12 +229,7 @@ test("with no analysis yet, Run now starts one, shows progress and refreshes whe
 
 test("roles that cannot start runs do not see Run now", async ({ page }) => {
   helper("seed", workspace, ["--scenario", "full"]);
-  await page.route("**/api/v1/auth/me", async (route) => {
-    const response = await route.fetch();
-    const body = await response.json();
-    for (const m of body.memberships) m.role = "front_desk";
-    await route.fulfill({ response, json: body });
-  });
+  helper("front-desk", workspace);
   await page.goto("/reactivation");
   await expect(tid(page, "tile-dormant")).toBeVisible();
   await expect(tid(page, "run-now")).toHaveCount(0);

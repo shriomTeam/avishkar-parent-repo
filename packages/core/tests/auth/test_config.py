@@ -47,3 +47,25 @@ def test_csrf(origin, token, allowed):
     else:
         with pytest.raises(HTTPException):
             check_csrf(request, digest(csrf_token(raw)), Settings())
+
+
+def test_production_email_worker_needs_no_oauth_secrets():
+    from cryptography.fernet import Fernet
+
+    from clinic_core.settings import EmailWorkerSettings
+
+    config = EmailWorkerSettings(
+        _env_file=None,
+        app_env="production",
+        invitations_enabled=True,
+        email_provider="sendgrid",
+        sendgrid_api_key="fake-test-key",
+        email_from_address="sender@example.com",
+        email_payload_encryption_key=Fernet.generate_key().decode(),
+        database_system_url="postgresql+psycopg://worker:test@db/clinic",
+    )
+    assert config.database_system_url.endswith("/clinic")
+    assert "google_client_secret" not in type(config).model_fields
+    assert "database_auth_url" not in type(config).model_fields
+    with pytest.raises(ValidationError):
+        EmailWorkerSettings(_env_file=None, invitations_enabled=True, email_payload_encryption_key="bad")
