@@ -12,7 +12,17 @@ import {
   type Draft,
   type DraftField,
 } from "../lib/inbound/draft";
-import { Field, Select, Switch, Textarea } from "./ui";
+import {
+  Button,
+  buttonStyles,
+  H3,
+  Muted,
+  Note,
+  TwoColumns,
+  CheckboxField,
+} from "@clinic/ui";
+import { useVoice } from "../lib/voice/provider";
+import { Dropdown, Field, Switch, Textarea } from "./ui";
 
 type Props = { draft: Draft; onChange: (draft: Draft) => void };
 
@@ -34,27 +44,27 @@ function setter({ draft, onChange }: Props) {
 export function ConfigurationFields(props: Props) {
   const { draft } = props;
   const set = setter(props);
+  const { variables, builtinVariables } = useVoice();
+  const names = [...builtinVariables, ...variables].map((v) => `{{${v.name}}}`);
   return (
     <>
-      <div className="formtwo">
+      <TwoColumns>
         <Field
           label="Agent name"
           value={draft.name}
           maxLength={200}
           onChange={(e) => set("name", e.target.value)}
         />
-        <Select
+        <Dropdown
           label="Language"
           value={draft.language}
-          onChange={(e) => set("language", e.target.value)}
-        >
-          {LANGUAGES.map(([code, name]) => (
-            <option key={code} value={code}>
-              {name}
-            </option>
-          ))}
-        </Select>
-      </div>
+          onChange={(language) => set("language", language)}
+          options={LANGUAGES.map(([code, name]) => ({
+            value: code,
+            label: name,
+          }))}
+        />
+      </TwoColumns>
       <Field
         label="Description"
         value={draft.description}
@@ -67,28 +77,37 @@ export function ConfigurationFields(props: Props) {
         maxLength={20000}
         onChange={(e) => set("prompt", e.target.value)}
       />
-      <small>
+      <small className="block text-[12px] text-muted">
         Tell the agent who it is, what the clinic offers and how to help
         callers. It speaks briefly and does not give medical advice.
       </small>
+      <small
+        className="mb-[18px] mt-1 block text-[12px] text-muted"
+        data-testid="variable-hint"
+      >
+        Variables you can use here and in the first message: {names.join(", ")}.{" "}
+        <Link
+          className="text-[#38691d] underline"
+          href="/voice-receptionist/variables"
+        >
+          Manage variables
+        </Link>
+      </small>
       <Textarea
         label="First message"
-        className="short-textarea"
+        compact
         value={draft.greeting}
         maxLength={1000}
         onChange={(e) => set("greeting", e.target.value)}
       />
-      <div className="formtwo">
-        <Select
+      <TwoColumns>
+        <Dropdown
           label="Voice"
           value={draft.voice}
-          onChange={(e) => set("voice", e.target.value)}
-        >
-          {VOICES.map((voice) => (
-            <option key={voice}>{voice}</option>
-          ))}
-        </Select>
-      </div>
+          onChange={(voice) => set("voice", voice)}
+          options={VOICES.map((voice) => ({ value: voice, label: voice }))}
+        />
+      </TwoColumns>
       <Switch
         label="Agent is active"
         description="Inactive agents cannot take calls."
@@ -109,20 +128,25 @@ export function CaptureFields(props: Props) {
     );
   return (
     <>
-      <h3>What to capture from callers</h3>
-      <p className="muted">
+      <H3>What to capture from callers</H3>
+      <Muted>
         The agent listens for these details, reads important ones back to the
         caller, and saves them with the call.
-      </p>
+      </Muted>
       {draft.fields.length === 0 && (
-        <div className="note">
+        <Note>
           No details yet. Add a field such as the caller’s name or phone number.
-        </div>
+        </Note>
       )}
       {draft.fields.map((f) => (
-        <div className="capture-field" key={f.uid} data-testid="capture-field">
-          <div className="capture-row">
+        <div
+          className="my-3.5 rounded-[10px] border border-line bg-[#fcfcfd] px-[18px] pb-3.5 pt-4 [&>[data-field]]:mb-3.5 [&_[role=combobox]]:h-[42px] [&_input:not([type=checkbox])]:h-[42px]"
+          key={f.uid}
+          data-testid="capture-field"
+        >
+          <div className="mb-3.5 grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_42px] items-end gap-3 max-app:grid-cols-2">
             <Field
+              flush
               label="Label"
               value={f.label}
               maxLength={200}
@@ -136,6 +160,7 @@ export function CaptureFields(props: Props) {
               }
             />
             <Field
+              flush
               label="Key"
               value={f.key}
               maxLength={63}
@@ -143,24 +168,23 @@ export function CaptureFields(props: Props) {
                 setField(f.uid, { key: e.target.value, keyTouched: true })
               }
             />
-            <Select
+            <Dropdown
+              flush
               label="Type"
               value={f.data_type}
-              onChange={(e) =>
-                setField(f.uid, {
-                  data_type: e.target.value as DraftField["data_type"],
-                })
+              onChange={(type) =>
+                setField(f.uid, { data_type: type as DraftField["data_type"] })
               }
-            >
-              {DATA_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {TYPE_LABELS[type]}
-                </option>
-              ))}
-            </Select>
-            <button
+              options={DATA_TYPES.map((type) => ({
+                value: type,
+                label: TYPE_LABELS[type] ?? type,
+              }))}
+            />
+            <Button
               type="button"
-              className="icon-button"
+              variant="outline"
+              size="square"
+              className="max-app:justify-self-end"
               aria-label={`Remove field ${f.label || f.key}`}
               onClick={() =>
                 set(
@@ -170,7 +194,7 @@ export function CaptureFields(props: Props) {
               }
             >
               <Trash2 size={16} />
-            </button>
+            </Button>
           </div>
           {f.data_type === "enum" && (
             <Field
@@ -185,24 +209,22 @@ export function CaptureFields(props: Props) {
             maxLength={1000}
             onChange={(e) => setField(f.uid, { description: e.target.value })}
           />
-          <label className="inline-check">
-            <input
-              type="checkbox"
-              checked={f.required}
-              onChange={(e) => setField(f.uid, { required: e.target.checked })}
-            />
-            Required: the agent keeps asking until it has this
-          </label>
+          <CheckboxField
+            checked={f.required}
+            onChange={(required) => setField(f.uid, { required })}
+            label="Required: the agent keeps asking until it has this"
+          />
         </div>
       ))}
-      <button
+      <Button
         type="button"
+        variant="outline"
         disabled={draft.fields.length >= MAX_FIELDS}
         onClick={() => set("fields", [...draft.fields, newField()])}
       >
         <Plus size={16} />
         Add field
-      </button>
+      </Button>
     </>
   );
 }
@@ -212,12 +234,12 @@ export function PrivacyFields(props: Props) {
   const set = setter(props);
   return (
     <>
-      <h3>What to save from each call</h3>
-      <p className="muted">
+      <H3>What to save from each call</H3>
+      <Muted>
         Captured details are always saved. Transcripts and raw model messages
         can contain patient information, so turn them off if you do not need
-        them. Audio is never stored.
-      </p>
+        them. Call audio is only kept if you turn on recording below.
+      </Muted>
       <Switch
         label="Save the transcript"
         description="Store the words spoken in each call, turn by turn."
@@ -229,6 +251,12 @@ export function PrivacyFields(props: Props) {
         description="Keep the unprocessed messages from the AI model (no audio) for each call."
         checked={draft.save_raw_events}
         onChange={(v) => set("save_raw_events", v)}
+      />
+      <Switch
+        label="Record the call"
+        description="Keep the audio of each call (caller and agent) so staff can play it back in Call history. Recordings contain patient information. Tell callers they are being recorded; many places require it."
+        checked={draft.save_recording}
+        onChange={(v) => set("save_recording", v)}
       />
     </>
   );
@@ -248,11 +276,11 @@ export function ToolFields({
     });
   return (
     <>
-      <h3>Tools this agent can use</h3>
-      <p className="muted">
+      <H3>Tools this agent can use</H3>
+      <Muted>
         During a call the agent can use these to act for the caller. Each run is
         saved with the call.
-      </p>
+      </Muted>
       {tools.map((tool) => (
         <Switch
           key={tool.id}
@@ -262,7 +290,10 @@ export function ToolFields({
           onChange={(on) => toggle(tool.id, on)}
         />
       ))}
-      <Link className="button spaced" href="/voice-receptionist/tools">
+      <Link
+        className={buttonStyles("outline", { className: "mt-5" })}
+        href="/voice-receptionist/tools"
+      >
         Manage tools
       </Link>
     </>

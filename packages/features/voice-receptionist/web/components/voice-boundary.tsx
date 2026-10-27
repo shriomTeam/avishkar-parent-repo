@@ -1,20 +1,23 @@
 "use client";
 import type { ReactNode } from "react";
+import { Alert, Button, Muted, Panel } from "@clinic/ui";
 import { useVoiceStatus } from "../lib/voice/provider";
 
 export function VoiceBoundary({ children }: { children: ReactNode }) {
-  const { agents, calls, tools, error, retry } = useVoiceStatus();
-  if (agents && calls && tools) return <>{children}</>;
+  const { agents, calls, tools, variables, error, retry } = useVoiceStatus();
+  if (agents && calls && tools && variables) return <>{children}</>;
   return (
-    <div className="panel">
+    <Panel>
       {error ? (
         <>
-          <p role="alert">{error}</p>
-          <button onClick={retry}>Retry</button>
+          <Alert>{error}</Alert>
+          <Button variant="outline" onClick={retry}>
+            Retry
+          </Button>
         </>
       ) : (
-        <p role="status">Loading your voice agents…</p>
+        <Muted role="status">Loading your voice agents…</Muted>
       )}
-    </div>
+    </Panel>
   );
 }

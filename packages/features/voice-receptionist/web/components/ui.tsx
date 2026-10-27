@@ -1,19 +1,51 @@
 "use client";
+import { useState, type ReactNode } from "react";
 import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type ReactNode,
-  type TextareaHTMLAttributes,
-} from "react";
-import { Brand as SharedBrand } from "@clinic/ui";
-import { X } from "lucide-react";
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  EmptyState,
+  Muted,
+  Note,
+  PageHeading,
+  Panel,
+  StatCard,
+  StatusBadge,
+  SwitchRow,
+  TextAreaField,
+  TextField,
+} from "@clinic/ui";
 import { useDemo } from "../lib/demo/provider";
 export function Brand() {
-  return <SharedBrand href="/voice-receptionist" />;
+  return (
+    <a
+      className="focus-ring flex items-center gap-[9px] px-[7px] text-[29px] font-[750] tracking-[-1.2px] max-app:text-[24px]"
+      href="/voice-receptionist"
+    >
+      <img
+        className="shrink-0 object-contain"
+        src="/brand/avishkar-logo.png"
+        alt=""
+        width={34}
+        height={34}
+      />
+      avishkar
+    </a>
+  );
 }
-export { Field, Select, FormError } from "@clinic/ui";
+export { Dialog, Dropdown, Tabs } from "@clinic/ui";
+export {
+  EmptyState as Empty,
+  SwitchRow as Switch,
+  TextAreaField as Textarea,
+  TextField as Field,
+};
+
+/** An error message above or below a form, shown only when there is one. */
+export function FormError({ message }: { message?: string }) {
+  return message ? <Alert>{message}</Alert> : null;
+}
 export function Heading({
   title,
   description,
@@ -27,174 +59,49 @@ export function Heading({
 }) {
   return (
     <>
-      <div className="heading">
-        <div>
-          <h1>{title}</h1>
-          <p>{description}</p>
-        </div>
-        {actions && <div className="actions">{actions}</div>}
-      </div>
+      <PageHeading title={title} description={description} actions={actions} />
       {demo && (
-        <div className="note demo-notice" role="note">
+        <Note className="mb-[18px]" role="note">
           <strong>Demo section.</strong> This page shows sample data and is not
           connected to real calls yet.
-        </div>
+        </Note>
       )}
     </>
   );
 }
 export function Badge({ children }: { children: string }) {
-  return (
-    <span
-      className={`badge ${["Draft", "Unassigned", "Disabled", "Archived"].includes(children) ? "neutral" : ["Failed", "Error"].includes(children) ? "bad" : "pale"}`}
-    >
-      {children}
-    </span>
-  );
-}
-export function Textarea({
-  label,
-  ...props
-}: TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string }) {
-  const id = useId();
-  return (
-    <div className="field">
-      <label htmlFor={id}>{label}</label>
-      <textarea {...props} id={id} />
-    </div>
-  );
-}
-export function Tabs({
-  tabs,
-  value,
-  onChange,
-}: {
-  tabs: string[];
-  value: string;
-  onChange: (tab: string) => void;
-}) {
-  const refs = useRef<(HTMLButtonElement | null)[]>([]);
-  const id = useId();
-  return (
-    <div className="tabs" role="tablist" aria-label="Section tabs">
-      {tabs.map((tab, index) => (
-        <button
-          key={tab}
-          id={`${id}-${index}`}
-          ref={(node) => {
-            refs.current[index] = node;
-          }}
-          role="tab"
-          aria-selected={value === tab}
-          tabIndex={value === tab ? 0 : -1}
-          className={value === tab ? "selected" : ""}
-          onClick={() => onChange(tab)}
-          onKeyDown={(event) => {
-            let target: number | undefined;
-            if (event.key === "ArrowRight") target = (index + 1) % tabs.length;
-            if (event.key === "ArrowLeft")
-              target = (index - 1 + tabs.length) % tabs.length;
-            if (event.key === "Home") target = 0;
-            if (event.key === "End") target = tabs.length - 1;
-            if (target !== undefined) {
-              event.preventDefault();
-              const selected = tabs[target];
-              if (selected !== undefined) onChange(selected);
-              refs.current[target]?.focus();
-            }
-          }}
-        >
-          {tab}
-        </button>
-      ))}
-    </div>
-  );
-}
-export function Dialog({
-  title,
-  children,
-  onClose,
-}: {
-  title: string;
-  children: ReactNode;
-  onClose: () => void;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
-  useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
-    const dialog = ref.current;
-    dialog?.showModal();
-    dialog?.querySelector<HTMLElement>("input, select, textarea")?.focus();
-    return () => {
-      dialog?.close();
-      previous?.focus();
-    };
-  }, []);
-  return (
-    <dialog
-      ref={ref}
-      aria-labelledby={titleId}
-      onCancel={onClose}
-      onClick={(event) => {
-        if (event.target === ref.current) {
-          const rect = ref.current.getBoundingClientRect();
-          if (
-            event.clientX < rect.left ||
-            event.clientX > rect.right ||
-            event.clientY < rect.top ||
-            event.clientY > rect.bottom
-          )
-            onClose();
-        }
-      }}
-    >
-      <div className="dialog-title">
-        <h2 id={titleId}>{title}</h2>
-        <button type="button" aria-label="Close dialog" onClick={onClose}>
-          <X size={18} />
-        </button>
-      </div>
-      {children}
-    </dialog>
-  );
-}
-
-export function Empty({
-  title,
-  description,
-}: {
-  title: string;
-  description?: string;
-}) {
-  return (
-    <div className="empty">
-      <h2>{title}</h2>
-      {description && <p>{description}</p>}
-    </div>
-  );
+  const tone = ["Draft", "Unassigned", "Disabled", "Archived"].includes(
+    children,
+  )
+    ? "muted"
+    : ["Failed", "Error"].includes(children)
+      ? "danger"
+      : "brand";
+  return <StatusBadge tone={tone}>{children}</StatusBadge>;
 }
 export function DemoBoundary({ children }: { children: ReactNode }) {
   const { state, error, retry } = useDemo();
   if (!state)
     return (
-      <div className="panel">
+      <Panel>
         {error ? (
           <>
-            <p role="alert">{error}</p>
-            <button onClick={retry}>Retry</button>
+            <Alert>{error}</Alert>
+            <Button variant="outline" onClick={retry}>
+              Retry
+            </Button>
           </>
         ) : (
-          <p role="status">Loading demo workspace…</p>
+          <Muted role="status">Loading demo workspace…</Muted>
         )}
-      </div>
+      </Panel>
     );
   return (
     <>
       {error && (
-        <div className="note error-note" role="alert">
+        <Note className="mb-[18px]" role="alert">
           {error}
-        </div>
+        </Note>
       )}
       {children}
     </>
@@ -212,38 +119,7 @@ export function Metric({
   feature?: boolean;
 }) {
   return (
-    <div className={`card metric ${feature ? "feature" : ""}`}>
-      <span className="metric-label">{label}</span>
-      <div className="value">{value}</div>
-      <small>{sub}</small>
-    </div>
-  );
-}
-export function Switch({
-  label,
-  description,
-  checked,
-  onChange,
-}: {
-  label: string;
-  description: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}) {
-  const id = useId();
-  return (
-    <div className="checkrow">
-      <label htmlFor={id}>
-        <strong>{label}</strong>
-        <p>{description}</p>
-      </label>
-      <input
-        id={id}
-        type="checkbox"
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-      />
-    </div>
+    <StatCard label={label} value={value} hint={sub} highlight={feature} />
   );
 }
 export function ResetDemo() {
@@ -251,17 +127,21 @@ export function ResetDemo() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button onClick={() => setOpen(true)}>Reset demo</button>
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        Reset demo
+      </Button>
       {open && (
         <Dialog title="Reset sample workspace?" onClose={() => setOpen(false)}>
-          <p>
+          <Muted>
             This clears changes made during this preview and restores the sample
             records.
-          </p>
-          <div className="actions dialog-actions">
-            <button onClick={() => setOpen(false)}>Cancel</button>
-            <button
-              className="primary"
+          </Muted>
+          <DialogActions>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="brand"
               disabled={busy}
               onClick={async () => {
                 if (await run({ type: "reset" }, "Sample workspace restored"))
@@ -269,8 +149,8 @@ export function ResetDemo() {
               }}
             >
               Reset demo
-            </button>
-          </div>
+            </Button>
+          </DialogActions>
         </Dialog>
       )}
     </>

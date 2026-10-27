@@ -28,15 +28,16 @@ async function createAgent(page: Page, name: string) {
   await dialog
     .getByRole("button", { name: "Create agent", exact: true })
     .click();
-  await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
+  // Creating adds the tool, saves the agent and opens its page, which a cold dev server compiles on first visit.
+  await expect(page.getByRole("heading", { name, exact: true })).toBeVisible(
+    CALL,
+  );
 }
 
 /** Opens Test studio, calls the agent, lets the scripted caller give details, and hangs up. */
 async function takeTestCall(page: Page, agentName: string) {
   await page.getByRole("link", { name: "Test studio", exact: true }).click();
-  await page
-    .getByLabel("Agent", { exact: true })
-    .selectOption({ label: agentName });
+  await choose(page, "Agent", agentName);
   await page.getByRole("button", { name: "Start test call" }).click();
   await expect(page.getByTestId("captured-fields")).toContainText(
     "Sam Lee",
@@ -148,7 +149,7 @@ test("create, edit and save an agent, take a test call, review it and route a nu
   await expect(page.getByRole("tabpanel")).toContainText("create_lead");
   await expect(page.getByRole("tabpanel")).toContainText("+14155550123");
   await page.getByRole("tab", { name: "Raw responses" }).click();
-  await expect(page.locator(".raw-events")).toContainText("turn_complete");
+  await expect(page.getByTestId("raw-events")).toContainText("turn_complete");
 
   await page.getByRole("link", { name: "Phone numbers", exact: true }).click();
   await page
@@ -158,10 +159,11 @@ test("create, edit and save an agent, take a test call, review it and route a nu
     .getByRole("dialog")
     .getByLabel("Phone number (E.164)")
     .fill("+919876543210");
-  await page
-    .getByRole("dialog")
-    .getByLabel("Assigned agent")
-    .selectOption({ label: "Pilot receptionist" });
+  await choose(
+    page.getByRole("dialog"),
+    "Assigned agent",
+    "Pilot receptionist",
+  );
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Save routing" })
@@ -185,16 +187,16 @@ test("the agent editor checks values before saving and keeps unsaved edits from 
   await createAgent(page, "Careful agent");
   await page.getByLabel("Agent name").fill("");
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
-  await expect(page.locator(".form-error")).toContainText(
-    "Give the agent a name.",
-  );
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Give the agent a name." }),
+  ).toBeVisible();
   await page.getByLabel("Agent name").fill("Careful agent");
   await page.getByRole("tab", { name: "What to capture" }).click();
   await page.getByRole("button", { name: "Add field" }).click();
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
-  await expect(page.locator(".form-error")).toContainText(
-    "Every field needs a label.",
-  );
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Every field needs a label." }),
+  ).toBeVisible();
   await page
     .getByTestId("capture-field")
     .last()
@@ -206,41 +208,226 @@ test("the agent editor checks values before saving and keeps unsaved edits from 
   await expect(page.getByLabel("Save the transcript")).toBeChecked();
 });
 
-test("variables persist and reset preserves authenticated workspace", async ({
+test("a recording agent keeps the call audio, which plays back in call history beside the transcript", async ({
+  page,
+}) => {
+  await createAgent(page, "Recorded line");
+  await page.getByRole("tab", { name: "Data & privacy" }).click();
+  const record = page.getByLabel("Record the call");
+  await expect(record).not.toBeChecked(); // off unless chosen
+  await record.check();
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Agent saved");
+
+  await takeTestCall(page, "Recorded line");
+  await page.getByRole("link", { name: "View saved call" }).click();
+  await expect(
+    page.getByText("Thanks Sam, I have your details."),
+  ).toBeVisible();
+  await expect(page.locator("audio")).toHaveCount(0); // nothing is downloaded until someone presses Play
+  await page.getByRole("button", { name: "Play recording" }).click();
+  const audio = page.locator("audio");
+  await expect(audio).toHaveCount(1, CALL);
+  await expect(
+    page.getByRole("button", { name: "Pause recording" }),
+  ).toBeVisible(CALL); // it started playing
+  await expect(page.getByLabel("Seek")).toBeEnabled();
+  await expect(page.locator("a[download], [download]")).toHaveCount(0); // no way to download it from the page
+  await page.getByRole("button", { name: /Playback speed 1×/ }).click();
+  await expect(
+    page.getByRole("button", { name: /Playback speed 1.25×/ }),
+  ).toBeVisible();
+  expect(await audio.evaluate((el: HTMLAudioElement) => el.playbackRate)).toBe(
+    1.25,
+  );
+  expect(await audio.evaluate((el: HTMLAudioElement) => el.controls)).toBe(
+    false,
+  );
+  const bytes = await audio.evaluate(async (el: HTMLAudioElement) => {
+    const blob = await (await fetch(el.src)).blob();
+    return new Uint8Array(await blob.arrayBuffer()).slice(0, 4);
+  });
+  expect(String.fromCharCode(...bytes)).toBe("RIFF");
+});
+
+test("an agent that does not record leaves no player in call history", async ({
+  page,
+}) => {
+  await createAgent(page, "Unrecorded line");
+  await takeTestCall(page, "Unrecorded line");
+  await page.getByRole("link", { name: "View saved call" }).click();
+  await expect(
+    page.getByText("Thanks Sam, I have your details."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Play recording" }),
+  ).toHaveCount(0);
+});
+
+test("selects are the app's own dropdown: styled list, keyboard and form use", async ({
+  page,
+}) => {
+  await createAgent(page, "First agent");
+  await createAgent(page, "Second agent");
+  await page.getByRole("link", { name: "Test studio", exact: true }).click();
+  const agent = page.getByRole("combobox", { name: "Agent" });
+  await expect(page.locator("select")).toHaveCount(0); // no browser-native menus on this screen
+  await agent.click();
+  await expect(page.getByRole("listbox")).toBeVisible();
+  await expect(page.getByRole("option")).toHaveCount(2);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+  await agent.focus();
+  await page.keyboard.press("ArrowDown"); // opens
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+  const chosen = await agent.innerText();
+  expect(["First agent", "Second agent"]).toContain(chosen.trim());
+  // Inside a form (Create agent): the choice is submitted through the hidden input.
+  await page.goto("/voice-receptionist/agents");
+  await page.getByRole("button", { name: "Create agent", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Agent name").fill("From a dropdown");
+  await choose(dialog, "Purpose", "Enquiry assistant");
+  await dialog
+    .getByRole("button", { name: "Create agent", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "From a dropdown", exact: true }),
+  ).toBeVisible(CALL);
+});
+
+test("variables: add, edit, use in a prompt, refuse unknown names, block deleting one in use", async ({
   page,
 }) => {
   await page.goto("/voice-receptionist/variables");
+  await expect(
+    page.getByRole("heading", { name: "No variables yet" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: "{{clinic_name}}" }),
+  ).toBeVisible(); // built in, listed for reference
+
   await page.getByRole("button", { name: "Add variable" }).click();
-  await page
-    .getByRole("dialog")
-    .getByLabel("Name", { exact: true })
-    .fill("company_name");
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Name", { exact: true }).fill("clinic_name");
+  await dialog.getByLabel("Value", { exact: true }).fill("Duplicate");
+  await dialog.getByRole("button", { name: "Save variable" }).click();
+  await expect(dialog.getByRole("alert")).toContainText("built in");
+  await dialog.getByLabel("Name", { exact: true }).fill("hours");
+  await dialog
+    .getByLabel("Value", { exact: true })
+    .fill("Monday to Friday, 9 to 5");
+  await dialog.getByRole("button", { name: "Save variable" }).click();
+  const row = page.getByRole("row", { name: /\{\{hours\}\}/ });
+  await expect(row).toContainText("Monday to Friday, 9 to 5");
+  await expect(row).toContainText("No agent");
+
+  await page.getByRole("button", { name: "Edit hours" }).click();
+  await expect(page.getByRole("dialog")).toContainText("cannot be changed");
   await page
     .getByRole("dialog")
     .getByLabel("Value", { exact: true })
-    .fill("Duplicate");
+    .fill("Daily, 8 to 6");
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Save variable" })
     .click();
-  await expect(page.getByRole("dialog").getByRole("alert")).toHaveText(
-    "A variable with this name already exists.",
+  await expect(row).toContainText("Daily, 8 to 6");
+
+  await createAgent(page, "Hours agent");
+  await expect(page.getByTestId("variable-hint")).toContainText("{{hours}}");
+  await page.getByLabel("System prompt").fill("We are open {{hourz}}.");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Unknown variables: {{hourz}}" }),
+  ).toBeVisible();
+  await page
+    .getByLabel("System prompt")
+    .fill("We are open {{hours}} at {{clinic_name}}.");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Agent saved");
+
+  await page.getByRole("link", { name: "Variables", exact: true }).click();
+  await expect(row).toContainText("Hours agent");
+  await page.getByRole("button", { name: "Delete hours" }).click();
+  await page.getByRole("button", { name: "Delete variable" }).click();
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Used by Hours agent" }),
+  ).toBeVisible();
+  await expect(row).toBeVisible();
+
+  await page.getByRole("link", { name: "Voice agents", exact: true }).click();
+  await page.getByRole("link", { name: "Open agent" }).click();
+  await page.getByLabel("System prompt").fill("No variables here.");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Agent saved");
+  await page.getByRole("link", { name: "Variables", exact: true }).click();
+  await page.getByRole("button", { name: "Delete hours" }).click();
+  await page.getByRole("button", { name: "Delete variable" }).click();
+  await expect(row).toHaveCount(0);
+});
+
+test("knowledge base: upload, see it become ready, replace, and delete", async ({
+  page,
+}) => {
+  const name = `hours-${Date.now()}.txt`;
+  const text = (words: string) => Buffer.from(`Opening hours\n\n${words}`);
+  await page.goto("/voice-receptionist");
+  await page.getByRole("link", { name: "Knowledge base", exact: true }).click();
+  await page.getByLabel("Choose a file").setInputFiles({
+    name,
+    mimeType: "text/plain",
+    buffer: text(`We are open nine to five. ${name}`),
+  });
+  const row = page.getByRole("row").filter({ hasText: name });
+  await expect(row).toContainText("Ready", CALL);
+
+  // Test search shows what an agent would find, and says so when nothing fits.
+  await page.getByLabel("Question").fill("we are open nine to five");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await expect(page.getByTestId("search-result").first()).toContainText(
+    name,
+    CALL,
   );
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Cancel" })
-    .click();
-  await page.getByRole("button", { name: "Edit company_name" }).click();
-  await page
-    .getByRole("dialog")
-    .getByLabel("Value", { exact: true })
-    .fill("Demo Clinic");
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Save variable" })
-    .click();
-  await expect(page.locator("pre").last()).toContainText("Demo Clinic");
-  await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await page.getByLabel("Question").fill("quantum chromodynamics lattice");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await expect(page.getByText("Nothing in your documents")).toBeVisible();
+
+  // The same file again is refused in plain words.
+  await page.getByLabel("Choose a file").setInputFiles({
+    name: `copy-${name}`,
+    mimeType: "text/plain",
+    buffer: text(`We are open nine to five. ${name}`),
+  });
+  await expect(
+    page
+      .getByRole("alert")
+      .filter({ hasText: "already in your knowledge base" }),
+  ).toBeVisible();
+
+  // A different file with the same name asks what to do.
+  await page.getByLabel("Choose a file").setInputFiles({
+    name,
+    mimeType: "text/plain",
+    buffer: text(`Now open until six. ${name}`),
+  });
+  await page.getByRole("button", { name: "Replace", exact: true }).click();
+  // The old file is removed once the new one is ready; reload so the list is the server's, not a stale view.
+  await expect(async () => {
+    await page.reload();
+    await expect(row).toHaveCount(1, { timeout: 2_000 });
+    await expect(row).toContainText("Ready", { timeout: 2_000 });
+  }).toPass(CALL);
+
+  await page.getByRole("button", { name: `Delete ${name}` }).click();
+  await page.getByRole("button", { name: "Delete document" }).click();
+  await expect(row).toHaveCount(0);
+});
+
+test("reset demo keeps the signed-in workspace", async ({ page }) => {
+  await page.goto("/voice-receptionist/settings");
   await expect(page.getByTestId("clinic-name")).toContainText(
     "Browser Practice",
   );
@@ -294,7 +481,7 @@ test("tools: add internal and external tools, validation, a real test run, attac
   await expect(picker.getByRole("listbox")).toHaveCount(0);
   await expect(picker).toBeVisible();
   await picker.getByRole("button", { name: "Add tool" }).click();
-  const update = page.locator("section.panel").filter({
+  const update = page.getByTestId("tool-card").filter({
     has: page.getByRole("heading", { name: "update_lead", exact: true }),
   });
   await expect(update).toContainText("never creates a lead");
@@ -307,10 +494,10 @@ test("tools: add internal and external tools, validation, a real test run, attac
   await expect(
     page.getByRole("button", { name: "View input schema" }),
   ).toHaveCount(0);
-  await expect(page.locator("pre.code")).toHaveCount(0);
+  await expect(page.locator("pre")).toHaveCount(0);
 
   // A built-in tool's wording can be changed, and put back.
-  const lead = page.locator("section.panel").filter({
+  const lead = page.getByTestId("tool-card").filter({
     has: page.getByRole("heading", { name: "create_lead", exact: true }),
   });
   await lead.getByRole("button", { name: "Edit description" }).click();
@@ -352,14 +539,14 @@ test("tools: add internal and external tools, validation, a real test run, attac
   await dialog.getByLabel("Auth header value").fill("secret-123");
   await dialog.getByRole("button", { name: "Save tool" }).click();
 
-  const panel = page.locator("section.panel").filter({
+  const panel = page.getByTestId("tool-card").filter({
     has: page.getByRole("heading", { name: "lookup_hours", exact: true }),
   });
   await expect(panel).toBeVisible();
   await expect(panel).toContainText("X-Api-Key (saved)");
   await expect(page.getByText("secret-123")).toHaveCount(0); // the value is never shown again
 
-  await expect(page.locator("pre.code")).toHaveCount(0); // schemas stay tucked away until asked for
+  await expect(page.locator("pre")).toHaveCount(0); // schemas stay tucked away until asked for
   await panel.getByRole("button", { name: "View input schema" }).click();
   await expect(page.getByRole("dialog")).toContainText('"day"');
   await page.keyboard.press("Escape");
@@ -409,11 +596,11 @@ test("call filters, CSV download and missing record states", async ({
     .getByRole("textbox", { name: "Search calls" })
     .fill("Filter agent");
   await expect(page.locator("tbody tr")).toHaveCount(1);
-  await page.getByLabel("Filter call status").selectOption("Failed");
+  await choose(page, "Filter call status", "Failed");
   await expect(
     page.getByRole("heading", { name: "No calls match your filters" }),
   ).toBeVisible();
-  await page.getByLabel("Filter call status").selectOption("all");
+  await choose(page, "Filter call status", "All statuses");
   const downloadEvent = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export CSV" }).click();
   const download = await downloadEvent;
@@ -510,27 +697,26 @@ test("original voice shell and platform return work across screen sizes", async 
   for (const width of [1440, 820, 390]) {
     await page.setViewportSize({ width, height: 950 });
     await page.goto("/voice-receptionist");
-    await expect(page.locator(".sidebar .brand")).toBeVisible();
+    await expect(page.getByTestId("voice-sidebar")).toBeVisible();
     await expect(
       page.getByRole("navigation", { name: "Workspace navigation" }),
     ).toBeVisible();
-    await expect(page.locator(".shell header .breadcrumb")).toContainText(
+    await expect(page.getByTestId("voice-breadcrumb")).toContainText(
       "Overview",
     );
     await expect(
       page.getByRole("link", { name: "Always-On Clinic", exact: true }),
     ).toHaveCount(0);
-    await expect(page.locator(".voice-navigation")).toHaveCount(0);
     if (width > 700) {
       await expect(page.getByTestId("clinic-name")).toHaveText(
         "Browser Practice",
       );
-      const sidebar = await page.locator(".sidebar").boundingBox();
-      const main = await page.locator(".shell main").boundingBox();
+      const sidebar = await page.getByTestId("voice-sidebar").boundingBox();
+      const main = await page.getByTestId("voice-main").boundingBox();
       expect(main!.x).toBeGreaterThanOrEqual(sidebar!.x + sidebar!.width);
       expect(
         await page
-          .locator(".voice-scope")
+          .getByTestId("voice-app")
           .evaluate((el) => getComputedStyle(el).zoom),
       ).toBe("0.9");
     }
@@ -552,5 +738,5 @@ test("original voice shell and platform return work across screen sizes", async 
   await page
     .getByRole("link", { name: "Voice Receptionist", exact: true })
     .click();
-  await expect(page.locator(".sidebar .brand")).toBeVisible();
+  await expect(page.getByTestId("voice-sidebar")).toBeVisible();
 });

@@ -16,16 +16,33 @@ import {
 import { EMPTY_SCHEMA, sampleInput, toToolInput } from "../lib/inbound/tools";
 import { dateLabel } from "../lib/format";
 import {
+  Avatar,
+  Button,
+  buttonStyles,
+  CheckboxField,
+  CodeBlock,
+  DialogActions,
+  FooterRow,
+  footerRowStyles,
+  H2,
+  Muted,
+  Note,
+  Panel,
+  SummaryList,
+  TwoColumns,
+  WideSplit,
+} from "@clinic/ui";
+import {
   Heading,
   Badge,
   Dialog,
+  Dropdown,
   Field,
   Textarea,
   Switch,
   FormError,
   Empty,
 } from "./ui";
-import { Dropdown } from "./dropdown";
 import { VoiceBoundary } from "./voice-boundary";
 
 export function Tools() {
@@ -98,138 +115,134 @@ function ToolList() {
         title="Tools"
         description="Give agents safe, structured actions to perform during a call."
         actions={
-          <button className="primary" onClick={() => setAdding(true)}>
+          <Button variant="brand" onClick={() => setAdding(true)}>
             <Plus size={16} />
             Add tool
-          </button>
+          </Button>
         }
       />
       <FormError message={error} />
       {tools.length === 0 && (
-        <section className="panel">
+        <Panel>
           <Empty
             title="No tools yet"
             description="Add an internal tool, such as Create lead, or connect your own API."
           />
-        </section>
+        </Panel>
       )}
-      <div className="tool-list">
+      <div className="grid gap-5">
         {tools.map((tool) => {
           const custom = tool.kind === "http";
           const uses = agents.filter((a) =>
             a.tool_ids?.includes(tool.id),
           ).length;
           return (
-            <section className="panel" key={tool.id}>
-              <div className="panelHead">
-                <div className="inline">
-                  <div className="avatar">
+            <Panel key={tool.id} data-testid="tool-card">
+              <div className="mb-5 flex items-center justify-between gap-3 max-app:flex-wrap">
+                <div className="flex items-center gap-2.5 max-app:flex-wrap">
+                  <Avatar>
                     <Code size={20} />
-                  </div>
+                  </Avatar>
                   <div>
-                    <h2>{tool.name}</h2>
-                    <p>{tool.description}</p>
+                    <H2 className="shrink-0">{tool.name}</H2>
+                    <Muted>{tool.description}</Muted>
                   </div>
                 </div>
                 <Badge>{tool.enabled ? "Enabled" : "Disabled"}</Badge>
               </div>
-              <div className="summarylist">
-                <div>
-                  <span>Type</span>
-                  <strong>{custom ? "Custom API" : "Built in"}</strong>
-                </div>
-                {!custom && (
-                  <div>
-                    <span>Description</span>
-                    <strong>
-                      {tool.description_customized
-                        ? "Custom wording"
-                        : "Default wording"}
-                    </strong>
-                  </div>
-                )}
-                <div>
-                  <span>{custom ? "Endpoint" : "Runs"}</span>
-                  <strong className="wrap-text">
-                    {custom
+              <SummaryList
+                items={[
+                  ["Type", custom ? "Custom API" : "Built in"],
+                  ...(!custom
+                    ? ([
+                        [
+                          "Description",
+                          tool.description_customized
+                            ? "Custom wording"
+                            : "Default wording",
+                        ],
+                      ] as [string, string][])
+                    : []),
+                  [
+                    custom ? "Endpoint" : "Runs",
+                    custom
                       ? `${tool.method} ${tool.endpoint}`
-                      : "Inside the platform"}
-                  </strong>
-                </div>
-                {custom && (
-                  <>
-                    <div>
-                      <span>Timeout</span>
-                      <strong>{tool.timeout_seconds} seconds</strong>
-                    </div>
-                    <div>
-                      <span>Retries</span>
-                      <strong>GET once · POST never</strong>
-                    </div>
-                    <div>
-                      <span>Auth header</span>
-                      <strong>
-                        {tool.has_auth
-                          ? `${tool.auth_header_name} (saved)`
-                          : "None"}
-                      </strong>
-                    </div>
-                  </>
-                )}
-              </div>
+                      : "Inside the platform",
+                  ],
+                  ...(custom
+                    ? ([
+                        ["Timeout", `${tool.timeout_seconds} seconds`],
+                        ["Retries", "GET once · POST never"],
+                        [
+                          "Auth header",
+                          tool.has_auth
+                            ? `${tool.auth_header_name} (saved)`
+                            : "None",
+                        ],
+                      ] as [string, string][])
+                    : []),
+                ]}
+              />
               <Switch
                 label="Enable tool"
                 description="When off, agents cannot use this tool, even mid-call."
                 checked={tool.enabled}
                 onChange={(enabled) => void toggle(tool, enabled)}
               />
-              <div className="rowline">
+              <FooterRow>
                 <span>
                   Used by {uses} {uses === 1 ? "agent" : "agents"}
                 </span>
-                <div className="actions">
+                <div className="flex items-center gap-2.5">
                   {!custom && (
-                    <button onClick={() => setRewording(tool)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setRewording(tool)}
+                    >
                       Edit description
-                    </button>
+                    </Button>
                   )}
                   {custom && (
-                    <button onClick={() => setViewing(tool)}>
+                    <Button variant="outline" onClick={() => setViewing(tool)}>
                       View input schema
-                    </button>
+                    </Button>
                   )}
-                  <button onClick={() => setDeleting(tool)}>
+                  <Button variant="outline" onClick={() => setDeleting(tool)}>
                     {custom ? "Delete" : "Remove"}
-                  </button>
+                  </Button>
                   {custom && (
                     <>
-                      <button onClick={() => setEditing(tool)}>
+                      <Button
+                        variant="outline"
+                        onClick={() => setEditing(tool)}
+                      >
                         Configure
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="outline"
                         disabled={!tool.enabled}
                         onClick={() => setTesting(tool)}
                       >
                         Test tool
-                      </button>
+                      </Button>
                     </>
                   )}
                 </div>
-              </div>
-            </section>
+              </FooterRow>
+            </Panel>
           );
         })}
       </div>
-      <div className="two spaced">
-        <section className="panel">
-          <h2>Execution history</h2>
+      <WideSplit className="mt-5">
+        <Panel>
+          <H2>Execution history</H2>
           {executions === null ? (
-            <p role="status">Loading…</p>
+            <Muted role="status">Loading…</Muted>
           ) : executions.length ? (
             executions.map((e) => (
               <Link
                 key={e.id}
-                className="rowline"
+                className={footerRowStyles}
                 href={`/voice-receptionist/calls/${e.call_id}`}
               >
                 <span>
@@ -245,10 +258,10 @@ function ToolList() {
               description="When an agent uses a tool during a call, it is listed here."
             />
           )}
-        </section>
-        <section className="panel">
-          <h2>How tools stay safe</h2>
-          <ul className="plain-list">
+        </Panel>
+        <Panel>
+          <H2>How tools stay safe</H2>
+          <ul className="mb-0 mt-2 grid list-disc gap-2 pl-[18px] text-[14px] text-muted">
             <li>
               Calls only go to public HTTPS addresses. Internal and private
               addresses are blocked.
@@ -261,8 +274,8 @@ function ToolList() {
               Every run is saved with the call, with its input and result.
             </li>
           </ul>
-        </section>
-      </div>
+        </Panel>
+      </WideSplit>
       {editing && (
         <ToolDialog
           tool={editing}
@@ -313,18 +326,18 @@ function ToolList() {
           title={`Input schema: ${viewing.name}`}
           onClose={() => setViewing(null)}
         >
-          <p className="muted">
+          <Muted>
             The arguments the agent supplies when it uses this tool. Anything
             else it sends is dropped before the tool runs.
-          </p>
-          <pre className="code schema-view" tabIndex={0}>
+          </Muted>
+          <CodeBlock className="max-h-[55vh] overflow-auto" tabIndex={0}>
             {JSON.stringify(viewing.input_schema, null, 2)}
-          </pre>
-          <div className="actions dialog-actions">
-            <button className="primary" onClick={() => setViewing(null)}>
+          </CodeBlock>
+          <DialogActions>
+            <Button variant="brand" onClick={() => setViewing(null)}>
               Done
-            </button>
-          </div>
+            </Button>
+          </DialogActions>
         </Dialog>
       )}
       {deleting && (
@@ -332,21 +345,23 @@ function ToolList() {
           title={`${deleting.kind === "http" ? "Delete" : "Remove"} ${deleting.name}?`}
           onClose={() => setDeleting(null)}
         >
-          <p>
+          <Muted>
             Agents stop using this tool. Past runs keep its name in call
             history.
             {deleting.kind === "http" ? "" : " You can add it again later."}
-          </p>
-          <div className="actions dialog-actions">
-            <button onClick={() => setDeleting(null)}>Cancel</button>
-            <button
-              className="primary"
+          </Muted>
+          <DialogActions>
+            <Button variant="outline" onClick={() => setDeleting(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="brand"
               disabled={busy}
               onClick={() => void remove(deleting)}
             >
               {deleting.kind === "http" ? "Delete tool" : "Remove tool"}
-            </button>
-          </div>
+            </Button>
+          </DialogActions>
         </Dialog>
       )}
     </>
@@ -425,7 +440,7 @@ function AddToolDialog({
       ) : (
         <>
           {catalog === null ? (
-            <p role="status">Loading…</p>
+            <Muted role="status">Loading…</Muted>
           ) : (
             <>
               <Dropdown
@@ -439,21 +454,19 @@ function AddToolDialog({
                 }))}
                 onChange={setChoice}
               />
-              {picked && !picked.added && (
-                <p className="muted">{picked.description}</p>
-              )}
+              {picked && !picked.added && <Muted>{picked.description}</Muted>}
               {catalog.every((i) => i.added) && (
-                <p className="muted">Every internal tool is already added.</p>
+                <Muted>Every internal tool is already added.</Muted>
               )}
             </>
           )}
           <FormError message={error} />
-          <div className="actions dialog-actions">
-            <button type="button" onClick={onClose}>
+          <DialogActions>
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
-            </button>
-            <button
-              className="primary"
+            </Button>
+            <Button
+              variant="brand"
               disabled={busy || !picked || picked.added}
               onClick={async () => {
                 setBusy(true);
@@ -471,8 +484,8 @@ function AddToolDialog({
               }}
             >
               Add tool
-            </button>
-          </div>
+            </Button>
+          </DialogActions>
         </>
       )}
     </Dialog>
@@ -544,7 +557,7 @@ function ExternalForm({
         <Textarea
           label="Description (tells the agent when to use it)"
           name="description"
-          className="short-textarea"
+          compact
           required
           defaultValue={tool?.description ?? ""}
         />
@@ -555,11 +568,11 @@ function ExternalForm({
           placeholder="https://api.example.com/leads"
           defaultValue={tool?.endpoint ?? ""}
         />
-        <small>
+        <small className="block text-[12px] text-muted">
           Public HTTPS addresses only. Private and internal addresses are
           blocked.
         </small>
-        <div className="formtwo">
+        <TwoColumns>
           <Dropdown
             label="HTTP method"
             name="method"
@@ -579,8 +592,8 @@ function ExternalForm({
             required
             defaultValue={tool?.timeout_seconds ?? 5}
           />
-        </div>
-        <div className="formtwo">
+        </TwoColumns>
+        <TwoColumns>
           <Field
             label="Auth header name (optional)"
             name="auth_name"
@@ -596,31 +609,31 @@ function ExternalForm({
               tool?.has_auth ? "Saved. Leave blank to keep it." : "Bearer …"
             }
           />
-        </div>
+        </TwoColumns>
         {tool?.has_auth && (
-          <label className="inline-check">
-            <input type="checkbox" name="clear_auth" />
-            Remove the saved auth header
-          </label>
+          <CheckboxField
+            name="clear_auth"
+            label="Remove the saved auth header"
+          />
         )}
         <Textarea
           label="Input schema"
           name="schema"
-          className="code"
+          code
           required
           defaultValue={
             tool ? JSON.stringify(tool.input_schema, null, 2) : EMPTY_SCHEMA
           }
         />
         <FormError message={error} />
-        <div className="actions dialog-actions">
-          <button type="button" onClick={onClose}>
+        <DialogActions>
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button className="primary" disabled={busy}>
+          </Button>
+          <Button type="submit" variant="brand" disabled={busy}>
             Save tool
-          </button>
-        </div>
+          </Button>
+        </DialogActions>
       </form>
     </>
   );
@@ -643,13 +656,13 @@ function TestDialog({
   const [busy, setBusy] = useState(false);
   return (
     <Dialog title={`Test ${tool.name}`} onClose={onClose}>
-      <div className="note">
+      <Note>
         This sends a real request to {tool.endpoint}. Use sample data, not
         patient details.
-      </div>
+      </Note>
       <Textarea
         label="Sample input (JSON)"
-        className="code"
+        code
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
@@ -657,22 +670,22 @@ function TestDialog({
       {result && (
         <>
           <Badge>{result.ok ? "Success" : "Failed"}</Badge>
-          <p>
+          <Muted>
             {result.status ? `Status ${result.status} · ` : ""}
             {result.duration_ms} ms
             {result.error ? ` · ${result.error}` : ""}
-          </p>
+          </Muted>
           {result.response !== undefined && result.response !== null && (
-            <pre className="code">
-              {JSON.stringify(result.response, null, 2)}
-            </pre>
+            <CodeBlock>{JSON.stringify(result.response, null, 2)}</CodeBlock>
           )}
         </>
       )}
-      <div className="actions dialog-actions">
-        <button onClick={onClose}>Close</button>
-        <button
-          className="primary"
+      <DialogActions>
+        <Button variant="outline" onClick={onClose}>
+          Close
+        </Button>
+        <Button
+          variant="brand"
           disabled={busy}
           onClick={async () => {
             let input: Record<string, unknown>;
@@ -698,8 +711,8 @@ function TestDialog({
           }}
         >
           {busy ? "Running…" : "Run test"}
-        </button>
-      </div>
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
@@ -719,11 +732,11 @@ function WordingDialog({
   const [busy, setBusy] = useState(false);
   return (
     <Dialog title={`Edit description: ${tool.name}`} onClose={onClose}>
-      <p className="muted">
+      <Muted>
         This is what tells the agent when and how to use the tool, so change it
         to match how your clinic works. The name and the arguments stay fixed,
         because they match what the platform saves.
-      </p>
+      </Muted>
       <Textarea
         label="Description"
         value={text}
@@ -731,19 +744,20 @@ function WordingDialog({
         onChange={(e) => setText(e.target.value)}
       />
       <FormError message={error} />
-      <div className="actions dialog-actions">
-        <button
+      <DialogActions>
+        <Button
           type="button"
+          variant="outline"
           disabled={text === fallback}
           onClick={() => setText(fallback)}
         >
           Reset to default
-        </button>
-        <button type="button" onClick={onClose}>
+        </Button>
+        <Button type="button" variant="outline" onClick={onClose}>
           Cancel
-        </button>
-        <button
-          className="primary"
+        </Button>
+        <Button
+          variant="brand"
           disabled={busy}
           onClick={async () => {
             if (!text.trim())
@@ -763,8 +777,8 @@ function WordingDialog({
           }}
         >
           Save description
-        </button>
-      </div>
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }

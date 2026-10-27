@@ -10,11 +10,11 @@ from clinic_api.main import create_app
 from clinic_core.settings import Settings
 
 try:  # Only present when the voice feature is installed. Removing a feature must not break platform tests.
-    from clinic_voice_receptionist.testing import ScriptedConnector
+    from clinic_voice_receptionist.testing import MemoryRecordingStore, ScriptedConnector
 except ModuleNotFoundError as exc:
     if exc.name != "clinic_voice_receptionist":
         raise  # a real import problem inside voice, not its absence
-    ScriptedConnector = None
+    ScriptedConnector = MemoryRecordingStore = None
 
 # Browser tests point custom tools at this server's own /_test/echo, so private addresses must be allowed.
 os.environ.setdefault("VOICE_TOOL_ALLOW_PRIVATE_HOSTS", "true")
@@ -51,6 +51,12 @@ app = create_app(settings, google=BrowserGoogle())
 # Voice calls use a scripted model so browser tests never reach Vertex.
 if ScriptedConnector is not None:
     app.state.voice_connector = ScriptedConnector()
+    app.state.recording_store = MemoryRecordingStore()
+    # Knowledge-base uploads stay in memory and embeddings are fake, so browser tests never reach Google.
+    from clinic_knowledge.testing import FakeEmbedder, MemoryFileStore
+
+    app.state.knowledge_store = MemoryFileStore()
+    app.state.knowledge_embedder = FakeEmbedder()
 
 
 @app.api_route("/_test/echo", methods=["GET", "POST"], include_in_schema=False)

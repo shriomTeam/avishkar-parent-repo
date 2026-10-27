@@ -44,6 +44,9 @@ class Agent(IdMixin, TenantMixin, TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=sql_text("true"))
     save_transcript: Mapped[bool] = mapped_column(Boolean, default=True, server_default=sql_text("true"))
     save_raw_events: Mapped[bool] = mapped_column(Boolean, default=True, server_default=sql_text("true"))
+    save_recording: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=sql_text("false"), comment="Keep the call audio; off unless chosen"
+    )
     created_by_staff_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("core.staff.id", ondelete="SET NULL"))
 
 
@@ -105,6 +108,12 @@ class Call(IdMixin, TenantMixin, TimestampMixin, Base):
     )
     lead_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("core.leads.id", ondelete="SET NULL"))
     patient_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("core.patients.id", ondelete="SET NULL"))
+    recording_object: Mapped[str | None] = mapped_column(
+        String(300), comment="Object name in the files bucket, voice-recordings/<tenant_id>/<call_id>.wav"
+    )
+    recording_status: Mapped[str | None] = mapped_column(
+        String(16), comment="saved or failed; null when the agent did not record this call"
+    )
 
 
 class CallTurn(IdMixin, TenantMixin, Base):
@@ -201,3 +210,13 @@ class ToolExecution(IdMixin, TenantMixin, Base):
     duration_ms: Mapped[int] = mapped_column(Integer)
     idempotency_key: Mapped[str] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Variable(IdMixin, TenantMixin, TimestampMixin, Base):
+    """A fixed value a clinic writes into agent prompts as {{name}}, shared by all its agents."""
+
+    __tablename__ = "variables"
+    __table_args__ = (UniqueConstraint("tenant_id", "name"), SCHEMA)
+
+    name: Mapped[str] = mapped_column(String(64), comment="snake_case, used as {{name}}; never changes after creation")
+    value: Mapped[str] = mapped_column(Text)
