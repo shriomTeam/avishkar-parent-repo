@@ -352,6 +352,28 @@ async def test_the_stream_is_refused_unless_the_ticket_is_for_this_call(client, 
         assert call.status == "failed"
 
 
+async def test_a_browser_test_call_ticket_cannot_open_the_phone_stream(client, monkeypatch):
+    async def fake_run(*args, **kwargs):
+        raise AssertionError("the call must not start")
+
+    monkeypatch.setattr(stream, "run_session", fake_run)
+    tenant = await create_test_tenant(("voice_receptionist",))
+    async with tenant_session(tenant) as s:
+        call = Call(tenant_id=tenant, agent_snapshot={"name": "x"}, channel="browser_test", is_test=True, model="m")
+        s.add(call)
+        await s.flush()
+        call_id = call.id
+    for call_sid in (None, ""):  # the client picks what it sends; none must not match "no provider id"
+        async with tenant_session(tenant) as s:
+            ticket = tickets.mint(await s.get(Call, call_id))  # a ticket works once, so mint a fresh one each time
+        start = {"streamSid": "MZ1", "customParameters": {"ticket": ticket}}
+        if call_sid is not None:
+            start["callSid"] = call_sid
+        ws = FakeSocket(['{"event":"connected"}', json.dumps({"event": "start", "start": start})])
+        await stream.phone_stream(ws)
+        assert ws.closed_with == 1008
+
+
 async def test_a_whole_phone_call_runs_through_the_real_call_engine(client):
     """Simulated Twilio audio in, the scripted model's reply out, and a finished call with a transcript behind it."""
     from clinic_db.models.voice import CallTurn

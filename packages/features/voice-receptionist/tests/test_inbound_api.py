@@ -270,6 +270,18 @@ async def test_calls_without_a_saved_recording_return_404(client, store):
         assert (await client.get(f"/inbound/calls/{call_id}/recording", headers=_h(t))).status_code == 404
 
 
+async def test_phone_calls_do_not_use_up_the_test_call_limit(client, monkeypatch):
+    monkeypatch.setattr(router_module, "MAX_OPEN_TEST_CALLS", 1)
+    t = await create_test_tenant()
+    agent = await _create(client, t)
+    async with tenant_session(t) as s:
+        s.add(Call(tenant_id=t, agent_snapshot={}, channel="twilio", is_test=False, status="in_progress", model="m"))
+    started = await client.post(f"/inbound/agents/{agent['id']}/test-call", headers=_h(t))
+    assert started.status_code == 201  # a live patient call is not a test call
+    again = await client.post(f"/inbound/agents/{agent['id']}/test-call", headers=_h(t))
+    assert again.status_code == 429  # an open test call still is
+
+
 async def test_recording_is_off_by_default_and_a_test_call_needs_storage_to_record(client, monkeypatch):
     monkeypatch.setattr(router_module, "get_voice_settings", lambda: VoiceSettings(recordings_bucket=""))
     t = await create_test_tenant()

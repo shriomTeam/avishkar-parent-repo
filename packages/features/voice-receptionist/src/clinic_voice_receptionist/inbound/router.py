@@ -238,7 +238,9 @@ async def start_test_call(
     now = datetime.now(UTC)
     await expire_stale_calls(session, voice, now)
     open_calls = await session.scalar(
-        select(func.count()).select_from(Call).where(Call.status.in_(("connecting", "in_progress")))
+        select(func.count())
+        .select_from(Call)
+        .where(Call.is_test.is_(True), Call.status.in_(("connecting", "in_progress")))
     )
     if open_calls >= MAX_OPEN_TEST_CALLS:
         raise HTTPException(429, "too many calls in progress; end one and try again")
