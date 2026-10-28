@@ -7,13 +7,16 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
+from sqlalchemy import select
+
 from clinic_core.database import tenant_session
-from clinic_db.models.voice import Tool
+from clinic_db.models.voice import Call, Tool
 from clinic_knowledge.embeddings import Embedder
 from clinic_voice_receptionist.config import get_voice_settings
 from clinic_voice_receptionist.knowledge.lookup import run_search
-from clinic_voice_receptionist.tools import secrets
+from clinic_voice_receptionist.tools import secrets, template
 from clinic_voice_receptionist.tools.builtin import run_lead
+from clinic_voice_receptionist.tools.fill import fill_args
 from clinic_voice_receptionist.tools.http_tool import call_http
 from clinic_voice_receptionist.tools.schema import check_args
 
@@ -38,6 +41,35 @@ def limited(value: dict[str, Any], size: int) -> dict[str, Any]:
     return value if len(text) <= size else {"truncated": True, "text": text[:size]}
 
 
+def missing_response(labels: list[str]) -> dict[str, Any]:
+    return {
+        "ok": False,
+        "missing": labels,
+        "error": f"Still missing: {', '.join(labels)}. Ask the caller, save it with save_caller_details, "
+        "then call this function again.",
+    }
+
+
+def build_request(
+    tool: Tool, args: dict[str, Any], *, values: dict[str, Any], call: dict[str, Any], labels: dict[str, str]
+) -> tuple[template.Rendered | None, dict[str, Any] | None]:
+    """Fill a custom tool's template and endpoint. Returns (request, None), or (None, what to tell the model) when
+    a captured detail or a needed argument is missing. Nothing is sent in that case."""
+    if tool.kind != "http":
+        return None, None
+    try:
+        used = template.inspect(tool.payload_template, tool.endpoint)
+    except template.TemplateError:
+        return None, {"ok": False, "error": "This tool's template is not valid. Ask staff to fix it."}
+    missing = [labels.get(key, key) for key in sorted(used.fields) if key not in values]
+    if missing:
+        return None, missing_response(missing)
+    rendered = template.render(tool.payload_template, tool.endpoint or "", fields=values, args=args, call=call)
+    if rendered.missing_args:
+        return None, {"ok": False, "invalid": {name: "is required" for name in rendered.missing_args}}
+    return rendered, None
+
+
 async def execute(
     tool: Tool,
     args: dict[str, Any],
@@ -47,8 +79,10 @@ async def execute(
     key: str,
     database_url: str | None,
     embedder: Embedder | None = None,
+    request: template.Rendered | None = None,
 ) -> ToolOutcome:
-    """Run ``tool`` with already-validated ``args``. Never raises; failures come back as an outcome."""
+    """Run ``tool`` with already-validated ``args``; ``request`` is a custom tool's filled template.
+    Never raises; failures come back as an outcome."""
     started = time.monotonic()
 
     def finish(success: bool, response: dict[str, Any], error: str | None = None) -> ToolOutcome:
@@ -79,9 +113,9 @@ async def execute(
         if tool.auth_header_name and tool.auth_header_secret:
             auth = (tool.auth_header_name, secrets.decrypt(tool.auth_header_secret))
         result = await call_http(
-            endpoint=tool.endpoint or "",
+            endpoint=request.endpoint if request and request.endpoint else tool.endpoint or "",
             method=tool.method,
-            args=args,
+            args=request.body if request and request.body is not None else args,
             timeout_seconds=tool.timeout_seconds,
             idempotency_key=key,
             auth_header=auth,
@@ -108,8 +142,9 @@ class ToolRunner:
     ):
         self.tenant_id, self.call_id, self._url, self._embedder = tenant_id, call_id, database_url, embedder
 
-    async def run(self, ref: dict, args: dict[str, Any], key: str) -> ToolOutcome:
-        """``ref`` is the tool entry from the call's snapshot; settings are read fresh so edits and disabling apply."""
+    async def run(self, ref: dict, args: dict[str, Any], key: str, values: dict[str, Any] | None = None) -> ToolOutcome:
+        """``ref`` is the tool entry from the call's snapshot; settings are read fresh so edits and disabling apply.
+        ``values`` are the details captured so far, which fill the arguments listed in ``ref["filled"]``."""
         started = time.monotonic()
 
         def refuse(response: dict[str, Any], error: str) -> ToolOutcome:
@@ -126,8 +161,16 @@ class ToolRunner:
             tool = await session.get(Tool, uuid.UUID(ref["id"]))
             if tool is not None:
                 session.expunge(tool)
+            from_number = await session.scalar(select(Call.from_number).where(Call.id == self.call_id))
         if tool is None or not tool.enabled:
             return refuse({"ok": False, "error": "This tool is not available."}, "tool unavailable")
+        cleaned, missing = fill_args(cleaned, ref.get("filled") or {}, values or {})
+        if missing:
+            return refuse(missing_response(missing), "missing details")
+        call = {"id": str(self.call_id), "caller_number": from_number}
+        request, problem = build_request(tool, cleaned, values=values or {}, call=call, labels=ref.get("labels") or {})
+        if problem:
+            return refuse(problem, "missing details" if "missing" in problem else "invalid arguments")
         return await execute(
             tool,
             cleaned,
@@ -136,4 +179,5 @@ class ToolRunner:
             key=key,
             database_url=self._url,
             embedder=self._embedder,
+            request=request,
         )

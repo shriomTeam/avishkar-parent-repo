@@ -18,7 +18,7 @@ from clinic_voice_receptionist.inbound.schemas import (
     ToolTestOut,
 )
 from clinic_voice_receptionist.tools import service
-from clinic_voice_receptionist.tools.runner import execute
+from clinic_voice_receptionist.tools.runner import build_request, execute
 from clinic_voice_receptionist.tools.schema import check_args
 
 router = APIRouter(prefix="/inbound", tags=["voice_receptionist"])
@@ -131,8 +131,23 @@ async def test_tool(
     if errors:
         raise HTTPException(422, "; ".join(f"{path} {message}" for path, message in errors.items()))
     await _audit(session, ctx, "voice.tool.tested", tool.id)
+    request, problem = build_request(
+        tool,
+        args,
+        values=body.field_values,
+        call={"id": "test-call", "caller_number": body.caller_number or "+15555550100"},
+        labels={},
+    )
+    if problem:
+        raise HTTPException(422, problem.get("error") or "; ".join(f"{k} {v}" for k, v in problem["invalid"].items()))
     outcome = await execute(
-        tool, args, tenant_id=ctx.tenant_id, call_id=None, key=f"test:{uuid.uuid4()}", database_url=ctx.database_url
+        tool,
+        args,
+        tenant_id=ctx.tenant_id,
+        call_id=None,
+        key=f"test:{uuid.uuid4()}",
+        database_url=ctx.database_url,
+        request=request,
     )
     return ToolTestOut(
         ok=outcome.success,

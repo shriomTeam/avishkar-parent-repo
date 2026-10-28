@@ -145,8 +145,15 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
     updateTool: (id: string, body: ToolInput) =>
       request<Tool>("PUT", `/tools/${id}`, body),
     deleteTool: (id: string) => request<void>("DELETE", `/tools/${id}`),
-    testTool: (id: string, input: Record<string, unknown>) =>
-      request<ToolTestResult>("POST", `/tools/${id}/test`, { input }),
+    testTool: (
+      id: string,
+      input: Record<string, unknown>,
+      field_values: Record<string, string> = {},
+    ) =>
+      request<ToolTestResult>("POST", `/tools/${id}/test`, {
+        input,
+        field_values,
+      }),
     listExecutions: (limit = 25) =>
       request<ToolExecution[]>("GET", `/tool-executions?limit=${limit}`),
     listVariables: () => request<Variables>("GET", "/variables"),

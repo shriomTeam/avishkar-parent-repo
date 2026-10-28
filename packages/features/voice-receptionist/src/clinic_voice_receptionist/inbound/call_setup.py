@@ -14,6 +14,7 @@ from clinic_db.models.voice import Agent, Call
 from clinic_voice_receptionist.config import VoiceSettings
 from clinic_voice_receptionist.inbound import service
 from clinic_voice_receptionist.inbound.live import tickets
+from clinic_voice_receptionist.tools import fill, template
 from clinic_voice_receptionist.tools.service import refresh_builtins
 from clinic_voice_receptionist.variables import service as variables
 
@@ -46,6 +47,18 @@ async def build_snapshot(
         caller_number=caller_number,
         now=now,
     )
+    field_entries = [
+        {
+            "id": str(f.id),
+            "key": f.key,
+            "label": f.label,
+            "description": f.description,
+            "data_type": f.data_type,
+            "enum_values": f.enum_values,
+            "required": f.required,
+        }
+        for f in fields
+    ]
     return {
         "id": str(agent.id),
         "name": agent.name,
@@ -59,27 +72,33 @@ async def build_snapshot(
         "save_recording": agent.save_recording,
         # Only what the model needs. Endpoints and auth headers stay out of the call record; the runner reads them
         # fresh when a tool runs, so disabling or deleting a tool takes effect even mid-call.
-        "tools": [
-            {
-                "id": str(t.id),
-                "name": t.name,
-                "description": t.description,
-                "kind": t.kind,
-                "schema": t.input_schema,
-                "timeout_seconds": t.timeout_seconds,
-            }
-            for t in tools
-        ],
-        "fields": [
-            {
-                "id": str(f.id),
-                "key": f.key,
-                "label": f.label,
-                "description": f.description,
-                "data_type": f.data_type,
-                "enum_values": f.enum_values,
-                "required": f.required,
-            }
-            for f in fields
-        ],
+        "tools": [_tool_entry(t, field_entries) for t in tools],
+        "fields": field_entries,
+    }
+
+
+def _tool_entry(tool, fields: list[dict]) -> dict:
+    """What the call keeps of a tool. A built-in's arguments that the agent's fields can fill are taken out of
+    the schema the model sees and listed in ``filled``; the runner adds the captured values when it runs."""
+    filled = fill.match_fields(tool.input_schema, fields) if tool.kind == "builtin" else {}
+    schema = fill.model_schema(tool.input_schema, filled)
+    if tool.kind == "http" and tool.payload_template is not None:
+        # The model is only asked for what the template uses; captured details never appear in its argument list.
+        schema = template.model_schema(tool.input_schema, template.inspect(tool.payload_template, tool.endpoint))
+    description = tool.description
+    if filled:
+        names = ", ".join(sorted(filled))
+        description += (
+            f" These details are added automatically from what you saved with save_caller_details, so do not "
+            f"send them yourself: {names}."
+        )
+    return {
+        "id": str(tool.id),
+        "name": tool.name,
+        "description": description,
+        "kind": tool.kind,
+        "schema": schema,
+        "filled": filled,
+        "labels": {f["key"]: f["label"] for f in fields} if tool.kind == "http" else {},
+        "timeout_seconds": tool.timeout_seconds,
     }

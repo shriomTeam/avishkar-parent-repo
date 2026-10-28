@@ -178,6 +178,9 @@ class Tool(IdMixin, TenantMixin, TimestampMixin, Base):
         comment="A clinic edited a built-in tool's description, so code updates must not overwrite it",
     )
     input_schema: Mapped[dict] = mapped_column(JSONB, comment="JSON schema for the arguments the model supplies")
+    payload_template: Mapped[dict | None] = mapped_column(
+        JSONB, comment="Request body with {{field.x}}, {{arg.x}}, {{call.x}} placeholders; null sends the arguments"
+    )
     auth_header_name: Mapped[str | None] = mapped_column(String(64))
     auth_header_secret: Mapped[str | None] = mapped_column(
         Text, comment="Fernet-encrypted header value; never returned"
