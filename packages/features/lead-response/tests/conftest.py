@@ -16,7 +16,7 @@ from clinic_core.settings import REPO_ROOT
 from clinic_core.testing import create_test_tenant
 
 
-def owner_url() -> str:
+def owner_url() -> str | None:
     url = os.environ.get("DATABASE_OWNER_URL")
     if url:
         return url
@@ -24,18 +24,29 @@ def owner_url() -> str:
     for line in env.read_text().splitlines() if env.exists() else []:
         if line.startswith("DATABASE_OWNER_URL="):
             return line.partition("=")[2].strip()
-    raise RuntimeError("DATABASE_OWNER_URL is not set")
+    return None
 
 
 @pytest.fixture(scope="session")
-def owner_engine():
-    engine = create_engine(owner_url())
+def cleanup_engine():
+    """The owner connection, or None. CI's "without voice" step copies the repo without .env and sets no owner URL,
+    so there is no owner role there: cleanup is skipped (a disposable database, and each test uses its own tenants)."""
+    url = owner_url()
+    engine = create_engine(url) if url else None
     yield engine
-    engine.dispose()
+    if engine is not None:
+        engine.dispose()
+
+
+@pytest.fixture(scope="session")
+def owner_engine(cleanup_engine):
+    if cleanup_engine is None:
+        pytest.skip("DATABASE_OWNER_URL is not set; this test needs the owner role")
+    return cleanup_engine
 
 
 @pytest.fixture
-async def make_tenant(owner_engine):
+async def make_tenant(cleanup_engine):
     made: list[uuid.UUID] = []
 
     async def make(features: tuple[str, ...] = ("lead_response",)) -> uuid.UUID:
@@ -45,12 +56,14 @@ async def make_tenant(owner_engine):
 
     yield make
 
+    if cleanup_engine is None:
+        return
     ids = [str(t) for t in made]
-    with owner_engine.begin() as conn:
+    with cleanup_engine.begin() as conn:
         conn.execute(text("SET LOCAL session_replication_role = replica"))
         for table in TABLES:
             conn.execute(
                 text(f"DELETE FROM lead_response.{table} WHERE tenant_id = ANY(CAST(:ids AS uuid[]))"), {"ids": ids}
             )
-    with owner_engine.begin() as conn:
+    with cleanup_engine.begin() as conn:
         conn.execute(text("DELETE FROM core.tenants WHERE id = ANY(CAST(:ids AS uuid[]))"), {"ids": ids})
