@@ -1,7 +1,7 @@
 """lead response tables
 
 Revision ID: 0282a1e9855e
-Revises: 20261026_pause_trials
+Revises: 20261027_tool_template
 Create Date: 2026-10-27 14:37:52.853494
 
 Checklist for tenant-scoped tables (anything with tenant_id):
@@ -33,7 +33,7 @@ TENANT_TABLES = [
 APPEND_ONLY_TABLES = ["messages", "message_events", "consent_records"]
 
 revision: str = "0282a1e9855e"
-down_revision: str | None = "20261026_pause_trials"
+down_revision: str | None = "20261027_tool_template"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
