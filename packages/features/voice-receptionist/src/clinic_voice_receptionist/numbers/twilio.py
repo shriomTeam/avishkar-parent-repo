@@ -58,10 +58,13 @@ class TwilioNumbers:
     def __init__(self, account_sid: str, auth_token: str, transport: httpx.AsyncBaseTransport | None = None):
         self._sid, self._auth, self._transport = account_sid, (account_sid, auth_token), transport
 
+    async def _request(self, method: str, path: str, **kwargs) -> httpx.Response:
+        async with httpx.AsyncClient(timeout=15, transport=self._transport) as client:
+            return await client.request(method, f"{BASE}/{self._sid}/{path}", auth=self._auth, **kwargs)
+
     async def _call(self, method: str, path: str, **kwargs) -> httpx.Response:
         try:
-            async with httpx.AsyncClient(timeout=15, transport=self._transport) as client:
-                return await client.request(method, f"{BASE}/{self._sid}/{path}", auth=self._auth, **kwargs)
+            return await self._request(method, path, **kwargs)
         except httpx.HTTPError:
             raise TwilioError("Twilio could not be reached. Please try again.", 503) from None
 
@@ -104,11 +107,39 @@ class TwilioNumbers:
         data = {"PhoneNumber": number, "FriendlyName": friendly_name}
         if voice_url:
             data |= {"VoiceUrl": voice_url, "VoiceMethod": "POST"}
-        response = await self._call("POST", "IncomingPhoneNumbers.json", data=data)
+        try:
+            response = await self._request("POST", "IncomingPhoneNumbers.json", data=data)
+        except httpx.HTTPError:
+            return await self._bought_without_answer(number)  # the purchase may have gone through unseen
         if response.status_code >= 300:
             raise self._fail(response, "buy this number")
-        body = response.json()
-        return PurchasedNumber(sid=body["sid"], number=body["phone_number"])
+        try:
+            body = response.json()
+            return PurchasedNumber(sid=body["sid"], number=body["phone_number"])
+        except (ValueError, KeyError, TypeError):
+            return await self._bought_without_answer(number)  # a 2xx we cannot read still means Twilio did it
+
+    async def _bought_without_answer(self, number: str) -> PurchasedNumber:
+        """Twilio may have completed a purchase whose answer we never read. The number was free a moment ago, so if
+        it is on the account now it is ours: hand it back to be saved (or given back if saving fails), instead of
+        leaving a number that is billed monthly but belongs to no clinic. The purchase itself is never repeated."""
+        found: list | None = None
+        try:
+            response = await self._request("GET", "IncomingPhoneNumbers.json", params={"PhoneNumber": number})
+            if response.status_code < 300:
+                found = response.json().get("incoming_phone_numbers", [])
+        except (httpx.HTTPError, ValueError, AttributeError):
+            pass
+        if found is None:
+            log.error("could not confirm whether Twilio bought %s after a lost answer; check the console", number)
+            raise TwilioError(
+                "We could not confirm whether Twilio bought this number. Check your Twilio console before trying "
+                "again, so you are not billed for two numbers.",
+                503,
+            )
+        if found:
+            return PurchasedNumber(sid=found[0]["sid"], number=found[0]["phone_number"])
+        raise TwilioError("Twilio could not be reached. Please try again.", 503)
 
     async def list_voice_urls(self) -> dict[str, str]:
         urls: dict[str, str] = {}

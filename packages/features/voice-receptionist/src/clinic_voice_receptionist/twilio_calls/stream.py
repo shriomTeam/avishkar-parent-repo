@@ -111,7 +111,9 @@ async def phone_stream(ws: WebSocket) -> None:
         call = await session.get(Call, call_id)
         entitled = FEATURE_KEY in await enabled_feature_keys(session)
         snapshot = call.agent_snapshot if call else None
-        same_call = bool(call and call.provider_call_id == call_sid)
+        # A browser test call has no provider id, and the client chooses what to send as callSid: both being empty
+        # must not count as a match, or a test-call ticket could open this stream and skip the browser socket's checks.
+        same_call = bool(call and call_sid and call.channel == "twilio" and call.provider_call_id == call_sid)
     if not entitled or snapshot is None or not same_call:  # a ticket only opens the stream of its own call
         await fail_call(tenant_id, call_id, "not_allowed", settings.database_url)
         await ws.close(POLICY_VIOLATION)

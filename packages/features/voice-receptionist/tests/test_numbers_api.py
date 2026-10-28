@@ -298,6 +298,49 @@ async def test_buy_sends_the_number_and_webhook_once_and_never_retries():
     assert "PhoneNumber=%2B12125550100" in sent[0] and "VoiceUrl=https%3A%2F%2Fx%2Fy" in sent[0]
 
 
+async def test_a_lost_answer_after_buying_finds_the_number_on_the_account_instead_of_billing_nobody():
+    seen = []
+
+    def handler(request):
+        seen.append(request.method)
+        if request.method == "POST":
+            raise httpx.ReadTimeout("no answer", request=request)  # Twilio may have done it
+        assert "PhoneNumber=%2B12125550100" in str(request.url)
+        return httpx.Response(200, json={"incoming_phone_numbers": [{"sid": "PN9", "phone_number": "+12125550100"}]})
+
+    bought = await _twilio(handler).buy(number="+12125550100", friendly_name="x", voice_url=None)
+    assert (bought.sid, bought.number) == ("PN9", "+12125550100")
+    assert seen == ["POST", "GET"]  # one purchase, then a lookup
+
+
+async def test_an_unreadable_success_answer_is_treated_the_same_way():
+    def handler(request):
+        if request.method == "POST":
+            return httpx.Response(201, text="<html>not json</html>")
+        return httpx.Response(200, json={"incoming_phone_numbers": [{"sid": "PN9", "phone_number": "+12125550100"}]})
+
+    assert (await _twilio(handler).buy(number="+12125550100", friendly_name="x", voice_url=None)).sid == "PN9"
+
+
+async def test_a_lost_answer_for_a_number_not_on_the_account_says_try_again():
+    def handler(request):
+        if request.method == "POST":
+            raise httpx.ConnectError("down", request=request)
+        return httpx.Response(200, json={"incoming_phone_numbers": []})
+
+    with pytest.raises(TwilioError, match="try again"):
+        await _twilio(handler).buy(number="+12125550100", friendly_name="x", voice_url=None)
+
+
+async def test_when_even_the_lookup_fails_staff_are_told_to_check_before_buying_again():
+    def handler(request):
+        raise httpx.ReadTimeout("no answer", request=request)
+
+    with pytest.raises(TwilioError, match="Check your Twilio console") as caught:
+        await _twilio(handler).buy(number="+12125550100", friendly_name="x", voice_url=None)
+    assert caught.value.status == 503
+
+
 async def test_errors_show_twilio_words_but_never_the_credentials():
     def handler(request):
         return httpx.Response(400, json={"message": "Phone number is not available", "code": 21452})
