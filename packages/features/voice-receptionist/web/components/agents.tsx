@@ -46,10 +46,11 @@ import {
   ToolFields,
 } from "./agent-fields";
 import { VoiceBoundary } from "./voice-boundary";
+import { AgentEditorSkeleton, AgentsSkeleton } from "./skeletons";
 
 export function AgentList() {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<AgentsSkeleton />}>
       <List />
     </VoiceBoundary>
   );
@@ -211,7 +212,7 @@ function List() {
 
 export function AgentEditor({ id }: { id: string }) {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<AgentEditorSkeleton />}>
       <EditorLoader id={id} />
     </VoiceBoundary>
   );

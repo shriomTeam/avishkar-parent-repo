@@ -178,6 +178,9 @@ class Tool(IdMixin, TenantMixin, TimestampMixin, Base):
         comment="A clinic edited a built-in tool's description, so code updates must not overwrite it",
     )
     input_schema: Mapped[dict] = mapped_column(JSONB, comment="JSON schema for the arguments the model supplies")
+    payload_template: Mapped[dict | None] = mapped_column(
+        JSONB, comment="Request body with {{field.x}}, {{arg.x}}, {{call.x}} placeholders; null sends the arguments"
+    )
     auth_header_name: Mapped[str | None] = mapped_column(String(64))
     auth_header_secret: Mapped[str | None] = mapped_column(
         Text, comment="Fernet-encrypted header value; never returned"
@@ -221,3 +224,21 @@ class Variable(IdMixin, TenantMixin, TimestampMixin, Base):
 
     name: Mapped[str] = mapped_column(String(64), comment="snake_case, used as {{name}}; never changes after creation")
     value: Mapped[str] = mapped_column(Text)
+
+
+class PhoneNumber(IdMixin, TenantMixin, TimestampMixin, Base):
+    """A phone number a clinic bought through the platform. One number belongs to one clinic, ever."""
+
+    __tablename__ = "phone_numbers"
+    __table_args__ = (UniqueConstraint("number"), UniqueConstraint("provider_sid"), SCHEMA)
+
+    number: Mapped[str] = mapped_column(String(20), comment="E.164, for example +14155550123")
+    provider: Mapped[str] = mapped_column(String(16), default="twilio", server_default="twilio")
+    provider_sid: Mapped[str] = mapped_column(String(64), comment="The provider's id for the number (Twilio PN...)")
+    kind: Mapped[str] = mapped_column(String(16), default="local", comment="local or toll_free")
+    agent_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("voice.agents.id", ondelete="SET NULL"),
+        index=True,
+        comment="The agent that answers; none = unassigned",
+    )
+    purchased_by_staff_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("core.staff.id", ondelete="SET NULL"))

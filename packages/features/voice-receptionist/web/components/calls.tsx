@@ -41,10 +41,11 @@ import { Heading, Badge, Tabs, Empty, Metric } from "./ui";
 import { CallsTable, Transcript } from "./calls-table";
 import { RecordingPlayer } from "./recording-player";
 import { VoiceBoundary } from "./voice-boundary";
+import { CallDetailSkeleton, CallsSkeleton, LinesSkeleton } from "./skeletons";
 
 export function CallHistory() {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<CallsSkeleton />}>
       <History />
     </VoiceBoundary>
   );
@@ -143,7 +144,7 @@ function History() {
 
 export function CallDetail({ id }: { id: string }) {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<CallDetailSkeleton />}>
       <DetailLoader id={id} />
     </VoiceBoundary>
   );
@@ -194,12 +195,7 @@ function DetailLoader({ id }: { id: string }) {
         <Alert>{error}</Alert>
       </Panel>
     );
-  if (!call)
-    return (
-      <Panel>
-        <Muted role="status">Loading call…</Muted>
-      </Panel>
-    );
+  if (!call) return <CallDetailSkeleton />;
   return <DetailView call={call} api={api} />;
 }
 
@@ -338,7 +334,7 @@ function DetailView({ call, api }: { call: Detail; api: InboundApi }) {
               (eventsError ? (
                 <Alert>{eventsError}</Alert>
               ) : events === null ? (
-                <Muted role="status">Loading…</Muted>
+                <LinesSkeleton />
               ) : events.length ? (
                 <CodeBlock
                   data-testid="raw-events"

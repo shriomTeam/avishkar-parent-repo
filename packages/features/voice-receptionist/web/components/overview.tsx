@@ -20,12 +20,13 @@ import {
 import { Heading, Metric, Badge, Dropdown, Empty } from "./ui";
 import { CallsTable } from "./calls-table";
 import { VoiceBoundary } from "./voice-boundary";
+import { OverviewSkeleton } from "./skeletons";
 
 const DAY = 86_400_000;
 
 export function Overview() {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<OverviewSkeleton />}>
       <Summary />
     </VoiceBoundary>
   );

@@ -4,11 +4,11 @@ from sqlalchemy import case, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from clinic_db.models.voice import Tool
+from clinic_db.models.voice import AgentField, Tool
 from clinic_voice_receptionist.config import get_voice_settings
 from clinic_voice_receptionist.inbound.live.prompt import END_TOOL, SAVE_TOOL
 from clinic_voice_receptionist.inbound.schemas import ToolIn, ToolOut
-from clinic_voice_receptionist.tools import secrets
+from clinic_voice_receptionist.tools import secrets, template
 from clinic_voice_receptionist.tools.builtin import BUILTINS
 from clinic_voice_receptionist.tools.http_tool import check_header_name
 from clinic_voice_receptionist.tools.netguard import BlockedTarget, parse_url
@@ -88,7 +88,7 @@ async def list_tools(session: AsyncSession) -> list[Tool]:
     return list((await session.scalars(select(Tool).order_by(Tool.kind, Tool.name))).all())
 
 
-def _validate(body: ToolIn, existing: Tool | None) -> None:
+def _validate(body: ToolIn, existing: Tool | None) -> template.Used:
     if body.name in RESERVED_NAMES:
         raise ToolError(f'"{body.name}" is used by the platform. Choose another name.')
     if not body.description.strip():
@@ -96,12 +96,20 @@ def _validate(body: ToolIn, existing: Tool | None) -> None:
     if not body.endpoint:
         raise ToolError("Enter the HTTPS endpoint to call.")
     try:
-        parse_url(body.endpoint, allow_private=get_voice_settings().tool_allow_private_hosts)
+        used = template.inspect(body.payload_template, body.endpoint)
+        allow_private = get_voice_settings().tool_allow_private_hosts
+        parse_url(template.sample_endpoint(body.endpoint.strip()), allow_private=allow_private)
         validate_definition(body.input_schema)
         if body.auth_header_name:
             check_header_name(body.auth_header_name)
-    except (BlockedTarget, SchemaError) as exc:
+    except (BlockedTarget, SchemaError, template.TemplateError) as exc:
         raise ToolError(str(exc)) from None
+    unknown_args = used.args - set(body.input_schema["properties"])
+    if unknown_args:
+        name = sorted(unknown_args)[0]
+        raise ToolError(f"The template uses {{{{arg.{name}}}}}, but the input schema has no argument by that name.")
+    if body.method == "GET" and any(isinstance(v, (dict, list)) for v in (body.payload_template or {}).values()):
+        raise ToolError("For a GET request the template can only hold single values, not lists or objects.")
     has_secret = bool(existing and existing.auth_header_secret and not body.clear_auth)
     if body.auth_header_name and not (body.auth_header_value or has_secret):
         raise ToolError("Enter the value to send in the auth header.")
@@ -109,6 +117,7 @@ def _validate(body: ToolIn, existing: Tool | None) -> None:
         raise ToolError("The auth header value cannot contain line breaks or other control characters.")
     if body.auth_header_value and not body.auth_header_name:
         raise ToolError("Enter the auth header name, for example Authorization.")
+    return used
 
 
 async def save_tool(session: AsyncSession, *, tenant_id: uuid.UUID, body: ToolIn, tool: Tool | None = None) -> Tool:
@@ -124,7 +133,14 @@ async def save_tool(session: AsyncSession, *, tenant_id: uuid.UUID, body: ToolIn
         await session.flush()
         await session.refresh(tool)
         return tool
-    _validate(body, tool)
+    used = _validate(body, tool)
+    known = set((await session.scalars(select(AgentField.key).distinct())).all())
+    unknown_fields = used.fields - known
+    if unknown_fields:
+        raise ToolError(
+            f'No agent captures a detail called "{sorted(unknown_fields)[0]}". '
+            "Add it under the agent's What to capture first, or check the spelling."
+        )
     taken = select(Tool.id).where(Tool.name == body.name)
     if tool is not None:
         taken = taken.where(Tool.id != tool.id)
@@ -137,6 +153,7 @@ async def save_tool(session: AsyncSession, *, tenant_id: uuid.UUID, body: ToolIn
         "method": body.method,
         "timeout_seconds": body.timeout_seconds,
         "input_schema": body.input_schema,
+        "payload_template": body.payload_template or None,
         "enabled": body.enabled,
         "auth_header_name": body.auth_header_name or None,
     }
