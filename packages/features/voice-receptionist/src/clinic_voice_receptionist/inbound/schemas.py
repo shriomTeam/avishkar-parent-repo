@@ -186,6 +186,7 @@ class ToolIn(BaseModel):
     method: Literal["GET", "POST"] = "POST"
     timeout_seconds: int = Field(default=5, ge=1, le=10)
     input_schema: dict = Field(default_factory=lambda: {"type": "object", "properties": {}})
+    payload_template: dict | None = None
     auth_header_name: str | None = Field(default=None, max_length=64)
     auth_header_value: str | None = Field(default=None, max_length=2000)  # write-only: stored encrypted, never returned
     clear_auth: bool = False
@@ -210,6 +211,7 @@ class ToolOut(BaseModel):
     method: str
     timeout_seconds: int
     input_schema: dict
+    payload_template: dict | None = None
     auth_header_name: str | None
     has_auth: bool = False
     enabled: bool
@@ -221,6 +223,8 @@ class ToolOut(BaseModel):
 
 class ToolTestIn(BaseModel):
     input: dict = Field(default_factory=dict)
+    field_values: dict[str, str] = Field(default_factory=dict)  # sample captured details, by field key
+    caller_number: str | None = Field(default=None, max_length=32)
 
 
 class ToolTestOut(BaseModel):

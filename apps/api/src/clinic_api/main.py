@@ -1,3 +1,5 @@
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Request
@@ -21,10 +23,31 @@ from clinic_core.queue import close_queues
 from clinic_core.settings import Settings, get_settings
 from clinic_db.models.core import StaffRole
 
+log = logging.getLogger("clinic_api")
+
+
+async def _run_startup_hook(key: str, hook, app: FastAPI) -> None:
+    try:
+        await hook(app)
+    except asyncio.CancelledError:
+        raise
+    except Exception:
+        log.warning("startup work of feature %s failed", key, exc_info=True)  # never stops the API
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Features may have work to do at start. It runs beside the app, not before it, so a slow or failing hook cannot
+    # delay or break serving.
+    hooks = [
+        asyncio.create_task(_run_startup_hook(key, f.on_startup, app))
+        for key, f in load_features().items()
+        if f.on_startup is not None
+    ]
     yield
+    for task in hooks:
+        task.cancel()
+    await asyncio.gather(*hooks, return_exceptions=True)
     await close_queues()
     await app.state.engine.dispose()
     await dispose_engines()

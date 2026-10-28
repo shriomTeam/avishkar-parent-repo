@@ -295,7 +295,7 @@ class CallSession:
         key = f"{self.recorder.call_id}:{call.name}:{call.id}"
         try:
             outcome = await asyncio.wait_for(
-                self.tool_runner.run(ref, call.args, key), timeout=ref.get("timeout_seconds", 5) + 3
+                self.tool_runner.run(ref, call.args, key, self._values), timeout=ref.get("timeout_seconds", 5) + 3
             )
         except TimeoutError:
             response = {"ok": False, "error": "The tool took too long to answer."}

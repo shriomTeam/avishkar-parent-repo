@@ -40,6 +40,74 @@ ws_router = APIRouter()
 _active_calls = 0
 
 
+def calls_full() -> bool:
+    return _active_calls >= get_voice_settings().max_concurrent_calls
+
+
+def call_started() -> None:
+    global _active_calls
+    _active_calls += 1
+
+
+def call_ended() -> None:
+    global _active_calls
+    _active_calls -= 1
+
+
+async def run_session(
+    app,
+    tenant_id: uuid.UUID,
+    call_id: uuid.UUID,
+    snapshot: dict,
+    transport,
+    *,
+    authorize=None,
+    on_revoked=None,
+) -> None:
+    """Run one call to its end, over any transport (browser WebSocket or phone line).
+
+    ``authorize`` is for calls started by a signed-in staff member: it is checked before every tool runs and every few
+    seconds, and the call ends when it says no. Phone calls have no staff session, so they pass none: they are trusted
+    because Twilio's signature was valid and the dialled number belongs to the clinic.
+    """
+    settings, voice = app.state.settings, get_voice_settings()
+    connector = getattr(app.state, "voice_connector", None) or GeminiConnector(voice)
+    recorder = CallRecorder(tenant_id, call_id, snapshot, settings.database_url)
+    running = CallSession(
+        authorize=authorize,
+        snapshot=snapshot,
+        transport=transport,
+        connector=connector,
+        recorder=recorder,
+        max_seconds=voice.max_call_seconds,
+        tool_runner=ToolRunner(
+            tenant_id=tenant_id,
+            call_id=call_id,
+            database_url=settings.database_url,
+            embedder=embedder_for(app, get_knowledge_settings()),
+        ),
+        audio=CallAudio(voice.max_call_seconds) if snapshot.get("save_recording") else None,
+        store=store_for(app, voice),
+    )
+
+    async def watch_access() -> None:
+        while True:
+            await asyncio.sleep(5)
+            if not await authorize():
+                running._end("access_revoked", failed=True)
+                if on_revoked is not None:
+                    await on_revoked()
+                return
+
+    monitor = asyncio.create_task(watch_access()) if authorize is not None else None
+    try:
+        await running.run()
+    finally:
+        if monitor is not None:
+            monitor.cancel()
+            await asyncio.gather(monitor, return_exceptions=True)
+
+
 class WebSocketTransport:
     def __init__(self, ws: WebSocket):
         self._ws = ws
@@ -92,12 +160,11 @@ def _origin_allowed(ws: WebSocket) -> bool:
 
 @ws_router.websocket("/inbound/live")
 async def live_call(ws: WebSocket, ticket: str = Query(min_length=1, max_length=300)) -> None:
-    global _active_calls
-    settings, voice = ws.app.state.settings, get_voice_settings()
+    settings = ws.app.state.settings
     if not _origin_allowed(ws):
         await ws.close(POLICY_VIOLATION)
         return
-    if _active_calls >= voice.max_concurrent_calls:
+    if calls_full():
         await ws.close(TRY_AGAIN_LATER)
         return
     redeemed = await tickets.redeem(ticket, settings.database_url)
@@ -123,48 +190,28 @@ async def live_call(ws: WebSocket, ticket: str = Query(min_length=1, max_length=
         return
 
     await ws.accept()
-    _active_calls += 1
+    call_started()
     try:
         try:
             await ws.send_json({"type": "ready", "input_rate": INPUT_RATE, "output_rate": OUTPUT_RATE})
         except (WebSocketDisconnect, RuntimeError):
             await fail_call(tenant_id, call_id, "caller_disconnected", settings.database_url)  # gone before it began
             return
-        connector = getattr(ws.app.state, "voice_connector", None) or GeminiConnector(voice)
-        recorder = CallRecorder(tenant_id, call_id, snapshot, settings.database_url)
-        running = CallSession(
-            authorize=authorized,
-            snapshot=snapshot,
-            transport=WebSocketTransport(ws),
-            connector=connector,
-            recorder=recorder,
-            max_seconds=voice.max_call_seconds,
-            tool_runner=ToolRunner(
-                tenant_id=tenant_id,
-                call_id=call_id,
-                database_url=settings.database_url,
-                embedder=embedder_for(ws.app, get_knowledge_settings()),
-            ),
-            audio=CallAudio(voice.max_call_seconds) if snapshot.get("save_recording") else None,
-            store=store_for(ws.app, voice),
+
+        async def close_for_revoked_access() -> None:
+            if ws.application_state == WebSocketState.CONNECTED:
+                await ws.close(POLICY_VIOLATION)
+
+        await run_session(
+            ws.app,
+            tenant_id,
+            call_id,
+            snapshot,
+            WebSocketTransport(ws),
+            authorize=authorized,  # a staff member's test call ends when their access does
+            on_revoked=close_for_revoked_access,
         )
-
-        async def watch_access():
-            while True:
-                await asyncio.sleep(5)
-                if not await authorized():
-                    running._end("access_revoked", failed=True)
-                    if ws.application_state == WebSocketState.CONNECTED:
-                        await ws.close(POLICY_VIOLATION)
-                    return
-
-        monitor = asyncio.create_task(watch_access())
-        try:
-            await running.run()
-        finally:
-            monitor.cancel()
-            await asyncio.gather(monitor, return_exceptions=True)
     finally:
-        _active_calls -= 1
+        call_ended()
         if ws.application_state == WebSocketState.CONNECTED:
             await ws.close()

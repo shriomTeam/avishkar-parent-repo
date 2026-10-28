@@ -12,3 +12,7 @@ email_from_name                = "Avishkar AI"
 email_reply_to                 = "abhinav.chaudhary@avishkar.app"
 email_secrets_preprovisioned   = true
 email_old_payload_keys_enabled = true
+
+# Phone numbers through Twilio. Turn on after adding TWILIO_ACCOUNT_SID (variable) and TWILIO_AUTH_TOKEN (secret)
+# to the GitHub environment "production".
+twilio_enabled = true

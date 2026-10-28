@@ -154,24 +154,37 @@ test("create, edit and save an agent, take a test call, review it and route a nu
   await page.getByRole("tab", { name: "Raw responses" }).click();
   await expect(page.getByTestId("raw-events")).toContainText("turn_complete");
 
+  // Phone numbers: search, buy (against a fake Twilio), assign, and release.
   await page.getByRole("link", { name: "Phone numbers", exact: true }).click();
+  await expect(page.getByText("No phone numbers yet")).toBeVisible();
+  await page.getByRole("button", { name: "Buy a number", exact: true }).click();
+  const buy = page.getByRole("dialog");
+  await buy.getByLabel("Area code (optional)").fill("415");
+  await buy.getByRole("button", { name: "Search numbers" }).click();
+  await buy.getByRole("radio").first().check();
+  await expect(buy).toContainText("charges your Twilio account");
+  await choose(buy, "Assigned agent", "Pilot receptionist");
+  await buy.getByRole("button", { name: "Buy number" }).click();
+  const owned = page.getByRole("row").filter({ hasText: "+1 (415) 555-" });
+  await expect(owned).toContainText("Pilot receptionist");
+  await expect(owned).toContainText("Connected");
+
+  await owned.getByRole("button", { name: /^Manage/ }).click();
+  const manage = page.getByRole("dialog");
+  await choose(manage, "Assigned agent", "Unassigned");
+  await manage.getByRole("button", { name: "Save routing" }).click();
+  await expect(owned).toContainText("Unassigned");
+
+  await owned.getByRole("button", { name: /^Manage/ }).click();
   await page
-    .getByRole("button", { name: "Connect number", exact: true })
+    .getByRole("dialog")
+    .getByRole("button", { name: "Release number" })
     .click();
   await page
     .getByRole("dialog")
-    .getByLabel("Phone number (E.164)")
-    .fill("+919876543210");
-  await choose(
-    page.getByRole("dialog"),
-    "Assigned agent",
-    "Pilot receptionist",
-  );
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Save routing" })
+    .getByRole("button", { name: "Release number" })
     .click();
-  await expect(page.getByText("+919876543210", { exact: true })).toBeVisible();
+  await expect(owned).toHaveCount(0);
 
   // Deleting the agent keeps its calls.
   await page.getByRole("link", { name: "Voice agents", exact: true }).click();
@@ -585,6 +598,60 @@ test("tools: add internal and external tools, validation, a real test run, attac
   await panel.getByRole("button", { name: "Delete" }).click();
   await page.getByRole("button", { name: "Delete tool" }).click();
   await expect(panel).toHaveCount(0);
+});
+
+test("tools: a payload template sends captured details, warns about privacy and is tested with sample details", async ({
+  page,
+}) => {
+  await createAgent(page, "Template agent"); // its starter fields include phone_number
+  await page.goto("/voice-receptionist/tools");
+  const lead = page.getByTestId("tool-card").filter({
+    has: page.getByRole("heading", { name: "create_lead", exact: true }),
+  });
+  await expect(lead).toContainText("Taken from the agent");
+
+  await page.getByRole("button", { name: "Add tool" }).click();
+  const dialog = page.getByRole("dialog");
+  await choose(dialog, "Tool type", "External: calls your own API");
+  await dialog.getByLabel("Tool name").fill("send_note");
+  await dialog.getByLabel("Description").fill("Send a note to the clinic CRM");
+  await dialog.getByLabel("Endpoint").fill("http://127.0.0.1:8001/_test/echo");
+  await dialog
+    .getByLabel("Input schema")
+    .fill(
+      '{"type":"object","properties":{"reason":{"type":"string"}},"required":["reason"]}',
+    );
+  await expect(dialog).toContainText("{{field.phone_number}}"); // what the agents capture
+  await expect(
+    dialog.getByText("Details from the call will be sent"),
+  ).toHaveCount(0);
+
+  const template = dialog.getByLabel("Payload template");
+  await template.fill('{"phone": "{{field.nobody_captures_this}}"}');
+  await dialog.getByRole("button", { name: "Save tool" }).click();
+  await expect(dialog.getByRole("alert")).toContainText("No agent captures");
+
+  await template.fill(
+    '{"phone": "{{field.phone_number}}", "why": "{{arg.reason}}"}',
+  );
+  await expect(dialog).toContainText("Details from the call will be sent");
+  await dialog.getByRole("button", { name: "Save tool" }).click();
+
+  const card = page.getByTestId("tool-card").filter({
+    has: page.getByRole("heading", { name: "send_note", exact: true }),
+  });
+  await expect(card).toContainText("A payload template");
+  await card.getByRole("button", { name: "Test tool" }).click();
+  const test = page.getByRole("dialog");
+  await expect(test.getByLabel("Sample captured details")).toHaveValue(
+    /"phone_number": "example"/,
+  );
+  await test
+    .getByLabel("Sample captured details")
+    .fill('{"phone_number": "+15550001111"}');
+  await test.getByRole("button", { name: "Run test" }).click();
+  await expect(test).toContainText("Success", CALL);
+  await expect(test).toContainText("+15550001111");
 });
 
 test("call filters, CSV download and missing record states", async ({

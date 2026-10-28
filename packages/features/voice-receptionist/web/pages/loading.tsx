@@ -1,9 +1,6 @@
-import { Muted } from "@clinic/ui";
+import { PageSkeleton } from "../components/skeletons";
 
+/** Shown by Next while a voice route is being prepared. Each screen then shows its own skeleton while its data loads. */
 export default function Loading() {
-  return (
-    <div className="mx-auto max-w-[700px] px-[30px] py-[70px]">
-      <Muted role="status">Loading your workspace…</Muted>
-    </div>
-  );
+  return <PageSkeleton />;
 }

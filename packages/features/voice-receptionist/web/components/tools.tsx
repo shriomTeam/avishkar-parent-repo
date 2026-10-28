@@ -13,7 +13,12 @@ import {
   type ToolInput,
   type ToolTestResult,
 } from "../lib/inbound/api";
-import { EMPTY_SCHEMA, sampleInput, toToolInput } from "../lib/inbound/tools";
+import {
+  EMPTY_SCHEMA,
+  fieldKeys,
+  sampleInput,
+  toToolInput,
+} from "../lib/inbound/tools";
 import { dateLabel } from "../lib/format";
 import {
   Avatar,
@@ -44,10 +49,13 @@ import {
   Empty,
 } from "./ui";
 import { VoiceBoundary } from "./voice-boundary";
+import { LinesSkeleton, ToolsSkeleton } from "./skeletons";
+
+const AUTOFILLED = new Set(["create_lead", "update_lead"]);
 
 export function Tools() {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<ToolsSkeleton />}>
       <ToolList />
     </VoiceBoundary>
   );
@@ -55,6 +63,9 @@ export function Tools() {
 
 function ToolList() {
   const { tools, agents, api, upsertTool, removeTool } = useVoice();
+  const detailKeys = [
+    ...new Set(agents.flatMap((a) => (a.fields ?? []).map((f) => f.key))),
+  ];
   const { state, notify } = useDemo();
   const [editing, setEditing] = useState<Tool | null>(null);
   const [adding, setAdding] = useState(false);
@@ -153,6 +164,11 @@ function ToolList() {
               <SummaryList
                 items={[
                   ["Type", custom ? "Custom API" : "Built in"],
+                  ...(!custom && AUTOFILLED.has(tool.name)
+                    ? ([
+                        ["Details", "Taken from the agent's captured fields"],
+                      ] as [string, string][])
+                    : []),
                   ...(!custom
                     ? ([
                         [
@@ -171,6 +187,12 @@ function ToolList() {
                   ],
                   ...(custom
                     ? ([
+                        ...(tool.payload_template
+                          ? ([["Sends", "A payload template"]] as [
+                              string,
+                              string,
+                            ][])
+                          : []),
                         ["Timeout", `${tool.timeout_seconds} seconds`],
                         ["Retries", "GET once · POST never"],
                         [
@@ -237,7 +259,7 @@ function ToolList() {
         <Panel>
           <H2>Execution history</H2>
           {executions === null ? (
-            <Muted role="status">Loading…</Muted>
+            <LinesSkeleton />
           ) : executions.length ? (
             executions.map((e) => (
               <Link
@@ -279,6 +301,7 @@ function ToolList() {
       {editing && (
         <ToolDialog
           tool={editing}
+          detailKeys={detailKeys}
           onClose={() => setEditing(null)}
           onSave={async (body) => {
             upsertTool(await api.updateTool(editing.id, body));
@@ -290,6 +313,7 @@ function ToolList() {
       {adding && (
         <AddToolDialog
           api={api}
+          detailKeys={detailKeys}
           onClose={() => setAdding(false)}
           onAdded={(tool, message) => {
             upsertTool(tool);
@@ -302,7 +326,7 @@ function ToolList() {
         <TestDialog
           tool={testing}
           onClose={() => setTesting(null)}
-          run={(input) => api.testTool(testing.id, input)}
+          run={(input, details) => api.testTool(testing.id, input, details)}
         />
       )}
       {rewording && (
@@ -370,26 +394,35 @@ function ToolList() {
 
 function ToolDialog({
   tool,
+  detailKeys,
   onClose,
   onSave,
 }: {
   tool: Tool;
+  detailKeys: string[];
   onClose: () => void;
   onSave: (body: ToolInput) => Promise<void>;
 }) {
   return (
     <Dialog title="Configure API tool" onClose={onClose}>
-      <ExternalForm tool={tool} onClose={onClose} onSave={onSave} />
+      <ExternalForm
+        tool={tool}
+        detailKeys={detailKeys}
+        onClose={onClose}
+        onSave={onSave}
+      />
     </Dialog>
   );
 }
 
 function AddToolDialog({
   api,
+  detailKeys,
   onClose,
   onAdded,
 }: {
   api: InboundApi;
+  detailKeys: string[];
   onClose: () => void;
   onAdded: (tool: Tool, message: string) => void;
 }) {
@@ -432,6 +465,7 @@ function AddToolDialog({
       {kind === "external" ? (
         <ExternalForm
           tool={null}
+          detailKeys={detailKeys}
           onClose={onClose}
           onSave={async (body) =>
             onAdded(await api.createTool(body), "Tool saved")
@@ -440,7 +474,7 @@ function AddToolDialog({
       ) : (
         <>
           {catalog === null ? (
-            <Muted role="status">Loading…</Muted>
+            <LinesSkeleton />
           ) : (
             <>
               <Dropdown
@@ -494,16 +528,25 @@ function AddToolDialog({
 
 function ExternalForm({
   tool,
+  detailKeys,
   onClose,
   onSave,
 }: {
   tool: Tool | null;
+  detailKeys: string[];
   onClose: () => void;
   onSave: (body: ToolInput) => Promise<void>;
 }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [method, setMethod] = useState(tool?.method === "GET" ? "GET" : "POST");
+  const [template, setTemplate] = useState(
+    tool?.payload_template
+      ? JSON.stringify(tool.payload_template, null, 2)
+      : "",
+  );
+  const [endpoint, setEndpoint] = useState(tool?.endpoint ?? "");
+  const sendsDetails = fieldKeys(template, endpoint).length > 0;
   return (
     <>
       <form
@@ -521,6 +564,20 @@ function ExternalForm({
           } catch {
             return setError("Enter valid JSON for the input schema.");
           }
+          let payload: Record<string, unknown> | null = null;
+          if (template.trim()) {
+            try {
+              payload = JSON.parse(template);
+              if (
+                !payload ||
+                Array.isArray(payload) ||
+                typeof payload !== "object"
+              )
+                throw new Error();
+            } catch {
+              return setError("Enter the payload template as a JSON object.");
+            }
+          }
           const headerName = String(data.get("auth_name")).trim();
           const headerValue = String(data.get("auth_value"));
           const body: ToolInput = {
@@ -530,6 +587,7 @@ function ExternalForm({
             method: data.get("method") === "GET" ? "GET" : "POST",
             timeout_seconds: Number(data.get("timeout")),
             input_schema: schema,
+            payload_template: payload,
             auth_header_name: headerName || null,
             auth_header_value: headerValue || null,
             clear_auth: data.get("clear_auth") === "on",
@@ -566,11 +624,13 @@ function ExternalForm({
           name="endpoint"
           required
           placeholder="https://api.example.com/leads"
-          defaultValue={tool?.endpoint ?? ""}
+          value={endpoint}
+          onChange={(e) => setEndpoint(e.target.value)}
         />
         <small className="block text-[12px] text-muted">
           Public HTTPS addresses only. Private and internal addresses are
-          blocked.
+          blocked. Placeholders work in the path and query, never in the host
+          name.
         </small>
         <TwoColumns>
           <Dropdown
@@ -625,6 +685,40 @@ function ExternalForm({
             tool ? JSON.stringify(tool.input_schema, null, 2) : EMPTY_SCHEMA
           }
         />
+        <Textarea
+          label="Payload template (optional, JSON)"
+          code
+          value={template}
+          placeholder={
+            '{\n  "phone": "{{field.phone}}",\n  "reason": "{{arg.reason}}"\n}'
+          }
+          onChange={(e) => setTemplate(e.target.value)}
+        />
+        <small className="block text-[12px] text-muted">
+          Leave empty to send the agent&apos;s arguments as they are.{" "}
+          <code>{"{{field.name}}"}</code> is a detail captured and checked
+          during the call, so the agent never types it.{" "}
+          <code>{"{{arg.name}}"}</code> is something the agent supplies, and
+          only these appear in its argument list (they must be in the input
+          schema). <code>{"{{call.id}}"}</code> and{" "}
+          <code>{"{{call.caller_number}}"}</code> describe the call. If a detail
+          has not been captured yet, the tool does not run and the agent asks
+          the caller first.
+          {detailKeys.length > 0 && (
+            <>
+              {" "}
+              Details your agents capture:{" "}
+              {detailKeys.map((k) => `{{field.${k}}}`).join(", ")}.
+            </>
+          )}
+        </small>
+        {sendsDetails && (
+          <Note>
+            Details from the call will be sent to this endpoint. Only use
+            systems that are allowed to hold patient information (for example
+            under a signed BAA).
+          </Note>
+        )}
         <FormError message={error} />
         <DialogActions>
           <Button type="button" variant="outline" onClick={onClose}>
@@ -646,10 +740,21 @@ function TestDialog({
 }: {
   tool: Tool;
   onClose: () => void;
-  run: (input: Record<string, unknown>) => Promise<ToolTestResult>;
+  run: (
+    input: Record<string, unknown>,
+    details: Record<string, string>,
+  ) => Promise<ToolTestResult>;
 }) {
   const [text, setText] = useState(() =>
     JSON.stringify(sampleInput(tool.input_schema), null, 2),
+  );
+  const keys = fieldKeys(tool.payload_template, tool.endpoint);
+  const [details, setDetails] = useState(() =>
+    JSON.stringify(
+      Object.fromEntries(keys.map((k) => [k, "example"])),
+      null,
+      2,
+    ),
   );
   const [result, setResult] = useState<ToolTestResult | null>(null);
   const [error, setError] = useState("");
@@ -666,6 +771,14 @@ function TestDialog({
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
+      {keys.length > 0 && (
+        <Textarea
+          label="Sample captured details (JSON)"
+          code
+          value={details}
+          onChange={(e) => setDetails(e.target.value)}
+        />
+      )}
       <FormError message={error} />
       {result && (
         <>
@@ -696,11 +809,23 @@ function TestDialog({
             } catch {
               return setError("Enter the sample input as a JSON object.");
             }
+            let sample: Record<string, string> = {};
+            try {
+              sample = keys.length ? JSON.parse(details) : {};
+              if (
+                !sample ||
+                Array.isArray(sample) ||
+                typeof sample !== "object"
+              )
+                throw new Error();
+            } catch {
+              return setError("Enter the sample details as a JSON object.");
+            }
             setBusy(true);
             setError("");
             setResult(null);
             try {
-              setResult(await run(input));
+              setResult(await run(input, sample));
             } catch (e) {
               setError(
                 e instanceof ApiError ? e.message : "The test could not run.",

@@ -17,6 +17,7 @@ import {
   TextField,
 } from "@clinic/ui";
 import { useDemo } from "../lib/demo/provider";
+import { PageSkeleton } from "./skeletons";
 export function Brand() {
   return (
     <a
@@ -81,19 +82,14 @@ export function Badge({ children }: { children: string }) {
 }
 export function DemoBoundary({ children }: { children: ReactNode }) {
   const { state, error, retry } = useDemo();
+  if (!state && !error) return <PageSkeleton />;
   if (!state)
     return (
       <Panel>
-        {error ? (
-          <>
-            <Alert>{error}</Alert>
-            <Button variant="outline" onClick={retry}>
-              Retry
-            </Button>
-          </>
-        ) : (
-          <Muted role="status">Loading demo workspace…</Muted>
-        )}
+        <Alert>{error}</Alert>
+        <Button variant="outline" onClick={retry}>
+          Retry
+        </Button>
       </Panel>
     );
   return (

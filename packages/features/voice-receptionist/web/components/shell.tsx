@@ -169,8 +169,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <footer className="flex gap-6 border-t border-line px-[38px] py-[18px] text-[12px] text-muted max-app:flex-wrap max-app:gap-2 max-app:p-4">
           Avishkar Voice{" "}
           <span>
-            Agents, calls, transcripts, tools and variables are real and stored
-            · phone numbers are demo
+            Agents, calls, transcripts, tools, variables, the knowledge base and
+            phone numbers are real and stored
           </span>
           <Link
             className="focus-ring ml-auto text-[#38691d]"

@@ -26,7 +26,7 @@ export const guide: [string, string, string][] = [
   [
     "/voice-receptionist/numbers",
     "Phone numbers",
-    "Add sample carrier numbers and assign inbound agents.",
+    "Buy a phone number and choose which agent it belongs to.",
   ],
   [
     "/voice-receptionist/calls",

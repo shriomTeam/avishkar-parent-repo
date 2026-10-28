@@ -1150,6 +1150,65 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/voice_receptionist/inbound/numbers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Numbers */
+        get: operations["list_numbers_features_voice_receptionist_inbound_numbers_get"];
+        put?: never;
+        /**
+         * Buy Number
+         * @description Buy the number. The purchase is committed before the answer goes back, and undone if it cannot be saved.
+         */
+        post: operations["buy_number_features_voice_receptionist_inbound_numbers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/numbers/available": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Numbers
+         * @description Numbers that can be bought right now. Searching is free.
+         */
+        get: operations["search_numbers_features_voice_receptionist_inbound_numbers_available_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/numbers/{number_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Assign Number */
+        put: operations["assign_number_features_voice_receptionist_inbound_numbers__number_id__put"];
+        post?: never;
+        /** Release Number */
+        delete: operations["release_number_features_voice_receptionist_inbound_numbers__number_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/voice_receptionist/inbound/tools": {
         parameters: {
             query?: never;
@@ -1320,6 +1379,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/voice_receptionist/twilio/voice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Incoming Call */
+        post: operations["incoming_call_features_voice_receptionist_twilio_voice_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1470,6 +1546,11 @@ export interface components {
              */
             revenue_at_risk: boolean;
         };
+        /** AssignIn */
+        AssignIn: {
+            /** Agent Id */
+            agent_id?: string | null;
+        };
         /** AuditOption */
         AuditOption: {
             /** Value */
@@ -1505,6 +1586,17 @@ export interface components {
             needs_onboarding: boolean;
             /** Csrf Token */
             csrf_token: string;
+        };
+        /** AvailableOut */
+        AvailableOut: {
+            /** Number */
+            number: string;
+            /** Locality */
+            locality: string;
+            /** Region */
+            region: string;
+            /** Kind */
+            kind: string;
         };
         /** BatchOut */
         BatchOut: {
@@ -1617,6 +1709,13 @@ export interface components {
             description: string;
             /** Example */
             example: string;
+        };
+        /** BuyIn */
+        BuyIn: {
+            /** Number */
+            number: string;
+            /** Agent Id */
+            agent_id?: string | null;
         };
         /** CallDetailOut */
         CallDetailOut: {
@@ -2601,6 +2700,38 @@ export interface components {
             /** Path */
             path: string;
         };
+        /** NumberOut */
+        NumberOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: string;
+            /** Kind */
+            kind: string;
+            /** Provider */
+            provider: string;
+            /** Agent Id */
+            agent_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** NumbersOut */
+        NumbersOut: {
+            /** Numbers */
+            numbers: components["schemas"]["NumberOut"][];
+            /** Enabled */
+            enabled: boolean;
+            /** Calls Enabled */
+            calls_enabled: boolean;
+            /** Max Numbers */
+            max_numbers: number;
+        };
         /** OneAndDone */
         OneAndDone: {
             /**
@@ -3260,6 +3391,10 @@ export interface components {
             input_schema?: {
                 [key: string]: unknown;
             };
+            /** Payload Template */
+            payload_template?: {
+                [key: string]: unknown;
+            } | null;
             /** Auth Header Name */
             auth_header_name?: string | null;
             /** Auth Header Value */
@@ -3300,6 +3435,10 @@ export interface components {
             input_schema: {
                 [key: string]: unknown;
             };
+            /** Payload Template */
+            payload_template?: {
+                [key: string]: unknown;
+            } | null;
             /** Auth Header Name */
             auth_header_name: string | null;
             /**
@@ -3333,6 +3472,12 @@ export interface components {
             input?: {
                 [key: string]: unknown;
             };
+            /** Field Values */
+            field_values?: {
+                [key: string]: string;
+            };
+            /** Caller Number */
+            caller_number?: string | null;
         };
         /** ToolTestOut */
         ToolTestOut: {
@@ -6050,6 +6195,185 @@ export interface operations {
             };
         };
     };
+    list_numbers_features_voice_receptionist_inbound_numbers_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NumbersOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    buy_number_features_voice_receptionist_inbound_numbers_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BuyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NumberOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_numbers_features_voice_receptionist_inbound_numbers_available_get: {
+        parameters: {
+            query?: {
+                kind?: "local" | "toll_free";
+                area_code?: string | null;
+                contains?: string | null;
+            };
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvailableOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assign_number_features_voice_receptionist_inbound_numbers__number_id__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                number_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NumberOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    release_number_features_voice_receptionist_inbound_numbers__number_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                number_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_tools_features_voice_receptionist_inbound_tools_get: {
         parameters: {
             query?: never;
@@ -6544,6 +6868,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    incoming_call_features_voice_receptionist_twilio_voice_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };

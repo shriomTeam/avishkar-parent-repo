@@ -18,10 +18,11 @@ import { useVoice } from "../lib/voice/provider";
 import { ApiError, type Variable } from "../lib/inbound/api";
 import { Heading, Dialog, Empty, Field, FormError, Textarea } from "./ui";
 import { VoiceBoundary } from "./voice-boundary";
+import { VariablesSkeleton } from "./skeletons";
 
 export function Variables() {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<VariablesSkeleton />}>
       <VariableList />
     </VoiceBoundary>
   );
