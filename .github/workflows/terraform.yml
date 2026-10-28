@@ -48,6 +48,9 @@ jobs:
       # External credentials follow the same production environment -> Terraform -> Secret Manager flow.
       TF_VAR_google_client_id: ${{ vars.GOOGLE_CLIENT_ID }}
       TF_VAR_google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      # Phone numbers (used only when twilio_enabled is true in envs/prod.tfvars).
+      TF_VAR_twilio_account_sid: ${{ vars.TWILIO_ACCOUNT_SID }}
+      TF_VAR_twilio_auth_token: ${{ secrets.TWILIO_AUTH_TOKEN }}
       TF_VAR_sendgrid_api_key: ${{ secrets.SENDGRID_API_KEY }}
       TF_VAR_email_old_payload_keys: ${{ secrets.EMAIL_OLD_PAYLOAD_KEYS }}
     steps:
@@ -88,6 +91,9 @@ jobs:
       # External credentials follow the same production environment -> Terraform -> Secret Manager flow.
       TF_VAR_google_client_id: ${{ vars.GOOGLE_CLIENT_ID }}
       TF_VAR_google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      # Phone numbers (used only when twilio_enabled is true in envs/prod.tfvars).
+      TF_VAR_twilio_account_sid: ${{ vars.TWILIO_ACCOUNT_SID }}
+      TF_VAR_twilio_auth_token: ${{ secrets.TWILIO_AUTH_TOKEN }}
       TF_VAR_sendgrid_api_key: ${{ secrets.SENDGRID_API_KEY }}
       TF_VAR_email_old_payload_keys: ${{ secrets.EMAIL_OLD_PAYLOAD_KEYS }}
     steps:

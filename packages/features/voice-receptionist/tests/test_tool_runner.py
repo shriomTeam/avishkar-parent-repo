@@ -1,4 +1,5 @@
 import asyncio
+import json
 import uuid
 
 import pytest
@@ -90,6 +91,32 @@ async def test_calling_create_lead_again_updates_the_same_lead():
         "sam@example.com",
     )
     assert leads[0].phone == "+14155550123" and events == ["lead.created"]  # announced once
+
+
+def _filled_ref(tool, **filled):
+    return _ref(tool) | {"filled": {a: {"key": k, "label": k.title(), "required": r} for a, (k, r) in filled.items()}}
+
+
+async def test_create_lead_takes_filled_arguments_from_captured_values_not_from_the_model():
+    tenant, call_id, tool = await _tenant_with_call()
+    runner = ToolRunner(tenant_id=tenant, call_id=call_id)
+    ref = _filled_ref(tool, phone=("mobile", True))
+    captured = {"mobile": "+14155550123"}
+    outcome = await runner.run(ref, {"first_name": "Sam", "phone": "+19998887777"}, "k", captured)
+    assert outcome.success
+    async with tenant_session(tenant) as s:
+        lead = await s.get(Lead, uuid.UUID(outcome.response["lead_id"]))
+    assert (lead.first_name, lead.phone) == ("Sam", "+14155550123")
+
+
+async def test_a_missing_required_detail_stops_the_tool_and_tells_the_model_what_to_ask():
+    tenant, call_id, tool = await _tenant_with_call()
+    runner = ToolRunner(tenant_id=tenant, call_id=call_id)
+    outcome = await runner.run(_filled_ref(tool, phone=("phone", True)), {"first_name": "Sam"}, "k", {})
+    assert not outcome.success and outcome.response["missing"] == ["Phone"]
+    assert "save_caller_details" in outcome.response["error"]
+    async with tenant_session(tenant) as s:
+        assert (await s.scalars(select(Lead))).all() == []
 
 
 @pytest.mark.parametrize(
@@ -187,6 +214,40 @@ async def test_a_custom_tool_calls_its_endpoint_and_the_answer_goes_back_to_the_
     assert requests[0]["headers"]["idempotency-key"] == "call:1"
 
 
+async def test_a_custom_tool_sends_its_template_filled_from_captured_details(allow_private):
+    tenant, call_id, _ = await _tenant_with_call()
+
+    async def handler(request, n):
+        return json_reply({"id": "n1"})
+
+    async with serve(handler) as (url, requests):
+        tool = await _http_tool(
+            tenant,
+            url + "/patients/{{field.phone}}/notes",
+            payload_template={"phone": "{{field.phone}}", "note": "{{arg.day}}", "call": "{{call.id}}", "k": 1},
+        )
+        ref = _ref(tool) | {"labels": {"phone": "Phone"}}
+        captured = {"phone": "+14155550123"}
+        outcome = await ToolRunner(tenant_id=tenant, call_id=call_id).run(ref, {"day": "mon"}, "k", captured)
+    assert outcome.success
+    assert requests[0]["target"] == "/patients/%2B14155550123/notes"
+    assert json.loads(requests[0]["body"]) == {"phone": "+14155550123", "note": "mon", "call": str(call_id), "k": 1}
+
+
+async def test_a_custom_tool_does_not_run_while_a_captured_detail_is_missing(allow_private):
+    tenant, call_id, _ = await _tenant_with_call()
+
+    async def handler(request, n):
+        return json_reply({})
+
+    async with serve(handler) as (url, requests):
+        tool = await _http_tool(tenant, url, payload_template={"phone": "{{field.phone}}"})
+        ref = _ref(tool) | {"labels": {"phone": "Mobile number"}}
+        outcome = await ToolRunner(tenant_id=tenant, call_id=call_id).run(ref, {"day": "mon"}, "k", {})
+    assert not outcome.success and outcome.response["missing"] == ["Mobile number"]
+    assert requests == []  # nothing was sent
+
+
 async def test_a_failing_endpoint_reports_the_problem_without_raising(allow_private):
     tenant, call_id, _ = await _tenant_with_call()
 
@@ -274,13 +335,13 @@ async def test_the_agent_can_create_a_lead_during_a_call_and_it_is_recorded():
 
 
 class SlowRunner:
-    async def run(self, ref, args, key):
+    async def run(self, ref, args, key, values=None):
         await asyncio.sleep(5)
         return ToolOutcome(True, {"ok": True})
 
 
 class BrokenRunner:
-    async def run(self, ref, args, key):
+    async def run(self, ref, args, key, values=None):
         return ToolOutcome(False, {"ok": False, "invalid": {"phone": "bad"}}, "invalid arguments", 3, {"ok": False})
 
 

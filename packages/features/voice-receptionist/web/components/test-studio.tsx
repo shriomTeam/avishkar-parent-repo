@@ -23,13 +23,14 @@ import {
 } from "@clinic/ui";
 import { Heading, Dropdown, Badge, Empty, FormError } from "./ui";
 import { VoiceBoundary } from "./voice-boundary";
+import { TestStudioSkeleton } from "./skeletons";
 
 const clock = (s: number) =>
   `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
 export function TestStudio() {
   return (
-    <VoiceBoundary>
+    <VoiceBoundary fallback={<TestStudioSkeleton />}>
       <Studio />
     </VoiceBoundary>
   );
