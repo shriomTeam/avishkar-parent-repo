@@ -8,8 +8,10 @@ SMS/email through clinic_engagement. See docs/ADDING_A_FEATURE.md.
 from fastapi import APIRouter
 
 from clinic_core.features import Feature, NavItem
+from clinic_lead_response.api.settings import router as settings_router
 
 router = APIRouter(tags=["lead_response"])
+router.include_router(settings_router)
 
 
 @router.get("/status")

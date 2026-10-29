@@ -574,6 +574,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/lead_response/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Settings */
+        get: operations["get_settings_features_lead_response_settings_get"];
+        /** Put Settings */
+        put: operations["put_settings_features_lead_response_settings_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/lead_response/status": {
         parameters: {
             query?: never;
@@ -2436,6 +2454,163 @@ export interface components {
                 [key: string]: unknown;
             } | null;
             active_run: components["schemas"]["ActiveRun"] | null;
+        };
+        /**
+         * LeadResponseBusinessHours
+         * @description Opening windows per day, in the clinic's own time zone. A day without windows is closed.
+         */
+        LeadResponseBusinessHours: {
+            /** Mon */
+            mon?: components["schemas"]["LeadResponseWindow"][];
+            /** Tue */
+            tue?: components["schemas"]["LeadResponseWindow"][];
+            /** Wed */
+            wed?: components["schemas"]["LeadResponseWindow"][];
+            /** Thu */
+            thu?: components["schemas"]["LeadResponseWindow"][];
+            /** Fri */
+            fri?: components["schemas"]["LeadResponseWindow"][];
+            /** Sat */
+            sat?: components["schemas"]["LeadResponseWindow"][];
+            /** Sun */
+            sun?: components["schemas"]["LeadResponseWindow"][];
+        };
+        /**
+         * LeadResponseCapabilities
+         * @description What the AI may do. Each is switched on separately. Stored but not wired in release 1.
+         */
+        LeadResponseCapabilities: {
+            /**
+             * Answer Questions
+             * @default false
+             */
+            answer_questions: boolean;
+            /**
+             * Quote Pricing
+             * @default false
+             */
+            quote_pricing: boolean;
+            /**
+             * Show Open Slots
+             * @default false
+             */
+            show_open_slots: boolean;
+            /**
+             * Book Appointments
+             * @default false
+             */
+            book_appointments: boolean;
+            /**
+             * Patient Aware Replies
+             * @default false
+             */
+            patient_aware_replies: boolean;
+        };
+        /**
+         * LeadResponseQuietWindow
+         * @description A daily window that may cross midnight (21:00 to 08:00). Start and end must differ.
+         */
+        LeadResponseQuietWindow: {
+            /** Start */
+            start: string;
+            /** End */
+            end: string;
+        };
+        /** LeadResponseSettings */
+        LeadResponseSettings: {
+            /**
+             * Ai Enabled
+             * @default false
+             */
+            ai_enabled: boolean;
+            capabilities?: components["schemas"]["LeadResponseCapabilities"];
+            /**
+             * Send Mode
+             * @default draft
+             * @enum {string}
+             */
+            send_mode: "draft" | "auto";
+            /**
+             * Ai Active Mode
+             * @default always
+             * @enum {string}
+             */
+            ai_active_mode: "always" | "after_hours" | "overflow";
+            /** Overflow Minutes */
+            overflow_minutes?: number | null;
+            /**
+             * Holding Minutes
+             * @default 15
+             */
+            holding_minutes: number;
+            /**
+             * Sla Minutes
+             * @default 30
+             */
+            sla_minutes: number;
+            /**
+             * Ack Text
+             * @default Thanks for your message. We have received it and a member of our team will reply soon.
+             */
+            ack_text: string;
+            business_hours?: components["schemas"]["LeadResponseBusinessHours"];
+            quiet_hours?: components["schemas"]["LeadResponseQuietWindow"] | null;
+            /**
+             * Escalation Role
+             * @default office_manager
+             * @enum {string}
+             */
+            escalation_role: "owner" | "office_manager";
+        };
+        /** LeadResponseSettingsOut */
+        LeadResponseSettingsOut: {
+            /** Version */
+            version: number;
+            config: components["schemas"]["LeadResponseSettings"];
+            /**
+             * @default {
+             *       "ai_enabled": false,
+             *       "capabilities": {
+             *         "answer_questions": false,
+             *         "book_appointments": false,
+             *         "patient_aware_replies": false,
+             *         "quote_pricing": false,
+             *         "show_open_slots": false
+             *       },
+             *       "send_mode": "draft",
+             *       "ai_active_mode": "always",
+             *       "holding_minutes": 15,
+             *       "sla_minutes": 30,
+             *       "ack_text": "Thanks for your message. We have received it and a member of our team will reply soon.",
+             *       "business_hours": {
+             *         "fri": [],
+             *         "mon": [],
+             *         "sat": [],
+             *         "sun": [],
+             *         "thu": [],
+             *         "tue": [],
+             *         "wed": []
+             *       },
+             *       "escalation_role": "office_manager"
+             *     }
+             */
+            defaults: components["schemas"]["LeadResponseSettings"];
+            /** Timezone */
+            timezone: string;
+            /** Updated By */
+            updated_by: string | null;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /**
+         * LeadResponseWindow
+         * @description A business-hours window inside one day: start before end.
+         */
+        LeadResponseWindow: {
+            /** Start */
+            start: string;
+            /** End */
+            end: string;
         };
         /** MappingConfig */
         MappingConfig: {
@@ -4640,6 +4815,77 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_settings_features_lead_response_settings_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponseSettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_settings_features_lead_response_settings_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadResponseSettings"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponseSettingsOut"];
                 };
             };
             /** @description Validation Error */
