@@ -67,6 +67,18 @@ export function statusLine(version: number): string {
   return version === 0 ? "Using the standard settings." : `Using your saved settings (version ${version}).`;
 }
 
+/** "Oct 30, 2026, 2:05 PM", in the clinic's own time zone so the server and the browser print the same text. */
+export function formatSavedAt(iso: string | null | undefined, timezone: string): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  try {
+    return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: timezone }).format(date);
+  } catch {
+    return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(date);
+  }
+}
+
 export function savedMessage(version: number): string {
   return `Saved (version ${version}). These settings take effect when lead response is switched on for your clinic.`;
 }
