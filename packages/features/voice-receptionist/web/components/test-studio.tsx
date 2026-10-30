@@ -127,20 +127,18 @@ function Studio() {
               <Button
                 variant={call.busy ? "dangerOutline" : "brand"}
                 className="mt-5"
-                disabled={
-                  !agent ||
-                  (!call.busy && !agent.is_active) ||
-                  call.state === "connecting"
-                }
+                disabled={!agent || (!call.busy && !agent.is_active)}
                 onClick={() =>
                   call.busy ? call.hangup() : agent && call.start(agent)
                 }
               >
-                {call.busy
-                  ? "End call"
-                  : finished || call.state === "error"
-                    ? "Call again"
-                    : "Start test call"}
+                {call.state === "connecting"
+                  ? "Cancel call"
+                  : call.busy
+                    ? "End call"
+                    : finished || call.state === "error"
+                      ? "Call again"
+                      : "Start test call"}
               </Button>
               {agent && !agent.is_active && (
                 <small className="block text-[12px] text-muted">
@@ -148,6 +146,21 @@ function Studio() {
                 </small>
               )}
             </div>
+            {call.audioBlocked && call.busy && (
+              <Note>
+                <p>
+                  Your browser paused call audio. Enable it to continue this
+                  call.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => void call.resumeAudio()}
+                >
+                  Enable audio
+                </Button>
+              </Note>
+            )}
             <FormError message={call.error} />
             {finished && (
               <Note>

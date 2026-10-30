@@ -2,6 +2,14 @@
 
 The implemented Avishkar Voice AI authentication, onboarding and dashboard now live in this monorepo. The original checkout remains intact. Google login and clinic onboarding use PostgreSQL; agents, calls, tools, variables and test calls are real; phone numbers and settings remain explicitly simulated.
 
+## Conversation languages and first-message previews
+
+The Language dropdown offers **English, Hindi, Spanish**, in that order. The call engine uses the selected language without rewriting the saved prompt or First message. Transcripts preserve actual spoken text; descriptive captured details use English, names use Latin transliteration and exact enum options/identifiers keep their configured values.
+
+**Listen to sample** generates speech from the current, unsaved **First message**, using the selected voice and language, including translation when the message is written in another language. Workspace variables are resolved with the same one-pass resolver as calls. Browser caller numbers are `not available`. Blank messages disable playback. Editing the message, agent name, voice or language stops playback and invalidates the pending browser request. Previews require no microphone, save, tools or call records.
+
+Generation uses the existing Vertex Live model and server credentials; there are no hardcoded audio files, new services or migrations. It adds model latency and cost. Identical resolved inputs are cached privately per workspace for three minutes in bounded API memory, never on disk; limits protect generation. See [implementation, testing and future-language rules](HINDI_AND_VOICE_PREVIEWS_PLAN.md).
+
 ## Code locations
 
 There is no standalone `apps/voice-receptionist` folder. Voice receptionist is a feature inside the existing `apps/web` frontend and `apps/api` backend. Its browser URL is `/voice-receptionist`; Next.js route groups `(fullscreen)`, `(platform)` and `(features)` do not appear in that URL.

@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from clinic_voice_receptionist.inbound.live.language import language_instruction
 from clinic_voice_receptionist.tools.schema import to_gemini
 
 SAVE_TOOL = "save_caller_details"
@@ -9,7 +10,8 @@ END_TOOL = "end_call"
 
 GUARDRAILS = """\
 You are speaking on a live phone call, so keep every reply short and natural, one or two sentences.
-Speak only in the caller's language unless they switch. Never give medical advice or diagnoses; offer to have
+Use the selected conversation language unless the caller requests a switch.
+Never give medical advice or diagnoses; offer to have
 the clinic team follow up instead. If you are unsure of something, say so rather than guessing.
 When you learn one of the details you are asked to collect, call {save} with the details you have so far,
 and read important values (name, phone number, email, dates) back to the caller to confirm. If the caller
@@ -40,7 +42,7 @@ _HINTS = {
 
 
 def system_instruction(agent: dict, fields: list[dict]) -> str:
-    parts = [agent["prompt"].strip(), GUARDRAILS.format(save=SAVE_TOOL, end=END_TOOL)]
+    parts = [agent["prompt"].strip(), GUARDRAILS.format(save=SAVE_TOOL, end=END_TOOL), language_instruction(agent)]
     if agent.get("tools"):
         parts.append(TOOLS_NOTE)
     if fields:
@@ -76,7 +78,10 @@ def function_declarations(fields: list[dict], tools: list[dict] | None = None) -
             0,
             {
                 "name": SAVE_TOOL,
-                "description": "Save details the caller has given. Include only values you are confident about.",
+                "description": (
+                    "Save details the caller has given. Use English for descriptive text, Latin transliteration "
+                    "for names, exact enum options and standard formats. Include only confident values."
+                ),
                 "parameters": {
                     "type": "OBJECT",
                     "properties": {f["key"]: field_schema(f) for f in fields},

@@ -17,6 +17,7 @@ from clinic_voice_receptionist.tools.router import router as tools_router
 from clinic_voice_receptionist.twilio_calls.stream import router as twilio_stream_router
 from clinic_voice_receptionist.twilio_calls.webhook import router as twilio_webhook_router
 from clinic_voice_receptionist.variables.router import router as variables_router
+from clinic_voice_receptionist.voice_preview.router import router as voice_preview_router
 
 router = APIRouter(tags=["voice_receptionist"])
 router.include_router(inbound_router)
@@ -29,6 +30,7 @@ ws_router.include_router(twilio_webhook_router)
 ws_router.include_router(twilio_stream_router)
 router.include_router(tools_router)
 router.include_router(variables_router)
+router.include_router(voice_preview_router)
 
 
 @router.get("/status")
