@@ -1,0 +1,665 @@
+{
+ "base": {
+  "ai_enabled": false,
+  "capabilities": {
+   "answer_questions": false,
+   "quote_pricing": false,
+   "show_open_slots": false,
+   "book_appointments": false,
+   "patient_aware_replies": false
+  },
+  "send_mode": "draft",
+  "ai_active_mode": "always",
+  "overflow_minutes": null,
+  "holding_minutes": 15,
+  "sla_minutes": 30,
+  "ack_text": "Thanks for your message. We have received it and a member of our team will reply soon.",
+  "business_hours": {
+   "mon": [],
+   "tue": [],
+   "wed": [],
+   "thu": [],
+   "fri": [],
+   "sat": [],
+   "sun": []
+  },
+  "quiet_hours": null,
+  "escalation_role": "office_manager"
+ },
+ "cases": [
+  {
+   "id": "defaults",
+   "valid": true,
+   "set": {}
+  },
+  {
+   "id": "holding 5 is the lowest",
+   "valid": true,
+   "set": {
+    "holding_minutes": 5,
+    "sla_minutes": 30
+   }
+  },
+  {
+   "id": "holding 60 is the highest",
+   "valid": true,
+   "set": {
+    "holding_minutes": 60,
+    "sla_minutes": 240
+   }
+  },
+  {
+   "id": "holding 4 is too low",
+   "valid": false,
+   "set": {
+    "holding_minutes": 4
+   }
+  },
+  {
+   "id": "holding 61 is too high",
+   "valid": false,
+   "set": {
+    "holding_minutes": 61,
+    "sla_minutes": 240
+   }
+  },
+  {
+   "id": "holding 0",
+   "valid": false,
+   "set": {
+    "holding_minutes": 0
+   }
+  },
+  {
+   "id": "holding 7.5 is not whole",
+   "valid": false,
+   "set": {
+    "holding_minutes": 7.5
+   }
+  },
+  {
+   "id": "sla 10 is the lowest",
+   "valid": true,
+   "set": {
+    "holding_minutes": 5,
+    "sla_minutes": 10
+   }
+  },
+  {
+   "id": "sla 240 is the highest",
+   "valid": true,
+   "set": {
+    "sla_minutes": 240
+   }
+  },
+  {
+   "id": "sla 9 is too low",
+   "valid": false,
+   "set": {
+    "holding_minutes": 5,
+    "sla_minutes": 9
+   }
+  },
+  {
+   "id": "sla 241 is too high",
+   "valid": false,
+   "set": {
+    "sla_minutes": 241
+   }
+  },
+  {
+   "id": "sla equal to holding",
+   "valid": false,
+   "set": {
+    "holding_minutes": 20,
+    "sla_minutes": 20
+   }
+  },
+  {
+   "id": "sla below holding",
+   "valid": false,
+   "set": {
+    "holding_minutes": 40,
+    "sla_minutes": 30
+   }
+  },
+  {
+   "id": "sla 11 with holding 10",
+   "valid": true,
+   "set": {
+    "holding_minutes": 10,
+    "sla_minutes": 11
+   }
+  },
+  {
+   "id": "holding 60 with sla 60",
+   "valid": false,
+   "set": {
+    "holding_minutes": 60,
+    "sla_minutes": 60
+   }
+  },
+  {
+   "id": "ack one character",
+   "valid": true,
+   "set": {
+    "ack_text": "K"
+   }
+  },
+  {
+   "id": "ack 320 characters",
+   "valid": true,
+   "set": {
+    "ack_text": {
+     "$repeat": [
+      "a",
+      320
+     ]
+    }
+   }
+  },
+  {
+   "id": "ack 321 characters",
+   "valid": false,
+   "set": {
+    "ack_text": {
+     "$repeat": [
+      "a",
+      321
+     ]
+    }
+   }
+  },
+  {
+   "id": "ack 320 emoji count as 320 characters",
+   "valid": true,
+   "set": {
+    "ack_text": {
+     "$repeat": [
+      "😀",
+      320
+     ]
+    }
+   }
+  },
+  {
+   "id": "ack 321 emoji",
+   "valid": false,
+   "set": {
+    "ack_text": {
+     "$repeat": [
+      "😀",
+      321
+     ]
+    }
+   }
+  },
+  {
+   "id": "ack empty",
+   "valid": false,
+   "set": {
+    "ack_text": ""
+   }
+  },
+  {
+   "id": "ack only spaces",
+   "valid": false,
+   "set": {
+    "ack_text": "   \n  "
+   }
+  },
+  {
+   "id": "ack padded with spaces",
+   "valid": true,
+   "set": {
+    "ack_text": "  Hello there  "
+   }
+  },
+  {
+   "id": "ack 320 characters plus padding",
+   "valid": true,
+   "set": {
+    "ack_text": "  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  "
+   }
+  },
+  {
+   "id": "ack with a new line",
+   "valid": true,
+   "set": {
+    "ack_text": "Hello.\nWe will reply soon."
+   }
+  },
+  {
+   "id": "ack with a tab",
+   "valid": false,
+   "set": {
+    "ack_text": "Hello\tthere"
+   }
+  },
+  {
+   "id": "ack with a carriage return",
+   "valid": false,
+   "set": {
+    "ack_text": "Hello\r\nthere"
+   }
+  },
+  {
+   "id": "ack with a zero-width space",
+   "valid": false,
+   "set": {
+    "ack_text": "Hello​there"
+   }
+  },
+  {
+   "id": "ack with an open brace",
+   "valid": false,
+   "set": {
+    "ack_text": "Hi {name}"
+   }
+  },
+  {
+   "id": "ack with a close brace",
+   "valid": false,
+   "set": {
+    "ack_text": "Hi name}"
+   }
+  },
+  {
+   "id": "ack with accents and punctuation",
+   "valid": true,
+   "set": {
+    "ack_text": "Merci, nous répondons vite. Thanks!"
+   }
+  },
+  {
+   "id": "role owner",
+   "valid": true,
+   "set": {
+    "escalation_role": "owner"
+   }
+  },
+  {
+   "id": "role office manager",
+   "valid": true,
+   "set": {
+    "escalation_role": "office_manager"
+   }
+  },
+  {
+   "id": "role not allowed",
+   "valid": false,
+   "set": {
+    "escalation_role": "front_desk"
+   }
+  },
+  {
+   "id": "one window",
+   "valid": true,
+   "set": {
+    "business_hours": {
+     "mon": [
+      {
+       "start": "09:00",
+       "end": "17:00"
+      }
+     ],
+     "tue": [],
+     "wed": [],
+     "thu": [],
+     "fri": [],
+     "sat": [],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "three windows",
+   "valid": true,
+   "set": {
+    "business_hours": {
+     "mon": [
+      {
+       "start": "08:00",
+       "end": "10:00"
+      },
+      {
+       "start": "11:00",
+       "end": "13:00"
+      },
+      {
+       "start": "14:00",
+       "end": "16:00"
+      }
+     ],
+     "tue": [],
+     "wed": [],
+     "thu": [],
+     "fri": [],
+     "sat": [],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "four windows",
+   "valid": false,
+   "set": {
+    "business_hours": {
+     "mon": [
+      {
+       "start": "08:00",
+       "end": "09:00"
+      },
+      {
+       "start": "10:00",
+       "end": "11:00"
+      },
+      {
+       "start": "12:00",
+       "end": "13:00"
+      },
+      {
+       "start": "14:00",
+       "end": "15:00"
+      }
+     ],
+     "tue": [],
+     "wed": [],
+     "thu": [],
+     "fri": [],
+     "sat": [],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "windows given out of order",
+   "valid": true,
+   "set": {
+    "business_hours": {
+     "mon": [],
+     "tue": [
+      {
+       "start": "14:00",
+       "end": "16:00"
+      },
+      {
+       "start": "08:00",
+       "end": "10:00"
+      }
+     ],
+     "wed": [],
+     "thu": [],
+     "fri": [],
+     "sat": [],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "windows that touch",
+   "valid": true,
+   "set": {
+    "business_hours": {
+     "mon": [],
+     "tue": [],
+     "wed": [
+      {
+       "start": "08:00",
+       "end": "12:00"
+      },
+      {
+       "start": "12:00",
+       "end": "16:00"
+      }
+     ],
+     "thu": [],
+     "fri": [],
+     "sat": [],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "windows that overlap",
+   "valid": false,
+   "set": {
+    "business_hours": {
+     "mon": [],
+     "tue": [],
+     "wed": [
+      {
+       "start": "08:00",
+       "end": "12:00"
+      },
+      {
+       "start": "11:59",
+       "end": "16:00"
+      }
+     ],
+     "thu": [],
+     "fri": [],
+     "sat": [],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "window starts when it ends",
+   "valid": false,
+   "set": {
+    "business_hours": {
+     "mon": [],
+     "tue": [],
+     "wed": [],
+     "thu": [
+      {
+       "start": "09:00",
+       "end": "09:00"
+      }
+     ],
+     "fri": [],
+     "sat": [],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "window ends before it starts",
+   "valid": false,
+   "set": {
+    "business_hours": {
+     "mon": [],
+     "tue": [],
+     "wed": [],
+     "thu": [
+      {
+       "start": "17:00",
+       "end": "09:00"
+      }
+     ],
+     "fri": [],
+     "sat": [],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "window from midnight to the last minute",
+   "valid": true,
+   "set": {
+    "business_hours": {
+     "mon": [],
+     "tue": [],
+     "wed": [],
+     "thu": [],
+     "fri": [
+      {
+       "start": "00:00",
+       "end": "23:59"
+      }
+     ],
+     "sat": [],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "window with a bad hour",
+   "valid": false,
+   "set": {
+    "business_hours": {
+     "mon": [],
+     "tue": [],
+     "wed": [],
+     "thu": [],
+     "fri": [],
+     "sat": [
+      {
+       "start": "24:00",
+       "end": "25:00"
+      }
+     ],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "window with a bad minute",
+   "valid": false,
+   "set": {
+    "business_hours": {
+     "mon": [],
+     "tue": [],
+     "wed": [],
+     "thu": [],
+     "fri": [],
+     "sat": [
+      {
+       "start": "09:60",
+       "end": "10:00"
+      }
+     ],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "window without a leading zero",
+   "valid": false,
+   "set": {
+    "business_hours": {
+     "mon": [],
+     "tue": [],
+     "wed": [],
+     "thu": [],
+     "fri": [],
+     "sat": [
+      {
+       "start": "9:00",
+       "end": "10:00"
+      }
+     ],
+     "sun": []
+    }
+   }
+  },
+  {
+   "id": "every day open",
+   "valid": true,
+   "set": {
+    "business_hours": {
+     "mon": [
+      {
+       "start": "09:00",
+       "end": "17:00"
+      }
+     ],
+     "tue": [
+      {
+       "start": "09:00",
+       "end": "17:00"
+      }
+     ],
+     "wed": [
+      {
+       "start": "09:00",
+       "end": "17:00"
+      }
+     ],
+     "thu": [
+      {
+       "start": "09:00",
+       "end": "17:00"
+      }
+     ],
+     "fri": [
+      {
+       "start": "09:00",
+       "end": "17:00"
+      }
+     ],
+     "sat": [
+      {
+       "start": "09:00",
+       "end": "17:00"
+      }
+     ],
+     "sun": [
+      {
+       "start": "09:00",
+       "end": "17:00"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "quiet hours across midnight",
+   "valid": true,
+   "set": {
+    "quiet_hours": {
+     "start": "21:00",
+     "end": "08:00"
+    }
+   }
+  },
+  {
+   "id": "quiet hours inside a day",
+   "valid": true,
+   "set": {
+    "quiet_hours": {
+     "start": "13:00",
+     "end": "14:00"
+    }
+   }
+  },
+  {
+   "id": "quiet hours with the same start and end",
+   "valid": false,
+   "set": {
+    "quiet_hours": {
+     "start": "21:00",
+     "end": "21:00"
+    }
+   }
+  },
+  {
+   "id": "quiet hours with a bad time",
+   "valid": false,
+   "set": {
+    "quiet_hours": {
+     "start": "25:00",
+     "end": "08:00"
+    }
+   }
+  },
+  {
+   "id": "quiet hours off",
+   "valid": true,
+   "set": {
+    "quiet_hours": null
+   }
+  }
+ ]
+}

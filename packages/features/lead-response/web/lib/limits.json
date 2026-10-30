@@ -1,0 +1,8 @@
+{
+  "holding_minutes": { "min": 5, "max": 60 },
+  "sla_minutes": { "min": 10, "max": 240 },
+  "ack_text": { "min_length": 1, "max_length": 320 },
+  "windows_per_day": 3,
+  "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+  "escalation_roles": ["owner", "office_manager"]
+}

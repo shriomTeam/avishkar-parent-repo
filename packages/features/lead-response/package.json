@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "lint": "uv run ruff check src tests",
-    "test": "uv run pytest tests -q"
+    "typecheck": "tsc --noEmit -p web/tsconfig.json",
+    "test": "uv run pytest tests -q && node --import ./web/unit/ts-resolve.mjs --test web/unit/*.test.ts",
+    "test:web": "node --import ./web/unit/ts-resolve.mjs --test web/unit/*.test.ts"
   },
   "exports": {
     "./web/*": "./web/pages/*.tsx"
