@@ -121,6 +121,30 @@ export function ConfigurationFields(props: Props) {
           options={VOICES.map((voice) => ({ value: voice, label: voice }))}
         />
       </VoicePreview>
+      <Dropdown
+        label="Speech detection"
+        value={draft.speech_start_sensitivity}
+        onChange={(value) =>
+          set("speech_start_sensitivity", value as "high" | "low")
+        }
+        options={[
+          {
+            value: "high",
+            label: "Sensitive (default)",
+            hint: "Better for short or quiet replies",
+          },
+          {
+            value: "low",
+            label: "Less sensitive to noise",
+            hint: "May miss quiet speech or delay interruptions",
+          },
+        ]}
+      />
+      <small className="mb-[18px] block text-[12px] text-muted">
+        Applies to new browser and phone calls after saving. Keep the default
+        unless you have tested short replies and interruptions on a real phone
+        with background noise.
+      </small>
       <Switch
         label="Agent is active"
         description="Inactive agents cannot take calls."

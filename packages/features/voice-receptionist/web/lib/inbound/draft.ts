@@ -46,6 +46,7 @@ export type Draft = {
   greeting: string;
   voice: string;
   language: string;
+  speech_start_sensitivity: "high" | "low";
   is_active: boolean;
   save_transcript: boolean;
   save_raw_events: boolean;
@@ -83,6 +84,7 @@ export function toDraft(agent?: Agent): Draft {
     greeting: agent?.greeting ?? "",
     voice: agent?.voice ?? "Puck",
     language: agent?.language ?? "en-US",
+    speech_start_sensitivity: agent?.speech_start_sensitivity ?? "high",
     is_active: agent?.is_active ?? true,
     save_transcript: agent?.save_transcript ?? true,
     save_raw_events: agent?.save_raw_events ?? true,
@@ -115,6 +117,7 @@ export function toInput(d: Draft): AgentInput {
     greeting: d.greeting.trim() || null,
     voice: d.voice,
     language: d.language,
+    speech_start_sensitivity: d.speech_start_sensitivity,
     is_active: d.is_active,
     save_transcript: d.save_transcript,
     save_raw_events: d.save_raw_events,

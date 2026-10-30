@@ -66,6 +66,7 @@ async def build_snapshot(
         "greeting": variables.resolve(agent.greeting, values),
         "voice": agent.voice,
         "language": agent.language,
+        "speech_start_sensitivity": agent.speech_start_sensitivity,
         "model": agent.model,
         "save_transcript": agent.save_transcript,
         "save_raw_events": agent.save_raw_events,

@@ -10,6 +10,12 @@ The Language dropdown offers **English, Hindi, Spanish**, in that order. The cal
 
 Generation uses the existing Vertex Live model and server credentials; there are no hardcoded audio files, new services or migrations. It adds model latency and cost. Identical resolved inputs are cached privately per workspace for three minutes in bounded API memory, never on disk; limits protect generation. See [implementation, testing and future-language rules](HINDI_AND_VOICE_PREVIEWS_PLAN.md).
 
+## Speech detection
+
+Each agent has a **Speech detection** setting. **Sensitive (default)** restores the pre-tuning HIGH speech-start sensitivity for short or quiet replies. **Less sensitive to noise** explicitly chooses LOW, which can reduce false interruptions but can miss quiet replies or delay genuine barge-in. The choice applies to new browser **and Twilio phone calls** and is copied into each call snapshot. Editing an agent does not change an already-created call's explicit setting. Legacy snapshots without this field fall back to HIGH.
+
+Migration `20261030_voice_sensitivity` adds the setting and defaults existing agents to HIGH. Run `pnpm db:migrate` before starting updated local services; deployment already migrates before the API. Owner/Office Manager configuration permissions are unchanged. Test real phone calls with short replies, interruptions and background noise before choosing LOW; automated tests are not acoustic acceptance.
+
 ## Code locations
 
 There is no standalone `apps/voice-receptionist` folder. Voice receptionist is a feature inside the existing `apps/web` frontend and `apps/api` backend. Its browser URL is `/voice-receptionist`; Next.js route groups `(fullscreen)`, `(platform)` and `(features)` do not appear in that URL.

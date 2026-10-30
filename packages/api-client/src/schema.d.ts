@@ -1455,6 +1455,12 @@ export interface components {
              */
             language: string;
             /**
+             * Speech Start Sensitivity
+             * @default high
+             * @enum {string}
+             */
+            speech_start_sensitivity: "high" | "low";
+            /**
              * Is Active
              * @default true
              */
@@ -1498,6 +1504,11 @@ export interface components {
             voice: string;
             /** Language */
             language: string;
+            /**
+             * Speech Start Sensitivity
+             * @enum {string}
+             */
+            speech_start_sensitivity: "high" | "low";
             /** Model */
             model: string;
             /** Direction */
