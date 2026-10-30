@@ -28,9 +28,21 @@ app.include_router(numbers_router)
 
 def _random_number(area: str | None = None) -> str:
     """Numbers are unique across the whole database and the test database keeps its rows, so every test gets its own."""
-    area = area or f"{random.randint(2, 9)}{random.randint(0, 99):02d}"
+    # Local-number fixtures must never randomly choose 800/833/844/855/866/877/888.
+    # Keep the remaining digits random because ownership is unique across persistent test rows.
+    area = area or random.choice(("212", "415", "628", "650", "718", "917"))
     exchange = f"{random.randint(2, 9)}{random.randint(0, 99):02d}"
     return f"+1{area}{exchange}{random.randint(0, 9999):04d}"
+
+
+def test_default_number_fixture_remains_local_even_when_random_digits_form_855(monkeypatch):
+    def digits(low, high):
+        return 8 if (low, high) == (2, 9) else 55 if high == 99 else 8056
+
+    monkeypatch.setattr(random, "randint", digits)
+    assert service.kind_of(_random_number()) == "local"
+    # Explicit toll-free test inputs still exercise the actual toll-free path.
+    assert service.kind_of(_random_number("855")) == "toll_free"
 
 
 @pytest.fixture
