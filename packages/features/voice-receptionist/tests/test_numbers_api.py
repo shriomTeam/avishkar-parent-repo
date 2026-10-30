@@ -298,6 +298,9 @@ async def test_buy_sends_the_number_and_webhook_once_and_never_retries():
     assert "PhoneNumber=%2B12125550100" in sent[0] and "VoiceUrl=https%3A%2F%2Fx%2Fy" in sent[0]
 
 
+OURS = {"sid": "PN9", "phone_number": "+12125550100", "friendly_name": "x"}  # what Twilio lists for our purchase
+
+
 async def test_a_lost_answer_after_buying_finds_the_number_on_the_account_instead_of_billing_nobody():
     seen = []
 
@@ -306,7 +309,7 @@ async def test_a_lost_answer_after_buying_finds_the_number_on_the_account_instea
         if request.method == "POST":
             raise httpx.ReadTimeout("no answer", request=request)  # Twilio may have done it
         assert "PhoneNumber=%2B12125550100" in str(request.url)
-        return httpx.Response(200, json={"incoming_phone_numbers": [{"sid": "PN9", "phone_number": "+12125550100"}]})
+        return httpx.Response(200, json={"incoming_phone_numbers": [OURS]})
 
     bought = await _twilio(handler).buy(number="+12125550100", friendly_name="x", voice_url=None)
     assert (bought.sid, bought.number) == ("PN9", "+12125550100")
@@ -317,7 +320,7 @@ async def test_an_unreadable_success_answer_is_treated_the_same_way():
     def handler(request):
         if request.method == "POST":
             return httpx.Response(201, text="<html>not json</html>")
-        return httpx.Response(200, json={"incoming_phone_numbers": [{"sid": "PN9", "phone_number": "+12125550100"}]})
+        return httpx.Response(200, json={"incoming_phone_numbers": [OURS]})
 
     assert (await _twilio(handler).buy(number="+12125550100", friendly_name="x", voice_url=None)).sid == "PN9"
 
@@ -330,6 +333,33 @@ async def test_a_lost_answer_for_a_number_not_on_the_account_says_try_again():
 
     with pytest.raises(TwilioError, match="try again"):
         await _twilio(handler).buy(number="+12125550100", friendly_name="x", voice_url=None)
+
+
+@pytest.mark.parametrize(
+    "owned",
+    [
+        {"phone_number": "+12125550100", "friendly_name": "Avishkar other123"},
+        {"phone_number": "+12125550199", "friendly_name": "x"},
+    ],
+)
+async def test_a_number_on_the_account_that_is_not_the_one_we_bought_is_never_claimed(owned):
+    def handler(request):
+        if request.method == "POST":
+            raise httpx.ReadTimeout("no answer", request=request)
+        return httpx.Response(200, json={"incoming_phone_numbers": [{"sid": "PN7", **owned}]})
+
+    with pytest.raises(TwilioError, match="try again"):
+        await _twilio(handler).buy(number="+12125550100", friendly_name="x", voice_url=None)
+
+
+async def test_a_recovered_number_that_clashes_with_a_saved_one_is_not_released(client, twilio, num):
+    a, b = await create_test_tenant(), await create_test_tenant()
+    assert (await _buy(client, a, num)).status_code == 201
+    twilio.recover_next_buy = True  # the lookup after a lost answer finds the number a already has
+    clash = await _buy(client, b, num)
+    assert clash.status_code == 409
+    assert list(twilio.owned.values()) == [num]
+    assert [c[0] for c in twilio.calls].count("release") == 0  # a's live number was left alone
 
 
 async def test_when_even_the_lookup_fails_staff_are_told_to_check_before_buying_again():

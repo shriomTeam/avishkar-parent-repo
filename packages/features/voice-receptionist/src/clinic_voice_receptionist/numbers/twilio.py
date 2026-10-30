@@ -35,6 +35,7 @@ class AvailableNumber:
 class PurchasedNumber:
     sid: str
     number: str
+    recovered: bool = False  # found on the account after a lost answer, so it may have been there before
 
 
 class NumbersClient(Protocol):
@@ -110,19 +111,21 @@ class TwilioNumbers:
         try:
             response = await self._request("POST", "IncomingPhoneNumbers.json", data=data)
         except httpx.HTTPError:
-            return await self._bought_without_answer(number)  # the purchase may have gone through unseen
+            return await self._bought_without_answer(number, friendly_name)  # it may have gone through unseen
         if response.status_code >= 300:
             raise self._fail(response, "buy this number")
         try:
             body = response.json()
             return PurchasedNumber(sid=body["sid"], number=body["phone_number"])
         except (ValueError, KeyError, TypeError):
-            return await self._bought_without_answer(number)  # a 2xx we cannot read still means Twilio did it
+            return await self._bought_without_answer(number, friendly_name)  # an unreadable 2xx is still a sale
 
-    async def _bought_without_answer(self, number: str) -> PurchasedNumber:
-        """Twilio may have completed a purchase whose answer we never read. The number was free a moment ago, so if
-        it is on the account now it is ours: hand it back to be saved (or given back if saving fails), instead of
-        leaving a number that is billed monthly but belongs to no clinic. The purchase itself is never repeated."""
+    async def _bought_without_answer(self, number: str, friendly_name: str) -> PurchasedNumber:
+        """Twilio may have completed a purchase whose answer we never read. If the number is on the account with the
+        name we sent, hand it back to be saved, instead of leaving a number that is billed monthly but belongs to no
+        clinic. A number with any other name belongs to someone else (another clinic or environment) and is never
+        claimed. The purchase itself is never repeated. A lookup made right after a timeout can still miss a
+        purchase Twilio has not finished; then staff see "try again" and the number may appear a moment later."""
         found: list | None = None
         try:
             response = await self._request("GET", "IncomingPhoneNumbers.json", params={"PhoneNumber": number})
@@ -137,8 +140,9 @@ class TwilioNumbers:
                 "again, so you are not billed for two numbers.",
                 503,
             )
-        if found:
-            return PurchasedNumber(sid=found[0]["sid"], number=found[0]["phone_number"])
+        ours = [n for n in found if n.get("phone_number") == number and n.get("friendly_name") == friendly_name]
+        if ours:
+            return PurchasedNumber(sid=ours[0]["sid"], number=number, recovered=True)
         raise TwilioError("Twilio could not be reached. Please try again.", 503)
 
     async def list_voice_urls(self) -> dict[str, str]:

@@ -85,7 +85,11 @@ async def buy(
         session.add(row)
         await session.flush()
     except IntegrityError:
-        await give_back(client, purchased.sid)
+        if purchased.recovered:
+            # Found on the account after a lost answer, so it may already belong to a clinic here. Never release it.
+            log.error("recovered phone number %s is already saved; it was not released", purchased.sid)
+        else:
+            await give_back(client, purchased.sid)
         raise NumberError("This number is already in use.") from None
     except Exception:
         await give_back(client, purchased.sid)

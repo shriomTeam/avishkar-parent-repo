@@ -100,6 +100,7 @@ class FakeNumbers:
         self.owned: dict[str, str] = {}  # sid -> number
         self.urls: dict[str, str] = {}  # sid -> the address its incoming calls go to
         self.fail_next_buy: str | None = None
+        self.recover_next_buy = False  # answer the next buy as a number that was already on the account
         self.calls: list[tuple] = []
 
     async def search(self, *, kind, area_code, contains, limit=10):
@@ -118,6 +119,10 @@ class FakeNumbers:
         if self.fail_next_buy:
             message, self.fail_next_buy = self.fail_next_buy, None
             raise TwilioError(message, 409)
+        if self.recover_next_buy:
+            self.recover_next_buy = False
+            sid = next(sid for sid, owned in self.owned.items() if owned == number)
+            return PurchasedNumber(sid, number, recovered=True)
         sid = f"PN{uuid.uuid4().hex}"
         self.owned[sid] = number
         self.urls[sid] = voice_url or ""
