@@ -16,10 +16,8 @@ import { SignOut } from "@clinic/core/web/auth/sign-out";
 import { Button } from "@clinic/ui";
 
 import { FOCUS, LINK, SCOPE } from "../lib/look";
+import { ROOT, SETTINGS_PATH } from "../lib/paths";
 import { clinicOf, personOf, roleLabel } from "../lib/profile";
-
-export const ROOT = "/lead-response";
-export const SETTINGS_PATH = `${ROOT}/settings`;
 
 export function Shell({ role, children }: { role: string | null; children: ReactNode }) {
   const path = usePathname();
