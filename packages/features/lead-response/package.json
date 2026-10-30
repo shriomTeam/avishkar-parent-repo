@@ -1,8 +1,31 @@
 {
   "name": "@clinic/feature-lead-response",
   "private": true,
+  "type": "module",
   "scripts": {
     "lint": "uv run ruff check src tests",
     "test": "uv run pytest tests -q"
+  },
+  "exports": {
+    "./web/*": "./web/pages/*.tsx"
+  },
+  "dependencies": {
+    "@clinic/api-client": "workspace:*",
+    "@clinic/core": "workspace:*",
+    "@clinic/ui": "workspace:*"
+  },
+  "peerDependencies": {
+    "next": "^16.4.2",
+    "react": "^19.3.0"
+  },
+  "devDependencies": {
+    "@clinic/tsconfig": "workspace:*",
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "typescript": "^5.9.3"
+  },
+  "clinic": {
+    "webTests": "web/tests"
   }
 }

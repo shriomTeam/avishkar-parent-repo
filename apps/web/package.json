@@ -13,6 +13,7 @@
   "dependencies": {
     "@clinic/api-client": "workspace:*",
     "@clinic/core": "workspace:*",
+    "@clinic/feature-lead-response": "workspace:*",
     "@clinic/feature-reactivation": "workspace:*",
     "@clinic/feature-voice-receptionist": "workspace:*",
     "@clinic/ui": "workspace:*",
