@@ -10,6 +10,7 @@ import time
 import uuid
 from collections import deque
 from collections.abc import AsyncIterator
+from contextlib import AsyncExitStack
 from datetime import UTC, datetime
 from typing import Protocol
 
@@ -28,6 +29,7 @@ from clinic_voice_receptionist.inbound.live.events import (
     Usage,
 )
 from clinic_voice_receptionist.inbound.live.fields import coerce_all
+from clinic_voice_receptionist.inbound.live.language import conversation_language
 from clinic_voice_receptionist.inbound.live.prompt import END_TOOL, SAVE_TOOL
 from clinic_voice_receptionist.inbound.live.recorder import CallRecorder
 from clinic_voice_receptionist.inbound.live.storage import RecordingStore, recording_name
@@ -39,6 +41,7 @@ MAX_FRAME_BYTES = 32_000  # one second of 16 kHz PCM16; anything larger is not a
 OUTBOUND_AUDIO_QUEUE = 256  # chunks buffered for a slow client before the oldest are dropped
 FLUSH_SECONDS = 2.0
 MAX_RECONNECTS = 3
+MODEL_CONNECT_SECONDS = 20
 PENDING_FRAMES = 50  # about one second of caller audio kept while the model connection is (re)opening
 
 
@@ -178,12 +181,18 @@ class CallSession:
         reconnects = 0
         while True:
             try:
-                async with self.connector.connect(self.snapshot, self.fields, self._handle) as model:
+                async with AsyncExitStack() as stack:
+                    async with asyncio.timeout(MODEL_CONNECT_SECONDS):
+                        model = await stack.enter_async_context(
+                            self.connector.connect(self.snapshot, self.fields, self._handle)
+                        )
                     if reconnects == 0:
-                        await model.send_text(self._opening())
+                        async with asyncio.timeout(10):
+                            await model.send_text(self._opening())
                     while self._pending:
                         await model.send_audio(self._pending.popleft())
                     self._model = model
+                    await self.transport.send_event({"type": "model_ready"})
                     if await self._read(model):
                         return  # the call ended while reading
             except ModelClosed:
@@ -204,8 +213,11 @@ class CallSession:
     def _opening(self) -> str:
         greeting = self.snapshot.get("greeting")
         if greeting:
-            return f'The call has just connected. Greet the caller by saying: "{greeting}"'
-        return "The call has just connected. Greet the caller."
+            return (
+                f"The call has just connected. Greet the caller in {conversation_language(self.snapshot)}. "
+                f'Translate this configured greeting into that language, preserving its meaning: "{greeting}"'
+            )
+        return f"The call has just connected. Greet the caller in {conversation_language(self.snapshot)}."
 
     async def _read(self, model) -> bool:
         """Handle model messages. True if the call is over, False if the model asked us to reconnect."""

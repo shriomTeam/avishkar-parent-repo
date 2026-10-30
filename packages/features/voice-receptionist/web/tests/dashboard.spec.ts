@@ -817,3 +817,267 @@ test("original voice shell and platform return work across screen sizes", async 
     .click();
   await expect(page.getByTestId("voice-sidebar")).toBeVisible();
 });
+
+test("Hindi selection and voice preview preserve the configured prompt without saving", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    HTMLMediaElement.prototype.play = function () {
+      return Promise.resolve();
+    };
+  });
+  await createAgent(page, "Hindi preview agent");
+  const prompt = await page.getByLabel("System prompt").inputValue();
+  const greeting = await page.getByLabel("First message").inputValue();
+  let writes = 0;
+  page.on("request", (request) => {
+    if (
+      ["POST", "PUT", "DELETE"].includes(request.method()) &&
+      request.url().includes("/inbound/agents")
+    )
+      writes++;
+  });
+  await choose(page, "Language", "Hindi (हिन्दी)");
+  await expect(page.getByLabel("System prompt")).toHaveValue(prompt);
+  await expect(page.getByLabel("First message")).toHaveValue(greeting);
+  const sample = page.waitForResponse((response) =>
+    response.url().includes("/voice-preview"),
+  );
+  await page
+    .getByRole("button", { name: "Listen to Puck voice sample" })
+    .click();
+  expect((await sample).status()).toBe(200);
+  await expect(
+    page.getByRole("button", { name: "Stop voice sample" }),
+  ).toHaveText("Stop sample");
+  await choose(page, "Voice", "Charon");
+  await expect(
+    page.getByRole("button", { name: "Listen to Charon voice sample" }),
+  ).toBeVisible();
+  expect(writes).toBe(0);
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await page.reload();
+  await expect(
+    page.getByRole("combobox", { name: "Language", exact: true }),
+  ).toContainText("Hindi");
+  await expect(page.getByLabel("System prompt")).toHaveValue(prompt);
+  await expect(page.getByLabel("First message")).toHaveValue(greeting);
+});
+
+test("voice sample failures are retryable and changing language stops playback", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    HTMLMediaElement.prototype.play = function () {
+      return Promise.resolve();
+    };
+  });
+  await createAgent(page, "Sample retry agent");
+  await page.route("**/voice-preview", (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({
+        detail: "Voice samples are temporarily unavailable.",
+      }),
+    }),
+  );
+  await page
+    .getByRole("button", { name: "Listen to Puck voice sample" })
+    .click();
+  await expect(
+    page
+      .getByRole("group", { name: "Voice sample preview" })
+      .getByRole("alert"),
+  ).toContainText("Voice samples are temporarily unavailable.");
+  await page.unroute("**/voice-preview");
+  await page
+    .getByRole("button", { name: "Listen to Puck voice sample" })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Stop voice sample" }),
+  ).toHaveText("Stop sample");
+  await choose(page, "Language", "Hindi (हिन्दी)");
+  await expect(
+    page.getByRole("button", { name: "Listen to Puck voice sample" }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("group", { name: "Voice sample preview" })
+      .getByRole("alert"),
+  ).toHaveCount(0);
+});
+
+test("a generated Hindi preview plays through the browser audio decoder", async ({
+  page,
+}) => {
+  await createAgent(page, "Audio playback agent");
+  await choose(page, "Language", "Hindi (हिन्दी)");
+  await page
+    .getByRole("button", { name: "Listen to Puck voice sample" })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Stop voice sample" }),
+  ).toHaveText("Stop sample");
+  await page.getByRole("button", { name: "Stop voice sample" }).click();
+  await expect(
+    page.getByRole("button", { name: "Listen to Puck voice sample" }),
+  ).toBeVisible();
+});
+
+test("English Hindi and Spanish preview the unsaved first message with no agent write", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    HTMLMediaElement.prototype.play = function () {
+      return Promise.resolve();
+    };
+  });
+  await createAgent(page, "Multilingual preview");
+  const prompt = await page.getByLabel("System prompt").inputValue();
+  await page
+    .getByLabel("First message")
+    .fill("Welcome to our practice. How may we help?");
+  await page.getByRole("combobox", { name: "Language", exact: true }).click();
+  await expect(page.getByRole("option")).toHaveText([
+    "English",
+    "Hindi (हिन्दी)",
+    "Spanish",
+  ]);
+  await page.getByRole("option", { name: "Spanish", exact: true }).click();
+  let agentWrites = 0;
+  page.on("request", (request) => {
+    if (
+      ["POST", "PUT", "DELETE"].includes(request.method()) &&
+      request.url().includes("/inbound/agents")
+    )
+      agentWrites++;
+  });
+  for (const [label, locale] of [
+    ["English", "en-US"],
+    ["Hindi (हिन्दी)", "hi-IN"],
+    ["Spanish", "es-US"],
+  ]) {
+    await choose(page, "Language", label);
+    const request = page.waitForRequest(
+      (r) => r.url().endsWith("/voice-preview") && r.method() === "POST",
+    );
+    await page
+      .getByRole("button", { name: "Listen to Puck voice sample" })
+      .click();
+    expect((await request).postDataJSON()).toEqual({
+      greeting: "Welcome to our practice. How may we help?",
+      voice: "Puck",
+      language: locale,
+      agent_name: "Multilingual preview",
+    });
+    await expect(
+      page.getByRole("button", { name: "Stop voice sample" }),
+    ).toHaveText("Stop sample");
+    await page.getByRole("button", { name: "Stop voice sample" }).click();
+  }
+  await page.getByLabel("First message").fill("A new unsaved opening.");
+  const changed = page.waitForRequest(
+    (r) => r.url().endsWith("/voice-preview") && r.method() === "POST",
+  );
+  await page
+    .getByRole("button", { name: "Listen to Puck voice sample" })
+    .click();
+  expect((await changed).postDataJSON().greeting).toBe(
+    "A new unsaved opening.",
+  );
+  await expect(
+    page.getByRole("button", { name: "Stop voice sample" }),
+  ).toHaveText("Stop sample");
+  await page.getByLabel("First message").fill("");
+  await expect(
+    page.getByRole("button", { name: "Listen to Puck voice sample" }),
+  ).toBeDisabled();
+  await expect(page.getByLabel("System prompt")).toHaveValue(prompt);
+  expect(agentWrites).toBe(0);
+});
+
+test("call audio is unlocked from the start click and can resume without a new session", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const NativeContext = window.AudioContext;
+    Object.defineProperty(window, "AudioContext", {
+      value: class extends NativeContext {
+        constructor(options?: AudioContextOptions) {
+          super(options);
+          Object.assign(window, {
+            testCallAudio: this,
+            testCallAudioGesture: navigator.userActivation.isActive,
+          });
+        }
+      },
+    });
+  });
+  await createAgent(page, "Audio recovery agent");
+  await page.getByRole("link", { name: "Test studio", exact: true }).click();
+  await choose(page, "Agent", "Audio recovery agent");
+  let starts = 0;
+  await page.route("**/inbound/agents/*/test-call", async (route) => {
+    starts++;
+    expect(
+      await page.evaluate(
+        () =>
+          (window as unknown as { testCallAudioGesture: boolean })
+            .testCallAudioGesture,
+      ),
+    ).toBe(true);
+    await route.continue();
+  });
+  await page.getByRole("button", { name: "Start test call" }).click();
+  await expect(page.getByTestId("captured-fields")).toContainText(
+    "Sam Lee",
+    CALL,
+  );
+  await page.evaluate(async () => {
+    await (
+      window as unknown as { testCallAudio: AudioContext }
+    ).testCallAudio.suspend();
+  });
+  await expect(
+    page.getByRole("button", { name: "Enable audio", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Enable audio", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Enable audio", exact: true }),
+  ).toHaveCount(0);
+  expect(starts).toBe(1);
+  await page.getByRole("button", { name: "End call", exact: true }).click();
+  await expect(
+    page.getByRole("link", { name: "View saved call" }),
+  ).toBeVisible();
+});
+
+test("microphone audio waits for model readiness instead of cutting off startup", async ({
+  page,
+}) => {
+  let ready = false;
+  let earlyFrames = 0;
+  await page.routeWebSocket("**/inbound/live?*", (socket) => {
+    const server = socket.connectToServer();
+    server.onMessage((message) => {
+      if (
+        typeof message === "string" &&
+        JSON.parse(message).type === "model_ready"
+      ) {
+        setTimeout(() => {
+          ready = true;
+          socket.send(message);
+        }, 500);
+      } else socket.send(message);
+    });
+    socket.onMessage((message) => {
+      if (typeof message !== "string" && !ready) earlyFrames++;
+      server.send(message);
+    });
+  });
+  await createAgent(page, "Ready handshake agent");
+  await takeTestCall(page, "Ready handshake agent");
+  expect(ready).toBe(true);
+  expect(earlyFrames).toBe(0);
+});

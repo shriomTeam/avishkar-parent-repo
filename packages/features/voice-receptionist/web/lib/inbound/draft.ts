@@ -11,12 +11,9 @@ export const VOICES = [
   "Zephyr",
 ];
 export const LANGUAGES = [
-  ["en-US", "English (US)"],
-  ["en-GB", "English (UK)"],
-  ["es-US", "Spanish (US)"],
-  ["fr-FR", "French"],
-  ["de-DE", "German"],
-  ["hi-IN", "Hindi"],
+  ["en-US", "English"],
+  ["hi-IN", "Hindi (हिन्दी)"],
+  ["es-US", "Spanish"],
 ] as const;
 export const DATA_TYPES = [
   "text",

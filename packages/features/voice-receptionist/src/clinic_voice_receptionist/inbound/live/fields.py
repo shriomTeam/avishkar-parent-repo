@@ -1,6 +1,7 @@
 """Validate and normalise values the model captured, so the database holds clean data."""
 
 import re
+import unicodedata
 from datetime import date
 from typing import Any
 
@@ -53,6 +54,8 @@ def coerce(field: dict, value: Any) -> Any:
         if text.lower() not in by_lower:
             raise InvalidValue("must be one of: " + ", ".join(field["enum_values"]))
         return by_lower[text.lower()]
+    if any(unicodedata.category(char).startswith("L") and "LATIN" not in unicodedata.name(char, "") for char in text):
+        raise InvalidValue("translate descriptive text into English; transliterate names into Latin letters and retry")
     return text[:MAX_TEXT]
 
 

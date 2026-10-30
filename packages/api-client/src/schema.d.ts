@@ -1362,6 +1362,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/voice_receptionist/inbound/voice-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Voice Preview */
+        post: operations["voice_preview_features_voice_receptionist_inbound_voice_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/voice_receptionist/status": {
         parameters: {
             query?: never;
@@ -3617,6 +3634,20 @@ export interface components {
             custom: components["schemas"]["VariableOut"][];
             /** Builtin */
             builtin: components["schemas"]["BuiltinOut"][];
+        };
+        /** VoicePreviewIn */
+        VoicePreviewIn: {
+            /** Greeting */
+            greeting: string;
+            /**
+             * Agent Name
+             * @default Voice agent
+             */
+            agent_name: string;
+            /** Language */
+            language: string;
+            /** Voice */
+            voice: string;
         };
         /** WorkspaceAuditOut */
         WorkspaceAuditOut: {
@@ -6825,6 +6856,43 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    voice_preview_features_voice_receptionist_inbound_voice_preview_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VoicePreviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "audio/wav": string;
+                };
             };
             /** @description Validation Error */
             422: {

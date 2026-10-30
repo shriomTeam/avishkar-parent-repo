@@ -25,9 +25,9 @@ from clinic_voice_receptionist.inbound.live.events import (
 )
 from clinic_voice_receptionist.inbound.live.prompt import function_declarations, system_instruction
 
-# Phone-call tuning. Barge-in is detected quickly (HIGH start), but the agent waits for a real pause
-# before answering (LOW end, 700 ms) so callers can spell out numbers without being cut off.
-START_SENSITIVITY = types.StartSensitivity.START_SENSITIVITY_HIGH
+# Require clearer speech before barge-in: HIGH start sensitivity was cutting off greetings on room noise.
+# Keep interruption available, and wait for a real pause (LOW end, 700 ms) before answering.
+START_SENSITIVITY = types.StartSensitivity.START_SENSITIVITY_LOW
 END_SENSITIVITY = types.EndSensitivity.END_SENSITIVITY_LOW
 PREFIX_PADDING_MS = 100
 SILENCE_MS = 700

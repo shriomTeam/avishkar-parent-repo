@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { VoicePreview } from "./voice-preview";
 import { Plus, Trash2 } from "lucide-react";
 import type { Tool } from "../lib/inbound/api";
 import {
@@ -44,7 +45,7 @@ function setter({ draft, onChange }: Props) {
 export function ConfigurationFields(props: Props) {
   const { draft } = props;
   const set = setter(props);
-  const { variables, builtinVariables } = useVoice();
+  const { variables, builtinVariables, api } = useVoice();
   const names = [...builtinVariables, ...variables].map((v) => `{{${v.name}}}`);
   return (
     <>
@@ -65,6 +66,11 @@ export function ConfigurationFields(props: Props) {
           }))}
         />
       </TwoColumns>
+      <small className="mb-[18px] block text-[12px] text-muted">
+        Calls use the selected language. Your prompt and first message stay
+        unchanged; captured details use English and transcripts keep the spoken
+        language.
+      </small>
       <Field
         label="Description"
         value={draft.description}
@@ -100,14 +106,21 @@ export function ConfigurationFields(props: Props) {
         maxLength={1000}
         onChange={(e) => set("greeting", e.target.value)}
       />
-      <TwoColumns>
+      <VoicePreview
+        voice={draft.voice}
+        language={draft.language}
+        greeting={draft.greeting}
+        agentName={draft.name}
+        api={api}
+      >
         <Dropdown
+          flush
           label="Voice"
           value={draft.voice}
           onChange={(voice) => set("voice", voice)}
           options={VOICES.map((voice) => ({ value: voice, label: voice }))}
         />
-      </TwoColumns>
+      </VoicePreview>
       <Switch
         label="Agent is active"
         description="Inactive agents cannot take calls."

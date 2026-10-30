@@ -52,7 +52,7 @@ function messageFor(status: number): string {
 async function detailOf(
   response: Response,
 ): Promise<{ message: string; code?: string } | null> {
-  if (![409, 422, 502, 503].includes(response.status)) return null;
+  if (![409, 422, 429, 502, 503].includes(response.status)) return null;
   try {
     const { detail } = (await response.json()) as { detail?: unknown };
     if (typeof detail === "string")
@@ -74,6 +74,7 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
     method: string,
     path: string,
     body?: unknown,
+    signal?: AbortSignal,
   ): Promise<Response> {
     const headers: Record<string, string> = { "X-CSRF-Token": session.csrf };
     if (session.tenantId) headers["X-Tenant-Id"] = session.tenantId;
@@ -84,6 +85,7 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
     try {
       response = await fetch(`${BASE}${path}`, {
         method,
+        signal,
         credentials: "same-origin",
         cache: "no-store",
         headers,
@@ -119,6 +121,10 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
       : ((await response.json()) as T);
   }
   return {
+    previewVoice: async (
+      body: Schemas["VoicePreviewIn"],
+      signal?: AbortSignal,
+    ) => (await send("POST", "/voice-preview", body, signal)).blob(),
     listAgents: () => request<Agent[]>("GET", "/agents"),
     createAgent: (body: AgentInput) => request<Agent>("POST", "/agents", body),
     updateAgent: (id: string, body: AgentInput) =>

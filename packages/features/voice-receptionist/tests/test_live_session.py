@@ -5,6 +5,7 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 
+import pytest
 from sqlalchemy import select
 
 from clinic_core.database import tenant_session
@@ -158,7 +159,9 @@ async def test_a_full_call_is_saved_turn_by_turn_with_captured_fields():
     model = FakeModel()
     tenant, call_id, session, connector, transport, task = await _start(model)
     await asyncio.sleep(0.05)
-    assert model.texts == ['The call has just connected. Greet the caller by saying: "Hi, thanks for calling!"']
+    assert len(model.texts) == 1
+    assert "Greet the caller in English (US)" in model.texts[0]
+    assert '"Hi, thanks for calling!"' in model.texts[0]
 
     model.push(Transcript("agent", "Hi, thanks "), AudioOut(b"\x00\x01" * 100), raw={"server_content": {"x": 1}})
     model.push(Transcript("agent", "for calling!"), TurnComplete())
@@ -444,3 +447,73 @@ async def test_a_call_that_never_got_to_run_is_closed_not_left_in_progress():
     async with tenant_session(tenant) as s:
         rows = {c.id: (c.status, c.end_reason) for c in (await s.scalars(select(Call))).all()}
     assert rows[mine_id] == ("failed", "not_allowed") and rows[done_id][0] == "completed"
+
+
+@pytest.mark.parametrize(
+    "locale,language,spoken,goodbye",
+    [
+        ("hi-IN", "Hindi", "मेरा नाम राहुल शर्मा है।", "धन्यवाद।"),
+        ("es-US", "Spanish (US)", "Me llamo Rahul Sharma.", "Gracias."),
+    ],
+)
+async def test_multilingual_transcript_is_preserved_while_extracted_values_are_english(
+    locale, language, spoken, goodbye
+):
+    model = FakeModel()
+    tenant, call_id, session, _, _, task = await _start(model, snapshot_extra={"language": locale})
+    await asyncio.sleep(0.05)
+    assert f"Greet the caller in {language}" in model.texts[0]
+    model.push(Transcript("caller", spoken), TurnComplete())
+    model.push(ToolCall("h1", "save_caller_details", {"caller_name": "राहुल शर्मा"}))
+    await asyncio.sleep(0.05)
+    assert not model.tool_results[0][0].response["ok"]
+    model.push(ToolCall("h2", "save_caller_details", {"caller_name": "Rahul Sharma"}))
+    model.push(ToolCall("h3", "end_call", {}), Transcript("agent", goodbye), TurnComplete())
+    await asyncio.wait_for(task, 5)
+    call, turns, values, _ = await _saved(tenant, call_id)
+    assert values == {"caller_name": "Rahul Sharma"}
+    assert [turn.text for turn in turns] == [spoken, goodbye]
+    assert call.agent_snapshot["greeting"] == "Hi, thanks for calling!"
+    assert call.agent_snapshot["prompt"] == "p"
+
+
+async def test_model_readiness_waits_for_connection_and_opening():
+    model = FakeModel()
+    opened = asyncio.Event()
+
+    @asynccontextmanager
+    async def connect(*args):
+        await opened.wait()
+        yield model
+
+    tenant, call_id, session, _, transport, task = await _start()
+    session.connector = type("DelayedConnector", (), {"connect": staticmethod(connect)})()
+    await asyncio.sleep(0.02)
+    assert not any(e["type"] == "model_ready" for e in transport.events)
+    opened.set()
+    await asyncio.sleep(0.02)
+    assert {"type": "model_ready"} in transport.events
+    assert len(model.texts) == 1
+    transport.inbox.put_nowait({"type": "hangup"})
+    await asyncio.wait_for(task, 2)
+
+
+async def test_model_connection_timeout_ends_instead_of_hanging(monkeypatch):
+    monkeypatch.setattr(session_module, "MODEL_CONNECT_SECONDS", 0.02)
+    closed = []
+
+    @asynccontextmanager
+    async def connect(*args):
+        try:
+            await asyncio.Event().wait()
+            yield FakeModel()
+        finally:
+            closed.append(True)
+
+    tenant, call_id, session, _, transport, task = await _start()
+    session.connector = type("StalledConnector", (), {"connect": staticmethod(connect)})()
+    await asyncio.wait_for(task, 2)
+    call, *_ = await _saved(tenant, call_id)
+    assert call.status == "failed" and call.end_reason == "model_disconnected"
+    assert closed == [True]
+    assert not any(e["type"] == "model_ready" for e in transport.events)

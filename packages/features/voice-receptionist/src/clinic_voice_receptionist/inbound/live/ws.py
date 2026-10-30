@@ -2,7 +2,7 @@
 
 Browser sends: binary PCM16 16 kHz mono frames, and {"type": "hangup"}.
 Server sends: binary PCM16 24 kHz agent audio, and JSON events
-  ready, transcript, fields, interrupted, ended, error.
+  ready (transport accepted), model_ready (speech model connected), transcript, fields, interrupted, ended, error.
 """
 
 import asyncio

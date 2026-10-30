@@ -10,7 +10,12 @@ from clinic_api.main import create_app
 from clinic_core.settings import Settings
 
 try:  # Only present when the voice feature is installed. Removing a feature must not break platform tests.
-    from clinic_voice_receptionist.testing import FakeNumbers, MemoryRecordingStore, ScriptedConnector
+    from clinic_voice_receptionist.testing import (
+        FakeNumbers,
+        MemoryRecordingStore,
+        ScriptedConnector,
+        scripted_voice_preview,
+    )
 except ModuleNotFoundError as exc:
     if exc.name != "clinic_voice_receptionist":
         raise  # a real import problem inside voice, not its absence
@@ -96,6 +101,7 @@ app.add_middleware(BrowserClientIsolation)
 # Voice calls use a scripted model so browser tests never reach Vertex.
 if ScriptedConnector is not None:
     app.state.voice_connector = ScriptedConnector()
+    app.state.voice_preview_generator = scripted_voice_preview
     app.state.recording_store = MemoryRecordingStore()
     # Buying a phone number never reaches Twilio: the fake hands out sample numbers.
     app.state.twilio_numbers = FakeNumbers()

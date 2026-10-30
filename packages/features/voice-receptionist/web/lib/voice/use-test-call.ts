@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ApiError, type Agent, type InboundApi } from "../inbound/api";
+import { type Agent, type InboundApi } from "../inbound/api";
 import { CallClient, type CallState } from "../inbound/call-client";
 
 export type Line = { speaker: "caller" | "agent"; text: string };
@@ -26,6 +26,7 @@ export function useTestCall(api: InboundApi, onFinished: () => void) {
   const [toolRuns, setToolRuns] = useState<ToolRun[]>([]);
   const [level, setLevel] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const [audioBlocked, setAudioBlocked] = useState(false);
   const [error, setError] = useState("");
   const [reason, setReason] = useState("");
   const [callId, setCallId] = useState<string | null>(null);
@@ -49,20 +50,14 @@ export function useTestCall(api: InboundApi, onFinished: () => void) {
     setSeconds(0);
     setCallId(null);
     setState("connecting");
-    let ticket;
-    try {
-      ticket = await api.startTestCall(agent.id);
-    } catch (e) {
-      setState("error");
-      setError(e instanceof ApiError ? e.message : "Could not start the call.");
-      return;
-    }
-    setCallId(ticket.call_id);
+    client.current?.dispose();
+    setAudioBlocked(false);
     const call = new CallClient({
       state: setState,
       level: setLevel,
       fields: setValues,
       interrupted: () => undefined,
+      audioBlocked: setAudioBlocked,
       tool: (name, status, durationMs) =>
         setToolRuns((runs) => {
           if (status === "running") return [...runs, { name, status }];
@@ -94,11 +89,23 @@ export function useTestCall(api: InboundApi, onFinished: () => void) {
       },
     });
     client.current = call;
-    await call.start({
-      path: ticket.ws_path,
-      ticket: ticket.ticket,
-      outputRate: ticket.output_rate,
-    });
+    try {
+      await call.prepare();
+      if (!call.active) return;
+      const ticket = await api.startTestCall(agent.id);
+      if (!call.active) return;
+      setCallId(ticket.call_id);
+      await call.start({
+        path: ticket.ws_path,
+        ticket: ticket.ticket,
+        outputRate: ticket.output_rate,
+      });
+    } catch (e) {
+      if (!call.active) return;
+      call.dispose();
+      setState("error");
+      setError(e instanceof Error ? e.message : "Could not start the call.");
+    }
   }
 
   return {
@@ -111,6 +118,8 @@ export function useTestCall(api: InboundApi, onFinished: () => void) {
     error,
     reason,
     callId,
+    audioBlocked,
+    resumeAudio: () => client.current?.resumeAudio(),
     busy: state === "connecting" || state === "live",
     start,
     hangup: () => client.current?.hangup(),

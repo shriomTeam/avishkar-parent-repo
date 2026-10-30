@@ -144,3 +144,10 @@ class FakeNumbers:
     async def release(self, sid):
         self.calls.append(("release", sid))
         self.owned.pop(sid, None)
+
+
+async def scripted_voice_preview(settings, *, text: str, voice: str, language: str) -> bytes:
+    """Test-only audio; browsers exercise the real route without any Vertex requests."""
+    from clinic_voice_receptionist.voice_preview.service import wav_bytes
+
+    return wav_bytes(tone(1))
