@@ -87,6 +87,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
   const [leaveTo, setLeaveTo] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [focusSummary, setFocusSummary] = useState(0);
+  const root = useRef<HTMLDivElement>(null); // the form's own element: field lookups stay inside it
   const summary = useRef<HTMLDivElement>(null);
   const problem = useRef<HTMLDivElement>(null);
   const skipWarning = useRef(false);
@@ -171,7 +172,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
   }
 
   return (
-    <div data-testid="settings-form" data-ready={ready || undefined}>
+    <div ref={root} data-testid="settings-form" data-ready={ready || undefined}>
       <PageHeading
         title="Settings"
         description="How your clinic answers a new lead who texts, and when your team is reminded."
@@ -240,7 +241,9 @@ export function SettingsForm({ initial }: { initial: Initial }) {
                   className={`${LINK} ${FOCUS}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById(p.id)?.focus();
+                    // Look inside this form only: Next can leave a hidden server-rendered copy of the page in the
+                    // document with the same ids, and focus() on that copy does nothing.
+                    root.current?.querySelector<HTMLElement>(`#${CSS.escape(p.id)}`)?.focus();
                   }}
                 >
                   {p.label}
