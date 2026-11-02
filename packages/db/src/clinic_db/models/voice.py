@@ -11,6 +11,7 @@ from datetime import datetime
 
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
     DateTime,
     ForeignKey,
     Index,
@@ -31,7 +32,11 @@ SCHEMA = {"schema": "voice"}
 
 class Agent(IdMixin, TenantMixin, TimestampMixin, Base):
     __tablename__ = "agents"
-    __table_args__ = (UniqueConstraint("tenant_id", "name"), SCHEMA)
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "name"),
+        CheckConstraint("speech_start_sensitivity IN ('high', 'low')", name="speech_start_sensitivity"),
+        SCHEMA,
+    )
 
     name: Mapped[str] = mapped_column(String(200))
     description: Mapped[str | None] = mapped_column(Text)
@@ -39,6 +44,7 @@ class Agent(IdMixin, TenantMixin, TimestampMixin, Base):
     greeting: Mapped[str | None] = mapped_column(Text, comment="What the agent says first")
     voice: Mapped[str] = mapped_column(String(64), default="Puck")
     language: Mapped[str] = mapped_column(String(16), default="en-US")
+    speech_start_sensitivity: Mapped[str] = mapped_column(String(16), default="high", server_default="high")
     model: Mapped[str] = mapped_column(String(100))
     direction: Mapped[str] = mapped_column(String(16), default="inbound", comment="inbound; outbound later")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=sql_text("true"))

@@ -53,6 +53,7 @@ class AgentIn(BaseModel):
     greeting: str | None = Field(default=None, max_length=1000)
     voice: str = "Puck"
     language: str = Field(default="en-US", pattern=r"^[a-z]{2,3}(-[A-Z]{2})?$")
+    speech_start_sensitivity: Literal["high", "low"] = "high"
     is_active: bool = True
     save_transcript: bool = True
     save_raw_events: bool = True
@@ -92,6 +93,7 @@ class AgentOut(BaseModel):
     greeting: str | None
     voice: str
     language: str
+    speech_start_sensitivity: Literal["high", "low"]
     model: str
     direction: str
     is_active: bool

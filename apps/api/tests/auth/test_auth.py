@@ -1196,7 +1196,8 @@ async def test_invitation_delivery_statuses_are_fetched_in_one_query(system):
     assert len(queries) == 1
 
 
-async def test_immediate_email_timeout_is_five_seconds_and_queue_recovers(system, monkeypatch):
+@pytest.mark.parametrize("timeout_phase", ["before_claim", "provider"])
+async def test_immediate_email_timeout_is_five_seconds_and_queue_recovers(system, monkeypatch, timeout_phase):
     from cryptography.fernet import Fernet
     from pydantic import SecretStr
 
@@ -1210,14 +1211,31 @@ async def test_immediate_email_timeout_is_five_seconds_and_queue_recovers(system
     app.state.settings.email_payload_encryption_key = SecretStr(Fernet.generate_key().decode())
     budgets = []
     real_timeout = asyncio.timeout
+    timeouts = []
+    provider_calls = []
+    real_deliver_due = service.deliver_due
 
     def bounded(seconds):
         budgets.append(seconds)
-        return real_timeout(0.05)  # Exercise cancellation without waiting five seconds.
+        # Do not race a 50 ms wall clock against database I/O on a loaded CI runner.
+        # Expire the real cancellation scope at the exact phase under test instead.
+        context = real_timeout(None)
+        timeouts.append(context)
+        return context
 
-    async def slow_provider(**kwargs):
+    async def expire_here():
+        timeouts[-1].reschedule(asyncio.get_running_loop().time())
         await asyncio.Event().wait()
 
+    async def slow_provider(**kwargs):
+        provider_calls.append(True)
+        await expire_here()
+
+    async def blocked_before_claim(*args, **kwargs):
+        await expire_here()
+
+    if timeout_phase == "before_claim":
+        monkeypatch.setattr(service, "deliver_due", blocked_before_claim)
     monkeypatch.setattr(service.asyncio, "timeout", bounded)
     monkeypatch.setattr(service, "send_email", slow_provider)
     response = await client.post(
@@ -1227,11 +1245,15 @@ async def test_immediate_email_timeout_is_five_seconds_and_queue_recovers(system
     )
     assert response.status_code == 201
     assert budgets == [5]
+    assert provider_calls == ([True] if timeout_phase == "provider" else [])
+    monkeypatch.setattr(service, "deliver_due", real_deliver_due)
     async with system_session(database_url=app.state.settings.database_system_url) as db:
         delivery = await db.scalar(
             select(EmailDelivery).where(EmailDelivery.invitation_id == uuid.UUID(response.json()["id"]))
         )
-        assert delivery.status == "sending" and delivery.payload
+        assert delivery.status == ("sending" if timeout_phase == "provider" else "queued")
+        assert delivery.attempts == (1 if timeout_phase == "provider" else 0)
+        assert delivery.payload
         delivery.next_attempt_at = now() - timedelta(seconds=1)
         ident = delivery.id
 

@@ -1081,3 +1081,30 @@ test("microphone audio waits for model readiness instead of cutting off startup"
   expect(ready).toBe(true);
   expect(earlyFrames).toBe(0);
 });
+
+test("speech detection defaults to sensitive and persists an explicit noise setting", async ({
+  page,
+}) => {
+  await createAgent(page, "Speech detection agent");
+  const prompt = await page.getByLabel("System prompt").inputValue();
+  const greeting = await page.getByLabel("First message").inputValue();
+  await expect(
+    page.getByRole("combobox", { name: "Speech detection", exact: true }),
+  ).toContainText("Sensitive (default)");
+  await choose(page, "Speech detection", "Less sensitive to noise");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Agent saved");
+  await page.reload();
+  await expect(
+    page.getByRole("combobox", { name: "Speech detection", exact: true }),
+  ).toContainText("Less sensitive to noise");
+  await expect(page.getByLabel("System prompt")).toHaveValue(prompt);
+  await expect(page.getByLabel("First message")).toHaveValue(greeting);
+  await choose(page, "Speech detection", "Sensitive (default)");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Agent saved");
+  await page.reload();
+  await expect(
+    page.getByRole("combobox", { name: "Speech detection", exact: true }),
+  ).toContainText("Sensitive (default)");
+});

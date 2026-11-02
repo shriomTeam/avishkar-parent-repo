@@ -25,9 +25,8 @@ from clinic_voice_receptionist.inbound.live.events import (
 )
 from clinic_voice_receptionist.inbound.live.prompt import function_declarations, system_instruction
 
-# Require clearer speech before barge-in: HIGH start sensitivity was cutting off greetings on room noise.
-# Keep interruption available, and wait for a real pause (LOW end, 700 ms) before answering.
-START_SENSITIVITY = types.StartSensitivity.START_SENSITIVITY_LOW
+# Preserve the pre-tuning HIGH default. LOW is an explicit per-agent choice, snapshotted for each call.
+# Browser and Twilio use this same config; short/quiet speech and barge-in must be phone-tested before choosing LOW.
 END_SENSITIVITY = types.EndSensitivity.END_SENSITIVITY_LOW
 PREFIX_PADDING_MS = 100
 SILENCE_MS = 700
@@ -53,7 +52,11 @@ def build_config(agent: dict, fields: list[dict], resume_handle: str | None) -> 
         output_audio_transcription=types.AudioTranscriptionConfig(),
         realtime_input_config=types.RealtimeInputConfig(
             automatic_activity_detection=types.AutomaticActivityDetection(
-                start_of_speech_sensitivity=START_SENSITIVITY,
+                start_of_speech_sensitivity=(
+                    types.StartSensitivity.START_SENSITIVITY_LOW
+                    if agent.get("speech_start_sensitivity") == "low"
+                    else types.StartSensitivity.START_SENSITIVITY_HIGH
+                ),
                 end_of_speech_sensitivity=END_SENSITIVITY,
                 prefix_padding_ms=PREFIX_PADDING_MS,
                 silence_duration_ms=SILENCE_MS,

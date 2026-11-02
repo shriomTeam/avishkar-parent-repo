@@ -419,3 +419,35 @@ def test_the_dialled_number_is_read_from_a_sip_address_only_when_allowed():
     assert webhook.dialled_number("sip:415-555-0123@d.sip.twilio.com", True) == "+14155550123"
     assert webhook.dialled_number("sip:+14155550123@d.sip.twilio.com", False).startswith("sip:")
     assert webhook.dialled_number("+14155550123", True) == "+14155550123"
+
+
+@pytest.mark.parametrize("sensitivity", ["high", "low"])
+async def test_phone_stream_uses_frozen_agent_speech_sensitivity(client, monkeypatch, sensitivity):
+    from google.genai import types
+
+    from clinic_voice_receptionist.inbound.live.gemini import build_config
+
+    tenant, number, agent_id = await _setup()
+    async with tenant_session(tenant) as session:
+        (await session.get(Agent, agent_id)).speech_start_sensitivity = sensitivity
+    params = _call(number)
+    ticket = _ticket(await _post(client, params))
+    # Later agent edits must not change settings on the already-created phone call.
+    async with tenant_session(tenant) as session:
+        (await session.get(Agent, agent_id)).speech_start_sensitivity = "high" if sensitivity == "low" else "low"
+    seen = []
+
+    async def fake_run(app, tenant_id, call_id, snapshot, transport):
+        assert snapshot["speech_start_sensitivity"] == sensitivity
+        config = build_config(snapshot, snapshot["fields"], None)
+        seen.append(config.realtime_input_config.automatic_activity_detection.start_of_speech_sensitivity)
+
+    monkeypatch.setattr(stream, "run_session", fake_run)
+    ws = FakeSocket([_start(ticket, params["CallSid"]), '{"event":"stop"}'])
+    await stream.phone_stream(ws)
+    expected = (
+        types.StartSensitivity.START_SENSITIVITY_LOW
+        if sensitivity == "low"
+        else types.StartSensitivity.START_SENSITIVITY_HIGH
+    )
+    assert seen == [expected]

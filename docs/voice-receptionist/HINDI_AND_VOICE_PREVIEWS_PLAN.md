@@ -19,7 +19,7 @@ The aligned Voice/preview control uses existing shared UI components and Tailwin
 
 ## Backend limits and privacy
 
-- Reuses the configured Vertex Live model, region, service identity and existing voice allowlist. No new environment variables, database tables, infrastructure, workers or background generation.
+- Reuses the configured Vertex Live model, region, service identity and existing voice allowlist. Preview generation needs no new environment variables, database tables, infrastructure, workers or background generation. The separate speech-sensitivity follow-up adds a column to existing agents.
 - Existing authentication, CSRF on writes, feature entitlements and manager configuration permissions apply. Owner and Office Manager can preview; other roles cannot. The preview cannot execute tools.
 - Request: nonblank first message, at most 1,000 characters; agent name at most 200; supported locale/voice only. Resolved message at most 4,000 characters. Unknown template variables return 422.
 - Durable rate counters: six requests/minute per actor/workspace and twenty/minute per workspace, including cache hits and provider failures. In-flight generation: two per API instance; duplicates already generating return retryable 429. These concurrency bounds are per instance, not a global quota.
@@ -46,7 +46,7 @@ Every newly supported language must use this same dynamic First-message preview 
 
 ## Local acceptance
 
-Start the existing database/Redis, apply current main migrations if not already done, then use the normal `pnpm dev` workflow. No extra keys or migrations are required for this feature.
+Start the existing database/Redis, apply current main migrations if not already done, then use the normal `pnpm dev` workflow. No extra keys are required. The later speech-sensitivity follow-up adds migration `20261030_voice_sensitivity`.
 
 Open an agent, change First message without saving, select English/Hindi/Spanish and a voice, then press Listen. Confirm the new text is used and speech follows the selected language. Change it again, retry and verify no stale audio plays. Preview variables, blank input, failures/retry and mobile alignment. Then save, make a Test studio call and inspect original-language transcripts and English captured fields. Test the Twilio path if configured. Human listening and translation/transliteration accuracy remain local acceptance checks.
 
@@ -67,7 +67,7 @@ Local metadata review found two short caller-ended calls with early model interr
 Changes:
 - Unlock/resume the AudioContext directly from the Start click, before the ticket request and microphone permission wait, following browser autoplay requirements.
 - Treat WebSocket `ready` as transport acceptance. The shared call engine emits `model_ready` only after provider connection/opening setup; browser microphone frames and the Live indicator wait for it, so startup input is not queued as stale speech while the model connects.
-- Lower Gemini start-of-speech sensitivity to reduce spurious greeting interruptions while retaining genuine caller barge-in. The existing end-of-speech timing stays unchanged. Verify behavior with real calls and background noise; this is a sensitivity tradeoff, not noise elimination.
+- Original PR #25 used LOW globally to reduce spurious interruptions. This is superseded by the per-agent follow-up below: HIGH is restored by default and LOW requires an explicit choice. End-of-speech timing remains unchanged.
 - Bound model connection (20 seconds), opening send (10 seconds) and browser connection wait (35 seconds). A stalled service cannot leave an indefinitely Live-looking session.
 - Expose an Enable audio action if the browser suspends/interrupts audio, allowing the same session to continue. Pause microphone forwarding while speaker audio is paused, stop stale queued playback and release device resources on cancel. Previously missed speech is not replayed automatically: ask the agent to repeat if necessary.
 - Allow cancelling while Connecting, handle late microphone permission resolution without leaking tracks, and stop audio immediately on caller hangup; only the agent's natural goodbye drains before closing.
@@ -77,3 +77,26 @@ Validation: **324 voice backend tests** and **24 voice browser journeys** passed
 References: [browser AudioContext activation](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Best_practices), [Gemini speech sensitivity values](https://ai.google.dev/api/live).
 
 Final follow-up validation: repository Python suite **1,270 passed, 4 expected failures**; production web build and architecture boundaries passed. Local API readiness returned 200. No real microphone recording was inspected, no production configuration changed, and no production deployment was performed.
+
+
+## Review follow-up: per-agent speech detection
+
+Updated the same branch from merged main `69e831c`. Removed the global LOW speech-start override. New/existing agents now default to HIGH, restoring the pre-tuning behavior. Added an Owner/Office-Manager-editable `speech_start_sensitivity` enum (`high`/`low`), persisted on `voice.agents`, returned in API responses, editable under Speech detection, and copied into the shared browser/Twilio call snapshot. The Gemini connector uses LOW only when explicitly present in that snapshot; missing/unknown legacy values use HIGH. End sensitivity, 700 ms silence and prefix padding are unchanged. The browser gesture/readiness/recovery fixes remain in place.
+
+The additive migration `20261030_voice_sensitivity` follows `0282a1e9855e`, adds a non-null server-default HIGH column and a high/low check constraint. Old API inserts can omit it. Existing agents were not implicitly opted into LOW by the previous hard-coded implementation; the migration deliberately restores HIGH for them. Already-created snapshots with explicit settings retain their own values when an agent is edited.
+
+Completed a disposable-database upgrade test containing a pre-migration agent: its new value is HIGH. Alembic reports no model drift. Configuration tests cover HIGH/LOW/legacy fallback, API persistence/validation/permissions, browser snapshots, and a signed Twilio webhook/stream path retaining the chosen sensitivity after a later agent edit. These tests verify configuration and authorization, **not** physical speech-detection accuracy.
+
+### Required phone acceptance before opting into LOW
+
+Use a real inbound Twilio call, not a preview or scripted browser model. Compare HIGH and LOW on the same agent/device and record the result:
+
+| Language | Short replies | Interruptions | Quiet room | Background noise | Result |
+| --- | --- | --- | --- | --- | --- |
+| English | yes / no | normal and quiet speech | Pending | Pending | Pending human test |
+| Hindi | हाँ / नहीं | normal and quiet speech | Pending | Pending | Pending human test |
+| Spanish | sí / no | normal and quiet speech | Pending | Pending | Pending human test |
+
+Confirm the opening is audible, short answers are recognized, callers can interrupt naturally and interruptions clear Twilio playback. Keep HIGH unless the actual call results justify LOW. Per-agent configuration makes the tradeoff explicit; it does not guarantee either value handles every noise level. No real phone call was placed or production deployment changed by this follow-up.
+
+Follow-up validation: **1,283 Python tests passed, 4 existing Lead Response permission xfails**; **25 voice browser journeys passed**; targeted sensitivity/Twilio slice **40 passed**. Production web build, feature typecheck, web ESLint, Ruff, architecture boundaries and whitespace checks passed. One Alembic head (`20261030_voice_sensitivity`), upgrade of a pre-existing agent and no model drift verified. Local development database was migrated; production was not touched. The real-phone acceptance table remains pending and must not be reported as passed.
