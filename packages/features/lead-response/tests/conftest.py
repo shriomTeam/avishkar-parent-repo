@@ -8,6 +8,7 @@ import os
 import uuid
 from pathlib import Path
 
+import httpx
 import pytest
 from lr_seed import TABLES
 from sqlalchemy import create_engine, text
@@ -67,3 +68,18 @@ async def make_tenant(cleanup_engine):
             )
     with cleanup_engine.begin() as conn:
         conn.execute(text("DELETE FROM core.tenants WHERE id = ANY(CAST(:ids AS uuid[]))"), {"ids": ids})
+
+
+@pytest.fixture(autouse=True)
+def no_real_network(monkeypatch):
+    """No test may reach the real network, so none can send a real SMS: the two real httpx transports refuse.
+    ``httpx.MockTransport`` and ``httpx.ASGITransport`` are other classes and keep working."""
+
+    async def refuse_async(self, request):
+        raise AssertionError(f"a test tried to use the real network ({request.method} {request.url.host})")
+
+    def refuse(self, request):
+        raise AssertionError(f"a test tried to use the real network ({request.method} {request.url.host})")
+
+    monkeypatch.setattr(httpx.AsyncHTTPTransport, "handle_async_request", refuse_async)
+    monkeypatch.setattr(httpx.HTTPTransport, "handle_request", refuse)
