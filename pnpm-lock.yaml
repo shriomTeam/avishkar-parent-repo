@@ -22,6 +22,9 @@ importers:
       '@clinic/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@clinic/feature-lead-response':
+        specifier: workspace:*
+        version: link:../../packages/features/lead-response
       '@clinic/feature-reactivation':
         specifier: workspace:*
         version: link:../../packages/features/reactivation
@@ -138,7 +141,39 @@ importers:
 
   packages/features/command-center: {}
 
-  packages/features/lead-response: {}
+  packages/features/lead-response:
+    dependencies:
+      '@clinic/api-client':
+        specifier: workspace:*
+        version: link:../../api-client
+      '@clinic/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@clinic/ui':
+        specifier: workspace:*
+        version: link:../../ui
+      next:
+        specifier: ^16.4.2
+        version: 16.4.2(@babel/core@7.29.7)(@playwright/test@1.64.0)(@types/node@22.20.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      react:
+        specifier: ^19.3.0
+        version: 19.3.0
+    devDependencies:
+      '@clinic/tsconfig':
+        specifier: workspace:*
+        version: link:../../tsconfig
+      '@playwright/test':
+        specifier: ^1.56.0
+        version: 1.64.0
+      '@types/node':
+        specifier: ^22.20.5
+        version: 22.20.5
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
   packages/features/photos: {}
 
