@@ -144,17 +144,23 @@ async def recent_inbound_count(session: AsyncSession, conversation_id: uuid.UUID
     )
 
 
-async def queue_ack(
-    session: AsyncSession, *, conversation_id: uuid.UUID, message_id: uuid.UUID, trace_id: uuid.UUID, now: datetime
+async def _queue(
+    session: AsyncSession,
+    kind: str,
+    *,
+    conversation_id: uuid.UUID,
+    message_id: uuid.UUID,
+    trace_id: uuid.UUID,
+    now: datetime,
 ) -> bool:
-    """The durable ack job, written in the same transaction as the message. Ids only, no personal data."""
+    """A durable job, written in the same transaction as the message. Ids only, no personal data."""
     statement = (
         insert(Job)
         .values(
             tenant_id=current_tenant(session),
-            kind="ack",
+            kind=kind,
             run_at=now,
-            idempotency_key=f"ack:{message_id}",
+            idempotency_key=f"{kind}:{message_id}",
             conversation_id=conversation_id,
             payload={"message_id": str(message_id)},
             trace_id=trace_id,
@@ -163,3 +169,45 @@ async def queue_ack(
         .returning(Job.id)
     )
     return await session.scalar(statement) is not None
+
+
+async def queue_ack(
+    session: AsyncSession, *, conversation_id: uuid.UUID, message_id: uuid.UUID, trace_id: uuid.UUID, now: datetime
+) -> bool:
+    return await _queue(
+        session, "ack", conversation_id=conversation_id, message_id=message_id, trace_id=trace_id, now=now
+    )
+
+
+async def queue_help(
+    session: AsyncSession, *, conversation_id: uuid.UUID, message_id: uuid.UUID, trace_id: uuid.UUID, now: datetime
+) -> bool:
+    """The job that sends the HELP answer. A later chunk decides whether and what to send."""
+    return await _queue(
+        session, "help", conversation_id=conversation_id, message_id=message_id, trace_id=trace_id, now=now
+    )
+
+
+async def message_id_for_sid(session: AsyncSession, sid: str) -> uuid.UUID | None:
+    """The message a Twilio retry is a copy of."""
+    return await session.scalar(
+        select(Message.id).where(Message.channel == CHANNEL, Message.provider_message_id == sid)
+    )
+
+
+async def keyword_already_applied(session: AsyncSession, contact_id: uuid.UUID, message_id: uuid.UUID) -> bool:
+    """True when this keyword text has already had its effect, or has been overtaken. A STOP that is retried after
+    the contact has since sent START must not opt them out again, so a retry only runs the keyword when no consent
+    record refers to the message and none is newer than it."""
+    sent_at = select(Message.created_at).where(Message.id == message_id).scalar_subquery()
+    return bool(
+        await session.scalar(
+            select(
+                exists().where(
+                    ConsentRecord.contact_id == contact_id,
+                    ConsentRecord.channel == CHANNEL,
+                    (ConsentRecord.message_id == message_id) | (ConsentRecord.created_at > sent_at),
+                )
+            )
+        )
+    )

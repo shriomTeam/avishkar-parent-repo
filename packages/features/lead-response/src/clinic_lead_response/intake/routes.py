@@ -6,9 +6,10 @@ here: a request is trusted only if Twilio's signature checks out, and the signat
 database or even looks at the tenant in the URL. Routes are left out of the OpenAPI schema, so the generated client is
 untouched.
 
-Answers: 503 not set up, 404 unknown channel, 400 unreadable, 413 too large, 403 bad signature, then 200 with an empty
-TwiML ``<Response/>`` for everything else, including texts we cannot or need not store (a 4xx would only make Twilio
-alert and retry). Reasons are logged as fixed words; nothing from the request is.
+Answers: 503 not set up, 404 unknown channel, 400 unreadable, 413 too large, 403 bad signature, 500 when a STOP, START
+or HELP could not be applied (Twilio retries, and the retry applies it), then 200 with an empty TwiML ``<Response/>``
+for everything else, including texts we cannot or need not store (a 4xx would only make Twilio alert and retry). We
+send no STOP or START confirmation ourselves. Reasons are logged as fixed words; nothing from the request is.
 """
 
 import logging
@@ -16,12 +17,14 @@ import time
 import uuid
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
+from functools import lru_cache
 
 from fastapi import APIRouter, Request, Response
 
 from clinic_core.settings import get_settings
 from clinic_lead_response.config import get_intake_settings
 from clinic_lead_response.gateway.log import log_event
+from clinic_lead_response.gateway.service import Gateway, build_gateway
 from clinic_lead_response.intake import service, signature
 from clinic_lead_response.intake.parse import (
     MAX_BODY_BYTES,
@@ -69,9 +72,16 @@ def requested_path(request: Request) -> str:
     return raw.decode("ascii", "replace") if raw else request.url.path
 
 
-def build_router(after_commit: AfterCommit | None = None) -> APIRouter:
-    """``after_commit`` is called once a text is stored, after the commit and before the answer; a failure in it is
-    logged and ignored. It is for the engine to start the ack at once. Nothing uses it in this chunk."""
+@lru_cache
+def keyword_gateway() -> Gateway:
+    """The gateway that records opt-outs and opt-ins. Intake never sends through it."""
+    return build_gateway()
+
+
+def build_router(after_commit: AfterCommit | None = None, gateway: Gateway | None = None) -> APIRouter:
+    """``after_commit`` is called once a text is stored and its keyword (if any) applied, before the answer; a failure
+    in it is logged and ignored. It is for the engine to start the ack at once. Nothing uses it in this chunk.
+    ``gateway`` records STOP and START; the default is the one the app uses."""
     router = APIRouter(include_in_schema=False)
 
     @router.post("/in/{channel}/{tenant}")
@@ -119,6 +129,13 @@ def build_router(after_commit: AfterCommit | None = None) -> APIRouter:
         if accepted.outcome is service.Outcome.NOT_ENABLED:
             log_event(log, "inbound", outcome="dropped", reason="tenant_not_enabled", trace_id=trace_id)
             return twiml()
+        if accepted.keyword_pending:
+            # The text is committed. Now its effect, in a second transaction, and no answer until that has finished.
+            try:
+                await service.apply_keyword(gateway or keyword_gateway(), tenant_id, accepted, text, trace_id=trace_id)
+            except Exception:
+                log_event(log, "keyword_failed", level=logging.ERROR, tenant_id=tenant_id, trace_id=trace_id)
+                return Response(status_code=500)  # Twilio retries; the retry finds the text and applies it
         if after_commit is not None and accepted.outcome is service.Outcome.STORED:
             try:
                 await after_commit(accepted)
@@ -131,7 +148,8 @@ def build_router(after_commit: AfterCommit | None = None) -> APIRouter:
             trace_id=trace_id,
             message_id=accepted.message_id,
             outcome=accepted.outcome.value,
-            reason="throttled" if accepted.throttled else None,
+            reason=(f"keyword_{accepted.keyword.value}" if accepted.keyword else None)
+            or ("throttled" if accepted.throttled else None),
             duration_ms=round((time.perf_counter() - started) * 1000),
         )
         return twiml()
