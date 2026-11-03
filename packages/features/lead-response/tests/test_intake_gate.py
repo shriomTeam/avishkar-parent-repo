@@ -22,9 +22,12 @@ def test_the_feature_still_says_it_is_not_available():
     assert feature.available is False  # the API gate never reads this; the test below shows why it matters
 
 
-def test_the_public_router_has_exactly_the_inbound_route():
+def test_the_public_router_has_exactly_the_inbound_and_receipt_routes():
     paths = {(route.path, tuple(sorted(route.methods))) for route in feature.websocket_router.routes}
-    assert paths == {("/in/{channel}/{tenant}", ("POST",))}
+    assert paths == {
+        ("/in/{channel}/{tenant}", ("POST",)),
+        ("/status/{channel}/{tenant}", ("POST",)),
+    }
 
 
 def test_no_route_of_the_public_router_is_in_the_openapi_schema():

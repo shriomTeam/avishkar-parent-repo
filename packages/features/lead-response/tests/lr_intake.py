@@ -114,6 +114,52 @@ class Intake:
         async with self.client(raise_app_exceptions=raise_app_exceptions) as client:
             return await client.post(path + (f"?{query}" if query else ""), content=body, headers=send)
 
+    async def post_status(
+        self,
+        tenant,
+        pairs: list[tuple[str, str]],
+        *,
+        m=None,
+        raw: bytes | None = None,
+        sign: bool = True,
+        token: str = TOKEN,
+        signed_path: str | None = None,
+        signed_query: str | None = None,
+        channel: str = "sms",
+        headers: dict[str, str] | None = None,
+        content_type: str = FORM,
+        raise_app_exceptions: bool = True,
+    ) -> httpx.Response:
+        """Post a delivery receipt the way Twilio does, to the URL the gateway would have given it (``m`` is the
+        message id in the query). The signature is correct for what is sent unless ``signed_path`` or
+        ``signed_query`` say otherwise."""
+        path = f"{PATH}/status/{channel}/{tenant}"
+        query = f"m={m}" if m else ""
+        body = raw if raw is not None else form_bytes(pairs)
+        send = {"content-type": content_type, **(headers or {})}
+        if sign:
+            signed = query if signed_query is None else signed_query
+            url = PUBLIC + (signed_path or path) + (f"?{signed}" if signed else "")
+            send["x-twilio-signature"] = reference_signature(token, url, parse_form(body))
+        async with self.client(raise_app_exceptions=raise_app_exceptions) as client:
+            return await client.post(path + (f"?{query}" if query else ""), content=body, headers=send)
+
+
+def receipt_pairs(message_sid: str, status: str = "delivered", **overrides: str) -> list[tuple[str, str]]:
+    """What Twilio posts to a StatusCallback. A value of None in ``overrides`` removes the field."""
+    fields = {
+        "MessageSid": message_sid,
+        "SmsSid": message_sid,
+        "MessageStatus": status,
+        "SmsStatus": status,
+        "AccountSid": "AC" + "b2" * 16,
+        "From": OUR_NUMBER,
+        "To": LEAD_NUMBER,
+        "ApiVersion": "2010-04-01",
+    }
+    fields.update(overrides)
+    return [(name, value) for name, value in fields.items() if value is not None]
+
 
 async def rows(tenant, model, *order):
     async with tenant_session(tenant) as session:
