@@ -4,11 +4,17 @@ own (``clinic_core`` has no public-address setting, and this package must not ed
 ``LEAD_RESPONSE_PUBLIC_API_URL`` is the public address of this API: ``https://<host>`` with no path. Twilio signs the
 exact URL it called, and a proxy or tunnel changes the address this server sees, so the signature is checked against
 this configured address plus the request path. Blank means the inbound routes are switched off (they answer 503).
+
+``LEAD_RESPONSE_ENGINE_ENABLED`` switches the engine on: the scheduled tick and the fast path that answer a lead.
+It is OFF unless set to a true word, and an unreadable value also means off. While it is off, texts are still stored
+and their jobs wait in the ``jobs`` table (nothing is lost, nothing is sent). Turn it on only after the wording of
+every automatic message has been approved.
 """
 
 from functools import lru_cache
 from urllib.parse import urlsplit
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from clinic_core.settings import REPO_ROOT
@@ -18,6 +24,15 @@ class IntakeSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=REPO_ROOT / ".env", extra="ignore", env_prefix="LEAD_RESPONSE_")
 
     public_api_url: str = ""
+    engine_enabled: bool = False
+
+    @field_validator("engine_enabled", mode="before")
+    @classmethod
+    def _only_a_true_word_switches_it_on(cls, value: object) -> bool:
+        """A typo must not stop the app starting, and must never switch automatic messages on."""
+        if isinstance(value, bool):
+            return value
+        return str(value).strip().lower() in {"1", "true", "yes", "on"}
 
     @property
     def public_base(self) -> str | None:
