@@ -9,6 +9,7 @@ from fastapi import APIRouter
 
 from clinic_core.features import Feature, NavItem
 from clinic_lead_response.api.settings import router as settings_router
+from clinic_lead_response.intake.routes import build_router as build_intake_router
 
 router = APIRouter(tags=["lead_response"])
 router.include_router(settings_router)
@@ -25,6 +26,7 @@ feature = Feature(
     name="The 60-Second Response System",
     description="Contacts every new lead in under a minute, then follows up until they book.",
     router=router,
+    websocket_router=build_intake_router(),  # the public inbound-text webhook; it checks Twilio's signature itself
     nav=[NavItem(label="Leads", path="/lead-response")],
     phi_sensitive=False,
 )
