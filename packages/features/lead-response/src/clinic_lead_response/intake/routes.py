@@ -20,14 +20,13 @@ import time
 import uuid
 from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
-from functools import lru_cache
 
 from fastapi import APIRouter, Request, Response
 
 from clinic_core.settings import get_settings
 from clinic_lead_response.config import get_intake_settings
 from clinic_lead_response.gateway.log import log_event
-from clinic_lead_response.gateway.service import Gateway, build_gateway
+from clinic_lead_response.gateway.service import Gateway
 from clinic_lead_response.intake import service, signature
 from clinic_lead_response.intake.parse import (
     MAX_BODY_BYTES,
@@ -37,6 +36,7 @@ from clinic_lead_response.intake.parse import (
     parse_inbound,
     parse_receipt,
 )
+from clinic_lead_response.runtime import get_gateway
 
 log = logging.getLogger("lead_response.intake")
 
@@ -111,16 +111,10 @@ def canonical_uuid(value: str | None) -> uuid.UUID | None:
     return parsed if str(parsed) == value else None
 
 
-@lru_cache
-def keyword_gateway() -> Gateway:
-    """The gateway that records opt-outs, opt-ins and delivery receipts. Intake never sends through it."""
-    return build_gateway()
-
-
 def build_router(after_commit: AfterCommit | None = None, gateway: Gateway | None = None) -> APIRouter:
     """``after_commit`` is called once a text is stored and its keyword (if any) applied, before the answer; a failure
     in it is logged and ignored. It is for the engine to start the ack at once. Nothing uses it in this chunk.
-    ``gateway`` records STOP, START and receipts; the default is the one the app uses."""
+    ``gateway`` records STOP, START and receipts; the default is the app's shared gateway (``runtime.get_gateway``)."""
     router = APIRouter(include_in_schema=False)
 
     @router.post("/in/{channel}/{tenant}")
@@ -155,7 +149,7 @@ def build_router(after_commit: AfterCommit | None = None, gateway: Gateway | Non
         if accepted.keyword_pending:
             # The text is committed. Now its effect, in a second transaction, and no answer until that has finished.
             try:
-                await service.apply_keyword(gateway or keyword_gateway(), tenant_id, accepted, text, trace_id=trace_id)
+                await service.apply_keyword(gateway or get_gateway(), tenant_id, accepted, text, trace_id=trace_id)
             except Exception:
                 log_event(log, "keyword_failed", level=logging.ERROR, tenant_id=tenant_id, trace_id=trace_id)
                 return Response(status_code=500)  # Twilio retries; the retry finds the text and applies it
@@ -196,7 +190,7 @@ def build_router(after_commit: AfterCommit | None = None, gateway: Gateway | Non
             log_event(log, "receipt", outcome="dropped", reason="tenant_not_enabled", trace_id=trace_id)
             return twiml()
         try:
-            await (gateway or keyword_gateway()).record_receipt(
+            await (gateway or get_gateway()).record_receipt(
                 tenant_id,
                 provider_status=note.status,
                 trace_id=trace_id,
