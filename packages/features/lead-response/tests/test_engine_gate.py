@@ -184,7 +184,7 @@ async def test_a_task_for_a_text_is_made_in_that_texts_own_clinic(make_tenant):
 
 async def test_only_the_kinds_with_a_handler_are_claimed(make_tenant):
     tenant = await make_tenant()
-    ids = {kind: await add_job(tenant, kind=kind) for kind in ("holding", "escalate", "help", "follow_up")}
+    ids = {kind: await add_job(tenant, kind=kind) for kind in ("follow_up", "bulk", "something_new")}
     engine, provider, clock = make_engine()
     clock.advance(minutes=1)
     assert await engine.run_due(tenant) == 0

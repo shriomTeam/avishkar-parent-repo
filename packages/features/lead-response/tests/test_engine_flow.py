@@ -99,14 +99,14 @@ async def test_start_creates_no_job(intake, make_tenant):
     assert await engine.run_due(tenant) == 0 and provider.requests == []
 
 
-async def test_help_creates_a_job_the_engine_does_not_take_yet(intake, make_tenant):
+async def test_help_creates_a_job_the_engine_cancels_without_sending(intake, make_tenant):
     tenant = await make_tenant()
     await text(intake, tenant, "HELP")
     engine, provider = engine_after_the_texts()
-    assert await engine.run_due(tenant) == 0
+    assert await engine.run_due(tenant) == 1
     assert provider.requests == [] and await tasks_of(tenant) == []
     (help_job,) = await jobs_of_kind(tenant, "help")
-    assert help_job.status == "pending" and help_job.attempts == 0
+    assert (help_job.status, help_job.cancel_reason) == ("cancelled", "help_wording_pending")
 
 
 async def test_two_clinics_with_the_same_lead_number_are_answered_separately(intake, make_tenant):
