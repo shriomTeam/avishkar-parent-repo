@@ -21,7 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from clinic_core.database import tenant_session
 from clinic_core.entitlements import enabled_feature_keys
 from clinic_lead_response.config import get_intake_settings
-from clinic_lead_response.engine import ack, help_job, holding
+from clinic_lead_response.engine import ack, escalation, help_job, holding
 from clinic_lead_response.engine.ports import Clock, JobQueue
 from clinic_lead_response.engine.queue import ClaimedJob, PostgresJobQueue
 from clinic_lead_response.engine.results import Cancel, Done, End, Wait
@@ -50,7 +50,12 @@ class Engine:
         self.scope: SessionScope = session_scope or tenant_session
         self.queue: JobQueue = queue or PostgresJobQueue(clock=self.now, session_scope=self.scope)
         self._enabled = enabled or (lambda: get_intake_settings().engine_enabled)
-        self.handlers: dict[str, Handler] = {"ack": ack.handle, "holding": holding.handle, "help": help_job.handle}
+        self.handlers: dict[str, Handler] = {
+            "ack": ack.handle,
+            "holding": holding.handle,
+            "help": help_job.handle,
+            "escalate": escalation.handle,
+        }
 
     async def may_run(self, tenant_id: uuid.UUID) -> bool:
         """The switch is on and the clinic has the feature. Checked at the start of every batch of work."""

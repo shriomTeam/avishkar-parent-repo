@@ -102,7 +102,11 @@ async def test_a_lengthened_timer_puts_the_job_back_without_counting_it(make_ten
     assert (job.status, job.attempts) == ("pending", 0)
     assert job.run_at == wait.task.received_at + timedelta(minutes=40)
     go_to(wait, 39)
-    assert await wait.engine.run_due(tenant) == 0
+    assert await wait.engine.run_due(tenant) == 1  # only the escalation job, which finds its own target lengthened too
+    assert holdings(wait.provider) == []
+    escalation = await timer(tenant, "escalate")
+    assert (escalation.status, escalation.attempts) == ("pending", 0)  # put back, and no attempt counted
+    assert escalation.run_at == wait.task.received_at + timedelta(minutes=60)  # the lengthened target
     go_to(wait, 40)
     assert await wait.engine.run_due(tenant) == 1 and len(holdings(wait.provider)) == 1
 
@@ -421,7 +425,9 @@ async def test_with_the_switch_off_the_holding_job_waits_untouched(make_tenant):
     job = await timer(tenant, "holding")
     assert (job.status, job.attempts, job.locked_at) == ("pending", 0, None)
     state["on"] = True
-    assert await wait.engine.run_due(tenant) == 1 and len(holdings(wait.provider)) == 1  # nothing was lost
+    assert (
+        await wait.engine.run_due(tenant) == 2 and len(holdings(wait.provider)) == 1
+    )  # holding and escalation, both due
 
 
 async def test_a_clinic_without_the_feature_gets_no_holding_message(make_tenant):
