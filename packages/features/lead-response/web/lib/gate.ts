@@ -1,7 +1,7 @@
 /**
- * What the answer to the first settings read means for the page. The API is the gate: this feature is not yet
- * "available" on the platform, so the platform's own feature check cannot be used (see PROGRESS.md; swap to
- * requireFeature when `available` flips). Only a plain "feature not enabled" is a 404. A role refusal shows the role
+ * What the answer to the first settings read means for the page. The API is the gate, not the platform's feature
+ * check (`requireFeature`), on purpose: that check answers 404 to a role the platform does not grant, and this page
+ * shows such a role an explanation instead. Only a plain "feature not enabled" is a 404. A role refusal shows the role
  * view, and everything else is an error the person can retry, never a 404.
  */
 export type Gate = "ok" | "not_found" | "role" | "error";
