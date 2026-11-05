@@ -50,6 +50,8 @@ class Accepted:
     throttled: bool = False  # saved, but too many texts too fast for us to answer each one
     keyword: Keyword | None = None  # what the text meant to the carriers, if anything
     keyword_pending: bool = False  # the keyword still has to be applied (new, or a retry whose effect is missing)
+    tenant_id: uuid.UUID | None = None  # who it belongs to and the trace it carries, for the hook after the commit
+    trace_id: uuid.UUID | None = None
 
 
 SessionScope = Callable[[uuid.UUID], AbstractAsyncContextManager[AsyncSession]]
@@ -109,6 +111,8 @@ async def accept(
         throttled=throttled,
         keyword=keyword,
         keyword_pending=keyword is not None,
+        tenant_id=tenant_id,
+        trace_id=trace_id,
     )
 
 

@@ -67,9 +67,10 @@ async def stuck_candidates(engine, tenant_id: uuid.UUID, *, limit: int) -> list[
         return list(await session.scalars(query))
 
 
-async def expire_stuck(engine, tenant_id: uuid.UUID, *, limit: int = 50) -> int:
-    """Settle this clinic's stuck messages. Returns how many were expired. Off when the engine is off."""
-    if not await engine.may_run(tenant_id):
+async def expire_stuck(engine, tenant_id: uuid.UUID, *, limit: int = 50, checked: bool = False) -> int:
+    """Settle this clinic's stuck messages. Returns how many were expired. Off when the engine is off. ``checked``
+    means the caller has just passed ``engine.may_run``."""
+    if not checked and not await engine.may_run(tenant_id):
         return 0
     expired = 0
     for message_id in await stuck_candidates(engine, tenant_id, limit=limit):

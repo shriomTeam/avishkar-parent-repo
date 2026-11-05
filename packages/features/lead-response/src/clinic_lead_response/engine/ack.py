@@ -17,6 +17,7 @@ Acks ignore quiet hours and need no grant (the gateway's rule); an opted-out con
 
 import logging
 import uuid
+from dataclasses import dataclass
 from datetime import timedelta
 
 from clinic_lead_response.engine.results import Cancel, Done, End, Wait
@@ -42,7 +43,26 @@ DAY = timedelta(hours=24)
 SENT_STATUSES = frozenset({MessageStatus.QUEUED, MessageStatus.SENT, MessageStatus.DELIVERED})
 
 
+@dataclass(frozen=True)
+class Ready:
+    """An ack that is due. The task and its timers are written and committed; nothing has been sent yet."""
+
+    request: SendRequest
+    task_id: uuid.UUID
+    trace_id: uuid.UUID
+
+
 async def handle(engine, job) -> End:
+    """The whole job: ``prepare`` (the task, its timers, the decision) and then ``deliver`` (the send). The fast path
+    after an inbound text runs the same two functions, the first awaited and the second in the background, so there is
+    one implementation."""
+    ready = await prepare(engine, job)
+    if isinstance(ready, Cancel | Done | Wait):
+        return ready
+    return await deliver(engine, job, ready)
+
+
+async def prepare(engine, job) -> "Ready | End":
     try:
         message_id = uuid.UUID(str(job.payload["message_id"]))
     except (KeyError, ValueError):
@@ -87,6 +107,12 @@ async def handle(engine, job) -> End:
         idempotency_key=f"ack:{task.id}",
         trace_id=trace_id,
     )
+    return Ready(request, task.id, trace_id)
+
+
+async def deliver(engine, job, ready: Ready) -> End:
+    """Send the ack once, record it, and say how the job ended. Safe to run again: the gateway key is per wait."""
+    request, task_id, trace_id = ready.request, ready.task_id, ready.trace_id
     result = await engine.gateway.send(job.tenant_id, request)
     if result.outcome is Outcome.DUPLICATE and result.status is MessageStatus.FAILED:
         # An earlier run of this very ack failed in a way the gateway may retry: this run is the retry.
@@ -94,14 +120,14 @@ async def handle(engine, job) -> End:
     end = _end_for(result, engine.now())
     if _went_out(result):
         async with engine.scope(job.tenant_id) as session:
-            await mark_first_ack(session, task.id, engine.now())
+            await mark_first_ack(session, task_id, engine.now())
     log_event(
         log,
         "ack",
         tenant_id=job.tenant_id,
         trace_id=trace_id,
         job_id=job.id,
-        task_id=task.id,
+        task_id=task_id,
         message_id=result.message_id,
         outcome=result.outcome.value,
         reason=result.reason,

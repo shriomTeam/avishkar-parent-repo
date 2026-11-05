@@ -64,9 +64,10 @@ class Engine:
         async with self.scope(tenant_id) as session:
             return FEATURE_KEY in await enabled_feature_keys(session)
 
-    async def run_due(self, tenant_id: uuid.UUID, *, limit: int = 10) -> int:
-        """Claim and run this clinic's due jobs. Returns how many were run."""
-        if not await self.may_run(tenant_id):
+    async def run_due(self, tenant_id: uuid.UUID, *, limit: int = 10, checked: bool = False) -> int:
+        """Claim and run this clinic's due jobs. Returns how many were run. ``checked`` means the caller has just
+        passed ``may_run`` and does not need it asked again."""
+        if not checked and not await self.may_run(tenant_id):
             return 0
         jobs = await self.queue.claim(tenant_id, limit=limit, kinds=list(self.handlers))
         for job in jobs:
@@ -79,6 +80,10 @@ class Engine:
         except Exception as error:
             await self.queue.fail_attempt(job, error)
             return
+        await self.finish(job, end)
+
+    async def finish(self, job: ClaimedJob, end: End) -> None:
+        """Turn how a job ended into the matching queue call."""
         match end:
             case Done(code=code):
                 applied = await self.queue.complete(job, code=code)
