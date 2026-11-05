@@ -7,8 +7,8 @@
     $SEED hold       --tenant-name NAME --seconds 4
     $SEED cleanup    --tenant-name NAME
 
-The feature is "available=False" on the platform and no provisioning path switches it on, so a workspace made by the
-browser sign-in does not have it. `enable` adds the entitlement row the API checks (`require_feature`), and with
+The feature is listed on the platform ("available=True") but no provisioning path switches it on, so a workspace made
+by the browser sign-in does not have it. `enable` adds the entitlement row the API checks (`require_feature`), and with
 `--scenario saved` also two saved settings versions (version 2 is current). `bump` saves one more version behind the
 page's back, so the next save from the page gets a 412. `front-desk` gives the workspace owner a real front-desk
 role, so the platform's own role check answers 403. `hold` takes a lock on lead_response.practice_settings for a few

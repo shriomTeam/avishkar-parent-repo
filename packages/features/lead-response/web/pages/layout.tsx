@@ -6,9 +6,9 @@ import { FrameSkeleton } from "../components/skeletons";
 import { currentRole, loadSettings } from "../lib/server";
 
 /**
- * The page's own gate. The platform's feature check (`requireFeature`) cannot be used while this feature is not
- * "available" on the platform, so the API's answer is the gate (see lib/gate.ts). When `available` becomes true,
- * replace the body of Gate with `await requireFeature("lead_response")` from @clinic/core/web/api.
+ * The page's own gate. The API's answer is the gate (see lib/gate.ts), not the platform's `requireFeature`, on
+ * purpose: `requireFeature` answers 404 to a role the platform does not grant the feature, while this page shows such
+ * a role an explanation (the role view). Revisit when the staff task API opens the feature to more roles.
  */
 async function Gate({ children }: { children: ReactNode }) {
   const loaded = await loadSettings();

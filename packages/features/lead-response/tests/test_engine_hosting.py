@@ -11,6 +11,7 @@ from lr_intake import Counter, Intake, sid, twilio_pairs
 from clinic_core.database import tenant_session
 from clinic_core.features import JobContext, Schedule, job_name, load_features
 from clinic_lead_response import runtime
+from clinic_lead_response.config import IntakeSettings
 from clinic_lead_response.engine.tick import TICK_EVERY_SECONDS, TICK_JOB
 from clinic_lead_response.feature import feature
 
@@ -25,8 +26,10 @@ def test_there_is_no_loop_inside_the_api():
     assert feature.on_startup is None  # the engine is hosted by the worker only
 
 
-def test_the_feature_is_still_not_available_so_nothing_is_offered_to_a_clinic():
-    assert feature.available is False
+def test_the_feature_is_listed_but_the_engine_is_off_by_default_so_nothing_is_sent(monkeypatch):
+    assert feature.available is True
+    monkeypatch.delenv("LEAD_RESPONSE_ENGINE_ENABLED", raising=False)
+    assert IntakeSettings(_env_file=None).engine_enabled is False
 
 
 def worker_job_table():

@@ -1,7 +1,10 @@
 """How the inbound route is mounted: public, off by default, and outside the generated API client."""
 
+from dataclasses import replace
+
 import httpx
 import pytest
+from fastapi import FastAPI
 from lr_api import build_app, client_for, headers
 from lr_intake import PATH, PUBLIC, TOKEN, Intake, count, form_bytes, reference_signature, twilio_pairs
 
@@ -18,8 +21,15 @@ def platform_app():
     return app
 
 
-def test_the_feature_still_says_it_is_not_available():
-    assert feature.available is False  # the API gate never reads this; the test below shows why it matters
+async def test_the_feature_is_available_and_the_public_route_answers_whatever_the_flag_says(monkeypatch, make_tenant):
+    assert feature.available is True  # the API gate never reads this
+    tenant = await make_tenant()
+    for flag in (True, False):
+        intake = Intake(monkeypatch)
+        intake.app = FastAPI()  # mounted the way the platform does it, from a copy of the feature with the flag set
+        intake.app.include_router(replace(feature, available=flag).websocket_router, prefix=PATH)
+        assert (await intake.post(tenant)).status_code == 200, flag
+    assert await count(tenant, Message) == 1  # the second post is the same text again, stored once
 
 
 def test_the_public_router_has_exactly_the_inbound_and_receipt_routes():
@@ -59,7 +69,7 @@ async def test_staff_routes_need_a_sign_in_but_the_public_route_does_not(monkeyp
     assert await count(tenant, Message) == 1
 
 
-async def test_it_works_for_a_clinic_whose_feature_is_on_even_though_available_is_false(monkeypatch, make_tenant):
+async def test_it_works_for_a_clinic_whose_feature_is_on_whatever_the_available_flag_says(monkeypatch, make_tenant):
     tenant = await make_tenant()
     assert (await Intake(monkeypatch).post(tenant)).status_code == 200
     assert await count(tenant, Message) == 1
