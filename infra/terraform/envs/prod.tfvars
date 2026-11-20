@@ -17,6 +17,6 @@ email_old_payload_keys_enabled = true
 # to the GitHub environment "production".
 twilio_enabled = true
 
-# The WhatsApp agent as its own Cloud Run service. Leave off until WHATSAPP_APP_SECRET and WHATSAPP_VERIFY_TOKEN
-# (secrets) are added to the GitHub environment "production".
-whatsapp_enabled = false
+# The WhatsApp agent as its own Cloud Run service. It needs WHATSAPP_APP_SECRET and WHATSAPP_VERIFY_TOKEN (secrets)
+# in the GitHub environment "production"; the Terraform plan fails without them.
+whatsapp_enabled = true
