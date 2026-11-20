@@ -18,6 +18,7 @@ from clinic_voice_receptionist.twilio_calls.stream import router as twilio_strea
 from clinic_voice_receptionist.twilio_calls.webhook import router as twilio_webhook_router
 from clinic_voice_receptionist.variables.router import router as variables_router
 from clinic_voice_receptionist.voice_preview.router import router as voice_preview_router
+from clinic_voice_receptionist.whatsapp.router import router as whatsapp_router
 
 router = APIRouter(tags=["voice_receptionist"])
 router.include_router(inbound_router)
@@ -31,6 +32,7 @@ ws_router.include_router(twilio_stream_router)
 router.include_router(tools_router)
 router.include_router(variables_router)
 router.include_router(voice_preview_router)
+router.include_router(whatsapp_router)  # staff side only; Meta's webhook is its own service (whatsapp/service_app.py)
 
 
 @router.get("/status")
@@ -44,7 +46,7 @@ feature = Feature(
     description="AI voice agent that answers, books, reschedules and escalates around the clock.",
     router=router,
     websocket_router=ws_router,
-    nav=[NavItem(label="Voice Receptionist", path="/voice-receptionist")],
+    nav=[NavItem(label="Agents", path="/voice-receptionist")],
     trial_eligible=True,
     phi_sensitive=True,
     on_startup=sync_on_startup,  # keeps bought numbers pointed at this server's call address

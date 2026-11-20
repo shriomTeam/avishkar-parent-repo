@@ -90,7 +90,8 @@ module "api" {
   timeout_seconds = 3600
   memory          = "1Gi"
 
-  env = merge(local.platform_env, var.twilio_enabled ? { TWILIO_ACCOUNT_SID = var.twilio_account_sid, VOICE_PUBLIC_API_URL = local.api_url } : {}, {
+  # The API only shows staff the WhatsApp service's address; messages never pass through it.
+  env = merge(local.platform_env, var.twilio_enabled ? { TWILIO_ACCOUNT_SID = var.twilio_account_sid, VOICE_PUBLIC_API_URL = local.api_url } : {}, var.whatsapp_enabled ? { VOICE_WHATSAPP_PUBLIC_URL = local.whatsapp_url } : {}, {
     INVITATIONS_ENABLED     = tostring(var.invitations_enabled)
     EMAIL_PROVIDER          = var.invitations_enabled ? "sendgrid" : "console"
     EMAIL_FROM_ADDRESS      = var.email_from_address

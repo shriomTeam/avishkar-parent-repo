@@ -46,6 +46,18 @@ class VoiceSettings(BaseSettings):
     # Dev and tests only: lets tools call localhost and private addresses. Never enable in production.
     tool_allow_private_hosts: bool = False
 
+    # WhatsApp agent. Meta calls the webhook on its own Cloud Run service (whatsapp/service_app.py), which proves each
+    # request with the Meta app secret. The verify token answers Meta's one-time check when the webhook is registered.
+    whatsapp_app_secret: str = ""
+    whatsapp_verify_token: str = ""
+    whatsapp_graph_version: str = "v27.0"
+    whatsapp_model: str = "gemini-3.5-flash"
+    whatsapp_location: str = "global"  # Gemini 3.5 Flash is served from the global endpoint, not from us-central1
+    whatsapp_history_messages: int = 20  # recent messages the model sees
+    # The public address of the WhatsApp service, such as https://whatsapp.example.com. Only shown to staff, so they
+    # know what to paste into Meta's webhook settings.
+    whatsapp_public_url: str = ""
+
     @model_validator(mode="after")
     def private_tools_are_local_only(self):
         if self.app_env == "production" and self.tool_allow_private_hosts:

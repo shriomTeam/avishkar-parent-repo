@@ -11,6 +11,8 @@ import {
   Brackets,
   BookOpen,
   ChevronRight,
+  MessageCircle,
+  Settings,
 } from "lucide-react";
 import { AccountMenu, Avatar, buttonStyles, StatusBadge } from "@clinic/ui";
 import { Brand, DemoBoundary } from "./ui";
@@ -31,6 +33,12 @@ export const navigation = [
     icon: BookOpen,
   },
 ];
+/** The WhatsApp channel has its own pages under /voice-receptionist/whatsapp. */
+const WHATSAPP = "/voice-receptionist/whatsapp";
+export const whatsappNavigation = [
+  { path: WHATSAPP, name: "Conversations", icon: MessageCircle },
+  { path: `${WHATSAPP}/settings`, name: "Configuration", icon: Settings },
+];
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useDemo();
@@ -39,14 +47,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
     (m) => m.workspace_id === auth.workspace?.id,
   )?.role;
   const manager = memberRole === "owner" || memberRole === "office_manager";
-  const visibleNavigation = navigation.filter(
+  const whatsapp = pathname.startsWith(WHATSAPP);
+  const channelNavigation = whatsapp ? whatsappNavigation : navigation;
+  const visibleNavigation = channelNavigation.filter(
     (item) =>
       manager ||
       item.path === "/voice-receptionist" ||
-      item.path === "/voice-receptionist/calls",
+      item.path === "/voice-receptionist/calls" ||
+      item.path === WHATSAPP,
   );
-  const active = navigation.find((item) =>
-    item.path === "/voice-receptionist"
+  const active = channelNavigation.find((item) =>
+    item.path === "/voice-receptionist" || item.path === WHATSAPP
       ? pathname === item.path
       : pathname.startsWith(item.path),
   );
@@ -70,10 +81,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
               className="block max-w-[140px] [overflow-wrap:anywhere]"
               data-testid="clinic-name"
             >
-              {state?.workspace.name || "Voice workspace"}
+              {state?.workspace.name || "Agents workspace"}
             </strong>
             <small className="block text-[12px] text-muted">
-              Voice workspace
+              Agents workspace
             </small>
           </div>
         </div>
@@ -83,8 +94,26 @@ export function Shell({ children }: { children: React.ReactNode }) {
         >
           ← All clinic products
         </Link>
+        <nav
+          aria-label="Agent channels"
+          className="mx-3 mb-4 grid grid-cols-2 gap-1 rounded-[10px] bg-[#f3f1f6] p-1 text-[13px]"
+        >
+          {[
+            { name: "Voice", href: "/voice-receptionist", current: !whatsapp },
+            { name: "WhatsApp", href: WHATSAPP, current: whatsapp },
+          ].map(({ name, href, current }) => (
+            <Link
+              key={name}
+              href={href}
+              aria-current={current ? "page" : undefined}
+              className={`focus-ring rounded-[7px] py-1.5 text-center ${current ? "bg-white font-semibold text-brand-ink shadow-sm" : "text-[#625d6b]"}`}
+            >
+              {name}
+            </Link>
+          ))}
+        </nav>
         <div className="mx-3 mb-2.5 text-[12px] tracking-[1.2px] text-[#96929f] max-app:hidden">
-          WORKSPACE
+          {whatsapp ? "WHATSAPP" : "VOICE"}
         </div>
         <nav
           aria-label="Workspace navigation"
@@ -113,8 +142,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="mb-5 rounded-[10px] bg-[#f7faf5] p-3.5 text-[12px] max-app:hidden">
             <strong>Authenticated workspace</strong>
             <p className="my-1 text-[14px] text-muted">
-              Agents, calls, tools and variables are live · other sections are
-              demo
+              Voice agents, calls, tools and variables and the WhatsApp agent
+              are live · other sections are demo
             </p>
           </div>
           <AccountMenu
@@ -148,7 +177,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span className="max-app:hidden">
               <StatusBadge>Live agents &amp; calls</StatusBadge>
             </span>
-            {manager && (
+            {manager && !whatsapp && (
               <Link
                 className={buttonStyles("outline", { size: "adaptive" })}
                 href="/voice-receptionist/test"
@@ -167,7 +196,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <DemoBoundary>{children}</DemoBoundary>
         </main>
         <footer className="flex gap-6 border-t border-line px-[38px] py-[18px] text-[12px] text-muted max-app:flex-wrap max-app:gap-2 max-app:p-4">
-          Avishkar Voice{" "}
+          Avishkar Agents{" "}
           <span>
             Agents, calls, transcripts, tools, variables, the knowledge base and
             phone numbers are real and stored

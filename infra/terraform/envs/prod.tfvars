@@ -16,3 +16,7 @@ email_old_payload_keys_enabled = true
 # Phone numbers through Twilio. Turn on after adding TWILIO_ACCOUNT_SID (variable) and TWILIO_AUTH_TOKEN (secret)
 # to the GitHub environment "production".
 twilio_enabled = true
+
+# The WhatsApp agent as its own Cloud Run service. Leave off until WHATSAPP_APP_SECRET and WHATSAPP_VERIFY_TOKEN
+# (secrets) are added to the GitHub environment "production".
+whatsapp_enabled = false

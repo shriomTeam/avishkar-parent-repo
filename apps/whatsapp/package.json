@@ -1,0 +1,7 @@
+{
+  "name": "@clinic/whatsapp",
+  "private": true,
+  "scripts": {
+    "dev": "PORT=8002 uv run python -m clinic_voice_receptionist.whatsapp.service_app"
+  }
+}

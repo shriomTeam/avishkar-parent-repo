@@ -40,6 +40,12 @@ const SCREENS = [
   ["/voice-receptionist/variables", "variables", "Variables"],
   ["/voice-receptionist/knowledge", "knowledge", "Knowledge base"],
   ["/voice-receptionist/numbers", "numbers", "Phone numbers"],
+  ["/voice-receptionist/whatsapp", "whatsapp-chats", "WhatsApp conversations"],
+  [
+    "/voice-receptionist/whatsapp/settings",
+    "whatsapp-settings",
+    "WhatsApp configuration",
+  ],
 ] as const;
 
 test("each screen shows a skeleton of itself while its data loads, then the real page", async ({

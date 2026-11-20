@@ -26,8 +26,8 @@ const products: Record<
     icon: Sparkles,
   },
   voice_receptionist: {
-    title: "Voice Receptionist",
-    description: "Manage voice agents, calls and conversations.",
+    title: "Agents",
+    description: "Manage voice and WhatsApp agents, calls and conversations.",
     icon: AudioLines,
   },
   command_center: {

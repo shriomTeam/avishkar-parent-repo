@@ -813,7 +813,7 @@ test("original voice shell and platform return work across screen sizes", async 
     page.getByRole("link", { name: "Always-On Clinic", exact: true }),
   ).toBeVisible();
   await page
-    .getByRole("link", { name: "Voice Receptionist", exact: true })
+    .getByRole("link", { name: "Agents", exact: true })
     .click();
   await expect(page.getByTestId("voice-sidebar")).toBeVisible();
 });

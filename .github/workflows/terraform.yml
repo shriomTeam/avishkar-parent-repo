@@ -51,6 +51,8 @@ jobs:
       # Phone numbers (used only when twilio_enabled is true in envs/prod.tfvars).
       TF_VAR_twilio_account_sid: ${{ vars.TWILIO_ACCOUNT_SID }}
       TF_VAR_twilio_auth_token: ${{ secrets.TWILIO_AUTH_TOKEN }}
+      TF_VAR_whatsapp_app_secret: ${{ secrets.WHATSAPP_APP_SECRET }}
+      TF_VAR_whatsapp_verify_token: ${{ secrets.WHATSAPP_VERIFY_TOKEN }}
       TF_VAR_sendgrid_api_key: ${{ secrets.SENDGRID_API_KEY }}
       TF_VAR_email_old_payload_keys: ${{ secrets.EMAIL_OLD_PAYLOAD_KEYS }}
     steps:
@@ -94,6 +96,8 @@ jobs:
       # Phone numbers (used only when twilio_enabled is true in envs/prod.tfvars).
       TF_VAR_twilio_account_sid: ${{ vars.TWILIO_ACCOUNT_SID }}
       TF_VAR_twilio_auth_token: ${{ secrets.TWILIO_AUTH_TOKEN }}
+      TF_VAR_whatsapp_app_secret: ${{ secrets.WHATSAPP_APP_SECRET }}
+      TF_VAR_whatsapp_verify_token: ${{ secrets.WHATSAPP_VERIFY_TOKEN }}
       TF_VAR_sendgrid_api_key: ${{ secrets.SENDGRID_API_KEY }}
       TF_VAR_email_old_payload_keys: ${{ secrets.EMAIL_OLD_PAYLOAD_KEYS }}
     steps:

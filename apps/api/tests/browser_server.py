@@ -12,6 +12,7 @@ from clinic_core.settings import Settings
 try:  # Only present when the voice feature is installed. Removing a feature must not break platform tests.
     from clinic_voice_receptionist.testing import (
         FakeNumbers,
+        FakeWhatsAppGraph,
         MemoryRecordingStore,
         ScriptedConnector,
         scripted_voice_preview,
@@ -19,7 +20,7 @@ try:  # Only present when the voice feature is installed. Removing a feature mus
 except ModuleNotFoundError as exc:
     if exc.name != "clinic_voice_receptionist":
         raise  # a real import problem inside voice, not its absence
-    ScriptedConnector = MemoryRecordingStore = FakeNumbers = None
+    ScriptedConnector = MemoryRecordingStore = FakeNumbers = FakeWhatsAppGraph = None
 
 # Browser tests point custom tools at this server's own /_test/echo, so private addresses must be allowed.
 os.environ.setdefault("VOICE_TOOL_ALLOW_PRIVATE_HOSTS", "true")
@@ -105,6 +106,8 @@ if ScriptedConnector is not None:
     app.state.recording_store = MemoryRecordingStore()
     # Buying a phone number never reaches Twilio: the fake hands out sample numbers.
     app.state.twilio_numbers = FakeNumbers()
+    # Connecting a WhatsApp number never reaches Meta either.
+    app.state.whatsapp_graph = FakeWhatsAppGraph()
     # Knowledge-base uploads stay in memory and embeddings are fake, so browser tests never reach Google.
     from clinic_knowledge.testing import FakeEmbedder, MemoryFileStore
 
