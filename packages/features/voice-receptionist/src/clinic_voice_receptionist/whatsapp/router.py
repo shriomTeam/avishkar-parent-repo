@@ -3,24 +3,37 @@
 Meta's webhook is not here. It runs as its own service (``service_app.py``), so patient messages never compete with the
 clinic's own traffic."""
 
+import logging
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from clinic_core.api import RequestContext, get_request_context, get_session, require_role
 from clinic_core.audit import audit
+from clinic_core.database import tenant_session
 from clinic_db.models.core import StaffRole
+from clinic_db.models.ops import AuditLog
+from clinic_db.models.voice import WhatsAppConversation
 from clinic_voice_receptionist.config import get_voice_settings
-from clinic_voice_receptionist.whatsapp import service
+from clinic_voice_receptionist.whatsapp import crypto, service
 from clinic_voice_receptionist.whatsapp.graph import GraphError, MetaGraph, WhatsAppGraph
 from clinic_voice_receptionist.whatsapp.webhook import WEBHOOK_PATH
 
+log = logging.getLogger("voice.whatsapp")
 router = APIRouter(prefix="/inbound/whatsapp", tags=["voice_receptionist"])
+
+# WhatsApp lets a business send free text only within 24 hours of the person's last message. After that, only approved
+# template messages work, and those are not built yet.
+REPLY_WINDOW = timedelta(hours=24)
+# An open chat window asks for new messages every few seconds, so one "viewed" audit line is written per person and
+# chat in this time, not one per refresh.
+VIEW_AUDIT_EVERY = timedelta(minutes=5)
 
 MANAGERS = [Depends(require_role(StaffRole.OWNER, StaffRole.OFFICE_MANAGER))]
 
@@ -71,6 +84,8 @@ class WhatsAppConversationOut(BaseModel):
     message_count: int
     last_message: str | None
     last_direction: Literal["inbound", "outbound"] | None
+    agent_paused: bool
+    paused_at: datetime | None
 
 
 class WhatsAppMessageOut(BaseModel):
@@ -79,6 +94,18 @@ class WhatsAppMessageOut(BaseModel):
     text: str
     status: str
     created_at: datetime
+    from_staff: bool
+    sent_by: str | None
+
+
+class WhatsAppReplyIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    text: str = Field(min_length=1, max_length=service.MAX_TEXT)
+
+
+class WhatsAppPauseOut(BaseModel):
+    agent_paused: bool
+    paused_at: datetime | None
 
 
 class WhatsAppConversationDetailOut(BaseModel):
@@ -183,15 +210,137 @@ async def read_conversation(
     if found is None:
         raise HTTPException(404, "That conversation no longer exists.")
     conversation, messages = found
-    await audit(  # patient messages are PHI: every read is recorded
+    recently = await session.scalar(
+        select(AuditLog.id)
+        .where(
+            AuditLog.action == "voice.whatsapp.conversation_viewed",
+            AuditLog.actor_id == ctx.actor_id,
+            AuditLog.entity_id == conversation_id,
+            AuditLog.occurred_at > datetime.now(UTC) - VIEW_AUDIT_EVERY,
+        )
+        .limit(1)
+    )
+    if recently is None:  # patient messages are PHI: opening a chat is recorded
+        await audit(
+            session,
+            "voice.whatsapp.conversation_viewed",
+            actor_type="staff",
+            actor_id=ctx.actor_id,
+            entity_type="voice.whatsapp_conversation",
+            entity_id=conversation_id,
+        )
+    return WhatsAppConversationDetailOut(
+        conversation=WhatsAppConversationOut(**vars(conversation)),
+        messages=[WhatsAppMessageOut(**vars(m)) for m in messages],
+    )
+
+
+def _staff_id(ctx: RequestContext) -> uuid.UUID | None:
+    try:
+        return uuid.UUID(ctx.actor_id)
+    except ValueError:
+        return None  # dev-only sign-in without a staff row
+
+
+@router.post(
+    "/conversations/{conversation_id}/messages",
+    response_model=WhatsAppMessageOut,
+    status_code=201,
+    dependencies=MANAGERS,
+)
+async def send_reply(
+    conversation_id: uuid.UUID,
+    body: WhatsAppReplyIn,
+    request: Request,
+    ctx: RequestContext = Depends(get_request_context),
+    session: AsyncSession = Depends(get_session),
+) -> WhatsAppMessageOut:
+    """A staff member answers the person. The agent is paused for this chat first, so it never talks over the person."""
+    text = body.text.strip()
+    if not text:
+        raise HTTPException(422, "Write a message first.")
+    conversation = await session.get(WhatsAppConversation, conversation_id)
+    if conversation is None:
+        raise HTTPException(404, "That conversation no longer exists.")
+    account = await service.get_account(session)
+    if account is None:
+        raise HTTPException(409, "No WhatsApp number is connected.")
+    last = await service.last_patient_message_at(session, conversation_id)
+    if last is None or datetime.now(UTC) - last > REPLY_WINDOW:
+        raise HTTPException(
+            409,
+            "The 24-hour reply window is closed. WhatsApp allows a free message only within 24 hours of the "
+            "person's last message.",
+        )
+    staff_id = _staff_id(ctx)
+    # Pause in its own committed transaction, before anything is sent, so a patient message that arrives now is not
+    # answered by the agent while this reply is on its way.
+    async with tenant_session(ctx.tenant_id, database_url=ctx.database_url) as pause_session:
+        await service.set_paused(pause_session, conversation_id, True, staff_id)
+    sent_id: str | None = None
+    status = "sent"
+    try:
+        sent_id = await _graph(request).send_text(
+            account.phone_number_id,
+            crypto.decrypt(ctx.tenant_id, account.access_token_enc),
+            crypto.decrypt(ctx.tenant_id, conversation.contact_number_enc),
+            text,
+        )
+    except GraphError as exc:
+        log.warning("WhatsApp staff reply was not delivered: %s", exc)  # no text or numbers in logs
+        status = "failed"  # kept in the chat, marked not delivered, so the person who wrote it can see
+    message = await service.record_outbound(
+        session, ctx.tenant_id, conversation_id, text=text, message_id=sent_id, status=status, staff_id=staff_id
+    )
+    await audit(  # who wrote to a patient is recorded; the text is not
         session,
-        "voice.whatsapp.conversation_viewed",
+        "voice.whatsapp.staff_reply",
+        actor_type="staff",
+        actor_id=ctx.actor_id,
+        entity_type="voice.whatsapp_conversation",
+        entity_id=conversation_id,
+        details={"status": status},
+    )
+    names = await service.staff_names(session, {staff_id} if staff_id else set())
+    return WhatsAppMessageOut(
+        id=message.id,
+        direction="outbound",
+        text=text,
+        status=status,
+        created_at=message.created_at,
+        from_staff=staff_id is not None,
+        sent_by=names.get(staff_id) if staff_id else None,
+    )
+
+
+async def _set_paused(conversation_id: uuid.UUID, paused: bool, ctx: RequestContext, session: AsyncSession):
+    conversation = await service.set_paused(session, conversation_id, paused, _staff_id(ctx))
+    if conversation is None:
+        raise HTTPException(404, "That conversation no longer exists.")
+    await audit(
+        session,
+        "voice.whatsapp.agent_paused" if paused else "voice.whatsapp.agent_resumed",
         actor_type="staff",
         actor_id=ctx.actor_id,
         entity_type="voice.whatsapp_conversation",
         entity_id=conversation_id,
     )
-    return WhatsAppConversationDetailOut(
-        conversation=WhatsAppConversationOut(**vars(conversation)),
-        messages=[WhatsAppMessageOut(**vars(m)) for m in messages],
-    )
+    return WhatsAppPauseOut(agent_paused=conversation.agent_paused, paused_at=conversation.paused_at)
+
+
+@router.post("/conversations/{conversation_id}/pause", response_model=WhatsAppPauseOut, dependencies=MANAGERS)
+async def pause_agent(
+    conversation_id: uuid.UUID,
+    ctx: RequestContext = Depends(get_request_context),
+    session: AsyncSession = Depends(get_session),
+) -> WhatsAppPauseOut:
+    return await _set_paused(conversation_id, True, ctx, session)
+
+
+@router.post("/conversations/{conversation_id}/resume", response_model=WhatsAppPauseOut, dependencies=MANAGERS)
+async def resume_agent(
+    conversation_id: uuid.UUID,
+    ctx: RequestContext = Depends(get_request_context),
+    session: AsyncSession = Depends(get_session),
+) -> WhatsAppPauseOut:
+    return await _set_paused(conversation_id, False, ctx, session)

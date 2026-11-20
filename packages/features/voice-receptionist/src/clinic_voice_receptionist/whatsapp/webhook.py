@@ -135,6 +135,8 @@ async def handle(
         )
         if inbound is None:
             return  # a retry of a message that was already handled
+        if inbound.paused:
+            return  # staff took over this chat: the message is saved, and a person will answer it
         token = crypto.decrypt(tenant_id, account.access_token_enc)
         use_knowledge = account.use_knowledge
         system = system_instruction(
@@ -158,6 +160,10 @@ async def handle(
             log.warning("the WhatsApp agent could not answer", exc_info=True)
             reply = FALLBACK_REPLY
 
+    # Staff may have taken over while the model was writing. Look again, so the agent never talks over a person.
+    async with tenant_session(tenant_id) as session:
+        if await service.is_paused(session, inbound.conversation_id):
+            return
     sent_id: str | None = None
     status = "sent"
     try:

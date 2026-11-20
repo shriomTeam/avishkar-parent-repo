@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from clinic_db.models.core import Staff
 from clinic_db.models.voice import WhatsAppAccount, WhatsAppConversation, WhatsAppMessage
 from clinic_voice_receptionist.whatsapp import crypto
 from clinic_voice_receptionist.whatsapp.reply import Turn
@@ -79,6 +80,7 @@ class Inbound:
     conversation_id: uuid.UUID
     first_message: bool
     turns: list[Turn]  # recent chat including the new message, oldest first
+    paused: bool  # staff took over this chat, so the agent must not answer
 
 
 async def record_inbound(
@@ -135,7 +137,8 @@ async def record_inbound(
     if name and conversation.contact_name_enc is None:
         conversation.contact_name_enc = crypto.encrypt(tenant_id, name)
     await session.flush()
-    return Inbound(conversation.id, first, await recent_turns(session, tenant_id, conversation.id, history))
+    turns = await recent_turns(session, tenant_id, conversation.id, history)
+    return Inbound(conversation.id, first, turns, conversation.agent_paused)
 
 
 async def record_outbound(
@@ -146,23 +149,63 @@ async def record_outbound(
     text: str,
     message_id: str | None,
     status: str,
-) -> None:
+    staff_id: uuid.UUID | None = None,
+) -> WhatsAppMessage:
+    """Store a message from the clinic. ``staff_id`` is set when a person wrote it, empty when the agent did."""
     now = datetime.now(UTC)
-    session.add(
-        WhatsAppMessage(
-            tenant_id=tenant_id,
-            conversation_id=conversation_id,
-            direction="outbound",
-            provider_message_id=message_id,
-            body_enc=crypto.encrypt(tenant_id, text[:MAX_TEXT]),
-            status=status,
-            created_at=now,
-        )
+    message = WhatsAppMessage(
+        tenant_id=tenant_id,
+        conversation_id=conversation_id,
+        direction="outbound",
+        provider_message_id=message_id,
+        body_enc=crypto.encrypt(tenant_id, text[:MAX_TEXT]),
+        status=status,
+        sent_by_staff_id=staff_id,
+        created_at=now,
     )
+    session.add(message)
     conversation = await session.get(WhatsAppConversation, conversation_id)
     conversation.message_count += 1
     conversation.last_message_at = now
     await session.flush()
+    return message
+
+
+async def is_paused(session: AsyncSession, conversation_id: uuid.UUID) -> bool:
+    return bool(
+        await session.scalar(
+            select(WhatsAppConversation.agent_paused).where(WhatsAppConversation.id == conversation_id)
+        )
+    )
+
+
+async def set_paused(
+    session: AsyncSession, conversation_id: uuid.UUID, paused: bool, staff_id: uuid.UUID | None
+) -> WhatsAppConversation | None:
+    """Pause or resume the agent for one chat. Resuming clears who paused it."""
+    conversation = await session.get(WhatsAppConversation, conversation_id, with_for_update=True)
+    if conversation is None:
+        return None
+    conversation.agent_paused = paused
+    conversation.paused_at = datetime.now(UTC) if paused else None
+    conversation.paused_by_staff_id = staff_id if paused else None
+    await session.flush()
+    return conversation
+
+
+async def last_patient_message_at(session: AsyncSession, conversation_id: uuid.UUID) -> datetime | None:
+    return await session.scalar(
+        select(func.max(WhatsAppMessage.created_at)).where(
+            WhatsAppMessage.conversation_id == conversation_id, WhatsAppMessage.direction == "inbound"
+        )
+    )
+
+
+async def staff_names(session: AsyncSession, ids: set[uuid.UUID]) -> dict[uuid.UUID, str]:
+    if not ids:
+        return {}
+    rows = await session.execute(select(Staff.id, Staff.name).where(Staff.id.in_(ids)))
+    return {row.id: row.name for row in rows}
 
 
 async def recent_turns(
@@ -193,6 +236,8 @@ class ConversationView:
     message_count: int
     last_message: str | None
     last_direction: str | None
+    agent_paused: bool = False
+    paused_at: datetime | None = None
 
 
 async def list_conversations(session: AsyncSession, tenant_id: uuid.UUID, limit: int = 100) -> list[ConversationView]:
@@ -229,6 +274,8 @@ async def list_conversations(session: AsyncSession, tenant_id: uuid.UUID, limit:
             message_count=c.message_count,
             last_message=crypto.decrypt(tenant_id, last[c.id].body_enc)[:160] if c.id in last else None,
             last_direction=last[c.id].direction if c.id in last else None,
+            agent_paused=c.agent_paused,
+            paused_at=c.paused_at,
         )
         for c in conversations
     ]
@@ -241,6 +288,8 @@ class MessageView:
     text: str
     status: str
     created_at: datetime
+    from_staff: bool = False  # a person wrote it (an outbound message without this flag came from the agent)
+    sent_by: str | None = None  # that person's name, when still known
 
 
 async def get_conversation(
@@ -256,8 +305,18 @@ async def get_conversation(
             .order_by(WhatsAppMessage.created_at, WhatsAppMessage.id)
         )
     ).all()
+    names = await staff_names(session, {m.sent_by_staff_id for m in rows if m.sent_by_staff_id})
     messages = [
-        MessageView(m.id, m.direction, crypto.decrypt(tenant_id, m.body_enc), m.status, m.created_at) for m in rows
+        MessageView(
+            m.id,
+            m.direction,
+            crypto.decrypt(tenant_id, m.body_enc),
+            m.status,
+            m.created_at,
+            from_staff=m.direction == "outbound" and m.sent_by_staff_id is not None,
+            sent_by=names.get(m.sent_by_staff_id) if m.sent_by_staff_id else None,
+        )
+        for m in rows
     ]
     view = ConversationView(
         id=conversation.id,
@@ -269,5 +328,7 @@ async def get_conversation(
         message_count=conversation.message_count,
         last_message=messages[-1].text[:160] if messages else None,
         last_direction=messages[-1].direction if messages else None,
+        agent_paused=conversation.agent_paused,
+        paused_at=conversation.paused_at,
     )
     return view, messages

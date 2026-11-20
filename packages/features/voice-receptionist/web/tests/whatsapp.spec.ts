@@ -1,3 +1,4 @@
+import { createHmac, randomUUID } from "node:crypto";
 import { test, expect, type Page } from "@playwright/test";
 
 // The Meta call is replaced by a fake (clinic_voice_receptionist.testing.FakeWhatsAppGraph). Patient messages arrive
@@ -125,4 +126,112 @@ test("a long last message is cut short, so the Open button stays on screen", asy
       ),
     ).toBeFalsy();
   }
+});
+
+// Plays the part of Meta: posts a signed webhook call straight to the test API, as the WhatsApp service would receive it.
+const API = "http://127.0.0.1:8001";
+async function patientWrites(page: Page, phoneId: string, text: string) {
+  const body = JSON.stringify({
+    object: "whatsapp_business_account",
+    entry: [
+      {
+        changes: [
+          {
+            value: {
+              metadata: { phone_number_id: phoneId },
+              contacts: [
+                { wa_id: "15550001111", profile: { name: "Pat Patient" } },
+              ],
+              messages: [
+                {
+                  from: "15550001111",
+                  id: `wamid.${randomUUID()}`,
+                  type: "text",
+                  text: { body: text },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  });
+  const signature =
+    "sha256=" +
+    createHmac("sha256", "browser-test-app-secret").update(body).digest("hex");
+  const response = await page.request.post(`${API}/whatsapp/webhook`, {
+    data: body,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Hub-Signature-256": signature,
+    },
+  });
+  expect(response.status()).toBe(200);
+}
+
+test("staff take over a chat: reply, the agent pauses, patient messages wait, then resume", async ({
+  page,
+}) => {
+  await signIn(page);
+  const phoneId = String(Math.floor(1e14 + Math.random() * 9e14));
+  await page.goto("/voice-receptionist/whatsapp/settings");
+  const form = page.getByRole("form", { name: "WhatsApp settings" });
+  await form.getByLabel("Phone number ID").fill(phoneId, FIRST_COMPILE);
+  await form.getByLabel("Access token").fill("EAAB-browser-test-token");
+  await form.getByRole("button", { name: "Connect number" }).click();
+  await expect(page.getByText("Agent on")).toBeVisible();
+
+  await patientWrites(page, phoneId, "Can I move my visit?");
+  await page.goto("/voice-receptionist/whatsapp");
+  const open = page.getByRole("button", {
+    name: "Open the conversation with Pat Patient",
+  });
+  await open.click(FIRST_COMPILE);
+  const thread = page.getByTestId("whatsapp-thread");
+  await expect(thread).toContainText("Can I move my visit?");
+  await expect(thread).toContainText("Agent reply to: Can I move my visit?");
+  await expect(page.getByTestId("whatsapp-agent-state")).toHaveText("Agent on");
+
+  // A staff reply is sent, labelled as staff, and pauses the agent.
+  const reply = page.getByRole("form", { name: "Reply to this person" });
+  await reply.getByLabel("Reply").fill("Yes, tomorrow at 10 works.");
+  await reply.getByRole("button", { name: "Send" }).click();
+  await expect(
+    thread.locator('[data-sender="staff"]', {
+      hasText: "Yes, tomorrow at 10 works.",
+    }),
+  ).toBeVisible();
+  await expect(thread.locator('[data-sender="staff"]')).toContainText(
+    "(staff)",
+  );
+  await expect(page.getByTestId("whatsapp-agent-state")).toHaveText(
+    "Agent paused",
+  );
+  await expect(reply.getByLabel("Reply")).toHaveValue("");
+  await expect(
+    page.getByRole("button", { name: "Resume agent" }),
+  ).toBeVisible();
+
+  // The patient writes again: the message is saved, and the agent stays silent.
+  await patientWrites(page, phoneId, "Great, thank you");
+  await page
+    .getByRole("button", { name: "Close", exact: true })
+    .first()
+    .click();
+  await expect(page.getByText("Needs reply")).toBeVisible(); // the list shows a chat waiting for a person
+  await expect(page.getByText("Agent paused")).toBeVisible();
+  await open.click();
+  await expect(thread).toContainText("Great, thank you");
+  await expect(thread).not.toContainText("Agent reply to: Great, thank you");
+
+  // Resume: the agent answers the next message again.
+  await page.getByRole("button", { name: "Resume agent" }).click();
+  await expect(page.getByTestId("whatsapp-agent-state")).toHaveText("Agent on");
+  await patientWrites(page, phoneId, "One more question");
+  await page
+    .getByRole("button", { name: "Close", exact: true })
+    .first()
+    .click();
+  await open.click();
+  await expect(thread).toContainText("Agent reply to: One more question");
 });

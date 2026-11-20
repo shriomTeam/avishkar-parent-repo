@@ -285,6 +285,14 @@ class WhatsAppConversation(IdMixin, TenantMixin, TimestampMixin, Base):
     contact_name_enc: Mapped[str | None] = mapped_column(Text)
     last_message_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     message_count: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    agent_paused: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default=sql_text("false"),
+        comment="Staff took over this chat: the agent stores new messages but does not answer them",
+    )
+    paused_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    paused_by_staff_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("core.staff.id", ondelete="SET NULL"))
 
 
 class WhatsAppMessage(IdMixin, TenantMixin, Base):
@@ -304,4 +312,8 @@ class WhatsAppMessage(IdMixin, TenantMixin, Base):
     provider_message_id: Mapped[str | None] = mapped_column(String(128), comment="Meta's message id (wamid)")
     body_enc: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(16), default="received", comment="received, sent or failed")
+    sent_by_staff_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("core.staff.id", ondelete="SET NULL"),
+        comment="Set when a staff member wrote this outbound message; empty means the agent wrote it",
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
