@@ -1379,6 +1379,59 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/voice_receptionist/inbound/whatsapp/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Account */
+        get: operations["get_account_features_voice_receptionist_inbound_whatsapp_account_get"];
+        /** Save Account */
+        put: operations["save_account_features_voice_receptionist_inbound_whatsapp_account_put"];
+        post?: never;
+        /** Disconnect Account */
+        delete: operations["disconnect_account_features_voice_receptionist_inbound_whatsapp_account_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/whatsapp/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Conversations */
+        get: operations["list_conversations_features_voice_receptionist_inbound_whatsapp_conversations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/whatsapp/conversations/{conversation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Conversation */
+        get: operations["read_conversation_features_voice_receptionist_inbound_whatsapp_conversations__conversation_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/voice_receptionist/status": {
         parameters: {
             query?: never;
@@ -3648,6 +3701,120 @@ export interface components {
             language: string;
             /** Voice */
             voice: string;
+        };
+        /** WhatsAppAccountIn */
+        WhatsAppAccountIn: {
+            /** Phone Number Id */
+            phone_number_id: string;
+            /** Access Token */
+            access_token?: string | null;
+            /**
+             * Agent Name
+             * @default WhatsApp assistant
+             */
+            agent_name: string;
+            /** Prompt */
+            prompt: string;
+            /** Greeting */
+            greeting?: string | null;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+            /**
+             * Use Knowledge
+             * @default false
+             */
+            use_knowledge: boolean;
+        };
+        /** WhatsAppAccountOut */
+        WhatsAppAccountOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Phone Number Id */
+            phone_number_id: string;
+            /** Display Number */
+            display_number: string | null;
+            /** Agent Name */
+            agent_name: string;
+            /** Prompt */
+            prompt: string;
+            /** Greeting */
+            greeting: string | null;
+            /** Is Active */
+            is_active: boolean;
+            /** Use Knowledge */
+            use_knowledge: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** WhatsAppAccountStateOut */
+        WhatsAppAccountStateOut: {
+            account: components["schemas"]["WhatsAppAccountOut"] | null;
+            /** Webhook Url */
+            webhook_url: string | null;
+            /** Ready */
+            ready: boolean;
+            /** Default Prompt */
+            default_prompt: string;
+        };
+        /** WhatsAppConversationDetailOut */
+        WhatsAppConversationDetailOut: {
+            conversation: components["schemas"]["WhatsAppConversationOut"];
+            /** Messages */
+            messages: components["schemas"]["WhatsAppMessageOut"][];
+        };
+        /** WhatsAppConversationOut */
+        WhatsAppConversationOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Contact Number */
+            contact_number: string;
+            /** Contact Name */
+            contact_name: string | null;
+            /**
+             * Last Message At
+             * Format: date-time
+             */
+            last_message_at: string;
+            /** Message Count */
+            message_count: number;
+            /** Last Message */
+            last_message: string | null;
+            /** Last Direction */
+            last_direction: ("inbound" | "outbound") | null;
+        };
+        /** WhatsAppMessageOut */
+        WhatsAppMessageOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "inbound" | "outbound";
+            /** Text */
+            text: string;
+            /** Status */
+            status: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** WorkspaceAuditOut */
         WorkspaceAuditOut: {
@@ -6892,6 +7059,175 @@ export interface operations {
                 };
                 content: {
                     "audio/wav": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_account_features_voice_receptionist_inbound_whatsapp_account_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatsAppAccountStateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_account_features_voice_receptionist_inbound_whatsapp_account_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WhatsAppAccountIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatsAppAccountOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    disconnect_account_features_voice_receptionist_inbound_whatsapp_account_delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_conversations_features_voice_receptionist_inbound_whatsapp_conversations_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatsAppConversationOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_conversation_features_voice_receptionist_inbound_whatsapp_conversations__conversation_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatsAppConversationDetailOut"];
                 };
             };
             /** @description Validation Error */

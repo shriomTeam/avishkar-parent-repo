@@ -14,13 +14,18 @@ class SecretsUnavailable(RuntimeError):
     pass
 
 
-@lru_cache
-def _fernet(key: str, app_env: str) -> Fernet:
+def key_material(key: str, app_env: str) -> str:
+    """The configured key, or in dev and test a fixed public one that protects nothing, so local use needs no setup."""
     if not key:
         if app_env not in ("dev", "test"):
             raise SecretsUnavailable("VOICE_SECRETS_KEY is not configured")
-        # A fixed, public key so local development works with no setup. It protects nothing.
         key = base64.urlsafe_b64encode(hashlib.sha256(b"avishkar-voice-dev-only").digest()).decode()
+    return key
+
+
+@lru_cache
+def _fernet(key: str, app_env: str) -> Fernet:
+    key = key_material(key, app_env)
     try:
         return Fernet(key)
     except ValueError as exc:

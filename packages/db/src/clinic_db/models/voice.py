@@ -242,3 +242,66 @@ class PhoneNumber(IdMixin, TenantMixin, TimestampMixin, Base):
         comment="The agent that answers; none = unassigned",
     )
     purchased_by_staff_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("core.staff.id", ondelete="SET NULL"))
+
+
+class WhatsAppAccount(IdMixin, TenantMixin, TimestampMixin, Base):
+    """A clinic's WhatsApp Business number and the agent that answers on it. A clinic has at most one."""
+
+    __tablename__ = "whatsapp_accounts"
+    __table_args__ = (UniqueConstraint("tenant_id"), UniqueConstraint("phone_number_id"), SCHEMA)
+
+    phone_number_id: Mapped[str] = mapped_column(
+        String(64), comment="Meta's id for the number; routes incoming webhooks"
+    )
+    display_number: Mapped[str | None] = mapped_column(String(32), comment="The number as people see it")
+    access_token_enc: Mapped[str] = mapped_column(Text, comment="Meta access token, encrypted; never returned")
+    agent_name: Mapped[str] = mapped_column(String(200), default="WhatsApp assistant")
+    prompt: Mapped[str] = mapped_column(Text, comment="System instruction sent to the model")
+    greeting: Mapped[str | None] = mapped_column(Text, comment="Sent first when a new person writes in")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=sql_text("true"))
+    use_knowledge: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default=sql_text("false"),
+        comment="The agent may look answers up in the clinic's knowledge base",
+    )
+
+
+class WhatsAppConversation(IdMixin, TenantMixin, TimestampMixin, Base):
+    """One person's chat with the agent. The number and name are encrypted; the hash only finds the chat again."""
+
+    __tablename__ = "whatsapp_conversations"
+    __table_args__ = (
+        UniqueConstraint("account_id", "contact_hash"),
+        Index("ix_voice_whatsapp_conversations_tenant_last", "tenant_id", "last_message_at"),
+        SCHEMA,
+    )
+
+    account_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("voice.whatsapp_accounts.id", ondelete="CASCADE"), index=True
+    )
+    contact_hash: Mapped[str] = mapped_column(String(64), comment="Keyed hash of the person's WhatsApp number")
+    contact_number_enc: Mapped[str] = mapped_column(Text)
+    contact_name_enc: Mapped[str | None] = mapped_column(Text)
+    last_message_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    message_count: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+
+
+class WhatsAppMessage(IdMixin, TenantMixin, Base):
+    """One message. The text is encrypted. Meta's message id is unique per clinic, so a retried webhook is a no-op."""
+
+    __tablename__ = "whatsapp_messages"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "provider_message_id"),
+        Index("ix_voice_whatsapp_messages_conversation_created", "conversation_id", "created_at"),
+        SCHEMA,
+    )
+
+    conversation_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("voice.whatsapp_conversations.id", ondelete="CASCADE"), index=True
+    )
+    direction: Mapped[str] = mapped_column(String(8), comment="inbound (the person) or outbound (the agent)")
+    provider_message_id: Mapped[str | None] = mapped_column(String(128), comment="Meta's message id (wamid)")
+    body_enc: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(16), default="received", comment="received, sent or failed")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

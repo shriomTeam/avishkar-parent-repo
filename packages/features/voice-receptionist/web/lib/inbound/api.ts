@@ -20,6 +20,13 @@ export type SearchResult = Schemas["SearchHitOut"];
 export type PhoneNumber = Schemas["NumberOut"];
 export type PhoneNumbers = Schemas["NumbersOut"];
 export type AvailableNumber = Schemas["AvailableOut"];
+export type WhatsAppState = Schemas["WhatsAppAccountStateOut"];
+export type WhatsAppAccount = Schemas["WhatsAppAccountOut"];
+export type WhatsAppAccountInput = Schemas["WhatsAppAccountIn"];
+export type WhatsAppConversation = Schemas["WhatsAppConversationOut"];
+export type WhatsAppConversationDetail =
+  Schemas["WhatsAppConversationDetailOut"];
+export type WhatsAppMessage = Schemas["WhatsAppMessageOut"];
 
 // Same-origin: Next rewrites /api/platform/* to the FastAPI backend, so the session cookie is sent.
 const BASE = "/api/platform/features/voice_receptionist/inbound";
@@ -195,6 +202,18 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
     assignNumber: (id: string, agentId: string | null) =>
       request<PhoneNumber>("PUT", `/numbers/${id}`, { agent_id: agentId }),
     releaseNumber: (id: string) => request<void>("DELETE", `/numbers/${id}`),
+    getWhatsAppAccount: () =>
+      request<WhatsAppState>("GET", "/whatsapp/account"),
+    saveWhatsAppAccount: (body: WhatsAppAccountInput) =>
+      request<WhatsAppAccount>("PUT", "/whatsapp/account", body),
+    disconnectWhatsApp: () => request<void>("DELETE", "/whatsapp/account"),
+    listWhatsAppConversations: () =>
+      request<WhatsAppConversation[]>("GET", "/whatsapp/conversations"),
+    getWhatsAppConversation: (id: string) =>
+      request<WhatsAppConversationDetail>(
+        "GET",
+        `/whatsapp/conversations/${id}`,
+      ),
     searchKnowledge: (query: string) =>
       request<{ results: SearchResult[] }>("POST", "/knowledge/search", {
         query,

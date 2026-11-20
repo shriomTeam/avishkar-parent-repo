@@ -93,6 +93,16 @@ class ScriptedConnector:
         yield ScriptedModel(fields, agent.get("tools"))
 
 
+class FakeWhatsAppGraph:
+    """A stand-in for Meta's WhatsApp API, for browser tests that must not reach Meta."""
+
+    async def display_number(self, phone_number_id: str, token: str) -> str | None:
+        return "+1 555 010 0000"
+
+    async def send_text(self, phone_number_id: str, token: str, to: str, body: str) -> str:
+        return "wamid.fake"
+
+
 class FakeNumbers:
     """A stand-in for Twilio's number API, for tests and browser tests that must not buy real numbers."""
 

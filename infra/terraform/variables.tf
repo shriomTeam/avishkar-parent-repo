@@ -76,6 +76,36 @@ variable "google_client_secret" {
   }
 }
 
+variable "whatsapp_enabled" {
+  type        = bool
+  default     = false
+  description = "Run the WhatsApp agent as its own Cloud Run service. Turn on only after WHATSAPP_APP_SECRET and WHATSAPP_VERIFY_TOKEN are added to the production GitHub environment."
+}
+
+variable "whatsapp_app_secret" {
+  type        = string
+  default     = ""
+  sensitive   = true
+  description = "The Meta app secret that signs every webhook call. Set from the WHATSAPP_APP_SECRET GitHub secret; Terraform stores it in Secret Manager."
+
+  validation {
+    condition     = !var.whatsapp_enabled || length(trimspace(var.whatsapp_app_secret)) > 0
+    error_message = "whatsapp_enabled needs whatsapp_app_secret. Add the WHATSAPP_APP_SECRET GitHub secret."
+  }
+}
+
+variable "whatsapp_verify_token" {
+  type        = string
+  default     = ""
+  sensitive   = true
+  description = "A token you choose, which Meta sends once when the webhook is registered. Set from the WHATSAPP_VERIFY_TOKEN GitHub secret."
+
+  validation {
+    condition     = !var.whatsapp_enabled || length(trimspace(var.whatsapp_verify_token)) > 0
+    error_message = "whatsapp_enabled needs whatsapp_verify_token. Add the WHATSAPP_VERIFY_TOKEN GitHub secret."
+  }
+}
+
 variable "invitations_enabled" {
   type        = bool
   default     = false

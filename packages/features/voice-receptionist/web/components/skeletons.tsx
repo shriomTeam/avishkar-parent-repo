@@ -539,6 +539,38 @@ export function NumbersSkeleton() {
   );
 }
 
+export function WhatsAppChatsSkeleton() {
+  return (
+    <Screen label="Loading WhatsApp conversations" id="whatsapp-chats">
+      <HeadingSkeleton />
+      <SidebarLayout>
+        <Panel>
+          <TableSkeleton columns={[150, 220, 90]} rows={4} />
+        </Panel>
+        <Panel>
+          <PanelHeadSkeleton title={150} />
+          <Skeleton className="mb-2 h-[14px] w-full" />
+          <Skeleton className="h-[14px] w-[70%]" />
+        </Panel>
+      </SidebarLayout>
+    </Screen>
+  );
+}
+
+export function WhatsAppSettingsSkeleton() {
+  return (
+    <Screen label="Loading WhatsApp settings" id="whatsapp-settings">
+      <HeadingSkeleton />
+      <Panel>
+        <PanelHeadSkeleton title={190} />
+        <Skeleton shape="box" className="mb-5 h-[42px] w-full" />
+        <Skeleton shape="box" className="mb-5 h-[42px] w-full" />
+        <Skeleton shape="box" className="h-[120px] w-full" />
+      </Panel>
+    </Screen>
+  );
+}
+
 /** For any voice route that has no screen of its own while it loads. */
 export function PageSkeleton() {
   return (

@@ -39,6 +39,11 @@ output "ingest_url" {
   value       = local.ingest_url
 }
 
+output "whatsapp_webhook_url" {
+  description = "Paste this into Meta's WhatsApp webhook settings. Empty until whatsapp_enabled is true."
+  value       = var.whatsapp_enabled ? "${local.whatsapp_url}/whatsapp/webhook" : ""
+}
+
 output "knowledge_queue" {
   value = module.knowledge_queue.name
 }
