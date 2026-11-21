@@ -4,10 +4,20 @@ import os
 import uuid
 from urllib.parse import urlencode
 
-from fastapi import Request, Response
+# Code that runs without a request (the WhatsApp webhook) reads the global settings, so those must point at the test
+# database too. This has to happen before clinic_api.main is imported, which reads them.
+for _name, _test in (
+    ("DATABASE_URL", "TEST_DATABASE_URL"),
+    ("DATABASE_SYSTEM_URL", "TEST_SYSTEM_DATABASE_URL"),
+    ("DATABASE_AUTH_URL", "TEST_AUTH_DATABASE_URL"),
+):
+    if os.environ.get(_test):
+        os.environ[_name] = os.environ[_test]
 
-from clinic_api.main import create_app
-from clinic_core.settings import Settings
+from fastapi import Request, Response  # noqa: E402
+
+from clinic_api.main import create_app  # noqa: E402
+from clinic_core.settings import Settings  # noqa: E402
 
 try:  # Only present when the voice feature is installed. Removing a feature must not break platform tests.
     from clinic_voice_receptionist.testing import (
@@ -15,15 +25,19 @@ try:  # Only present when the voice feature is installed. Removing a feature mus
         FakeWhatsAppGraph,
         MemoryRecordingStore,
         ScriptedConnector,
+        ScriptedWhatsAppModel,
         scripted_voice_preview,
     )
+    from clinic_voice_receptionist.whatsapp.webhook import router as whatsapp_webhook
 except ModuleNotFoundError as exc:
     if exc.name != "clinic_voice_receptionist":
         raise  # a real import problem inside voice, not its absence
-    ScriptedConnector = MemoryRecordingStore = FakeNumbers = FakeWhatsAppGraph = None
+    ScriptedConnector = MemoryRecordingStore = FakeNumbers = FakeWhatsAppGraph = ScriptedWhatsAppModel = None
 
 # Browser tests point custom tools at this server's own /_test/echo, so private addresses must be allowed.
 os.environ.setdefault("VOICE_TOOL_ALLOW_PRIVATE_HOSTS", "true")
+# Browser tests sign WhatsApp webhook calls with this secret (the production webhook runs as its own service).
+os.environ.setdefault("VOICE_WHATSAPP_APP_SECRET", "browser-test-app-secret")
 
 if not os.environ.get("TEST_DATABASE_URL"):
     raise RuntimeError("Browser tests require a disposable TEST_DATABASE_URL")
@@ -108,6 +122,9 @@ if ScriptedConnector is not None:
     app.state.twilio_numbers = FakeNumbers()
     # Connecting a WhatsApp number never reaches Meta either.
     app.state.whatsapp_graph = FakeWhatsAppGraph()
+    # The webhook is mounted here only so browser tests can play the part of Meta; the model answers from a script.
+    app.state.whatsapp_model = ScriptedWhatsAppModel()
+    app.include_router(whatsapp_webhook)
     # Knowledge-base uploads stay in memory and embeddings are fake, so browser tests never reach Google.
     from clinic_knowledge.testing import FakeEmbedder, MemoryFileStore
 

@@ -1432,6 +1432,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/features/voice_receptionist/inbound/whatsapp/conversations/{conversation_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send Reply
+         * @description A staff member answers the person. The agent is paused for this chat first, so it never talks over the person.
+         */
+        post: operations["send_reply_features_voice_receptionist_inbound_whatsapp_conversations__conversation_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/whatsapp/conversations/{conversation_id}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pause Agent */
+        post: operations["pause_agent_features_voice_receptionist_inbound_whatsapp_conversations__conversation_id__pause_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/features/voice_receptionist/inbound/whatsapp/conversations/{conversation_id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resume Agent */
+        post: operations["resume_agent_features_voice_receptionist_inbound_whatsapp_conversations__conversation_id__resume_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/features/voice_receptionist/status": {
         parameters: {
             query?: never;
@@ -3793,6 +3847,10 @@ export interface components {
             last_message: string | null;
             /** Last Direction */
             last_direction: ("inbound" | "outbound") | null;
+            /** Agent Paused */
+            agent_paused: boolean;
+            /** Paused At */
+            paused_at: string | null;
         };
         /** WhatsAppMessageOut */
         WhatsAppMessageOut: {
@@ -3815,6 +3873,22 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /** From Staff */
+            from_staff: boolean;
+            /** Sent By */
+            sent_by: string | null;
+        };
+        /** WhatsAppPauseOut */
+        WhatsAppPauseOut: {
+            /** Agent Paused */
+            agent_paused: boolean;
+            /** Paused At */
+            paused_at: string | null;
+        };
+        /** WhatsAppReplyIn */
+        WhatsAppReplyIn: {
+            /** Text */
+            text: string;
         };
         /** WorkspaceAuditOut */
         WorkspaceAuditOut: {
@@ -7228,6 +7302,115 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WhatsAppConversationDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_reply_features_voice_receptionist_inbound_whatsapp_conversations__conversation_id__messages_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WhatsAppReplyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatsAppMessageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pause_agent_features_voice_receptionist_inbound_whatsapp_conversations__conversation_id__pause_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatsAppPauseOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resume_agent_features_voice_receptionist_inbound_whatsapp_conversations__conversation_id__resume_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-tenant-id"?: string | null;
+                "x-staff-role"?: components["schemas"]["StaffRole"];
+                "x-staff-id"?: string;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatsAppPauseOut"];
                 };
             };
             /** @description Validation Error */

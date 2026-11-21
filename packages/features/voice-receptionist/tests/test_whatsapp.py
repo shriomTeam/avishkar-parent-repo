@@ -14,6 +14,7 @@ from clinic_core.auth.database import create_database
 from clinic_core.database import system_session, tenant_session
 from clinic_core.settings import Settings
 from clinic_core.testing import create_test_tenant
+from clinic_db.models.core import Staff
 from clinic_knowledge import ingest
 from clinic_knowledge import service as knowledge_service
 from clinic_knowledge.config import KnowledgeSettings
@@ -63,6 +64,7 @@ class FakeModel:
         self.offered_search: list[bool] = []  # whether the agent was allowed to look things up
         self.ask: str | None = None  # a question to look up before answering
         self.found: dict | None = None  # what the lookup returned
+        self.during = None  # an async function to run while the model is "writing" (for the race test)
 
     async def reply(self, system, turns, *, search=None):
         self.calls.append((system, list(turns)))
@@ -71,6 +73,8 @@ class FakeModel:
             raise RuntimeError("model down")
         if self.ask and search is not None:
             self.found = await search({"query": self.ask})
+        if self.during is not None:
+            await self.during()
         return f"Answer {len(self.calls)}"
 
 
@@ -491,3 +495,218 @@ async def test_a_model_that_never_stops_asking_is_cut_off():
     with pytest.raises(RuntimeError):
         await GeminiReply(get_voice_settings(), client=client).reply("sys", [("user", "hi")], search=search)
     assert len(client.requests) == 4 and client.requests[-1][1].tools is None  # the last request had no tool to call
+
+
+# ---- staff take over a chat ----------------------------------------------------------------------------------
+
+
+async def _staff(tenant, name="Dr Pat Manager") -> str:
+    async with tenant_session(tenant) as session:
+        row = Staff(tenant_id=tenant, email=f"{uuid.uuid4().hex[:8]}@example.com", name=name, role="office_manager")
+        session.add(row)
+        await session.flush()
+        return str(row.id)
+
+
+def _hs(tenant, staff_id, role="owner"):
+    return _h(tenant, role) | {"X-Staff-Id": staff_id}
+
+
+async def _chat(staff_client, tenant):
+    return (await staff_client.get("/inbound/whatsapp/conversations", headers=_h(tenant))).json()[0]
+
+
+async def _thread(staff_client, tenant, chat_id):
+    return (await staff_client.get(f"/inbound/whatsapp/conversations/{chat_id}", headers=_h(tenant))).json()
+
+
+async def test_a_staff_reply_reaches_the_person_pauses_the_agent_and_shows_who_wrote_it(
+    staff_client, hook_client, clinic, model, graph
+):
+    tenant, phone_id = clinic
+    staff = await _staff(tenant)
+    await _post(hook_client, _payload(phone_id, text="Can I move my visit?"))
+    chat = await _chat(staff_client, tenant)
+    assert chat["agent_paused"] is False
+
+    r = await staff_client.post(
+        f"/inbound/whatsapp/conversations/{chat['id']}/messages",
+        json={"text": "  Yes, tomorrow at 10 works.  "},
+        headers=_hs(tenant, staff),
+    )
+    assert r.status_code == 201, r.text
+    assert r.json()["from_staff"] is True and r.json()["sent_by"] == "Dr Pat Manager" and r.json()["status"] == "sent"
+    assert graph.sent[-1] == (
+        phone_id,
+        TOKEN,
+        "15550001111",
+        "Yes, tomorrow at 10 works.",
+    )  # trimmed, to the right number
+
+    detail = await _thread(staff_client, tenant, chat["id"])
+    assert detail["conversation"]["agent_paused"] is True  # the first staff message paused the agent
+    last = detail["messages"][-1]
+    assert (last["direction"], last["from_staff"], last["sent_by"]) == ("outbound", True, "Dr Pat Manager")
+    assert detail["messages"][1]["from_staff"] is False  # the earlier answer came from the agent
+
+    async with system_session() as db:  # stored as ciphertext, like every message
+        raw = (
+            await db.execute(text("SELECT body_enc FROM voice.whatsapp_messages WHERE tenant_id = :t"), {"t": tenant})
+        ).all()
+    assert "tomorrow" not in " ".join(r[0] for r in raw)
+    async with tenant_session(tenant) as session:
+        audits = (await session.execute(text("SELECT action, details FROM ops.audit_log"))).all()
+    assert "voice.whatsapp.staff_reply" in [a[0] for a in audits]
+    assert "tomorrow" not in str([a[1] for a in audits])  # the audit log never holds the text
+
+
+async def test_a_paused_chat_stores_new_patient_messages_but_the_agent_stays_silent_until_resumed(
+    staff_client, hook_client, clinic, model, graph
+):
+    tenant, phone_id = clinic
+    staff = await _staff(tenant)
+    await _post(hook_client, _payload(phone_id, text="Hello"))
+    chat = await _chat(staff_client, tenant)
+    paused = await staff_client.post(f"/inbound/whatsapp/conversations/{chat['id']}/pause", headers=_hs(tenant, staff))
+    assert paused.json()["agent_paused"] is True and paused.json()["paused_at"]
+
+    answers, asked = len(graph.sent), len(model.calls)
+    await _post(hook_client, _payload(phone_id, text="Anyone there?"))
+    assert len(graph.sent) == answers and len(model.calls) == asked  # no model call, nothing sent
+    chat = await _chat(staff_client, tenant)
+    assert (
+        chat["last_direction"] == "inbound" and chat["last_message"] == "Anyone there?"
+    )  # saved, waiting for a person
+
+    resumed = await staff_client.post(
+        f"/inbound/whatsapp/conversations/{chat['id']}/resume", headers=_hs(tenant, staff)
+    )
+    assert resumed.json() == {"agent_paused": False, "paused_at": None}
+    await _post(hook_client, _payload(phone_id, text="Hello again"))
+    assert len(graph.sent) == answers + 1  # the agent answers again
+    turns = model.calls[-1][1]
+    assert ("user", "Anyone there?") in turns and turns[-1] == ("user", "Hello again")
+
+
+async def test_after_a_resume_the_agent_sees_what_the_staff_member_wrote(staff_client, hook_client, clinic, model):
+    tenant, phone_id = clinic
+    staff = await _staff(tenant)
+    await _post(hook_client, _payload(phone_id, text="Hi"))
+    chat = await _chat(staff_client, tenant)
+    await staff_client.post(
+        f"/inbound/whatsapp/conversations/{chat['id']}/messages",
+        json={"text": "Call us on 555-0100."},
+        headers=_hs(tenant, staff),
+    )
+    await staff_client.post(f"/inbound/whatsapp/conversations/{chat['id']}/resume", headers=_hs(tenant, staff))
+    await _post(hook_client, _payload(phone_id, text="Thanks, and the address?"))
+    assert ("model", "Call us on 555-0100.") in model.calls[-1][1]  # staff words count as the clinic's own
+
+
+async def test_staff_cannot_reply_after_the_24_hour_window_and_nothing_changes(
+    staff_client, hook_client, clinic, model, graph
+):
+    tenant, phone_id = clinic
+    await _post(hook_client, _payload(phone_id, text="Hi"))
+    chat = await _chat(staff_client, tenant)
+    async with system_session() as db:
+        await db.execute(
+            text("UPDATE voice.whatsapp_messages SET created_at = now() - interval '25 hours' WHERE tenant_id = :t"),
+            {"t": tenant},
+        )
+    sent = len(graph.sent)
+    r = await staff_client.post(
+        f"/inbound/whatsapp/conversations/{chat['id']}/messages", json={"text": "Late hello"}, headers=_h(tenant)
+    )
+    assert r.status_code == 409 and "24-hour" in r.json()["detail"]
+    assert len(graph.sent) == sent
+    assert (await _thread(staff_client, tenant, chat["id"]))["conversation"][
+        "agent_paused"
+    ] is False  # a refused reply does not pause
+
+
+async def test_a_failed_staff_send_is_kept_marked_and_the_agent_stays_paused(
+    staff_client, hook_client, clinic, model, graph
+):
+    tenant, phone_id = clinic
+    await _post(hook_client, _payload(phone_id, text="Hi"))
+    chat = await _chat(staff_client, tenant)
+    graph.fail_send = True
+    r = await staff_client.post(
+        f"/inbound/whatsapp/conversations/{chat['id']}/messages", json={"text": "On our way"}, headers=_h(tenant)
+    )
+    assert r.status_code == 201 and r.json()["status"] == "failed"
+    detail = await _thread(staff_client, tenant, chat["id"])
+    assert detail["messages"][-1]["status"] == "failed" and detail["conversation"]["agent_paused"] is True
+
+
+async def test_the_agent_does_not_send_when_staff_pause_while_the_model_is_writing(
+    staff_client, hook_client, clinic, model, graph
+):
+    tenant, phone_id = clinic
+    await _post(hook_client, _payload(phone_id, text="Hi"))
+    chat = await _chat(staff_client, tenant)
+    await staff_client.post(f"/inbound/whatsapp/conversations/{chat['id']}/resume", headers=_h(tenant))
+    sent = len(graph.sent)
+
+    async def staff_takes_over():
+        await staff_client.post(f"/inbound/whatsapp/conversations/{chat['id']}/pause", headers=_h(tenant))
+
+    model.during = staff_takes_over
+    await _post(hook_client, _payload(phone_id, text="Second question"))
+    assert len(graph.sent) == sent  # the late agent answer was dropped
+    detail = await _thread(staff_client, tenant, chat["id"])
+    assert [m["text"] for m in detail["messages"]][-1] == "Second question"
+
+
+async def test_only_managers_reply_or_pause_and_other_clinics_get_nothing(staff_client, hook_client, clinic, model):
+    tenant, phone_id = clinic
+    await _post(hook_client, _payload(phone_id, text="Hi"))
+    chat = await _chat(staff_client, tenant)
+    base = f"/inbound/whatsapp/conversations/{chat['id']}"
+    desk = _h(tenant, "front_desk")
+    assert (await staff_client.post(base + "/messages", json={"text": "x"}, headers=desk)).status_code == 403
+    assert (await staff_client.post(base + "/pause", headers=desk)).status_code == 403
+    assert (await staff_client.post(base + "/resume", headers=desk)).status_code == 403
+    assert (
+        await staff_client.get(base, headers=desk)
+    ).status_code == 200  # reading stays open to front desk, as before
+    other = await create_test_tenant(("voice_receptionist",))
+    for path, body in (("/messages", {"text": "x"}), ("/pause", None), ("/resume", None)):
+        r = (
+            await staff_client.post(base + path, json=body, headers=_h(other))
+            if body
+            else await staff_client.post(base + path, headers=_h(other))
+        )
+        assert r.status_code in (404, 409), (path, r.status_code)  # never touches another clinic's chat
+
+
+async def test_empty_or_oversized_replies_are_refused(staff_client, hook_client, clinic, model, graph):
+    tenant, phone_id = clinic
+    await _post(hook_client, _payload(phone_id, text="Hi"))
+    chat = await _chat(staff_client, tenant)
+    url = f"/inbound/whatsapp/conversations/{chat['id']}/messages"
+    sent = len(graph.sent)
+    for body in ({"text": ""}, {"text": "   "}, {"text": "x" * 4097}, {"text": "ok", "extra": 1}):
+        assert (await staff_client.post(url, json=body, headers=_h(tenant))).status_code == 422
+    assert len(graph.sent) == sent
+    missing = f"/inbound/whatsapp/conversations/{uuid.uuid4()}"
+    assert (await staff_client.post(missing + "/messages", json={"text": "x"}, headers=_h(tenant))).status_code == 404
+    assert (await staff_client.post(missing + "/pause", headers=_h(tenant))).status_code == 404
+
+
+async def test_refreshing_an_open_chat_writes_one_audit_line_not_one_per_refresh(
+    staff_client, hook_client, clinic, model
+):
+    tenant, phone_id = clinic
+    await _post(hook_client, _payload(phone_id, text="Hi"))
+    chat = await _chat(staff_client, tenant)
+    for _ in range(4):
+        await _thread(staff_client, tenant, chat["id"])
+    async with tenant_session(tenant) as session:
+        views = (
+            await session.execute(
+                text("SELECT count(*) FROM ops.audit_log WHERE action = 'voice.whatsapp.conversation_viewed'")
+            )
+        ).scalar()
+    assert views == 1

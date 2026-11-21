@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import {
   Button,
@@ -16,6 +16,7 @@ import {
   Th,
   Tr,
 } from "@clinic/ui";
+import { useAuth } from "@clinic/core/web/auth/provider";
 import { useDemo } from "../lib/demo/provider";
 import { useVoice } from "../lib/voice/provider";
 import {
@@ -71,8 +72,11 @@ function Conversations() {
   const [chats, setChats] = useState<WhatsAppConversation[] | null>(null);
   const [error, setError] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
-  const [detail, setDetail] = useState<WhatsAppConversationDetail | null>(null);
-  const [detailError, setDetailError] = useState("");
+  const { auth } = useAuth();
+  const role = auth.memberships.find(
+    (m) => m.workspace_id === auth.workspace?.id,
+  )?.role;
+  const manager = role === "owner" || role === "office_manager";
 
   const refresh = useCallback(async () => {
     try {
@@ -85,24 +89,6 @@ function Conversations() {
   useEffect(() => {
     void refresh();
   }, [refresh]);
-
-  useEffect(() => {
-    if (!openId) return;
-    let current = true;
-    setDetail(null);
-    setDetailError("");
-    api
-      .getWhatsAppConversation(openId)
-      .then((d) => current && setDetail(d))
-      .catch(
-        (e) =>
-          current &&
-          setDetailError(failure(e, "Could not load this conversation.")),
-      );
-    return () => {
-      current = false;
-    };
-  }, [api, openId]);
 
   return (
     <>
@@ -151,6 +137,14 @@ function Conversations() {
                     <Td>
                       <strong>{who(c)}</strong>
                       {c.contact_name && <Muted>+{c.contact_number}</Muted>}
+                      {c.agent_paused && (
+                        <span className="mt-1 flex gap-1.5">
+                          <Badge>Agent paused</Badge>
+                          {c.last_direction === "inbound" && (
+                            <Badge>Needs reply</Badge>
+                          )}
+                        </span>
+                      )}
                     </Td>
                     {/* w-full max-w-0 lets this column take the leftover width and cut a long message with "…",
                         so the Open button is always on screen and the table never scrolls sideways. */}
@@ -180,7 +174,9 @@ function Conversations() {
           <H2>How it works</H2>
           <Muted>
             Patient writes on WhatsApp → the agent answers using your prompt →
-            both messages are saved here.
+            both messages are saved here. Owners and office managers can reply
+            themselves. A reply pauses the agent for that chat until you press
+            Resume agent.
           </Muted>
           <Muted className="mt-3">
             {chats ? `${chats.length} conversation(s) shown.` : " "}
@@ -188,44 +184,235 @@ function Conversations() {
         </Panel>
       </SidebarLayout>
       {openId && (
-        <Dialog
-          title={detail ? who(detail.conversation) : "Conversation"}
-          onClose={() => setOpenId(null)}
-        >
-          <FormError message={detailError} />
-          {!detail && !detailError && <Muted role="status">Loading…</Muted>}
-          {detail && (
-            <ol
-              aria-label="Messages"
-              data-testid="whatsapp-thread"
-              className="m-0 grid max-h-[60vh] list-none gap-2 overflow-auto p-0"
-            >
-              {detail.messages.map((m) => (
-                <li
-                  key={m.id}
-                  data-direction={m.direction}
-                  className={`max-w-[85%] rounded-xl px-3 py-2 text-[14px] [overflow-wrap:anywhere] ${m.direction === "outbound" ? "justify-self-end bg-brand-soft" : "justify-self-start border border-line bg-white"}`}
-                >
-                  <small className="block text-[12px] text-muted">
-                    {m.direction === "outbound"
-                      ? "Agent"
-                      : who(detail.conversation)}{" "}
-                    · {dateLabel(m.created_at, timezone)}
-                    {m.status === "failed" ? " · not delivered" : ""}
-                  </small>
-                  <span className="whitespace-pre-wrap">{m.text}</span>
-                </li>
-              ))}
-            </ol>
-          )}
-          <DialogActions>
-            <Button variant="outline" onClick={() => setOpenId(null)}>
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <ConversationDialog
+          key={openId}
+          id={openId}
+          timezone={timezone}
+          manager={manager}
+          onClose={() => {
+            setOpenId(null);
+            void refresh(); // the list shows what arrived while the chat was open
+          }}
+          onChanged={() => void refresh()}
+        />
       )}
     </>
+  );
+}
+
+// ---- One conversation: the thread, the pause button and the reply box ----------------------------------------------
+
+const WINDOW_MS = 24 * 60 * 60 * 1000; // WhatsApp allows a free message only this long after the person's last one
+const POLL_MS = 10_000;
+
+function ConversationDialog({
+  id,
+  timezone,
+  manager,
+  onClose,
+  onChanged,
+}: {
+  id: string;
+  timezone: string;
+  manager: boolean;
+  onClose: () => void;
+  onChanged: () => void;
+}) {
+  const { api } = useVoice();
+  const [detail, setDetail] = useState<WhatsAppConversationDetail | null>(null);
+  const [error, setError] = useState("");
+  const [draft, setDraft] = useState("");
+  const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const endRef = useRef<HTMLLIElement | null>(null);
+
+  const load = useCallback(
+    async (first: boolean) => {
+      try {
+        setDetail(await api.getWhatsAppConversation(id));
+        if (first) setError("");
+      } catch (e) {
+        if (first) setError(failure(e, "Could not load this conversation."));
+      }
+    },
+    [api, id],
+  );
+  useEffect(() => {
+    void load(true);
+    // New patient messages appear without a reload. A hidden tab, or a send in progress, does not ask.
+    const timer = setInterval(() => {
+      if (!document.hidden && !busyRef.current) void load(false);
+    }, POLL_MS);
+    return () => clearInterval(timer);
+  }, [load]);
+  const count = detail?.messages.length ?? 0;
+  useEffect(() => {
+    endRef.current?.scrollIntoView?.({ block: "end" });
+  }, [count]);
+
+  async function run(action: () => Promise<unknown>, failed: string) {
+    busyRef.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      await action();
+      await load(false);
+      onChanged();
+      return true;
+    } catch (e) {
+      setError(failure(e, failed));
+      return false;
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
+  }
+
+  const paused = detail?.conversation.agent_paused ?? false;
+  const lastPatient = detail?.messages
+    .filter((m) => m.direction === "inbound")
+    .at(-1);
+  const windowOpen =
+    !!lastPatient &&
+    Date.now() - new Date(lastPatient.created_at).getTime() < WINDOW_MS;
+
+  return (
+    <Dialog
+      title={detail ? who(detail.conversation) : "Conversation"}
+      onClose={onClose}
+    >
+      <FormError message={error} />
+      {!detail && !error && <Muted role="status">Loading…</Muted>}
+      {detail && (
+        <>
+          <ol
+            aria-label="Messages"
+            data-testid="whatsapp-thread"
+            className="m-0 grid max-h-[50vh] list-none gap-2 overflow-auto p-0"
+          >
+            {detail.messages.map((m) => (
+              <li
+                key={m.id}
+                data-direction={m.direction}
+                data-sender={
+                  m.direction === "inbound"
+                    ? "patient"
+                    : m.from_staff
+                      ? "staff"
+                      : "agent"
+                }
+                className={`max-w-[85%] rounded-xl px-3 py-2 text-[14px] [overflow-wrap:anywhere] ${m.direction === "outbound" ? (m.from_staff ? "justify-self-end bg-[#eef3ff]" : "justify-self-end bg-brand-soft") : "justify-self-start border border-line bg-white"}`}
+              >
+                <small className="block text-[12px] text-muted">
+                  {m.direction === "inbound"
+                    ? who(detail.conversation)
+                    : m.from_staff
+                      ? `${m.sent_by ?? "Staff"} (staff)`
+                      : "Agent"}{" "}
+                  · {dateLabel(m.created_at, timezone)}
+                  {m.status === "failed" ? " · not delivered" : ""}
+                </small>
+                <span className="whitespace-pre-wrap">{m.text}</span>
+              </li>
+            ))}
+            <li ref={endRef} aria-hidden="true" />
+          </ol>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <span data-testid="whatsapp-agent-state">
+              <Badge>{paused ? "Agent paused" : "Agent on"}</Badge>
+            </span>
+            {manager && (
+              <Button
+                variant="outline"
+                disabled={busy}
+                onClick={() =>
+                  void run(
+                    () =>
+                      paused
+                        ? api.resumeWhatsAppAgent(id)
+                        : api.pauseWhatsAppAgent(id),
+                    "Could not change the agent for this chat.",
+                  )
+                }
+              >
+                {paused ? "Resume agent" : "Pause agent"}
+              </Button>
+            )}
+          </div>
+          {paused && (
+            <Muted className="mt-2">
+              The agent is paused for this chat. It saves new messages but does
+              not answer them. Press Resume agent to let it answer again.
+            </Muted>
+          )}
+          {manager ? (
+            <form
+              aria-label="Reply to this person"
+              className="mt-4"
+              onSubmit={async (event) => {
+                event.preventDefault();
+                const text = draft.trim();
+                if (!text) return;
+                if (
+                  await run(
+                    () => api.sendWhatsAppReply(id, text),
+                    "Could not send the reply.",
+                  )
+                )
+                  setDraft("");
+              }}
+            >
+              <Textarea
+                label="Reply"
+                name="reply"
+                compact
+                maxLength={4096}
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                disabled={busy || !windowOpen}
+                hint={
+                  windowOpen
+                    ? paused
+                      ? "You are the one answering this chat."
+                      : "Sending a reply pauses the agent for this chat."
+                    : "The 24-hour reply window is closed. WhatsApp allows a free message only within 24 hours of the person's last message."
+                }
+              />
+              <DialogActions>
+                <Button variant="outline" type="button" onClick={onClose}>
+                  Close
+                </Button>
+                <Button
+                  type="submit"
+                  variant="brand"
+                  disabled={busy || !windowOpen || !draft.trim()}
+                >
+                  {busy ? "Sending…" : "Send"}
+                </Button>
+              </DialogActions>
+            </form>
+          ) : (
+            <>
+              <Muted className="mt-3">
+                Only owners and office managers can reply to this chat.
+              </Muted>
+              <DialogActions>
+                <Button variant="outline" onClick={onClose}>
+                  Close
+                </Button>
+              </DialogActions>
+            </>
+          )}
+        </>
+      )}
+      {!detail && (
+        <DialogActions>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </DialogActions>
+      )}
+    </Dialog>
   );
 }
 

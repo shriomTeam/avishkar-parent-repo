@@ -27,6 +27,7 @@ export type WhatsAppConversation = Schemas["WhatsAppConversationOut"];
 export type WhatsAppConversationDetail =
   Schemas["WhatsAppConversationDetailOut"];
 export type WhatsAppMessage = Schemas["WhatsAppMessageOut"];
+export type WhatsAppPause = Schemas["WhatsAppPauseOut"];
 
 // Same-origin: Next rewrites /api/platform/* to the FastAPI backend, so the session cookie is sent.
 const BASE = "/api/platform/features/voice_receptionist/inbound";
@@ -214,6 +215,18 @@ export function createInboundApi(session: { csrf: string; tenantId?: string }) {
         "GET",
         `/whatsapp/conversations/${id}`,
       ),
+    sendWhatsAppReply: (id: string, text: string) =>
+      request<WhatsAppMessage>(
+        "POST",
+        `/whatsapp/conversations/${id}/messages`,
+        {
+          text,
+        },
+      ),
+    pauseWhatsAppAgent: (id: string) =>
+      request<WhatsAppPause>("POST", `/whatsapp/conversations/${id}/pause`),
+    resumeWhatsAppAgent: (id: string) =>
+      request<WhatsAppPause>("POST", `/whatsapp/conversations/${id}/resume`),
     searchKnowledge: (query: string) =>
       request<{ results: SearchResult[] }>("POST", "/knowledge/search", {
         query,

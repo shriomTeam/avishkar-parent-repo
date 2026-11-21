@@ -100,7 +100,14 @@ class FakeWhatsAppGraph:
         return "+1 555 010 0000"
 
     async def send_text(self, phone_number_id: str, token: str, to: str, body: str) -> str:
-        return "wamid.fake"
+        return f"wamid.fake.{uuid.uuid4().hex}"  # Meta gives every message its own id
+
+
+class ScriptedWhatsAppModel:
+    """Answers every WhatsApp message with a fixed line that repeats it, so browser tests never reach Vertex."""
+
+    async def reply(self, system: str, turns: list, *, search=None) -> str:
+        return f"Agent reply to: {turns[-1][1]}"
 
 
 class FakeNumbers:
