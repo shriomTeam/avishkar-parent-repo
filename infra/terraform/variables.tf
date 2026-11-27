@@ -164,3 +164,20 @@ variable "email_old_payload_keys" {
     error_message = "Enabled email key compatibility requires comma-separated, 44-character URL-safe base64 Fernet keys (no spaces)."
   }
 }
+
+variable "admin_enabled" {
+  type        = bool
+  default     = false
+  description = "Run the admin console as its own Cloud Run service. Terraform generates its password and session key in Secret Manager."
+}
+
+variable "admin_username" {
+  type        = string
+  default     = "avishkar-admin"
+  description = "The admin console's user name. Stored in Secret Manager next to the generated password."
+
+  validation {
+    condition     = length(trimspace(var.admin_username)) >= 3
+    error_message = "admin_username must be at least 3 characters."
+  }
+}

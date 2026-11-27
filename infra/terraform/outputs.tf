@@ -52,3 +52,8 @@ output "files_bucket" {
   description = "Private bucket for feature files; voice recordings go under voice-recordings/."
   value       = module.storage.name
 }
+
+output "admin_url" {
+  description = "Address of the admin console. Empty until admin_enabled is true."
+  value       = var.admin_enabled ? local.admin_url : ""
+}
