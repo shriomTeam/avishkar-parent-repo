@@ -1,0 +1,9 @@
+{
+  "name": "@clinic/admin",
+  "private": true,
+  "scripts": {
+    "dev": "PORT=8003 uv run python -m clinic_admin.app",
+    "lint": "uv run ruff check src tests",
+    "test": "uv run pytest tests -q"
+  }
+}

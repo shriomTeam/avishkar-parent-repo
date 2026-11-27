@@ -20,3 +20,7 @@ twilio_enabled = true
 # The WhatsApp agent as its own Cloud Run service. It needs WHATSAPP_APP_SECRET and WHATSAPP_VERIFY_TOKEN (secrets)
 # in the GitHub environment "production"; the Terraform plan fails without them.
 whatsapp_enabled = true
+
+# The admin console as its own Cloud Run service. Terraform generates the password and session key in Secret Manager,
+# so nothing needs adding to GitHub first. Set to true to create it; see admin.tf for how to read the sign-in details.
+admin_enabled = true
